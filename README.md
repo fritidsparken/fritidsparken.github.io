@@ -8,8 +8,6 @@ Ett statiskt aktivitetsverktyg för fritidshem F–6. 24 färdiga aktiviteter me
 
 Nuvarande Pages-adress: https://fritidsparken.se
 
-Adressen https://fritidsparken.github.io/ kräver att ägaren är användaren eller organisationen fritidsparken, med ett repository med namnet fritidsparken.github.io.
-
 ## Utveckling
 
 Ingen byggprocess eller API-nyckel behövs. Kör exempelvis python3 -m http.server 8080 i projektmappen. Innehåll och logik finns i app.js, design i style.css.
