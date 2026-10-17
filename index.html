@@ -233,7 +233,26 @@ html,body{max-width:100%;overflow-x:clip}
 .brand:first-child:hover>.site-name,.brand:first-child:focus-visible>.site-name,.brand.plugg-brand:hover>.plugg-name,.brand.plugg-brand:focus-visible>.plugg-name{border-color:var(--green);box-shadow:0 0 0 2px color-mix(in srgb,var(--green) 14%,transparent)}
 .team-warning{padding:12px 14px;background:var(--mint);border-radius:12px}
 @media(max-width:540px){.card{padding:12px;gap:10px}.ctext strong{font-size:15px}.ctext small{font-size:13px}}
-</style></head>
+</style><style>
+@media(max-width:480px) and (orientation:portrait){
+  .modalback{padding:8px;align-items:center}
+  .modal{display:grid;grid-template-columns:52px minmax(0,1fr);column-gap:10px;row-gap:0;width:100%;max-height:calc(100dvh - 16px);overflow-y:auto;align-content:start;padding:16px}
+  .modal .big{grid-column:1;grid-row:1 / span 2;align-self:center;font-size:48px;line-height:1;margin:0}
+  .modal .eyebrow{grid-column:2;grid-row:1;align-self:end;font-size:12px;line-height:1.2;margin:0 0 3px}
+  .modal h2{grid-column:2;grid-row:2;font-size:21px;line-height:1.16;margin:0;padding-right:34px}
+  .modal #mdesc{grid-column:1 / -1;font-size:14px;line-height:1.35;margin:10px 0 5px}
+  .modal #mPreview{display:none!important}
+  .modal .steps{grid-column:1 / -1;margin:5px 0 8px;padding:10px 12px;font-size:14px;line-height:1.35}
+  .modal .steps ol{padding-left:19px;margin:3px 0}
+  .modal .steps li{margin:2px 0}
+  .modal #mtime,.modal #progress,.modal .actions{grid-column:1 / -1}
+  .modal #mtime{margin:0 0 4px;padding:6px 10px;font-size:13px}
+  .modal #progress{margin:3px 0}
+  .modal .actions{gap:7px}
+  .modal .primary,.modal .secondary{padding:9px 11px;font-size:14px}
+}
+</style>
+</head>
 <body>
 <header class="top"><div class="topin"><a class="brand" href="https://fritidsparken.se/" aria-label="Gå till Fritidsparken.se"><span>🌳</span><span class="site-name">Fritidsparken.se</span></a><span class="brand-switch" aria-hidden="true"></span><a class="brand plugg-brand" href="https://pluggparken.se/" aria-label="Gå till Pluggparken.se"><span class="plugg-icon"><img src="https://pluggparken.se/favicon.svg" alt=""></span><span class="plugg-name">Pluggparken.se</span></a><nav class="nav"><button data-jump="Aktiviteter">Aktiviteter</button><button data-jump="Om Fritidsparken">Om sidan</button></nav><button type="button" class="iconbtn" id="theme" aria-label="Byt tema" aria-pressed="false">🌙</button><button type="button" class="profile" id="profile">🦊 Hej där!</button></div></header>
 <main class="wrap">
