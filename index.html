@@ -241,14 +241,15 @@ html,body{max-width:100%;overflow-x:clip}
   .modal .eyebrow{grid-column:2;grid-row:1;align-self:end;font-size:12px;line-height:1.2;margin:0 0 3px}
   .modal h2{grid-column:2;grid-row:2;font-size:21px;line-height:1.16;margin:0;padding-right:34px}
   .modal #mdesc{grid-column:1 / -1;font-size:14px;line-height:1.35;margin:10px 0 5px}
-  .modal #mPreview{display:none!important}
-  .modal .steps{grid-column:1 / -1;margin:5px 0 8px;padding:10px 12px;font-size:14px;line-height:1.35}
+  .modal #mPreview:not(.hide){grid-column:1 / -1;grid-row:5;display:block!important;margin:5px 0 8px;padding:8px 10px}
+  .modal #mPreview:not(.hide) strong{font-size:12px;margin-bottom:4px}
+  .modal #mPreview:not(.hide) img{width:min(100%,220px);max-height:125px;aspect-ratio:auto;object-fit:contain}
+  .modal .steps{grid-column:1 / -1;grid-row:4;margin:5px 0 8px;padding:10px 12px;font-size:14px;line-height:1.35}
   .modal .steps ol{padding-left:19px;margin:3px 0}
   .modal .steps li{margin:2px 0}
-  .modal #mtime,.modal #progress,.modal .actions{grid-column:1 / -1}
-  .modal #mtime{margin:0 0 4px;padding:6px 10px;font-size:13px}
-  .modal #progress{margin:3px 0}
-  .modal .actions{gap:7px}
+  .modal #mtime{grid-column:1 / -1;grid-row:6;margin:0 0 4px;padding:6px 10px;font-size:13px}
+  .modal #progress{grid-column:1 / -1;grid-row:7;margin:3px 0}
+  .modal .actions{grid-column:1 / -1;grid-row:8;gap:7px}
   .modal .primary,.modal .secondary{padding:9px 11px;font-size:14px}
 }
 </style>
