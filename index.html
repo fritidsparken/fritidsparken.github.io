@@ -114,7 +114,7 @@ body.dark .hero p{color:#e0eadf}
 }
 @media(max-width:360px){.topin{padding-left:9px;padding-right:9px;column-gap:6px}.topin>.brand:first-child,.topin>.brand.plugg-brand{font-size:13px;gap:3px}}
 
-@media(max-width:760px) and (orientation:portrait){.topin>.profile{display:none!important}}
+@media(max-width:760px) and (orientation:portrait){.topin{grid-template-columns:auto auto minmax(0,1fr);grid-template-rows:auto;align-items:center;column-gap:clamp(4px,1.6vw,10px)}.topin>.profile{display:none!important}.topin>.iconbtn{grid-column:3;grid-row:1;justify-self:end}}
 </style>
 </head>
 <body>
