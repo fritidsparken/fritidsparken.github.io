@@ -115,10 +115,26 @@ body.dark .hero p{color:#e0eadf}
 @media(max-width:360px){.topin{padding-left:9px;padding-right:9px;column-gap:6px}.topin>.brand:first-child,.topin>.brand.plugg-brand{font-size:13px;gap:3px}}
 
 @media(max-width:760px) and (orientation:portrait){.topin{grid-template-columns:auto auto auto minmax(0,1fr);grid-template-rows:auto;align-items:center;column-gap:clamp(4px,1.6vw,10px)}.topin>.brand:first-child{grid-column:1;grid-row:1}.topin>.brand-switch{display:grid;grid-column:2;grid-row:1;place-items:center;min-width:clamp(35px,11vw,50px);color:var(--muted);font-size:clamp(15px,4vw,19px);font-weight:900;letter-spacing:-2px;line-height:1;white-space:nowrap;transform:scaleX(.5625)}.topin>.brand.plugg-brand{grid-column:3;grid-row:1}.topin>.profile{display:none!important}.topin>.iconbtn{grid-column:4;grid-row:1;justify-self:end}}
+
+/* En rad för hela mobilhuvudet i stående läge */
+@media(max-width:760px) and (orientation:portrait){
+ .topin{display:grid;grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr) auto;grid-template-rows:auto;align-items:center;column-gap:clamp(4px,1.3vw,8px);height:auto;min-height:0;padding:9px clamp(8px,2.6vw,14px)}
+ .topin>.brand:first-child{grid-column:1;grid-row:1;min-width:0;width:100%;margin:0;font-size:clamp(11px,3.5vw,15px);letter-spacing:-.35px;gap:4px;white-space:nowrap}
+ .topin>.brand:first-child span{width:24px;height:24px;flex:0 0 24px;margin:0;border-radius:8px;font-size:14px}
+ .topin>.brand-switch{display:grid;grid-column:2;grid-row:1;place-items:center;width:28px;min-width:0;height:20px;position:relative;overflow:visible;transform:none;color:var(--muted);font-size:0}
+ .topin>.brand-switch:before{content:"";position:absolute;left:2px;right:2px;top:9px;height:2px;background:currentColor}
+ .topin>.brand-switch:after{content:"‹ ›";position:absolute;left:0;top:1px;padding:0 1px;background:var(--paper);font:900 14px/16px system-ui,sans-serif;letter-spacing:3px;white-space:nowrap}
+ .topin>.brand.plugg-brand{grid-column:3;grid-row:1;min-width:0;width:100%;margin:0;font-size:clamp(11px,3.5vw,15px);letter-spacing:-.35px;gap:4px;white-space:nowrap}
+ .topin>.brand.plugg-brand .plugg-icon{width:24px;height:24px;flex:0 0 24px;margin:0;border-radius:0}
+ .topin>.brand.plugg-brand .plugg-name{display:inline!important;min-width:0;width:auto;height:auto;overflow:visible;text-overflow:clip;white-space:nowrap;background:transparent;margin:0;padding:0;font-size:inherit;letter-spacing:inherit}
+ .topin>.nav{display:none}
+ .topin>.iconbtn{grid-column:4;grid-row:1;justify-self:end;flex:0 0 auto;padding:5px 6px;font-size:18px}
+ .topin>.profile{display:none!important}
+}
 </style>
 </head>
 <body>
-<header class="top"><div class="topin"><a class="brand" href="#"><span>🌳</span>Fritidsparken</a><span class="brand-switch" aria-hidden="true">←──────→</span><a class="brand plugg-brand" href="https://pluggparken.se/" target="_blank" rel="noopener noreferrer" aria-label="Besök Pluggparken.se"><span class="plugg-icon"><img src="https://pluggparken.se/favicon.svg" alt=""></span><span class="plugg-name">Pluggparken</span></a><nav class="nav"><button data-jump="Aktiviteter">Aktiviteter</button><button data-jump="Om Fritidsparken">Om sidan</button></nav><button class="iconbtn" id="theme" aria-label="Byt tema">🌙</button><button class="profile" id="profile">🦊 Hej där!</button></div></header>
+<header class="top"><div class="topin"><a class="brand" href="#"><span>🌳</span>Fritidsparken</a><span class="brand-switch" aria-hidden="true"></span><a class="brand plugg-brand" href="https://pluggparken.se/" target="_blank" rel="noopener noreferrer" aria-label="Besök Pluggparken.se"><span class="plugg-icon"><img src="https://pluggparken.se/favicon.svg" alt=""></span><span class="plugg-name">Pluggparken</span></a><nav class="nav"><button data-jump="Aktiviteter">Aktiviteter</button><button data-jump="Om Fritidsparken">Om sidan</button></nav><button class="iconbtn" id="theme" aria-label="Byt tema">🌙</button><button class="profile" id="profile">🦊 Hej där!</button></div></header>
 <main class="wrap">
 <section class="hero"><div><div class="eyebrow">Välkommen till Fritidsparken</div><h1>Vad vill du hitta på?</h1><p>Välj en idé och ha kul tillsammans.</p></div><div class="heroart" aria-hidden="true">🦊</div></section>
 <div class="sectionhead" id="Aktiviteter"><div><h2>Utforska aktiviteter</h2><p>Små och stora idéer för en rolig stund på fritids.</p></div><div class="tools"><input class="search" id="search" placeholder="🔎 Sök aktivitet…" aria-label="Sök aktivitet"></div></div>
