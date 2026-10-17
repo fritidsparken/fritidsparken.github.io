@@ -6,7 +6,7 @@ Ett statiskt aktivitetsverktyg för fritidshem F–6. 24 färdiga aktiviteter me
 
 Öppna Settings → Pages. Välj Deploy from a branch, grenen main och mappen / (root). Spara.
 
-Nuvarande Pages-adress: https://fritidsparken.github.io/
+Nuvarande Pages-adress: https://fritidsparken.se
 
 Adressen https://fritidsparken.github.io/ kräver att ägaren är användaren eller organisationen fritidsparken, med ett repository med namnet fritidsparken.github.io.
 
