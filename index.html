@@ -151,6 +151,21 @@ body.dark .hero p{color:#e0eadf}
 .draw-svg .canvas{fill:var(--paper);stroke:var(--line);stroke-width:2}.draw-svg .line{stroke:#51443b;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;fill:none}.draw-svg .animal-fill{fill:var(--fur)}.draw-svg .inner-fill{fill:var(--inner);stroke:#51443b;stroke-width:2.5}.draw-svg .mane{fill:#eaa93e;stroke:#a9682d;stroke-width:3}.draw-svg .muzzle{fill:#fff4dc;stroke:#51443b;stroke-width:2.5}.draw-svg .dark-fill{fill:#303235;stroke:#303235;stroke-width:2}.draw-svg .eye{fill:#fff;stroke:#51443b;stroke-width:2.5}.draw-svg .eye-ring{fill:#f5dca2;stroke:#51443b;stroke-width:2.5}.draw-svg .nose{fill:#443433;stroke:#443433;stroke-width:2}.draw-svg .beak{fill:#f3a83b;stroke:#51443b;stroke-width:2.5}.draw-svg .shell-fill{fill:#4f9663;stroke:#426d4b;stroke-width:3}.draw-svg .spot{fill:#ca8f42;stroke:#765a35;stroke-width:2}.draw-svg .detail{fill:none;stroke:#74553e;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round}.drawing-filters{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 18px}.drawing-filters .mandala-type{flex:0 0 auto}
 .filters{display:flex;flex-wrap:wrap;overflow:visible;overscroll-behavior:initial;white-space:normal}.filters .filter{flex:0 0 auto}
 @media(max-width:480px){.filters{display:flex;flex-wrap:wrap;overflow:visible;overscroll-behavior:initial;scrollbar-width:auto;padding-bottom:10px}.filters .filter{white-space:nowrap;flex:0 0 auto}}
+
+/* Mobil i liggande läge: håll logotyp och namn ihop på en rad */
+@media(max-width:1100px) and (orientation:landscape){
+ .topin{display:flex;flex-wrap:nowrap;align-items:center;justify-content:flex-start;gap:clamp(5px,1vw,12px);width:100%;height:auto;min-height:60px;padding:8px clamp(10px,2vw,20px)}
+ .topin>.brand:first-child,.topin>.brand.plugg-brand{display:flex;flex:0 0 auto;align-items:center;gap:6px;width:auto;min-width:0;margin:0;font-size:clamp(13px,1.8vw,19px);line-height:1;letter-spacing:-.45px;white-space:nowrap}
+ .topin>.brand:first-child span{display:grid;width:clamp(25px,3vw,32px);height:clamp(25px,3vw,32px);flex:0 0 clamp(25px,3vw,32px);margin:0;border-radius:9px;font-size:15px}
+ .topin>.brand.plugg-brand .plugg-icon{width:clamp(25px,3vw,32px);height:clamp(25px,3vw,32px);flex:0 0 clamp(25px,3vw,32px);margin:0;border-radius:0}
+ .topin>.brand.plugg-brand .plugg-name{display:inline!important;width:auto;height:auto;margin:0;padding:0;background:transparent;font-size:inherit;letter-spacing:inherit;white-space:nowrap}
+ .topin>.brand-switch{display:grid;place-items:center;position:relative;flex:0 0 clamp(26px,3vw,34px);width:clamp(26px,3vw,34px);min-width:0;height:20px;margin:0;padding:0;border-radius:0;background:transparent!important;transform:none;font-size:0;color:var(--muted)}
+ .topin>.brand-switch:before{content:"";position:absolute;left:2px;right:2px;top:9px;height:2px;background:currentColor}
+ .topin>.brand-switch:after{content:"‹ ›";position:absolute;left:0;top:1px;padding:0 1px;background:var(--paper);font:900 13px/16px system-ui,sans-serif;letter-spacing:2px;white-space:nowrap}
+ .topin>.nav{display:none}
+ .topin>.profile{display:none!important}
+ .topin>.iconbtn{display:block;flex:0 0 auto;margin-left:auto;padding:5px 7px;font-size:18px;line-height:1}
+}
 </style>
 </head>
 <body>
