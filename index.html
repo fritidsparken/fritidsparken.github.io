@@ -1174,7 +1174,7 @@ function paint(canvas){
    }
    tc.putImageData(frame,0,0);
    const x=LEFT+i*(PW+GAP);ctx.drawImage(tile,x+2,renderTop+2);
-   if(file==="owl.png"&&i===4){ctx.fillStyle="#082c1d";ctx.fillRect(x+PW-16,renderTop+6,12,PH-12)}
+   if(file==="owl.png"&&i===4){ctx.fillStyle="#082c1d";ctx.fillRect(x+PW-28,renderTop+2,24,PH-4)}
    rounded(ctx,x,renderTop,PW,PH,17);
    if(missingNumbers.has(file)){
     const cx=x+44,cy=renderTop+43;ctx.beginPath();ctx.arc(cx,cy,34,0,Math.PI*2);
@@ -1186,7 +1186,7 @@ function paint(canvas){
   canvas.dataset.rendered="1";delete canvas.dataset.loading;
  };
  img.onerror=()=>{delete canvas.dataset.loading;canvas.dataset.failed="1"};
- img.src="assets/drawing-guides/"+file+"?v=20261018-unified";
+ img.src="assets/drawing-guides/"+file+"?v=20261018-owl-edge";
 }
 window.drawingGuideSprite=function(a){
  return '<canvas class="draw-guide-sprite" data-drawing-guide="'+a.id+'" width="1993" height="789" role="img" aria-label="Fem enhetliga ritsteg för '+a.name+'; sista steget är färglagt"></canvas>';
