@@ -1,6 +1,6 @@
 # Egna vårbilder för Fritidsparken
 
-20 nya motiv genererade med det inbyggda bildgenereringsverktyget den 18 oktober 2026. Varje motiv har en WebP-förhandsvisning och en separat A4-PDF. De tidigare säsongsmallarna har ersatts enligt beställningen.
+27 nya motiv genererade med det inbyggda bildgenereringsverktyget den 18 oktober 2026. Varje motiv har en WebP-förhandsvisning och en separat A4-PDF. De tidigare säsongsmallarna har ersatts enligt beställningen.
 
 ## Gemensam bildprompt
 
@@ -28,3 +28,13 @@ Use case: illustration-story. Asset type: original printable spring coloring pag
 18. **Trollsländans damm** — a large elegant dragonfly with patterned transparent wing sections above water lilies and pond ripples, leaf wreath
 19. **Maskrosor och frön** — a circular composition of dandelion flowers, seed heads with clear open sections, flying seeds and jagged leaves
 20. **Vårens stora mandala** — a true radial spring mandala with eightfold symmetry: rings of tulips, butterflies, leaves, daisies and petal shapes, varied large enclosed coloring spaces
+
+## Tillagda motiv
+
+21. **Igelkottens vårpromenad** — a friendly hedgehog emerging from leaves in a spring garden, surrounded by primroses, curling fern shoots and one butterfly
+22. **Andfamilj i dammen** — a mother duck and three fluffy ducklings swimming in a small pond with water lilies, cattails and spring blossoms
+23. **Vattenkanna med vårblommor** — a beautifully patterned watering can overflowing with tulips, daffodils, daisies and flowing leaves, surrounded by a soft oval botanical wreath
+24. **Svalornas hemkomst** — two elegant swallows flying around a blossoming branch, spring clouds and a wreath of flowering vines, clear enclosed wing-feather patterns
+25. **Snödroppar i vårsolen** — a generous botanical composition of snowdrop flowers, crocuses, curling leaves and a little sun with outlined rays, oval composition
+26. **Kycklingar bland blommor** — three fluffy friendly chicks exploring a meadow with daisies, tulips, small patterned eggshells and a loose flower wreath
+27. **Vårkrans med fjärilar** — a true radial spring mandala with a central primrose, concentric rings of leaves, cherry blossoms, butterfly wings and broad petal patterns, sixfold symmetry, large closed coloring spaces
