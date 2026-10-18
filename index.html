@@ -1206,4 +1206,97 @@ body.christmas #seasonalCraftCta::after{background:radial-gradient(ellipse,#e6bf
 .draw-modal-guides .draw-guide-sprite{max-height:68vh}
 .draw-card .draw-guide-sprite{aspect-ratio:2.53/1;border-radius:17px 17px 0 0}
 @media(max-width:760px){.draw-modal-guides .draw-guide-sprite{max-height:none}}
-</style></body></html>
+</style><style id="drawing-guides-one-size-theme">
+.draw-page .draw-grid{align-items:start}
+.draw-page .draw-card{min-width:0;overflow:hidden}
+.draw-page .draw-card .draw-guide-sprite,
+.draw-modal-guides .draw-guide-sprite{
+ display:block!important;width:100%!important;height:auto!important;
+ aspect-ratio:1993 / 789!important;object-fit:fill!important;
+ padding:0!important;border:0!important;filter:none!important;
+ mix-blend-mode:normal!important;background:#100907!important;
+}
+.draw-page .draw-card .draw-guide-sprite{border-radius:16px 16px 0 0!important}
+.draw-modal-guides{background:#100907!important}
+</style><script id="drawing-guides-unified-renderer">
+(()=>{
+const crops={
+"boat-chalkboard.png":[63,160,1937,579],"butterfly.png":[39,124,1954,644],
+"car-chalkboard.png":[61,161,1939,580],"cat-slate-guide.png":[62,159,1938,587],
+"dinosaur.png":[39,112,1953,666],"dog-chalkboard.png":[42,214,1734,672],
+"dolphin.png":[39,137,1954,663],"dragon.png":[39,139,1953,652],
+"elephant-chalkboard.png":[36,210,1746,659],"flower-chalkboard.png":[63,161,1936,578],
+"fox-guide-final.webp":[32,116,1568,504],"giraffe.png":[39,103,1954,701],
+"horse.png":[39,110,1953,662],"house-chalkboard.png":[34,224,1741,658],
+"kite-chalkboard.png":[62,160,1936,579],"koala.png":[39,146,1953,633],
+"lion-guide.webp":[32,161,1568,494],"owl.png":[39,135,1953,656],
+"panda.png":[39,134,1954,651],"peacock.png":[39,118,1954,666],
+"penguin.png":[39,141,1953,656],"phoenix.png":[39,119,1954,704],
+"rabbit-chalkboard.png":[42,184,1733,689],"rocket-chalkboard.png":[44,172,1737,660],
+"snake.png":[36,148,1962,642],"tiger.png":[39,122,1954,659],
+"tree-chalkboard.png":[61,162,1938,579],"turtle.png":[39,150,1953,664],
+"umbrella-chalkboard.png":[63,160,1938,579],"wolf.png":[39,120,1953,623]
+};
+const W=1993,H=789,PW=372,PH=498,GAP=16,LEFT=34,TOP=147;
+const missingNumbers=new Set(["fox-guide-final.webp","lion-guide.webp"]);
+function rounded(ctx,x,y,w,h,r){
+ ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.strokeStyle="#416b4e";ctx.lineWidth=4;ctx.stroke();
+}
+function paint(canvas){
+ if(canvas.dataset.rendered||canvas.dataset.loading)return;
+ const id=canvas.dataset.drawingGuide;
+ const file=window.drawingGuideAsset?.[id];
+ const crop=crops[file];
+ if(!file||!crop)return;
+ canvas.dataset.loading="1";
+ const img=new Image();
+ img.onload=()=>{
+  canvas.width=W;canvas.height=H;
+  const ctx=canvas.getContext("2d",{willReadFrequently:true});
+  ctx.fillStyle="#100907";ctx.fillRect(0,0,W,H);
+  const [sx0,sy0,sx1,sy1]=crop,cellWidth=(sx1-sx0)/5,sh=sy1-sy0;
+  for(let i=0;i<5;i++){
+   const sx=sx0+i*cellWidth+cellWidth*.012,sw=cellWidth*.976;
+   const tile=document.createElement("canvas");tile.width=PW-4;tile.height=PH-4;
+   const tc=tile.getContext("2d",{willReadFrequently:true});
+   tc.fillStyle="#082c1d";tc.fillRect(0,0,tile.width,tile.height);
+   const scale=Math.min(tile.width/sw,tile.height/sh);
+   const dw=sw*scale,dh=sh*scale,dx=(tile.width-dw)/2,dy=(tile.height-dh)/2;
+   tc.drawImage(img,sx,sy0,sw,sh,dx,dy,dw,dh);
+   const frame=tc.getImageData(0,0,tile.width,tile.height),p=frame.data;
+   for(let k=0;k<p.length;k+=4){
+    const dark=Math.max(p[k],p[k+1],p[k+2])<78,amt=dark?.40:.08;
+    p[k]=p[k]*(1-amt)+7*amt;p[k+1]=p[k+1]*(1-amt)+43*amt;p[k+2]=p[k+2]*(1-amt)+28*amt;
+   }
+   tc.putImageData(frame,0,0);
+   const x=LEFT+i*(PW+GAP);ctx.drawImage(tile,x+2,TOP+2);
+   rounded(ctx,x,TOP,PW,PH,17);
+   if(missingNumbers.has(file)){
+    const cx=x+44,cy=TOP+43;ctx.beginPath();ctx.arc(cx,cy,34,0,Math.PI*2);
+    ctx.fillStyle="#ff6818";ctx.fill();ctx.fillStyle="#fff9ef";
+    ctx.font="700 46px system-ui,sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText(String(i+1),cx,cy+1);
+   }
+  }
+  canvas.dataset.rendered="1";delete canvas.dataset.loading;
+ };
+ img.onerror=()=>{delete canvas.dataset.loading;canvas.dataset.failed="1"};
+ img.src="assets/drawing-guides/"+file+"?v=20261018-unified";
+}
+window.drawingGuideSprite=function(a){
+ return '<canvas class="draw-guide-sprite" data-drawing-guide="'+a.id+'" width="1993" height="789" role="img" aria-label="Fem enhetliga ritsteg för '+a.name+'; sista steget är färglagt"></canvas>';
+};
+const visibility=window.IntersectionObserver?new IntersectionObserver(entries=>{
+ entries.forEach(e=>{if(e.isIntersecting){paint(e.target);visibility.unobserve(e.target)}});
+},{rootMargin:"300px"}):null;
+function mount(root){
+ const list=[];
+ if(root?.matches?.("canvas[data-drawing-guide]"))list.push(root);
+ root?.querySelectorAll?.("canvas[data-drawing-guide]").forEach(c=>list.push(c));
+ list.forEach(c=>{if(c.dataset.watch)return;c.dataset.watch="1";visibility?visibility.observe(c):paint(c)});
+}
+const observer=new MutationObserver(records=>records.forEach(rec=>rec.addedNodes.forEach(n=>{if(n.nodeType===1)mount(n)})));
+observer.observe(document.body,{childList:true,subtree:true});
+mount(document);
+})();
+</script></body></html>
