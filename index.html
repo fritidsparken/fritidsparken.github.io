@@ -1245,7 +1245,7 @@ function rounded(ctx,x,y,w,h,r){
 function paint(canvas){
  if(canvas.dataset.rendered||canvas.dataset.loading)return;
  const id=canvas.dataset.drawingGuide;
- const file=window.drawingGuideAsset?.[id];
+ const file=drawingGuideAsset?.[id];
  const crop=crops[file];
  if(!file||!crop)return;
  canvas.dataset.loading="1";
