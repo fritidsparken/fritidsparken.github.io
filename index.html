@@ -616,7 +616,10 @@ body.halloween .top::before{
 @media(max-width:760px) and (orientation:portrait){
  .topin{grid-template-columns:minmax(0,1fr) 0 minmax(0,1fr) auto!important;column-gap:4px!important}
  .topin>.brand-switch{display:none!important;width:0!important;min-width:0!important}
- .topin>.brand:first-child,.topin>.brand.plugg-brand{font-size:clamp(11px,3vw,13px)!important;gap:3px!important}
+ .topin>.brand:first-child,.topin>.brand.plugg-brand{font-size:clamp(16.5px,4.5vw,19.5px)!important;gap:3px!important}
+ .topin>.brand:first-child>span.site-logo,.topin>.brand.plugg-brand .plugg-icon{width:20px;height:20px;flex:0 0 20px}
+ .topin>.brand:first-child .site-name,.topin>.brand.plugg-brand .plugg-name{letter-spacing:-.55px!important}
+ .topin>.iconbtn{min-width:30px;width:30px;height:30px;padding:3px!important;font-size:16px!important}
  .topin>.brand:first-child .site-name,.topin>.brand.plugg-brand .plugg-name{
   min-width:0!important;max-width:100%;overflow:visible!important;text-overflow:clip!important;
   flex:0 1 auto!important;white-space:nowrap!important
