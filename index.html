@@ -394,14 +394,15 @@ function seasonalMandalaItems(){
   lines.push('<rect x="34" y="34" width="732" height="932" rx="20" fill="#fff" stroke="#111" stroke-width="3"/>');
   lines.push('<circle cx="400" cy="500" r="342" fill="none" stroke="#111" stroke-width="2.6"/>');
   for(let layer=0;layer<rings;layer++){
-   const radius=78+layer*48, sx=0.52+((index+layer)%4)*0.08, sw=1.7+(layer%2)*.3;
-   lines.push('<circle cx="400" cy="500" r="'+radius+'" fill="none" stroke="#111" stroke-width="2"/>');
-   for(let j=0;j<count;j++){
-    const angle=(360/count)*j+rotate+layer*7;
-    lines.push('<g transform="translate(400 500) rotate('+angle+') translate(0 -'+radius+') scale('+sx+')"><path d="'+motif[1]+'" fill="none" stroke="#111" stroke-width="'+sw+'" stroke-linecap="round" stroke-linejoin="round"/></g>');
+   const radius=72+layer*53, layerMotif=motifs[(index*2+layer*2+Math.floor(index/5))%motifs.length], layerCount=Math.max(6,count+((layer%3)-1)*2), sx=0.5+((index+layer*2)%5)*0.075, sw=1.6+((index+layer)%3)*.25;
+   lines.push('<circle cx="400" cy="500" r="'+radius+'" fill="none" stroke="#111" stroke-width="'+(1.5+(layer%3)*.35)+'" stroke-dasharray="'+(layer%2?'':'2 5')+'"/>');
+   for(let j=0;j<layerCount;j++){
+    const angle=(360/layerCount)*j+rotate+layer*13+((index%3)*4);
+    const scale=sx*(0.82+((j+index+layer)%4)*0.09);
+    lines.push('<g transform="translate(400 500) rotate('+angle+') translate(0 -'+radius+') scale('+scale+')"><path d="'+layerMotif[1]+'" fill="none" stroke="#111" stroke-width="'+sw+'" stroke-linecap="round" stroke-linejoin="round"/></g>');
    }
   }
-  const centerMotif=motifs[(index+2)%motifs.length];
+  const centerMotif=motifs[(index*3+Math.floor(index/5)+2)%motifs.length];
   lines.push('<circle cx="400" cy="500" r="'+(43+(index%4)*8)+'" fill="none" stroke="#111" stroke-width="2.5"/>');
   lines.push('<g transform="translate(400 500) scale(1.25)"><path d="'+centerMotif[1]+'" fill="none" stroke="#111" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g>');
   for(let p=0;p<count*2;p++){
