@@ -660,150 +660,9 @@ const mandalas=[{title:"Blommor & blad",type:"Blommor & blad",img:"https://frees
 {"title":"Ronaldo med fotboll","type":"Fotbollsstjärnor","pdf":"https://mondaymandala.com/wp-content/uploads/Cristiano-Ronaldo-With-Soccer-Ball-Coloring.pdf","preview":"./assets/mandala-previews/070.jpg","src":"https://mondaymandala.com/cristiano-ronaldo-coloring-pages/"},
 {"title":"Ronaldo gör en bicykelspark","type":"Fotbollsstjärnor","pdf":"https://mondaymandala.com/wp-content/uploads/Ronaldo-Bicycle-Kick-Coloring-In.pdf","preview":"./assets/mandala-previews/071.jpg","src":"https://mondaymandala.com/cristiano-ronaldo-coloring-pages/"}];
 
-function seasonalMandalaItems(){
- const themes=[
- {type:"Vår",name:"Vår",items:[
- ["Tulpan","M0 40V-8 M0 -7 C-30 -34 -32 2 0 5 C32 2 30 -34 0 -7Z M0 16Q-23 0 -30 24Q-13 31 0 16 M0 25Q21 5 31 23Q15 32 0 25"],
- ["Tusensköna","M0 -8C-24 -31 -8 -39 0 -17C8 -39 24 -31 0 -8C28 -21 32 -3 8 0C32 4 25 20 3 7C18 30 0 35 0 11C-7 36 -23 25 -5 5C-29 17 -35 1 -9 -3C-33 -13 -22 -28 0 -8Z M0 -4A7 7 0 1 0 0 10A7 7 0 1 0 0 -4Z"],
- ["Fjäril","M0 -4C-12 -30 -39 -36 -36 -12Q-34 1 -8 6Q-30 12 -27 29Q-15 39 0 12Q15 39 27 29Q30 12 8 6Q34 1 36 -12Q39 -36 12 -4Z M0 -7V20 M-23 -14Q-11 -8 -19 0 M23 -14Q11 -8 19 0"],
- ["Bivaxbi","M0 -14A14 14 0 1 0 0 14A14 14 0 1 0 0 -14Z M-8 -11V11 M4 -13V13 M-7 -15Q-20 -33 -26 -17 M7 -15Q20 -33 26 -17 M-23 0H-14 M14 0H23"],
- ["Fågelbo","M-32 5Q0 35 32 5 M-27 13Q0 38 27 13 M-21 -1Q-8 -18 3 -2Q15 -18 27 -1 M4 -5Q20 -18 27 -9Q17 -1 4 -5Z M-2 -6V-20"],
- ["Nyckelpiga","M0 -23A23 23 0 1 0 0 23A23 23 0 1 0 0 -23Z M0 -22V22 M-14 -12A3 3 0 1 0 -14 -6A3 3 0 1 0 -14 -12Z M13 5A3 3 0 1 0 13 11A3 3 0 1 0 13 5Z M-13 8A3 3 0 1 0 -13 14A3 3 0 1 0 -13 8Z M12 -15A3 3 0 1 0 12 -9A3 3 0 1 0 12 -15Z"],
- ["Groda","M-24 0Q-25 -19 -11 -19Q0 -19 0 -7Q0 -19 12 -19Q26 -19 24 0Q21 20 0 22Q-21 20 -24 0Z M-18 -18A7 7 0 1 0 -18 -4A7 7 0 1 0 -18 -18Z M18 -18A7 7 0 1 0 18 -4A7 7 0 1 0 18 -18Z M-10 4Q0 13 10 4"],
- ["Snigel","M-30 13Q-9 5 14 12Q31 9 31 22H-29Z M-7 9A14 14 0 1 0 -7 -19A14 14 0 1 0 -7 9Z M-7 -19Q-18 -4 -7 9 M20 12V-1 M20 -1Q26 -9 31 -2"],
- ["Körsbärsblom","M0 0Q-23 -23 -18 -35Q-14 -47 0 -30Q14 -47 18 -35Q23 -23 0 0Z M0 0Q23 -23 35 -18Q47 -14 30 0Q47 14 35 18Q23 23 0 0Z M0 0Q23 23 18 35Q14 47 0 30Q-14 47 -18 35Q-23 23 0 0Z M0 0Q-23 23 -35 18Q-47 14 -30 0Q-47 -14 -35 -18Q-23 -23 0 0Z M0 -4A4 4 0 1 0 0 4A4 4 0 1 0 0 -4Z"],
- ["Bladskott","M0 30V-25 M0 -8Q-25 -32 -30 -10Q-22 5 0 0 M0 6Q25 -18 30 4Q22 19 0 14 M0 -18Q-5 -40 0 -43Q11 -33 0 -18Z"],
- ["Regndroppe","M0 -36Q-31 2 -24 19A25 25 0 0 0 24 19Q31 2 0 -36Z M-10 16Q-8 27 1 29"],
- ["Fjärilslarv","M-26 0A9 9 0 1 0 -8 0A9 9 0 1 0 -26 0 M-9 0A9 9 0 1 0 9 0A9 9 0 1 0 -9 0 M8 0A9 9 0 1 0 26 0A9 9 0 1 0 8 0 M20 -8Q21 -23 29 -24 M-29 -9Q-24 -21 -17 -22"],
- ["Maskros","M0 30V-12 M0 -12L-22 -28 M0 -12L-12 -40 M0 -12V-44 M0 -12L12 -40 M0 -12L22 -28 M-5 -7L-30 -9 M5 -7L30 -9 M-4 -3L-23 9 M4 -3L23 9"],
- ["Fröplanta","M0 35V-12 M0 -4Q-27 -31 -34 -12Q-24 2 0 2 M0 -11Q26 -39 34 -20Q26 -7 0 -4 M-16 35H17"],
- ["Näckros","M0 25Q-20 12 -20 -2Q-19 -20 0 -31Q19 -20 20 -2Q20 12 0 25Z M-28 25Q-7 28 0 23Q7 28 28 25 M-14 4Q0 -5 14 4 M0 24V34"],
- ["Lamm","M-25 17Q-35 0 -22 -9Q-20 -31 0 -25Q18 -35 23 -12Q37 -2 24 16Q12 28 -10 25Q-27 28 -25 17Z M-12 -2A3 3 0 1 0 -12 4A3 3 0 1 0 -12 -2Z M12 -2A3 3 0 1 0 12 4A3 3 0 1 0 12 -2Z M-7 12Q0 17 7 12"],
- ["Fågelägg","M0 -33C-22 -9 -25 7 -18 20Q-12 34 0 34Q12 34 18 20C25 7 22 -9 0 -33Z M-9 4Q0 -3 9 4 M-9 13Q0 7 9 13"],
- ["Vitsippa","M0 -6Q-18 -28 -9 -35Q0 -38 0 -10Q9 -38 18 -35Q27 -28 5 -6Q32 -17 34 -6Q37 5 7 2Q29 15 20 22Q12 29 0 6Q-4 35 -15 30Q-27 24 -4 3Q-33 14 -35 3Q-36 -9 -6 -6Z M0 -4A4 4 0 1 0 0 4A4 4 0 1 0 0 -4Z"],
- ["Kvastblomma","M0 34V-8 M0 -8Q-30 -31 -22 -42Q-12 -47 0 -21Q10 -49 22 -41Q29 -28 0 -8Z M0 4Q-24 -6 -30 11Q-19 22 0 4 M0 9Q21 -2 30 14Q18 23 0 9"],
- ["Vårfjäril","M0 -5Q-27 -37 -38 -17Q-42 -1 -9 8Q-32 23 -14 33Q-4 34 0 12Q4 34 14 33Q32 23 9 8Q42 -1 38 -17Q27 -37 0 -5Z M0 -10V27 M-24 -19L-15 -12 M24 -19L15 -12"]
- ]},
- {type:"Sommar",name:"Sommar",items:[
- ["Solros","M0 -12Q-17 -34 -8 -42Q0 -47 0 -18Q8 -47 17 -42Q24 -34 5 -12Q32 -28 37 -17Q41 -6 12 -5Q42 4 36 15Q30 25 7 6Q20 34 8 39Q-3 43 -3 12Q-18 39 -27 31Q-34 22 -6 4Q-40 13 -42 2Q-42 -9 -12 -9Z M0 -9A12 12 0 1 0 0 15A12 12 0 1 0 0 -9Z"],
- ["Ananas","M-17 -2Q-20 32 0 35Q20 32 17 -2Z M-17 2L17 26 M17 2L-17 26 M-16 13L14 -5 M-14 28L17 9 M0 -3Q-19 -28 -13 -38Q-1 -38 0 -9Q3 -38 14 -37Q20 -25 2 -3"],
- ["Våg","M-39 -14Q-20 -34 0 -14Q20 6 39 -14 M-39 2Q-20 -18 0 2Q20 22 39 2 M-39 18Q-20 -2 0 18Q20 38 39 18 M-20 -30Q-13 -38 -6 -30"],
- ["Sjöstjärna","M0 -38L9 -12L36 -12L15 4L23 31L0 15L-23 31L-15 4L-36 -12L-9 -12Z M0 -25V-13 M24 -5L14 1 M15 20L7 12 M-15 20L-7 12 M-24 -5L-14 1"],
- ["Snäcka","M-31 24Q-40 -4 -22 -24Q0 -44 24 -27Q38 -16 26 2Q17 17 0 11Q-14 6 -9 -8Q-5 -19 6 -16Q15 -13 10 -5 M-31 24Q0 36 31 24 M-21 18L-10 5 M-10 23L-2 12 M2 25L6 13 M15 23L14 11"],
- ["Sjöfisk","M-36 0Q-8 -27 20 -1L37 -16V16L20 1Q-8 27 -36 0Z M-11 -7A3 3 0 1 0 -11 -1A3 3 0 1 0 -11 -7Z M0 -12L7 0L0 12"],
- ["Sailboat","M0 -25V18 M0 -21L-21 9H0Z M3 -12L24 12H3Z M-30 20Q0 31 30 20"],
- ["Glass","M-25 -29H25L19 12Q0 25 -19 12Z M0 22V34 M-11 34H11 M-15 -19H15 M-13 -5H13"],
- ["Solhatt","M-34 8Q0 -9 34 8Q30 17 -30 17Z M-19 7Q-21 -16 0 -20Q22 -16 19 7 M-8 -17Q-7 -29 0 -29Q9 -28 8 -17"],
- ["Krabba","M-23 -2Q-24 -22 0 -23Q24 -22 23 -2L18 19Q0 29 -18 19Z M-22 5L-39 -4L-38 12L-24 13 M22 5L39 -4L38 12L24 13 M-13 -22L-20 -33 M13 -22L20 -33 M-8 -8A2 2 0 1 0 -8 -4 M8 -8A2 2 0 1 0 8 -4"],
- ["Vattenmelon","M-34 -16A34 34 0 0 0 34 -16 M-28 -8A28 28 0 0 0 28 -8 M-22 0A22 22 0 0 0 22 0 M-12 -12V-7 M0 -14V-9 M12 -12V-7"],
- ["Citron","M-30 0Q-19 -20 0 -19Q19 -20 30 0Q19 20 0 19Q-19 20 -30 0Z M-34 0H-28 M28 0H34 M0 -20Q3 -30 13 -30"],
- ["Palmlöv","M0 34V-25 M0 -4Q-22 -29 -32 -19Q-26 -4 0 4 M0 -10Q17 -38 31 -29Q28 -11 0 -2 M0 8Q-30 -3 -35 13Q-22 24 0 18 M0 18Q17 -1 35 8Q30 23 0 27"],
- ["Fyr","M-13 30H13L9 -16H-9Z M-8 -17H8V-29H-8Z M-16 -30L0 -39L16 -30 M0 -36V-10 M-31 32H31"],
- ["Snorkelmask","M-34 -9Q-32 -29 -7 -25Q0 -23 0 -13Q0 -23 7 -25Q32 -29 34 -9L27 10Q17 17 4 6H-4Q-17 17 -27 10Z M-23 -7Q-17 -14 -7 -8 M23 -7Q17 -14 7 -8 M0 -13V-2"],
- ["Sandcastle","M-31 29V-12H-22V-27H-12V-12H-4V-29H6V-12H17V-23H26V-12H31V29Z M-20 5H-11V14H-20Z M9 5H20V14H9Z M-4 29V17H4V29"],
- ["Bi","M0 -19Q-23 -18 -22 7Q-20 26 0 26Q20 26 22 7Q23 -18 0 -19Z M-13 -14L-9 19 M9 -14L13 19 M-9 -19Q-14 -39 -24 -31 M9 -19Q14 -39 24 -31 M-22 -2H22"],
- ["Båt","M-35 8H35L23 27H-22Z M-8 8V-25L16 8 M-32 33Q0 40 32 33"],
- ["Kokosnöt","M-25 7A25 25 0 1 0 25 7A25 25 0 1 0 -25 7Z M-14 -12A4 4 0 1 0 -14 -4 M0 -16A4 4 0 1 0 0 -8 M14 -12A4 4 0 1 0 14 -4 M-16 -24Q-20 -39 -30 -39 M0 -28Q-2 -43 4 -48 M17 -23Q24 -38 33 -36"],
- ["Solnedgång","M-34 13A34 34 0 0 1 34 13 M-24 13A24 24 0 0 1 24 13 M-12 13A12 12 0 0 1 12 13 M-34 14H34 M-25 22H25 M-16 30H16"],
- 
- ]},
- {type:"Höst",name:"Höst",items:[
- ["Lönnlöv","M0 34L-6 19L-23 27L-18 10L-34 4L-17 -5L-25 -24L-6 -16L0 -36L6 -16L25 -24L17 -5L34 4L18 10L23 27L6 19Z M0 34V-28"],
- ["Ekollon","M-21 -8Q-25 -31 0 -32Q25 -31 21 -8 M-21 -8Q-33 22 -10 31Q0 37 10 31Q33 22 21 -8Z M-12 -21L-6 -29 M0 -22V-31 M12 -21L6 -29 M0 33V39"],
- ["Pumpa","M0 -29Q-24 -39 -29 -13Q-35 17 -13 27Q0 32 0 24Q0 32 13 27Q35 17 29 -13Q24 -39 0 -29Z M0 -28V24 M-15 -28Q-7 -5 -14 22 M15 -28Q7 -5 14 22 M0 -29Q0 -42 10 -45"],
- ["Svamp","M-32 -5Q-30 -35 0 -35Q30 -35 32 -5Z M-12 -5L-17 30H17L12 -5Z M-21 -17H-13 M0 -27V-20 M21 -17H13"],
- ["Räv","M-25 -7L-30 -34L-7 -20Q0 -24 7 -20L30 -34L25 -7Q35 7 22 22Q0 38 -22 22Q-35 7 -25 -7Z M-12 1A3 3 0 1 0 -12 7 M12 1A3 3 0 1 0 12 7 M-6 13Q0 8 6 13 M-25 11L-37 8 M25 11L37 8"],
- ["Ekorre","M-17 24Q-29 10 -19 -6Q-8 -22 8 -14Q22 -6 15 9L5 26Z M-15 -13Q-31 -23 -22 -35Q-8 -40 -5 -23 M11 -10Q24 -24 31 -13Q36 -3 19 2 M-11 -2A3 3 0 1 0 -11 4 M5 -2A3 3 0 1 0 5 4 M-2 8L2 8"],
- ["Uggla","M-25 23L-29 -19L-8 -9L0 -19L8 -9L29 -19L25 23Q0 38 -25 23Z M-21 -20Q-24 -37 -10 -30L-7 -12 M21 -20Q24 -37 10 -30L7 -12 M-11 0A8 8 0 1 0 5 0A8 8 0 1 0 -11 0 M11 0A8 8 0 1 0 27 0A8 8 0 1 0 11 0 M-3 14L0 9L3 14Z"],
- ["Pinecone","M0 -34Q-23 -27 -22 -1Q-20 25 0 35Q20 25 22 -1Q23 -27 0 -34Z M0 -26L-12 -15L0 -5L-12 5L0 15L-9 25 M0 -26L12 -15L0 -5L12 5L0 15L9 25"],
- ["Kastanj","M-25 -4Q-30 -31 0 -32Q30 -31 25 -4 M-25 -4Q-38 21 -14 29Q0 34 14 29Q38 21 25 -4Z M-17 -17L-8 -27 M0 -19V-30 M17 -17L8 -27"],
- ["Kråka","M-29 3Q-26 -20 -4 -17Q14 -15 15 2Q30 0 35 7L16 12Q9 30 -12 24Q-28 19 -29 3Z M-8 -5A3 3 0 1 0 -8 1 M-5 9Q2 6 7 12 M-19 22L-25 31 M-3 24L-5 33"],
- ["Päron","M0 -31Q-8 -15 -19 -11Q-34 -4 -26 16Q-18 37 0 28Q18 37 26 16Q34 -4 19 -11Q8 -15 0 -31Z M4 -25Q10 -36 20 -34"],
- ["Kotte","M0 -35Q-20 -22 -17 4Q-14 30 0 34Q14 30 17 4Q20 -22 0 -35Z M0 -26L-11 -16L0 -7L-11 2L0 11L-8 23 M0 -26L11 -16L0 -7L11 2L0 11L8 23"],
- ["Majskolv","M-15 -26Q-25 0 -13 29Q0 37 13 29Q25 0 15 -26Z M-9 -20L-6 -12 M4 -20L7 -12 M-9 -5L-5 3 M5 -5L9 3 M-8 10L-4 18 M5 10L8 18 M-24 28Q-34 1 -15 -6 M24 28Q34 1 15 -6"],
- ["Igelkott","M-30 15Q-35 -2 -20 -11L-31 -23L-8 -18L-1 -32L8 -17L24 -27L18 -10Q33 -3 28 16Q15 34 -12 27Q-28 25 -30 15Z M-10 4A3 3 0 1 0 -10 10 M22 6L30 9"],
- ["Äpple","M0 -20Q-23 -36 -31 -12Q-39 13 -19 28Q-4 37 0 28Q4 37 19 28Q39 13 31 -12Q23 -36 0 -20Z M0 -20Q-3 -35 10 -39 M0 -29Q13 -42 22 -33"],
- ["Lövkvist","M-28 29Q0 8 28 -29 M-17 15Q-35 9 -31 -7Q-12 -6 -8 8 M-7 6Q-17 -12 -3 -24Q10 -14 0 0 M5 -5Q7 -25 24 -26Q27 -8 11 0 M-23 23Q-9 19 -8 31"],
- ["Fladdermus","M0 -4Q-12 -31 -31 -27L-24 -5L-38 8L-16 6L0 25L16 6L38 8L24 -5L31 -27Q12 -31 0 -4Z M-10 -4A2 2 0 1 0 -10 0 M10 -4A2 2 0 1 0 10 0"],
- ["Höstkrans","M0 -29A29 29 0 1 0 0 29A29 29 0 1 0 0 -29Z M-20 -14L-9 -25L-5 -12L-18 -4Z M17 9L28 1L25 17L11 20Z M-18 12L-28 4L-23 21L-10 22Z M18 -13L27 -20L25 -4L13 -3Z"],
- ["Skördsvagn","M-29 0H29L22 22H-22Z M-20 -17H20V0H-20Z M-12 -29H12V-17H-12Z M-15 26A5 5 0 1 0 -15 36A5 5 0 1 0 -15 26 M15 26A5 5 0 1 0 15 36A5 5 0 1 0 15 26"],
- ["Vindpust","M-33 -16Q-8 -34 7 -17Q17 -6 0 0Q-12 4 -19 -3 M-33 0Q-9 -18 8 -1Q20 10 2 18Q-10 22 -18 15 M-33 16Q-17 2 -7 12Q0 20 -9 28"]
- ]},
- {type:"Vinter",name:"Vinter",items:[
- ["Snöflinga","M0 -36V36 M-31 -18L31 18 M31 -18L-31 18 M0 -21L-8 -29 M0 -21L8 -29 M0 21L-8 29 M0 21L8 29 M-18 -10L-29 -10 M-18 -10L-23 0 M18 10L29 10 M18 10L23 0"],
- ["Gran","M0 -36L-25 -6H-12L-31 14H-10L-23 31H23L10 14H31L12 -6H25Z M0 31V37"],
- ["Vante","M-19 30V-12Q-19 -23 -8 -24Q0 -23 0 -13Q2 -27 12 -24Q22 -21 19 -10V30Z M-19 7Q0 -2 19 7 M0 -14V30"],
- ["Rödstrup","M-28 3Q-28 -21 -4 -23Q17 -23 22 -4L34 0L22 6Q16 27 -7 25Q-29 22 -28 3Z M-18 -12Q-10 -20 -1 -13Q-8 -2 -18 -5Z M-10 2A3 3 0 1 0 -10 8 M-8 16Q0 12 8 16"],
- ["Hus i snö","M-28 30V-2L0 -26L28 -2V30Z M-35 0L0 -31L35 0 M-8 30V10H8V30 M-18 4H-10V12H-18Z M12 4H20V12H12Z M-33 32Q0 25 33 32"],
- ["Iskristall","M0 -36L6 -12L22 -28L14 -7L36 0L14 7L22 28L6 12L0 36L-6 12L-22 28L-14 7L-36 0L-14 -7L-22 -28L-6 -12Z"],
- ["Holly","M0 30Q-34 14 -28 -12Q-17 -9 -13 -27Q-2 -22 3 -36Q18 -23 27 -24Q28 -4 18 5Q32 11 20 25Z M0 28L18 -21 M0 7L-17 -4 M4 0L21 3 M-5 12L-22 13"],
- ["Bjällra","M-22 19Q-20 -8 -13 -18Q0 -31 13 -18Q20 -8 22 19Z M-28 19H28 M-5 27Q0 33 5 27 M0 -29V-35"],
- ["Julstjärna","M0 -36L8 -11L34 -11L13 4L21 29L0 14L-21 29L-13 4L-34 -11L-8 -11Z M0 -25V-14 M22 -6L13 0 M14 18L6 10 M-14 18L-6 10 M-22 -6L-13 0"],
- ["Isbjörn","M-27 7Q-34 -12 -18 -19Q0 -30 18 -19Q34 -12 27 7Q18 27 0 24Q-18 27 -27 7Z M-18 -19Q-22 -32 -10 -28L-6 -19 M18 -19Q22 -32 10 -28L6 -19 M-10 -3A3 3 0 1 0 -10 3 M10 -3A3 3 0 1 0 10 3 M-5 11Q0 6 5 11"],
- ["Skridsko","M-24 -23H13V3Q13 22 28 23Q15 38 -8 30Q-29 26 -29 17 M-10 -23V3Q-10 12 1 15 M-25 -14H13 M-25 -5H13"],
- ["Snögubbe","M0 -30A13 13 0 1 0 0 -4A13 13 0 1 0 0 -30Z M0 4A18 18 0 1 0 0 40A18 18 0 1 0 0 4Z M-6 -14A2 2 0 1 0 -6 -10 M6 -14A2 2 0 1 0 6 -10 M0 -9L9 -7 M-7 14H7 M0 14V19"],
- ["Ljus","M-19 31H19L14 -14H-14Z M-11 -14Q-15 -23 -7 -31Q1 -38 -5 -45Q13 -34 8 -20Q6 -13 0 -14 M-9 0H9"],
- ["Pulka","M-29 6H23Q35 6 31 18Q28 25 16 25H-23Q-33 25 -32 18 M-22 -17V4 M-22 -12H18L25 4 M-32 29Q0 37 32 29"],
- ["Pingvin","M-22 24Q-30 0 -20 -24Q0 -38 20 -24Q30 0 22 24Q0 38 -22 24Z M-14 -5Q0 -19 14 -5L11 17Q0 24 -11 17Z M-9 -12A2 2 0 1 0 -9 -8 M9 -12A2 2 0 1 0 9 -8 M-7 -1L0 5L7 -1"],
- ["Snölykta","M-25 -17H25L21 29H-21Z M-18 -8H18V18H-18Z M0 -2Q-8 8 0 15Q8 8 0 -2 M-30 -22H30"],
- ["Stjärnhimmel","M0 -28L6 -8L27 -8L10 4L16 24L0 12L-16 24L-10 4L-27 -8L-6 -8Z M-29 -28L-26 -22L-20 -21L-26 -18L-29 -12L-32 -18L-38 -21L-32 -22Z M29 16L32 22L38 23L32 26L29 32L26 26L20 23L26 22Z"],
- ["Ekorre med mössa","M-19 26Q-26 6 -13 -7Q0 -17 13 -7Q23 3 15 18L4 30Z M-11 -8Q-17 -24 -3 -28Q8 -30 9 -18 M4 -23L18 -31L15 -15 M-10 4A3 3 0 1 0 -10 10 M8 5A3 3 0 1 0 8 11"],
- ["Snöig gren","M-30 28L30 -29 M-18 16L-20 -1 M-18 16L-2 18 M-7 4L-8 -14 M-7 4L10 5 M4 -7L20 -9 M4 -7L3 -24"],
- ["Renen","M-22 27Q-27 1 -13 -15Q0 -28 13 -15Q27 1 22 27Q0 38 -22 27Z M-13 -14L-25 -30L-22 -14L-35 -20 M13 -14L25 -30L22 -14L35 -20 M-9 0A3 3 0 1 0 -9 6 M9 0A3 3 0 1 0 9 6 M-5 14Q0 9 5 14"]
- ]},
- {type:"Halloween",name:"Halloween",items:[
- ["Pumpa","M0 -29Q-24 -39 -29 -13Q-35 17 -13 27Q0 32 0 24Q0 32 13 27Q35 17 29 -13Q24 -39 0 -29Z M0 -28V24 M-15 -28Q-7 -5 -14 22 M15 -28Q7 -5 14 22 M0 -29Q0 -42 10 -45 M-16 -4L-5 2L-16 8 M16 -4L5 2L16 8 M-9 15Q0 23 9 15"],
- ["Spöke","M0 -36Q-28 -36 -25 -6L-25 28L-13 18L0 29L13 18L25 28V-6Q28 -36 0 -36Z M-10 -7A3 3 0 1 0 -10 -1 M10 -7A3 3 0 1 0 10 -1 M-7 10Q0 17 7 10"],
- ["Fladdermus","M0 -5Q-12 -32 -31 -28L-24 -6L-39 9L-16 6L0 27L16 6L39 9L24 -6L31 -28Q12 -32 0 -5Z M-10 -5A2 2 0 1 0 -10 -1 M10 -5A2 2 0 1 0 10 -1"],
- ["Spindel","M0 -12A12 12 0 1 0 0 12A12 12 0 1 0 0 -12 M-9 -9L-29 -29 M-12 0L-37 0 M-9 9L-29 29 M9 -9L29 -29 M12 0L37 0 M9 9L29 29 M-27 -29Q-35 -34 -36 -25 M27 -29Q35 -34 36 -25"],
- ["Katt","M-24 -4L-30 -33L-8 -18Q0 -22 8 -18L30 -33L24 -4Q35 10 18 25Q0 34 -18 25Q-35 10 -24 -4Z M-12 -3A3 3 0 1 0 -12 3 M12 -3A3 3 0 1 0 12 3 M-6 10L0 14L6 10 M-14 11L-28 7 M14 11L28 7"],
- ["Häxhatt","M-34 23H34L23 16L14 -26L-12 -26L-22 16Z M-12 -18H12 M-20 8H21 M-5 -31Q-7 -39 0 -42Q7 -39 5 -31"],
- ["Kittel","M-23 -30L-9 -20L0 -31L9 -20L23 -30L28 31H-28Z M-10 -19L-6 0L0 -6L6 0L10 -19 M-14 11H14"],
- ["Uggla","M-25 23L-29 -19L-8 -9L0 -19L8 -9L29 -19L25 23Q0 38 -25 23Z M-11 0A8 8 0 1 0 5 0A8 8 0 1 0 -11 0 M11 0A8 8 0 1 0 27 0A8 8 0 1 0 11 0 M-3 13L0 8L3 13Z"],
- ["Spökhus","M-29 31V-7L0 -31L29 -7V31Z M-12 -4H-3V7H-12Z M7 -4H16V7H7Z M-7 31V13H7V31 M-31 0L0 -36L31 0"],
- ["Kittelgryta","M-27 -5H27L22 20Q0 37 -22 20Z M-32 -7H32 M-15 -11Q-24 -22 -15 -30 M0 -11Q-9 -24 0 -35 M15 -11Q6 -22 15 -30 M-9 7A3 3 0 1 0 -9 13 M9 7A3 3 0 1 0 9 13"],
- ["Skelett","M0 -28A10 10 0 1 0 0 -8A10 10 0 1 0 0 -28Z M-13 1H13 M0 1V25 M-16 7L16 7 M-13 15L13 15 M-9 25L-22 35 M9 25L22 35 M-4 1L-18 -7 M4 1L18 -7"],
- ["Spindelnät","M0 -34V34 M-29 -17L29 17 M29 -17L-29 17 M-20 -20Q0 -9 20 -20 M-25 0Q0 10 25 0 M-19 20Q0 8 19 20"],
- ["Fladdermusunge","M0 -5Q-10 -25 -25 -19L-20 -1L-32 9L-12 7L0 22L12 7L32 9L20 -1L25 -19Q10 -25 0 -5Z M-8 -2A2 2 0 1 0 -8 2 M8 -2A2 2 0 1 0 8 2 M-4 9L0 12L4 9"],
- ["Månskära","M13 -31A31 31 0 1 0 13 31Q-5 18 -5 0Q-5 -18 13 -31Z M21 -22L23 -16L29 -15L23 -12L21 -6L18 -12L12 -15L18 -16Z"],
- ["Korp","M-31 7Q-24 -16 -5 -16Q15 -16 18 0L35 8L17 12Q9 29 -13 22Q-31 18 -31 7Z M-12 -5A3 3 0 1 0 -12 1 M-7 8Q0 5 7 10 M-23 20L-28 30 M-9 23L-12 32"],
- ["Monster","M-28 25L-30 -18L-13 -11L0 -25L13 -11L30 -18L28 25Q0 36 -28 25Z M-10 0A4 4 0 1 0 -10 8 M10 0A4 4 0 1 0 10 8 M-9 17Q0 12 9 17"],
- ["Spökkatt","M-24 -4L-29 -32L-8 -18L0 -22L8 -18L29 -32L24 -4Q34 8 19 23Q0 34 -19 23Q-34 8 -24 -4Z M-11 -2A3 3 0 1 0 -11 4 M11 -2A3 3 0 1 0 11 4 M-8 12Q0 18 8 12 M-15 11L-28 7 M15 11L28 7"],
- ["Kyrkogårdsport","M-33 31V-8Q-33 -30 -18 -30Q-3 -30 -3 -8V31 M3 31V-8Q3 -30 18 -30Q33 -30 33 -8V31 M-38 31H38 M-38 -8H38 M-30 -19L-18 -34L-6 -19 M6 -19L18 -34L30 -19"],
- ["Spökträd","M-2 33V-14Q-3 -34 18 -34Q31 -29 21 -18Q39 -18 33 0Q27 10 13 4Q9 14 2 18 M-2 -5Q-18 -22 -29 -13Q-35 -3 -21 2Q-37 5 -29 19Q-20 27 -2 14"],
- ["Fladdermusnatt","M0 15L-28 22L-22 7L-34 -5L-17 -1L-13 -23L0 -11L13 -23L17 -1L34 -5L22 7L28 22Z M0 -33A11 11 0 1 0 0 -11A11 11 0 1 0 0 -33Z M-4 -24L0 -19L4 -24"]
- ]}
- ];
- const rings=[
- "M0 -28C-16 -18 -16 4 0 16C16 4 16 -18 0 -28Z",
- "M0 -28L17 0L0 28L-17 0Z",
- "M-18 8Q-18 -19 0 -28Q18 -19 18 8Q0 28 -18 8Z",
- "M0 -29Q-24 -7 0 15Q24 -7 0 -29Z M0 -18V6",
- "M-15 -24Q0 -35 15 -24L13 8Q0 25 -13 8Z"
- ];
- function svgFor(theme,index,item){
-   const petals=8+(index%9), outer= rings[(index+theme.items.length)%rings.length], ring2=rings[(index*3+1)%rings.length], ring3=rings[(index*7+2)%rings.length];
-   let s=['<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800"><rect width="800" height="800" fill="white"/>','<circle cx="400" cy="400" r="366" fill="none" stroke="#111" stroke-width="3"/>','<circle cx="400" cy="400" r="349" fill="none" stroke="#111" stroke-width="1.5"/>'];
-   const n1=petals, r1=311;
-   for(let k=0;k<n1;k++) s.push('<g transform="translate(400 400) rotate('+(360*k/n1+index*7)+') translate(0 -'+r1+')"><path d="'+outer+'" fill="none" stroke="#111" stroke-width="2.4" stroke-linejoin="round"/></g>');
-   s.push('<circle cx="400" cy="400" r="268" fill="none" stroke="#111" stroke-width="2"/>');
-   const n2=petals+6, r2=223;
-   for(let k=0;k<n2;k++) s.push('<g transform="translate(400 400) rotate('+(360*k/n2+index*11)+') translate(0 -'+r2+') scale(.77)"><path d="'+ring2+'" fill="none" stroke="#111" stroke-width="2.6" stroke-linejoin="round"/></g>');
-   s.push('<circle cx="400" cy="400" r="177" fill="none" stroke="#111" stroke-width="2"/>');
-   const n3=8+(index*3%11),r3=137;
-   for(let k=0;k<n3;k++) s.push('<g transform="translate(400 400) rotate('+(360*k/n3+index*17)+') translate(0 -'+r3+') scale(.66)"><path d="'+ring3+'" fill="none" stroke="#111" stroke-width="2.8" stroke-linejoin="round"/></g>');
-   s.push('<circle cx="400" cy="400" r="91" fill="none" stroke="#111" stroke-width="2.8"/>');
-   s.push('<g transform="translate(400 400) scale(1.75)"><path d="'+item[1]+'" fill="none" stroke="#111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g>');
-   s.push('<circle cx="400" cy="400" r="42" fill="none" stroke="#111" stroke-width="2"/>');
-   s.push('<circle cx="400" cy="400" r="356" fill="none" stroke="#111" stroke-width="1.4" stroke-dasharray="'+(4+(index%9))+' '+(4+(index%5))+'"/>');
-   return s.join('')+'</svg>';
- }
- return themes.flatMap(theme=>theme.items.map((item,index)=>{
-   const uri='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svgFor(theme,index,item));
-   return {title:theme.name+' · '+item[0]+' '+String(index+1).padStart(2,'0'),type:theme.type,img:uri,preview:uri,src:uri,pdf:uri,sourceLabel:'Egenritad mandalamall'};
- }));
-}
-mandalas.push(...seasonalMandalaItems());
+// Original spring coloring pages, generated for Fritidsparken.
+mandalas.push(...[{"title":"Tulpanträdgård","type":"Vår","img":"./assets/mandala-spring-2026/tulpantradgard.webp","preview":"./assets/mandala-spring-2026/tulpantradgard.webp","pdf":"./assets/mandala-spring-2026/tulpantradgard.pdf","src":"./assets/mandala-spring-2026/tulpantradgard.pdf","sourceLabel":"Eget vårmotiv · Fritidsparken"},{"title":"Fjärilsäng","type":"Vår","img":"./assets/mandala-spring-2026/fjarilsang.webp","preview":"./assets/mandala-spring-2026/fjarilsang.webp","pdf":"./assets/mandala-spring-2026/fjarilsang.pdf","src":"./assets/mandala-spring-2026/fjarilsang.pdf","sourceLabel":"Eget vårmotiv · Fritidsparken"},{"title":"Fågelbo i blom","type":"Vår","img":"./assets/mandala-spring-2026/fagelbo.webp","preview":"./assets/mandala-spring-2026/fagelbo.webp","pdf":"./assets/mandala-spring-2026/fagelbo.pdf","src":"./assets/mandala-spring-2026/fagelbo.pdf","sourceLabel":"Eget vårmotiv · Fritidsparken"},{"title":"Grodans vårdamm","type":"Vår","img":"./assets/mandala-spring-2026/groddamm.webp","preview":"./assets/mandala-spring-2026/groddamm.webp","pdf":"./assets/mandala-spring-2026/groddamm.pdf","src":"./assets/mandala-spring-2026/groddamm.pdf","sourceLabel":"Eget vårmotiv · Fritidsparken"},{"title":"Blommande träd","type":"Vår","img":"./assets/mandala-spring-2026/blommandetrad.webp","preview":"./assets/mandala-spring-2026/blommandetrad.webp","pdf":"./assets/mandala-spring-2026/blommandetrad.pdf","src":"./assets/mandala-spring-2026/blommandetrad.pdf","sourceLabel":"Eget vårmotiv · Fritidsparken"},{"title":"Nyckelpigor och blad","type":"Vår","img":"./assets/mandala-spring-2026/nyckelpigor.webp","preview":"./assets/mandala-spring-2026/nyckelpigor.webp","pdf":"./assets/mandala-spring-2026/nyckelpigor.pdf","src":"./assets/mandala-spring-2026/nyckelpigor.pdf","sourceLabel":"Eget vårmotiv · Fritidsparken"},{"title":"Bin bland blommor","type":"Vår","img":"./assets/mandala-spring-2026/bin.webp","preview":"./assets/mandala-spring-2026/bin.webp","pdf":"./assets/mandala-spring-2026/bin.pdf","src":"./assets/mandala-spring-2026/bin.pdf","sourceLabel":"Eget vårmotiv · Fritidsparken"},{"title":"Snigel i trädgården","type":"Vår","img":"./assets/mandala-spring-2026/snigel.webp","preview":"./assets/mandala-spring-2026/snigel.webp","pdf":"./assets/mandala-spring-2026/snigel.pdf","src":"./assets/mandala-spring-2026/snigel.pdf","sourceLabel":"Eget vårmotiv · Fritidsparken"},{"title":"Vårregn","type":"Vår","img":"./assets/mandala-spring-2026/varregn.webp","preview":"./assets/mandala-spring-2026/varregn.webp","pdf":"./assets/mandala-spring-2026/varregn.pdf","src":"./assets/mandala-spring-2026/varregn.pdf","sourceLabel":"Eget vårmotiv · Fritidsparken"},{"title":"Regnbågens vår","type":"Vår","img":"./assets/mandala-spring-2026/regnbage.webp","preview":"./assets/mandala-spring-2026/regnbage.webp","pdf":"./assets/mandala-spring-2026/regnbage.pdf","src":"./assets/mandala-spring-2026/regnbage.pdf","sourceLabel":"Eget vårmotiv · Fritidsparken"},{"title":"Kanin bland krokusar","type":"Vår","img":"./assets/mandala-spring-2026/kanin.webp","preview":"./assets/mandala-spring-2026/kanin.webp","pdf":"./assets/mandala-spring-2026/kanin.pdf","src":"./assets/mandala-spring-2026/kanin.pdf","sourceLabel":"Eget vårmotiv · Fritidsparken"},{"title":"Lamm på vårängen","type":"Vår","img":"./assets/mandala-spring-2026/lamm.webp","preview":"./assets/mandala-spring-2026/lamm.webp","pdf":"./assets/mandala-spring-2026/lamm.pdf","src":"./assets/mandala-spring-2026/lamm.pdf","sourceLabel":"Eget vårmotiv · Fritidsparken"},{"title":"Vitsippsbacke","type":"Vår","img":"./assets/mandala-spring-2026/vitsippor.webp","preview":"./assets/mandala-spring-2026/vitsippor.webp","pdf":"./assets/mandala-spring-2026/vitsippor.pdf","src":"./assets/mandala-spring-2026/vitsippor.pdf","sourceLabel":"Eget vårmotiv · Fritidsparken"},{"title":"Påskliljornas krans","type":"Vår","img":"./assets/mandala-spring-2026/paskliljor.webp","preview":"./assets/mandala-spring-2026/paskliljor.webp","pdf":"./assets/mandala-spring-2026/paskliljor.pdf","src":"./assets/mandala-spring-2026/paskliljor.pdf","sourceLabel":"Eget vårmotiv · Fritidsparken"},{"title":"Körsbärsblom","type":"Vår","img":"./assets/mandala-spring-2026/korsbarsblom.webp","preview":"./assets/mandala-spring-2026/korsbarsblom.webp","pdf":"./assets/mandala-spring-2026/korsbarsblom.pdf","src":"./assets/mandala-spring-2026/korsbarsblom.pdf","sourceLabel":"Eget vårmotiv · Fritidsparken"},{"title":"Fågelholk på våren","type":"Vår","img":"./assets/mandala-spring-2026/fagelholk.webp","preview":"./assets/mandala-spring-2026/fagelholk.webp","pdf":"./assets/mandala-spring-2026/fagelholk.pdf","src":"./assets/mandala-spring-2026/fagelholk.pdf","sourceLabel":"Eget vårmotiv · Fritidsparken"},{"title":"Frön som gror","type":"Vår","img":"./assets/mandala-spring-2026/odling.webp","preview":"./assets/mandala-spring-2026/odling.webp","pdf":"./assets/mandala-spring-2026/odling.pdf","src":"./assets/mandala-spring-2026/odling.pdf","sourceLabel":"Eget vårmotiv · Fritidsparken"},{"title":"Trollsländans damm","type":"Vår","img":"./assets/mandala-spring-2026/trollslanda.webp","preview":"./assets/mandala-spring-2026/trollslanda.webp","pdf":"./assets/mandala-spring-2026/trollslanda.pdf","src":"./assets/mandala-spring-2026/trollslanda.pdf","sourceLabel":"Eget vårmotiv · Fritidsparken"},{"title":"Maskrosor och frön","type":"Vår","img":"./assets/mandala-spring-2026/maskros.webp","preview":"./assets/mandala-spring-2026/maskros.webp","pdf":"./assets/mandala-spring-2026/maskros.pdf","src":"./assets/mandala-spring-2026/maskros.pdf","sourceLabel":"Eget vårmotiv · Fritidsparken"},{"title":"Vårens stora mandala","type":"Vår","img":"./assets/mandala-spring-2026/varmandala.webp","preview":"./assets/mandala-spring-2026/varmandala.webp","pdf":"./assets/mandala-spring-2026/varmandala.pdf","src":"./assets/mandala-spring-2026/varmandala.pdf","sourceLabel":"Eget vårmotiv · Fritidsparken"}]);
+
 
 const paperDolls=[{title:"Klippdocka med kläder",type:"Svartvit mall",img:"https://freesvg.org/img/tippy-paper-doll.png",src:"https://freesvg.org/paper-doll-with-costumes"},{title:"Klippdocka med olika kläder",type:"Svartvit mall",img:"https://freesvg.org/img/classicpaperdolls.png",src:"https://freesvg.org/paper-doll"},{title:"Klippdocka med garderob",type:"Mall med kläder",img:"https://freesvg.org/img/classicpaperdoll-colour.png",src:"https://freesvg.org/paper-doll-with-clothes"},{title:"Tysk klippdocka med tre klänningar",type:"Svartvit mall",img:"https://freesvg.org/img/germanpaperdoll.png",src:"https://freesvg.org/index.php/german-paper-doll"},{title:"Klippdocka med klänning",type:"Svartvit mall",img:"https://freesvg.org/img/paperdoll.png",src:"https://freesvg.org/paper-doll-image"},{title:"Detaljerad klippdocka med kläder",type:"Utskrivbar målarbild",img:"./assets/paper_doll_detailed.jpg"},{title:"Kawaii klippdocka med modekläder",type:"Utskrivbar målarbild",img:"./assets/paper_doll_kawaii.jpg"},{title:"Minecraft pappersdocka med utrustning",type:"Utskrivbar klippmall",img:"./assets/paper_doll_minecraft.jpg"},{title:"Kawaii pappersfigurer att klippa ut",type:"Utskrivbara figurer",img:"./assets/paper_figures_kawaii.jpg"}];const halloweenCrafts=[
 ["🧻","Toarullsmumie","En randig mumie av tom toarulle, papper och stora ögon.","Toarulle, vitt papper eller gasbinda, lim och ögon av papper.",["Riv vitt papper i långa remsor.","Linda remsorna kors och tvärs runt rullen och limma ändarna.","Klipp ut två stora ögon och fäst dem mellan remsorna."]],
@@ -874,9 +733,9 @@ const pearlPatterns=[
 const $=s=>document.querySelector(s);function save(){localStorage.fpFavs=JSON.stringify(favs)}
 function drawFilters(){$("#filters").innerHTML=cats.map(c=>'<button class="filter '+(c===category?"active":"")+'" data-cat="'+c+'">'+c+"</button>").join("")}
 function mandalaGallery(q){
-let styles=["Alla","Blommor & blad","Djur","Geometriska","Ornament","Cirklar & linjer","Pokémon","Marvel","Fotbollsstjärnor","Vår","Sommar","Höst","Vinter","Halloween"];
+let styles=["Alla","Blommor & blad","Djur","Geometriska","Ornament","Cirklar & linjer","Pokémon","Marvel","Fotbollsstjärnor","Vår"];
 let shown=mandalas.filter(m=>(mandalaStyle==="Alla"||m.type===mandalaStyle)&&(m.title+" "+m.type).toLocaleLowerCase("sv").includes(q));
-return '<div class="mandala-intro"><strong>Välj mandala eller ett tema att färglägga</strong><p>Blommor, djur, geometri, ornament och utskrivbara sidor med Pokémon, Marvel-hjältar och fotbollsstjärnor. Förhandsbilden visar hela utskriftssidan. Öppna PDF-filen för utskrift på A4. Befintliga utskriftssidor länkar till sina källor. Vår, sommar, höst, vinter och Halloween har 20 egna utskrivbara mandalor var. <a href="https://mondaymandala.com/" target="_blank" rel="noopener">Monday Mandala</a> · <a href="https://www.supercoloring.com/coloring-pages/mandala" target="_blank" rel="noopener">Super Coloring</a>. Klicka på en bild för att öppna hela sidan.</p></div><div class="mandala-types">'+styles.map(s=>'<button class="mandala-type '+(s===mandalaStyle?"active":"")+'" data-mstyle="'+s+'">'+s+'</button>').join("")+'</div><div class="mandala-grid">'+shown.map(m=>'<article class="mandala-card"><a href="'+(m.pdf||m.img)+'" target="_blank" rel="noopener"><img loading="lazy" decoding="async" src="'+(m.preview||m.img)+'" alt="Helsidesförhandsvisning av '+m.title+'"></a><div class="mandala-info"><span class="mandala-label">'+m.type+'</span><h3>'+m.title+'</h3><div class="mandala-links"><a href="'+(m.pdf||m.img)+'" target="_blank" rel="noopener">Öppna / skriv ut</a><a href="'+m.src+'" target="_blank" rel="noopener">'+(m.sourceLabel|| (m.pdf?"Källa: Monday Mandala":"Källa & licens"))+'</a>'+(m.src2?'<a href="'+m.src2+'" target="_blank" rel="noopener">Super Coloring</a>':"")+'</div></div></article>').join("")+'</div>'+(shown.length?"":'<div class="empty">Inga mandalas i den här gruppen.</div>')
+return '<div class="mandala-intro"><strong>Välj mandala eller ett tema att färglägga</strong><p>Blommor, djur, geometri, ornament och utskrivbara sidor med Pokémon, Marvel-hjältar och fotbollsstjärnor. Förhandsbilden visar hela utskriftssidan. Öppna PDF-filen för utskrift på A4. Befintliga utskriftssidor länkar till sina källor. Vår har 20 nya egna bilder att rita och färglägga, med en separat PDF i A4-format för varje motiv. <a href="https://mondaymandala.com/" target="_blank" rel="noopener">Monday Mandala</a> · <a href="https://www.supercoloring.com/coloring-pages/mandala" target="_blank" rel="noopener">Super Coloring</a>. Klicka på en bild för att öppna hela sidan.</p></div><div class="mandala-types">'+styles.map(s=>'<button class="mandala-type '+(s===mandalaStyle?"active":"")+'" data-mstyle="'+s+'">'+s+'</button>').join("")+'</div><div class="mandala-grid">'+shown.map(m=>'<article class="mandala-card"><a href="'+(m.pdf||m.img)+'" target="_blank" rel="noopener"><img loading="lazy" decoding="async" src="'+(m.preview||m.img)+'" alt="Helsidesförhandsvisning av '+m.title+'"></a><div class="mandala-info"><span class="mandala-label">'+m.type+'</span><h3>'+m.title+'</h3><div class="mandala-links"><a href="'+(m.pdf||m.img)+'" target="_blank" rel="noopener">Öppna / skriv ut</a><a href="'+m.src+'" target="_blank" rel="noopener">'+(m.sourceLabel|| (m.pdf?"Källa: Monday Mandala":"Källa & licens"))+'</a>'+(m.src2?'<a href="'+m.src2+'" target="_blank" rel="noopener">Super Coloring</a>':"")+'</div></div></article>').join("")+'</div>'+(shown.length?"":'<div class="empty">Inga mandalas i den här gruppen.</div>')
 }function dollGallery(q){return '<div class="mandala-intro"><strong>Färglägg, klipp ut och klä på</strong><p>Välj en mall och öppna den för att skriva ut. Skriv gärna ut på lite tjockare papper. Klipp ut dockan och kläderna längs ytterlinjerna.</p></div><div class="mandala-grid">'+paperDolls.filter(m=>(m.title+" "+m.type).toLocaleLowerCase("sv").includes(q)).map(m=>'<article class="mandala-card"><a href="'+m.img+'" target="_blank" rel="noopener"><img loading="lazy" src="'+m.img+'" alt="'+m.title+'"></a><div class="mandala-info"><span class="mandala-label">'+m.type+'</span><h3>'+m.title+'</h3><div class="mandala-links"><a href="'+m.img+'" target="_blank" rel="noopener">Öppna / skriv ut</a>' + (m.src?'<a href="'+m.src+'" target="_blank" rel="noopener">Källa &amp; licens</a>':'') + '</div></div></article>').join("")+'</div>'}
 
 const drawingAnimals=[
