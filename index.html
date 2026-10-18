@@ -1212,12 +1212,12 @@ body.christmas #seasonalCraftCta::after{background:radial-gradient(ellipse,#e6bf
 .draw-page .draw-card .draw-guide-sprite,
 .draw-modal-guides .draw-guide-sprite{
  display:block!important;width:100%!important;height:auto!important;
- aspect-ratio:1993 / 789!important;object-fit:fill!important;
+ aspect-ratio:1993 / 530!important;object-fit:fill!important;
  padding:0!important;border:0!important;filter:none!important;
- mix-blend-mode:normal!important;background:#100907!important;
+ mix-blend-mode:normal!important;background:transparent!important;
 }
 .draw-page .draw-card .draw-guide-sprite{border-radius:16px 16px 0 0!important}
-.draw-modal-guides{background:#100907!important}
+.draw-modal-guides{background:transparent!important}
 
 /* Compact popup image margins and give the guides 25% more desktop width. */
 .draw-modal{grid-template-columns:minmax(0,1.25fr) minmax(260px,.60fr)}
@@ -1282,10 +1282,10 @@ function paint(canvas){
  canvas.dataset.loading="1";
  const img=new Image();
  img.onload=()=>{
-  const popup=!!canvas.closest(".draw-modal-guides"),renderTop=popup?16:TOP,renderHeight=popup?PH+32:H;
+  const renderTop=16,renderHeight=PH+32;
   canvas.width=W;canvas.height=renderHeight;
   const ctx=canvas.getContext("2d",{willReadFrequently:true});
-  if(!popup){ctx.fillStyle="#100907";ctx.fillRect(0,0,W,renderHeight);}
+  ctx.clearRect(0,0,W,renderHeight);
   const [sx0,sy0,sx1,sy1]=crop,sh=sy1-sy0,cuts=getPanelCuts(img,crop,file);
   for(let i=0;i<5;i++){
    const cellWidth=cuts[i+1]-cuts[i],inset=Math.max(5,Math.round(cellWidth*.025));
