@@ -1224,6 +1224,7 @@ body.christmas #seasonalCraftCta::after{background:radial-gradient(ellipse,#e6bf
 .draw-modal-guides{padding:6px!important}
 .draw-modal-guides .draw-guide-sprite{aspect-ratio:1993 / 530!important;max-height:none!important}
 @media(max-width:900px){.draw-modal{grid-template-columns:minmax(0,1fr)!important}.draw-modal-guides,.draw-modal .draw-instructions{grid-column:1!important;grid-row:auto!important}}
+.draw-modal-guides,.draw-modal-guides .draw-guide-sprite{background:transparent!important}
 </style><script id="drawing-guides-unified-renderer">
 (()=>{
 const crops={
@@ -1284,7 +1285,7 @@ function paint(canvas){
   const popup=!!canvas.closest(".draw-modal-guides"),renderTop=popup?16:TOP,renderHeight=popup?PH+32:H;
   canvas.width=W;canvas.height=renderHeight;
   const ctx=canvas.getContext("2d",{willReadFrequently:true});
-  ctx.fillStyle="#100907";ctx.fillRect(0,0,W,renderHeight);
+  if(!popup){ctx.fillStyle="#100907";ctx.fillRect(0,0,W,renderHeight);}
   const [sx0,sy0,sx1,sy1]=crop,sh=sy1-sy0,cuts=getPanelCuts(img,crop,file);
   for(let i=0;i<5;i++){
    const cellWidth=cuts[i+1]-cuts[i],inset=Math.max(5,Math.round(cellWidth*.025));
