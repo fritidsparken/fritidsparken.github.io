@@ -46,3 +46,12 @@
 
 /* Centrera ljudsymbolen lodrätt i knapprutan */
 .topin>#halloweenSound{place-items:center!important;line-height:1!important;padding:4px 0 0!important}
+
+
+/* Mobil: centrera darkmodeknappen och låt den fylla sin knappbox */
+@media(max-width:1100px),(hover:none),(pointer:coarse){
+ body:not(.halloween):not(.christmas) .topin>.iconbtn#theme{
+  display:grid!important;place-items:center!important;text-align:center!important;
+  padding:0!important;line-height:1!important;vertical-align:middle!important
+ }
+}
