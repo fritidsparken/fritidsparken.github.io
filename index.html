@@ -895,7 +895,7 @@ const halloweenPictures={hero:"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
 document.documentElement.style.setProperty("--halloween-hero","url('"+halloweenPictures.hero+"')");
 document.documentElement.style.setProperty("--halloween-web","url('"+halloweenPictures.web+"')");
 document.documentElement.style.setProperty("--halloween-mark","url('"+halloweenPictures.mark+"')");
-function stockholmDateCode(){const p=new Intl.DateTimeFormat("en-GB",{timeZone:"Europe/Stockholm",month:"2-digit",day:"2-digit"}).formatToParts(new Date());return Number(p.find(x=>x.type==="month").value)*100+Number(p.find(x=>x.type==="day").value)}
+function stockholmDateCode(){const d=new Date();return (d.getMonth()+1)*100+d.getDate()}
 const todayCode=stockholmDateCode(),autoHalloween=todayCode>=1001&&todayCode<=1108,autoChristmas=todayCode>=1201||todayCode<=110;
 const manualHalloween=!autoChristmas&&localStorage.fpHalloweenManual==="1";
 document.body.classList.toggle("halloween",autoHalloween||manualHalloween);
