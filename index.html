@@ -511,7 +511,7 @@ body.halloween .seasonal-craft-cta::after{content:"";position:absolute;inset:-13
 .theme-code-actions{display:flex;justify-content:flex-end;gap:9px}
 </style></head>
 <body>
-<header class="top"><div class="topin"><a class="brand" href="https://fritidsparken.se/" aria-label="Gå till Fritidsparken.se"><span class="site-logo"><img src="./assets/fritidsparken-logo.jpg" alt=""></span><span class="site-name">Fritidsparken.se</span></a><span class="brand-switch" aria-hidden="true"></span><a class="brand plugg-brand" href="https://pluggparken.se/" aria-label="Gå till Pluggparken.se"><span class="plugg-icon"><img src="https://pluggparken.se/favicon.svg" alt=""></span><span class="plugg-name">Pluggparken.se</span></a><button type="button" class="iconbtn" id="theme" aria-label="Byt tema" aria-pressed="false">🌙</button><button type="button" class="iconbtn season-picker" id="seasonPicker" aria-label="Välj säsongstema" aria-expanded="false" title="Välj säsongstema">🎃</button><button type="button" class="iconbtn halloween-sound" id="halloweenSound" aria-label="Stäng av Halloween-ljud" aria-pressed="true" title="Stäng av Halloween-ljud" disabled>🔊</button><button type="button" class="profile" id="profile">🦊 Hej där!</button></div></header><div id="seasonMenu" class="season-menu" hidden></div>
+<header class="top"><div class="topin"><a class="brand" href="https://fritidsparken.se/" aria-label="Gå till Fritidsparken.se"><span class="site-logo"><img src="./assets/fritidsparken-logo.jpg" alt=""></span><span class="site-name">Fritidsparken.se</span></a><span class="brand-switch" aria-hidden="true"></span><a class="brand plugg-brand" href="https://pluggparken.se/" aria-label="Gå till Pluggparken.se"><span class="plugg-icon"><img src="https://pluggparken.se/favicon.svg" alt=""></span><span class="plugg-name">Pluggparken.se</span></a><button type="button" class="iconbtn" id="theme" aria-label="Byt tema" aria-pressed="false">🌙</button><button type="button" class="iconbtn season-picker" id="seasonPicker" aria-label="Välj säsongstema" aria-expanded="false" title="Välj säsongstema">🎃</button><button type="button" class="iconbtn halloween-sound" id="halloweenSound" aria-label="Stäng av Halloween-ljud" aria-pressed="true" title="Stäng av Halloween-ljud" disabled>🔊</button></div></header><div id="seasonMenu" class="season-menu" hidden></div>
 <main class="wrap">
 <section class="hero"><div><div class="eyebrow">Välkommen till Fritidsparken</div><h1>Vad vill du <span class="halloween-highlight">hitta på?</span></h1><p>Välj en idé och ha kul tillsammans.</p><a class="halloween-cta seasonal-craft-cta" id="seasonalCraftCta" href="#catalog" data-open-seasonal>Halloweenpyssel</a></div><div class="heroart" aria-hidden="true">🦊</div></section>
 <div class="sectionhead" id="Aktiviteter"><div><h2>Utforska aktiviteter</h2><p>Små och stora idéer för en rolig stund på fritids.</p></div><div class="tools"><input class="search" id="search" placeholder="🔎 Sök aktivitet…" aria-label="Sök aktivitet"></div></div>
@@ -1071,4 +1071,19 @@ body.halloween #seasonalCraftCta::after,body.christmas #seasonalCraftCta::after{
 body.halloween #seasonalCraftCta::after{background:radial-gradient(ellipse,#ff6a13b8 0%,#ff8a3566 46%,transparent 76%)!important}
 body.christmas #seasonalCraftCta::after{background:radial-gradient(ellipse,#e6bf58d9 0%,#f0c64c88 32%,#1d9b5d75 58%,transparent 78%)!important;animation:christmasGlow 2.4s ease-in-out infinite!important}\n@keyframes christmasTextGlow{0%,100%{text-shadow:0 0 5px #ffe88a,0 0 11px #ffd34f,0 0 22px #ffbd35,0 0 34px #f49a1c}50%{text-shadow:0 0 8px #fff1a8,0 0 17px #ffdb62,0 0 32px #ffc439,0 0 46px #f49a1c}}
 @media(prefers-reduced-motion:reduce){body.halloween #seasonalCraftCta::after,body.christmas #seasonalCraftCta::after{animation:none!important;opacity:.8}body.christmas #seasonalCraftCta{animation:none!important}}
+</style><style id="drawing-gallery-sizing">
+/* Större ritbilder och popup på större skärmar. */
+@media(min-width:1024px){
+ .draw-grid{grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:16px!important}
+ .draw-card-image{height:190px!important}
+ .draw-card .draw-svg{height:190px!important}
+ .draw-modal{width:min(1240px,96vw);max-height:94vh;padding:30px}
+ .draw-popup-image{width:min(100%,940px);max-height:68vh}
+ .draw-modal .draw-sequence{max-width:1080px;gap:16px}
+}
+@media(min-width:761px) and (max-width:1023px){
+ .draw-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+ .draw-modal{width:min(1000px,96vw)}
+ .draw-popup-image{width:min(100%,800px);max-height:62vh}
+}
 </style></body></html>
