@@ -288,9 +288,60 @@ html,body{max-width:100%;overflow-x:clip}
 .draw-instructions li{padding:0 0 13px 4px;line-height:1.45}
 .draw-tip-inline{color:var(--muted);background:var(--mint);padding:12px 14px;border-radius:12px}
 @media(max-width:760px){.draw-step-card{grid-template-columns:1fr;padding:13px}.draw-card-image{height:145px}.draw-step-image{width:100%}.draw-step-copy{padding:4px 8px 8px}}
+</style><style>
+/* Optional Halloween theme inspired by the supplied reference */
+body.halloween{--bg:#100d0d;--paper:#1d1513;--ink:#fff4df;--muted:#cfbba7;--line:#68320f;--green:#ff8a13;--mint:#352016;--yellow:#ffad19;--shadow:0 12px 32px #0009;background-color:var(--bg);background-image:radial-gradient(ellipse at 50% -10%,#54250e66,transparent 60%),radial-gradient(ellipse at 100% 80%,#50220a44,transparent 45%)}
+body.halloween.dark{--bg:#09090c;--paper:#171217;--ink:#fff0dc;--muted:#c7b3a5;--line:#51290f;--green:#ff9b20;--mint:#2b1b1b;--shadow:0 12px 34px #000b}
+body.halloween .top{background:#120e0eeb;border-bottom:1px solid #8b3a09;box-shadow:0 4px 22px #0008}
+body.halloween .brand{color:#ff9b32}
+body.halloween .brand.plugg-brand{color:#fff1db}
+body.halloween .brand-switch:after{background:#120e0e}
+body.halloween .brand-switch:before{background:#e17b20}
+body.halloween .iconbtn,body.halloween .nav button{color:#fff0dc}
+body.halloween .iconbtn:hover,body.halloween .nav button:hover{background:#55290f}
+body.halloween .iconbtn[aria-pressed="true"]{background:#542709;box-shadow:inset 0 0 0 1px #ff8a13}
+body.halloween .profile{background:#3b2418;color:#fff0dc;border:1px solid #8a430e}
+body.halloween .hero{position:relative;min-height:270px;isolation:isolate;overflow:hidden;border:1px solid #f28a12;background-color:#25130f;background-image:linear-gradient(90deg,#150f10ed 0%,#1d1110cb 38%,#1d111011 78%),url("./assets/halloween-scene.svg");background-position:center;background-size:cover;box-shadow:0 14px 38px #0009}
+body.halloween .hero:before{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 50px #08060899;pointer-events:none;z-index:-1}
+body.halloween .eyebrow{color:#ff9b1b}
+body.halloween .hero h1{color:#fff8ec;text-shadow:0 3px 16px #120909}
+body.halloween .hero h1 em{color:#ff8a13}
+body.halloween .hero p{color:#fff0df}
+body.halloween .heroart{font-size:0;margin:0;min-width:132px;min-height:142px;position:relative}
+body.halloween .heroart:before{content:"🦉";font-size:102px;position:absolute;right:3px;bottom:0;filter:drop-shadow(0 8px 12px #000b)}
+body.halloween .heroart:after{content:"🧙";position:absolute;right:20px;top:-3px;font-size:32px;transform:rotate(10deg)}
+body.halloween .sectionhead h2,body.halloween .group h3{color:#fff2df}
+body.halloween .sectionhead p{color:#cdb9a7}
+body.halloween .filter,body.halloween .mandala-type{background:#211815;border-color:#75370e;color:#ffebd5}
+body.halloween .filter:hover,body.halloween .mandala-type:hover{background:#392117;border-color:#ef7c0c}
+body.halloween .filter.active,body.halloween .mandala-type.active{background:linear-gradient(135deg,#ffb019,#f36b08);border-color:#ffad1d;color:#1b1009;box-shadow:0 4px 15px #e66a1744}
+body.halloween .search{background:#211815;border-color:#85400e;color:#fff0dc}
+body.halloween .search:focus{border-color:#ff9212;box-shadow:0 0 0 3px #ff921233}
+body.halloween .card,body.halloween .mandala-card,body.halloween .pearl-card,body.halloween .gym-planner,body.halloween .modal{background:linear-gradient(145deg,#211714,#171213);border-color:#76390f;box-shadow:0 5px 18px #0006}
+body.halloween .card:hover{border-color:#ff8b16;box-shadow:0 8px 24px #0009,0 0 0 1px #ff8b1644}
+body.halloween .emoji{background:#392216}
+body.halloween .arrow{color:#ff9a18}
+body.halloween .mandala-intro,body.halloween .gym-intro{background:linear-gradient(120deg,#382116,#201715);border:1px solid #71360f;color:#fff0df}
+body.halloween .mandala-links a,body.halloween .secondary,body.halloween .close{background:#3b2419;color:#ffe7ce}
+body.halloween .primary{background:linear-gradient(135deg,#ffad18,#ee6908);color:#1a100a}
+body.halloween .empty,body.halloween .steps,body.halloween .gym-field input{background:#211815;color:#fff0df}
+body.halloween .footer{border-color:#63300f;color:#cdb9a7}
+body.halloween .modalback{background:#090608d9}
+body.halloween .toast{background:#ff9618;color:#180d08}
+body.halloween .pearl-board{fill:#261a16;stroke:#81521e}
+body.halloween .pearl-svg{background:#201714}
+body.halloween .mandala-card img{background:#fff}
+body.halloween .mandala-pdf-preview{background:#fff}
+body.halloween .team-grid article{background:#211815;border-color:#76390f}
+body.halloween .team-warning{color:#ffb369}
+body.halloween .halloween-toggle{color:#ffb020}
+body.halloween .halloween-sound:disabled{opacity:.4}
+@media(min-width:761px){.topin>.halloween-toggle,.topin>.halloween-sound{width:42px;height:42px;display:grid;place-items:center;padding:0;font-size:20px;flex:0 0 42px}}
+@media(max-width:760px){.topin>.iconbtn#theme{margin-left:auto}.topin>.halloween-toggle,.topin>.halloween-sound{display:block;flex:0 0 auto;margin-left:0;padding:5px 4px;font-size:16px;line-height:1}.topin>.iconbtn#theme{padding:5px 4px;font-size:16px}}
+@media(max-width:390px){.topin{gap:2px}.topin>.brand:first-child,.topin>.brand.plugg-brand{font-size:clamp(10px,3.1vw,13px);gap:2px}.topin>.brand-switch{flex-basis:16px;width:16px}.topin>.iconbtn#theme,.topin>.halloween-toggle,.topin>.halloween-sound{padding:4px 2px;font-size:14px}}
 </style></head>
 <body>
-<header class="top"><div class="topin"><a class="brand" href="https://fritidsparken.se/" aria-label="Gå till Fritidsparken.se"><span class="site-logo"><img src="./assets/fritidsparken-logo.jpg" alt=""></span><span class="site-name">Fritidsparken.se</span></a><span class="brand-switch" aria-hidden="true"></span><a class="brand plugg-brand" href="https://pluggparken.se/" aria-label="Gå till Pluggparken.se"><span class="plugg-icon"><img src="https://pluggparken.se/favicon.svg" alt=""></span><span class="plugg-name">Pluggparken.se</span></a><nav class="nav"><button data-jump="Aktiviteter">Aktiviteter</button><button data-jump="Om Fritidsparken">Om sidan</button></nav><button type="button" class="iconbtn" id="theme" aria-label="Byt tema" aria-pressed="false">🌙</button><button type="button" class="profile" id="profile">🦊 Hej där!</button></div></header>
+<header class="top"><div class="topin"><a class="brand" href="https://fritidsparken.se/" aria-label="Gå till Fritidsparken.se"><span class="site-logo"><img src="./assets/fritidsparken-logo.jpg" alt=""></span><span class="site-name">Fritidsparken.se</span></a><span class="brand-switch" aria-hidden="true"></span><a class="brand plugg-brand" href="https://pluggparken.se/" aria-label="Gå till Pluggparken.se"><span class="plugg-icon"><img src="https://pluggparken.se/favicon.svg" alt=""></span><span class="plugg-name">Pluggparken.se</span></a><nav class="nav"><button data-jump="Aktiviteter">Aktiviteter</button><button data-jump="Om Fritidsparken">Om sidan</button></nav><button type="button" class="iconbtn" id="theme" aria-label="Byt tema" aria-pressed="false">🌙</button><button type="button" class="iconbtn halloween-toggle" id="halloweenTheme" aria-label="Aktivera Halloween-tema" aria-pressed="false" title="Aktivera Halloween-tema">🎃</button><button type="button" class="iconbtn halloween-sound" id="halloweenSound" aria-label="Stäng av Halloween-ljud" aria-pressed="true" title="Stäng av Halloween-ljud" disabled>🔊</button><button type="button" class="profile" id="profile">🦊 Hej där!</button></div></header>
 <main class="wrap">
 <section class="hero"><div><div class="eyebrow">Välkommen till Fritidsparken</div><h1>Vad vill du hitta på?</h1><p>Välj en idé och ha kul tillsammans.</p></div><div class="heroart" aria-hidden="true">🦊</div></section>
 <div class="sectionhead" id="Aktiviteter"><div><h2>Utforska aktiviteter</h2><p>Små och stora idéer för en rolig stund på fritids.</p></div><div class="tools"><input class="search" id="search" placeholder="🔎 Sök aktivitet…" aria-label="Sök aktivitet"></div></div>
@@ -641,6 +692,13 @@ $("#catalog").addEventListener("click",e=>{let ft=e.target.closest("[data-funtoo
 $("#catalog").addEventListener("submit",e=>{if(e.target.id==="huntForm"){e.preventDefault();let fd=new FormData(e.target),place=fd.get("place"),n=Number(fd.get("count")),clues=["Leta där vi hänger våra jackor.","Nästa ledtråd finns nära något som visar tiden.","Gå till platsen där böcker eller spel väntar.","Titta under ett bord nära väggen.","Sök där vi brukar samlas tillsammans.","Följ färgen grön till nästa plats.","Räkna tre steg från dörren och titta försiktigt."];$("#huntResult").innerHTML="<h3>Skattjakt "+place+"</h3><ol>"+clues.slice(0,n).map(x=>"<li>"+x+"</li>").join("")+"</ol><p>Göm skatten på en trygg och tillåten plats. En vuxen kan lägga ut ledtrådarna i ordning.</p>";return}if(e.target.id==="teamsForm"){e.preventDefault();const fd=new FormData(e.target);let names=String(fd.get("names")||"").split(/\r?\n|,/).map(x=>x.trim()).filter(Boolean);if(names.length<2){$("#teamsResult").innerHTML='<p class="team-warning">Skriv in minst två namn för att dela in i lag.</p>';return}let count=Math.max(2,Math.min(names.length,Number(fd.get("count"))||2));for(let i=names.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[names[i],names[j]]=[names[j],names[i]]}let teams=Array.from({length:count},()=>[]);names.forEach((n,i)=>teams[i%count].push(n));const safe=n=>n.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");$("#teamsResult").innerHTML="<div class=\"team-grid\">"+teams.map((t,i)=>"<article><h3>Lag "+(i+1)+"</h3><p>"+t.map(safe).join(", ")+"</p></article>").join("")+"</div>";return}if(e.target.id==="gymPlanner"){e.preventDefault();gymStudents=Math.max(2,Math.min(60,Number($("#gymStudents").value)||20));gymMinutes=Math.max(5,Math.min(120,Number($("#gymMinutes").value)||30));draw()}});$("#search").addEventListener("input",draw);$("#close").onclick=()=>$("#modalback").classList.remove("show");$("#modalback").addEventListener("click",e=>{if(e.target.id==="modalback")$("#modalback").classList.remove("show")});
 $("#complete").onclick=()=>{$("#progress").textContent="Bra jobbat, hoppas ni hade kul!";$("#toast").textContent="Aktivitet klar!";$("#toast").classList.add("show");setTimeout(()=>$("#toast").classList.remove("show"),1800)};
 $("#fav").onclick=()=>{if(!selected)return;if(favs.includes(selected[2]))favs=favs.filter(x=>x!==selected[2]);else favs.push(selected[2]);save();$("#fav").textContent=favs.includes(selected[2])?"★ Sparad favorit":"☆ Spara favorit"};
+let spookyCtx=null,spookyMaster=null,spookyNoise=null,spookyMuted=localStorage.fpHalloweenMuted==="1";
+function updateHalloweenControls(){const on=document.body.classList.contains("halloween"),themeBtn=$("#halloweenTheme"),soundBtn=$("#halloweenSound");themeBtn.setAttribute("aria-pressed",on?"true":"false");themeBtn.setAttribute("aria-label",on?"Stäng av Halloween-tema":"Aktivera Halloween-tema");themeBtn.title=on?"Stäng av Halloween-tema":"Aktivera Halloween-tema";soundBtn.disabled=!on;soundBtn.textContent=spookyMuted?"🔇":"🔊";soundBtn.setAttribute("aria-pressed",(!spookyMuted&&on)?"true":"false");soundBtn.setAttribute("aria-label",spookyMuted?"Sätt på Halloween-ljud":"Stäng av Halloween-ljud");soundBtn.title=spookyMuted?"Sätt på Halloween-ljud":"Stäng av Halloween-ljud";document.querySelector('meta[name="theme-color"]')?.setAttribute("content",on?"#100d0d":"#f6f4ec")}
+function startSpookyAudio(){try{const Ctx=window.AudioContext||window.webkitAudioContext;if(!Ctx)return;spookyCtx=spookyCtx||new Ctx();if(spookyCtx.state==="suspended")spookyCtx.resume();if(spookyMaster)return;spookyMaster=spookyCtx.createGain();spookyMaster.gain.setValueAtTime(0.0001,spookyCtx.currentTime);spookyMaster.gain.linearRampToValueAtTime(.035,spookyCtx.currentTime+1.4);spookyMaster.connect(spookyCtx.destination);const len=spookyCtx.sampleRate*3,buffer=spookyCtx.createBuffer(1,len,spookyCtx.sampleRate),data=buffer.getChannelData(0);let last=0;for(let i=0;i<len;i++){last=(last*.985)+(Math.random()*2-1)*.015;data[i]=last*5}spookyNoise=spookyCtx.createBufferSource();spookyNoise.buffer=buffer;spookyNoise.loop=true;const low=spookyCtx.createBiquadFilter();low.type="lowpass";low.frequency.value=380;const wind=spookyCtx.createGain();wind.gain.value=.9;spookyNoise.connect(low);low.connect(wind);wind.connect(spookyMaster);spookyNoise.start();[47,52].forEach((hz,i)=>{const o=spookyCtx.createOscillator(),g=spookyCtx.createGain();o.type=i?"sine":"triangle";o.frequency.value=hz;g.gain.value=i?.035:.025;o.connect(g);g.connect(spookyMaster);o.start()})}catch(err){console.warn("Halloween-ljud kunde inte startas",err)}}
+function stopSpookyAudio(){if(spookyMaster&&spookyCtx){const m=spookyMaster;spookyMaster=null;m.gain.cancelScheduledValues(spookyCtx.currentTime);m.gain.setTargetAtTime(0,spookyCtx.currentTime,.06);setTimeout(()=>{try{spookyNoise?.stop();spookyNoise=null;spookyCtx?.close();spookyCtx=null}catch{}},450)}}
+$("#halloweenTheme").addEventListener("click",()=>{const on=!document.body.classList.contains("halloween");document.body.classList.toggle("halloween",on);localStorage.fpHalloween=on?"1":"0";if(on&&!spookyMuted)startSpookyAudio();else stopSpookyAudio();updateHalloweenControls()});
+$("#halloweenSound").addEventListener("click",()=>{if(!document.body.classList.contains("halloween"))return;spookyMuted=!spookyMuted;localStorage.fpHalloweenMuted=spookyMuted?"1":"0";if(spookyMuted)stopSpookyAudio();else startSpookyAudio();updateHalloweenControls()});
+if(localStorage.fpHalloween==="1")document.body.classList.add("halloween");updateHalloweenControls();
 $("#theme").addEventListener("click",e=>{e.preventDefault();document.body.classList.toggle("dark");let dark=document.body.classList.contains("dark");localStorage.fpDark=dark?"1":"0";$("#theme").textContent=dark?"☀️":"🌙";$("#theme").setAttribute("aria-pressed",dark?"true":"false")});if(localStorage.fpDark==="1"){document.body.classList.add("dark");$("#theme").textContent="☀️";$("#theme").setAttribute("aria-pressed","true")}
 $("#profile").onclick=()=>{const choices=["🦊","🐻","🐸","🦉","🐼","🐰"];const current=localStorage.fpAvatar||"🦊";let next=choices[(choices.indexOf(current)+1)%choices.length];localStorage.fpAvatar=next;$("#profile").textContent=next+" Hej där!";document.querySelector(".heroart").textContent=next};if(localStorage.fpAvatar){$("#profile").textContent=localStorage.fpAvatar+" Hej där!";document.querySelector(".heroart").textContent=localStorage.fpAvatar}
 document.querySelectorAll("[data-jump]").forEach(b=>b.onclick=()=>document.getElementById(b.dataset.jump).scrollIntoView({behavior:"smooth"}));
