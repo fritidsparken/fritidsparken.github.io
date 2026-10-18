@@ -646,6 +646,24 @@ body.halloween .top::before{
  .topin>.brand:first-child .site-name,.topin>.brand.plugg-brand .plugg-name{min-width:0!important;max-width:100%!important;overflow:hidden!important;text-overflow:clip!important;white-space:nowrap!important;flex:0 1 auto!important}
  .topin>.brand.plugg-brand{transform:none!important}
 }
+</style><style id="portrait-header-no-overlap-final">
+@media(max-width:760px) and (orientation:portrait){
+ .topin{grid-template-columns:minmax(0,1.15fr) 0 minmax(0,1fr) auto!important;column-gap:3px!important;padding-left:6px!important;padding-right:6px!important}
+ .topin>.brand-switch{display:none!important;width:0!important;min-width:0!important}
+ .topin>.brand:first-child,.topin>.brand.plugg-brand{
+  display:flex!important;min-width:0!important;width:100%!important;max-width:100%!important;
+  overflow:hidden!important;box-sizing:border-box!important;gap:2px!important;
+  font-size:clamp(15px,3.8vw,17px)!important;transform:none!important
+ }
+ .topin>.brand:first-child>span.site-logo,.topin>.brand.plugg-brand .plugg-icon{
+  width:18px!important;height:18px!important;flex:0 0 18px!important
+ }
+ .topin>.brand:first-child .site-name,.topin>.brand.plugg-brand .plugg-name{
+  display:block!important;flex:1 1 0!important;width:0!important;min-width:0!important;max-width:100%!important;
+  overflow:hidden!important;text-overflow:clip!important;white-space:nowrap!important;
+  font-size:inherit!important;letter-spacing:-.5px!important
+ }
+}
 </style></head>
 <body>
 <header class="top"><div class="topin"><a class="brand" href="https://fritidsparken.se/" aria-label="Gå till Fritidsparken.se"><span class="site-logo"><img src="./assets/fritidsparken-logo.jpg" alt=""></span><span class="site-name">Fritidsparken.se</span></a><span class="brand-switch" aria-hidden="true"></span><a class="brand plugg-brand" href="https://pluggparken.se/" aria-label="Gå till Pluggparken.se"><span class="plugg-icon"><img src="https://pluggparken.se/favicon.svg" alt=""></span><span class="plugg-name">Pluggparken.se</span></a><button type="button" class="iconbtn" id="theme" aria-label="Byt tema" aria-pressed="false">🌙</button><button type="button" class="iconbtn season-picker" id="seasonPicker" aria-label="Välj säsongstema" aria-expanded="false" title="Välj säsongstema">🎃</button><button type="button" class="iconbtn halloween-sound" id="halloweenSound" aria-label="Stäng av Halloween-ljud" aria-pressed="true" title="Stäng av Halloween-ljud" disabled>🔊</button></div></header><div id="seasonMenu" class="season-menu" hidden></div>
