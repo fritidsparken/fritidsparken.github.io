@@ -980,4 +980,16 @@ $("#halloweenSound").addEventListener("click",()=>{if(document.body.classList.co
 $("#theme").addEventListener("click",e=>{e.preventDefault();document.body.classList.toggle("dark");let dark=document.body.classList.contains("dark");localStorage.fpDark=dark?"1":"0";$("#theme").textContent=dark?"☀️":"🌙";$("#theme").setAttribute("aria-pressed",dark?"true":"false")});if(localStorage.fpDark==="1"&&!autoHalloween){document.body.classList.add("dark");$("#theme").textContent="☀️";$("#theme").setAttribute("aria-pressed","true")}
 $("#profile").onclick=()=>{const choices=["🦊","🐻","🐸","🦉","🐼","🐰"];const current=localStorage.fpAvatar||"🦊";let next=choices[(choices.indexOf(current)+1)%choices.length];localStorage.fpAvatar=next;$("#profile").textContent=next+" Hej där!";document.querySelector(".heroart").textContent=next};if(localStorage.fpAvatar){$("#profile").textContent=localStorage.fpAvatar+" Hej där!";document.querySelector(".heroart").textContent=localStorage.fpAvatar}
 document.querySelectorAll("[data-jump]").forEach(b=>b.onclick=()=>document.getElementById(b.dataset.jump).scrollIntoView({behavior:"smooth"}));
-</script></body></html>
+</script><style id="craft-popup-layout-final">
+.modal.craft-detail{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(270px,.9fr)!important;grid-template-areas:"big big" "eyebrow eyebrow" "title title" "desc desc" "preview steps" "time time" "progress progress" "actions actions"!important;grid-template-rows:auto auto auto auto minmax(220px,1fr) auto auto auto!important;gap:12px 22px!important;align-items:start}
+.modal.craft-detail>.big{grid-area:big!important;grid-column:auto!important;grid-row:auto!important;font-size:42px!important;line-height:1!important;margin:0!important}
+.modal.craft-detail>.eyebrow{grid-area:eyebrow!important;grid-column:auto!important;grid-row:auto!important}
+.modal.craft-detail>h2{grid-area:title!important;grid-column:auto!important;grid-row:auto!important;margin:0!important}
+.modal.craft-detail>#mdesc{grid-area:desc!important;grid-column:auto!important;grid-row:auto!important;margin:0!important}
+.modal.craft-detail>#mPreview{grid-area:preview!important;grid-column:auto!important;grid-row:auto!important;min-width:0}
+.modal.craft-detail>.steps{grid-area:steps!important;grid-column:auto!important;grid-row:auto!important;min-width:0;align-self:stretch}
+.modal.craft-detail>#mtime{grid-area:time!important;grid-column:auto!important;grid-row:auto!important}
+.modal.craft-detail>#progress{grid-area:progress!important;grid-column:auto!important;grid-row:auto!important}
+.modal.craft-detail>.actions{grid-area:actions!important;grid-column:auto!important;grid-row:auto!important;margin-top:4px}
+@media(max-width:680px){.modal.craft-detail{grid-template-columns:minmax(0,1fr)!important;grid-template-areas:"big" "eyebrow" "title" "desc" "preview" "steps" "time" "progress" "actions"!important;grid-template-rows:auto!important}.modal.craft-detail>#mPreview,.modal.craft-detail>.steps{grid-column:auto!important;grid-row:auto!important}}
+</style></body></html>
