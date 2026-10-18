@@ -372,7 +372,52 @@ const mandalas=[{title:"Blommor & blad",type:"Blommor & blad",img:"https://frees
 {"title":"Messi firar mål","type":"Fotbollsstjärnor","pdf":"https://mondaymandala.com/wp-content/uploads/Lionel-Messi-Celebrating-Goal-Coloring-In.pdf","preview":"./assets/mandala-previews/068.jpg","src":"https://mondaymandala.com/lionel-messi-coloring-pages/"},
 {"title":"Messi i Argentinas tröja","type":"Fotbollsstjärnor","pdf":"https://mondaymandala.com/wp-content/uploads/GOAT-Lionel-Messi-In-Argentina-Jersey.pdf","preview":"./assets/mandala-previews/069.jpg","src":"https://mondaymandala.com/lionel-messi-coloring-pages/"},
 {"title":"Ronaldo med fotboll","type":"Fotbollsstjärnor","pdf":"https://mondaymandala.com/wp-content/uploads/Cristiano-Ronaldo-With-Soccer-Ball-Coloring.pdf","preview":"./assets/mandala-previews/070.jpg","src":"https://mondaymandala.com/cristiano-ronaldo-coloring-pages/"},
-{"title":"Ronaldo gör en bicykelspark","type":"Fotbollsstjärnor","pdf":"https://mondaymandala.com/wp-content/uploads/Ronaldo-Bicycle-Kick-Coloring-In.pdf","preview":"./assets/mandala-previews/071.jpg","src":"https://mondaymandala.com/cristiano-ronaldo-coloring-pages/"}];const paperDolls=[{title:"Klippdocka med kläder",type:"Svartvit mall",img:"https://freesvg.org/img/tippy-paper-doll.png",src:"https://freesvg.org/paper-doll-with-costumes"},{title:"Klippdocka med olika kläder",type:"Svartvit mall",img:"https://freesvg.org/img/classicpaperdolls.png",src:"https://freesvg.org/paper-doll"},{title:"Klippdocka med garderob",type:"Mall med kläder",img:"https://freesvg.org/img/classicpaperdoll-colour.png",src:"https://freesvg.org/paper-doll-with-clothes"},{title:"Tysk klippdocka med tre klänningar",type:"Svartvit mall",img:"https://freesvg.org/img/germanpaperdoll.png",src:"https://freesvg.org/index.php/german-paper-doll"},{title:"Klippdocka med klänning",type:"Svartvit mall",img:"https://freesvg.org/img/paperdoll.png",src:"https://freesvg.org/paper-doll-image"},{title:"Detaljerad klippdocka med kläder",type:"Utskrivbar målarbild",img:"./assets/paper_doll_detailed.jpg"},{title:"Kawaii klippdocka med modekläder",type:"Utskrivbar målarbild",img:"./assets/paper_doll_kawaii.jpg"},{title:"Minecraft pappersdocka med utrustning",type:"Utskrivbar klippmall",img:"./assets/paper_doll_minecraft.jpg"},{title:"Kawaii pappersfigurer att klippa ut",type:"Utskrivbara figurer",img:"./assets/paper_figures_kawaii.jpg"}];let mandalaStyle="Alla";let category="Alla",selected=null,favs=JSON.parse(localStorage.fpFavs||"[]");
+{"title":"Ronaldo gör en bicykelspark","type":"Fotbollsstjärnor","pdf":"https://mondaymandala.com/wp-content/uploads/Ronaldo-Bicycle-Kick-Coloring-In.pdf","preview":"./assets/mandala-previews/071.jpg","src":"https://mondaymandala.com/cristiano-ronaldo-coloring-pages/"}];
+
+function seasonalMandalaItems(){
+ const seasons=[
+  {name:"Vår",source:"https://mondaymandala.com/spring-coloring-pages/"},
+  {name:"Sommar",source:"https://mondaymandala.com/summer-coloring-pages/"},
+  {name:"Höst",source:"https://mondaymandala.com/fall-coloring-pages/"},
+  {name:"Vinter",source:"https://mondaymandala.com/winter-coloring-pages/"}
+ ];
+ const items=[];
+ seasons.forEach(season=>{
+  for(let i=1;i<=50;i++){
+   const petals=8+(i%9), rings=3+(i%4), rotate=(i*17)%360, lines=[];
+   lines.push('<rect x="38" y="38" width="724" height="924" rx="18" fill="white" stroke="#111" stroke-width="3"/>');
+   lines.push('<circle cx="400" cy="500" r="320" fill="none" stroke="#111" stroke-width="3"/>');
+   lines.push('<circle cx="400" cy="500" r="285" fill="none" stroke="#111" stroke-width="2"/>');
+   for(let layer=0;layer<rings;layer++){
+    const r=64+layer*42, rx=17+(i+layer)%17, ry=25+(i*2+layer*7)%23;
+    lines.push('<circle cx="400" cy="500" r="'+r+'" fill="none" stroke="#111" stroke-width="2"/>');
+    for(let p=0;p<petals;p++){
+     const angle=(360/petals)*p+rotate+layer*9, cy=-r;
+     lines.push('<g transform="translate(400 500) rotate('+angle+') translate(0 '+cy+')"><ellipse cx="0" cy="0" rx="'+rx+'" ry="'+ry+'" fill="none" stroke="#111" stroke-width="2"/><circle cx="0" cy="0" r="'+(4+(i+layer)%5)+'" fill="none" stroke="#111" stroke-width="1.5"/></g>');
+    }
+   }
+   for(let p=0;p<petals*2;p++){
+    const angle=(360/(petals*2))*p+rotate, r=310;
+    const symbol=season.name==="Vår"
+     ? '<path d="M0 -8 C-15 -22 -12 -40 0 -48 C12 -40 15 -22 0 -8 M0 -12 L0 -43"'
+     : season.name==="Sommar"
+     ? '<path d="M0 -8 L0 -49 M-7 -15 L-30 -37 M7 -15 L30 -37 M-9 -5 L-38 -5 M9 -5 L38 -5"'
+     : season.name==="Höst"
+     ? '<path d="M0 -7 C-32 -22 -31 -44 0 -52 C31 -44 32 -22 0 -7 M0 -9 L0 -46 M0 -28 L-17 -39 M0 -23 L17 -37"'
+     : '<path d="M0 -7 L0 -53 M-24 -18 L24 -42 M-24 -42 L24 -18 M0 -30 L-13 -42 M0 -30 L13 -42 M0 -30 L-13 -18 M0 -30 L13 -18"';
+    lines.push('<g transform="translate(400 500) rotate('+angle+') translate(0 -'+r+')">'+symbol+' fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>');
+   }
+   lines.push('<circle cx="400" cy="500" r="35" fill="none" stroke="#111" stroke-width="3"/>');
+   const svg='<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000"><rect width="800" height="1000" fill="white"/>'+lines.join("")+'</svg>';
+   const uri="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);
+   items.push({title:season.name+"mandala "+String(i).padStart(2,"0"),type:season.name,img:uri,preview:uri,src:season.source,src2:"https://www.supercoloring.com/coloring-pages/mandala",sourceLabel:"Egenritad originalmall"});
+  }
+ });
+ return items;
+}
+
+mandalas.push(...seasonalMandalaItems());
+const paperDolls=[{title:"Klippdocka med kläder",type:"Svartvit mall",img:"https://freesvg.org/img/tippy-paper-doll.png",src:"https://freesvg.org/paper-doll-with-costumes"},{title:"Klippdocka med olika kläder",type:"Svartvit mall",img:"https://freesvg.org/img/classicpaperdolls.png",src:"https://freesvg.org/paper-doll"},{title:"Klippdocka med garderob",type:"Mall med kläder",img:"https://freesvg.org/img/classicpaperdoll-colour.png",src:"https://freesvg.org/paper-doll-with-clothes"},{title:"Tysk klippdocka med tre klänningar",type:"Svartvit mall",img:"https://freesvg.org/img/germanpaperdoll.png",src:"https://freesvg.org/index.php/german-paper-doll"},{title:"Klippdocka med klänning",type:"Svartvit mall",img:"https://freesvg.org/img/paperdoll.png",src:"https://freesvg.org/paper-doll-image"},{title:"Detaljerad klippdocka med kläder",type:"Utskrivbar målarbild",img:"./assets/paper_doll_detailed.jpg"},{title:"Kawaii klippdocka med modekläder",type:"Utskrivbar målarbild",img:"./assets/paper_doll_kawaii.jpg"},{title:"Minecraft pappersdocka med utrustning",type:"Utskrivbar klippmall",img:"./assets/paper_doll_minecraft.jpg"},{title:"Kawaii pappersfigurer att klippa ut",type:"Utskrivbara figurer",img:"./assets/paper_figures_kawaii.jpg"}];let mandalaStyle="Alla";let category="Alla",selected=null,favs=JSON.parse(localStorage.fpFavs||"[]");
 let pearlPage=false,pearlLevel="Alla",selectedPearl=null;
 const pearlColors={R:"#ee5f62",P:"#f4a6c0",Y:"#f5cc50",O:"#f39745",G:"#68b982",D:"#359a72",B:"#67b9df",U:"#7188d9",V:"#a47bd0",W:"#fffdf7",K:"#4b5664"};
 const pearlPatterns=[
@@ -401,9 +446,9 @@ const pearlPatterns=[
 const $=s=>document.querySelector(s);function save(){localStorage.fpFavs=JSON.stringify(favs)}
 function drawFilters(){$("#filters").innerHTML=cats.map(c=>'<button class="filter '+(c===category?"active":"")+'" data-cat="'+c+'">'+c+"</button>").join("")}
 function mandalaGallery(q){
-let styles=["Alla","Blommor & blad","Djur","Geometriska","Ornament","Cirklar & linjer","Pokémon","Marvel","Fotbollsstjärnor"];
+let styles=["Alla","Blommor & blad","Djur","Geometriska","Ornament","Cirklar & linjer","Pokémon","Marvel","Fotbollsstjärnor","Vår","Sommar","Höst","Vinter"];
 let shown=mandalas.filter(m=>(mandalaStyle==="Alla"||m.type===mandalaStyle)&&(m.title+" "+m.type).toLocaleLowerCase("sv").includes(q));
-return '<div class="mandala-intro"><strong>Välj mandala eller ett tema att färglägga</strong><p>Blommor, djur, geometri, ornament och utskrivbara sidor med Pokémon, Marvel-hjältar och fotbollsstjärnor. Förhandsbilden visar hela utskriftssidan. Öppna PDF-filen för utskrift på A4. Monday Mandala anges som källa på varje kort.</p></div><div class="mandala-types">'+styles.map(s=>'<button class="mandala-type '+(s===mandalaStyle?"active":"")+'" data-mstyle="'+s+'">'+s+'</button>').join("")+'</div><div class="mandala-grid">'+shown.map(m=>'<article class="mandala-card"><a href="'+(m.pdf||m.img)+'" target="_blank" rel="noopener"><img loading="lazy" decoding="async" src="'+(m.preview||m.img)+'" alt="Helsidesförhandsvisning av '+m.title+'"></a><div class="mandala-info"><span class="mandala-label">'+m.type+'</span><h3>'+m.title+'</h3><div class="mandala-links"><a href="'+(m.pdf||m.img)+'" target="_blank" rel="noopener">Öppna / skriv ut</a><a href="'+m.src+'" target="_blank" rel="noopener">'+(m.pdf?"Källa: Monday Mandala":"Källa & licens")+'</a></div></div></article>').join("")+'</div>'+(shown.length?"":'<div class="empty">Inga mandalas i den här gruppen.</div>')
+return '<div class="mandala-intro"><strong>Välj mandala eller ett tema att färglägga</strong><p>Blommor, djur, geometri, ornament och utskrivbara sidor med Pokémon, Marvel-hjältar och fotbollsstjärnor. Förhandsbilden visar hela utskriftssidan. Öppna PDF-filen för utskrift på A4. Befintliga utskriftssidor länkar till sina källor. De fyra årstidskategorierna har 50 egenritade utskriftsmandalor var. <a href="https://mondaymandala.com/" target="_blank" rel="noopener">Monday Mandala</a> · <a href="https://www.supercoloring.com/coloring-pages/mandala" target="_blank" rel="noopener">Super Coloring</a>. Klicka på en bild för att öppna hela sidan.</p></div><div class="mandala-types">'+styles.map(s=>'<button class="mandala-type '+(s===mandalaStyle?"active":"")+'" data-mstyle="'+s+'">'+s+'</button>').join("")+'</div><div class="mandala-grid">'+shown.map(m=>'<article class="mandala-card"><a href="'+(m.pdf||m.img)+'" target="_blank" rel="noopener"><img loading="lazy" decoding="async" src="'+(m.preview||m.img)+'" alt="Helsidesförhandsvisning av '+m.title+'"></a><div class="mandala-info"><span class="mandala-label">'+m.type+'</span><h3>'+m.title+'</h3><div class="mandala-links"><a href="'+(m.pdf||m.img)+'" target="_blank" rel="noopener">Öppna / skriv ut</a><a href="'+m.src+'" target="_blank" rel="noopener">'+(m.sourceLabel|| (m.pdf?"Källa: Monday Mandala":"Källa & licens"))+'</a>'+(m.src2?'<a href="'+m.src2+'" target="_blank" rel="noopener">Super Coloring</a>':"")+'</div></div></article>').join("")+'</div>'+(shown.length?"":'<div class="empty">Inga mandalas i den här gruppen.</div>')
 }function dollGallery(q){return '<div class="mandala-intro"><strong>Färglägg, klipp ut och klä på</strong><p>Välj en mall och öppna den för att skriva ut. Skriv gärna ut på lite tjockare papper. Klipp ut dockan och kläderna längs ytterlinjerna.</p></div><div class="mandala-grid">'+paperDolls.filter(m=>(m.title+" "+m.type).toLocaleLowerCase("sv").includes(q)).map(m=>'<article class="mandala-card"><a href="'+m.img+'" target="_blank" rel="noopener"><img loading="lazy" src="'+m.img+'" alt="'+m.title+'"></a><div class="mandala-info"><span class="mandala-label">'+m.type+'</span><h3>'+m.title+'</h3><div class="mandala-links"><a href="'+m.img+'" target="_blank" rel="noopener">Öppna / skriv ut</a>' + (m.src?'<a href="'+m.src+'" target="_blank" rel="noopener">Källa &amp; licens</a>':'') + '</div></div></article>').join("")+'</div>'}
 
 const drawingAnimals=[
