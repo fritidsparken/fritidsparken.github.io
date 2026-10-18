@@ -975,8 +975,8 @@ document.documentElement.style.setProperty("--halloween-mark","url('"+halloweenP
 function stockholmDateCode(){const parts=new Intl.DateTimeFormat("en-US",{timeZone:"Europe/Stockholm",month:"numeric",day:"numeric"}).formatToParts(new Date());return Number(parts.find(p=>p.type==="month").value)*100+Number(parts.find(p=>p.type==="day").value)}
 const todayCode=stockholmDateCode(),autoHalloween=todayCode>=1001&&todayCode<=1108,autoChristmas=todayCode>=1201||todayCode<=110;
 const savedTheme=localStorage.fpSeasonTheme||"",codeUnlocked=localStorage.fpThemeCodeUnlocked==="1";
-const initialChristmas=codeUnlocked&&savedTheme==="christmas"||autoChristmas;
-const initialHalloween=codeUnlocked&&savedTheme==="halloween"||autoHalloween;
+const initialChristmas=codeUnlocked?savedTheme==="christmas":autoChristmas;
+const initialHalloween=codeUnlocked?savedTheme==="halloween":autoHalloween;
 document.body.classList.toggle("halloween",initialHalloween&&!initialChristmas);
 document.body.classList.toggle("christmas",initialChristmas);
 if(autoHalloween){document.body.classList.remove("dark")}
