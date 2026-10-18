@@ -1239,6 +1239,24 @@ const crops={
 };
 const W=1993,H=789,PW=372,PH=498,GAP=16,LEFT=34,TOP=147;
 const missingNumbers=new Set(["fox-guide-final.webp","lion-guide.webp"]);
+const panelCutsCache=new Map();
+function getPanelCuts(img,crop,file){
+ if(panelCutsCache.has(file))return panelCutsCache.get(file);
+ const [x0,y0,x1,y1]=crop,width=x1-x0,height=y1-y0;
+ const scan=document.createElement("canvas");scan.width=width;scan.height=height;
+ const sc=scan.getContext("2d",{willReadFrequently:true});
+ sc.drawImage(img,x0,y0,width,height,0,0,width,height);
+ const pixels=sc.getImageData(0,0,width,height).data,means=new Float32Array(width);
+ for(let x=0;x<width;x++){let sum=0,count=0;for(let y=0;y<height;y+=3){const k=(y*width+x)*4;sum+=Math.max(pixels[k],pixels[k+1],pixels[k+2]);count++}means[x]=sum/count}
+ const cuts=[x0];
+ for(let i=1;i<5;i++){
+  const ideal=width*i/5,radius=Math.ceil(width*.08),lo=Math.max(2,Math.floor(ideal-radius)),hi=Math.min(width-3,Math.ceil(ideal+radius));
+  let peak=lo;for(let x=lo+1;x<=hi;x++)if(means[x]>means[peak])peak=x;
+  const baseline=means[Math.round(ideal)];
+  cuts.push(means[peak]>190&&means[peak]-baseline>80?x0+peak:x0+Math.round(ideal));
+ }
+ cuts.push(x1);panelCutsCache.set(file,cuts);return cuts;
+}
 function rounded(ctx,x,y,w,h,r){
  ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.strokeStyle="#416b4e";ctx.lineWidth=4;ctx.stroke();
 }
@@ -1254,9 +1272,10 @@ function paint(canvas){
   canvas.width=W;canvas.height=H;
   const ctx=canvas.getContext("2d",{willReadFrequently:true});
   ctx.fillStyle="#100907";ctx.fillRect(0,0,W,H);
-  const [sx0,sy0,sx1,sy1]=crop,cellWidth=(sx1-sx0)/5,sh=sy1-sy0;
+  const [sx0,sy0,sx1,sy1]=crop,sh=sy1-sy0,cuts=getPanelCuts(img,crop,file);
   for(let i=0;i<5;i++){
-   const sx=sx0+i*cellWidth+cellWidth*.012,sw=cellWidth*.976;
+   const cellWidth=cuts[i+1]-cuts[i],inset=Math.max(5,Math.round(cellWidth*.025));
+   const sx=cuts[i]+inset,sw=cellWidth-inset*2;
    const tile=document.createElement("canvas");tile.width=PW-4;tile.height=PH-4;
    const tc=tile.getContext("2d",{willReadFrequently:true});
    tc.fillStyle="#082c1d";tc.fillRect(0,0,tile.width,tile.height);
