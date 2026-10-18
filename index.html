@@ -509,6 +509,48 @@ body.halloween .seasonal-craft-cta::after{content:"";position:absolute;inset:-13
 .theme-code-card input:focus{border-color:var(--green);box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 20%,transparent)}
 .theme-code-error{min-height:24px;margin:7px 0!important;color:#bd392d!important;font-weight:750}
 .theme-code-actions{display:flex;justify-content:flex-end;gap:9px}
+</style><style id="drawing-guides-unified-dark-theme">
+.draw-page{
+  color:#f2eee4;
+  background:linear-gradient(145deg,#15281f 0%,#1b3428 55%,#13251d 100%);
+  border:1px solid #355642;
+  border-radius:24px;
+  padding:clamp(16px,3vw,30px);
+}
+.draw-page .draw-title h2,.draw-page .draw-card-title,.draw-page .draw-step-copy h3{color:#f5f0e5}
+.draw-page .draw-title p,.draw-page .draw-card-title small,.draw-page .draw-step-count,.draw-page .draw-step-copy p,.draw-page .draw-tip,.draw-page .draw-sequence-step{color:#c4d4c8}
+.draw-page .draw-card,.draw-page .draw-step-card,.draw-modal{
+  background:#182d23;
+  color:#f4efe4;
+  border-color:#45634e;
+  box-shadow:0 14px 40px #07110c80;
+}
+.draw-page .draw-card{border:1px solid #45634e}
+.draw-page .draw-card-image,.draw-page .draw-svg,.draw-page .draw-step-image,.draw-page .draw-popup-image{
+  background:#173b2d;
+  border-color:#45634e;
+}
+.draw-page .draw-svg .canvas{fill:#173b2d;stroke:#52735d}
+.draw-page .draw-svg .line{stroke:#f0e9d9}
+.draw-page .draw-svg .detail{stroke:#d8d0bd}
+.draw-page .draw-svg .guide{fill:#294638;fill-opacity:.8;stroke:#92b39b}
+.draw-page .draw-svg .dot{fill:#f0e9d9}
+.draw-page .draw-svg .nose{fill:#f0e9d9;stroke:#f0e9d9}
+.draw-page .draw-dot{background:#20392b;color:#f2eee4;border-color:#56745f}
+.draw-page .draw-dot.active{background:#368354;color:#fff}
+.draw-page .draw-actions button,.draw-page .draw-back,.draw-page .drawing-filters button{
+  background:#244332;
+  color:#f4efe4;
+  border-color:#52735d;
+}
+.draw-page .draw-actions button:hover,.draw-page .draw-back:hover,.draw-page .drawing-filters button:hover{background:#315941}
+.draw-page .draw-tip-inline{color:#d5e2d7;background:#203b2c}
+.draw-modal-close{background:#315941;color:#fff4e2}
+.draw-modal-title p{color:#c4d4c8}
+.draw-modal .draw-instructions{color:#e9e5dc}
+@media(max-width:640px){
+  .draw-page{padding:14px 10px;border-radius:18px}
+}
 </style></head>
 <body>
 <header class="top"><div class="topin"><a class="brand" href="https://fritidsparken.se/" aria-label="Gå till Fritidsparken.se"><span class="site-logo"><img src="./assets/fritidsparken-logo.jpg" alt=""></span><span class="site-name">Fritidsparken.se</span></a><span class="brand-switch" aria-hidden="true"></span><a class="brand plugg-brand" href="https://pluggparken.se/" aria-label="Gå till Pluggparken.se"><span class="plugg-icon"><img src="https://pluggparken.se/favicon.svg" alt=""></span><span class="plugg-name">Pluggparken.se</span></a><button type="button" class="iconbtn" id="theme" aria-label="Byt tema" aria-pressed="false">🌙</button><button type="button" class="iconbtn season-picker" id="seasonPicker" aria-label="Välj säsongstema" aria-expanded="false" title="Välj säsongstema">🎃</button><button type="button" class="iconbtn halloween-sound" id="halloweenSound" aria-label="Stäng av Halloween-ljud" aria-pressed="true" title="Stäng av Halloween-ljud" disabled>🔊</button></div></header><div id="seasonMenu" class="season-menu" hidden></div>
