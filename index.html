@@ -1288,7 +1288,7 @@ window.drawingGuideSprite=function(a){
 };
 const visibility=window.IntersectionObserver?new IntersectionObserver(entries=>{
  entries.forEach(e=>{if(e.isIntersecting){paint(e.target);visibility.unobserve(e.target)}});
-},{rootMargin:"300px"}):null;
+},{rootMargin:"2000px"}):null;
 function mount(root){
  const list=[];
  if(root?.matches?.("canvas[data-drawing-guide]"))list.push(root);
