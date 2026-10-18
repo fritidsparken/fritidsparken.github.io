@@ -470,7 +470,19 @@ body.halloween .seasonal-craft-cta::after{content:"";position:absolute;inset:-13
 @keyframes halloweenTextGlow{0%,100%{text-shadow:0 0 5px #ff7618,0 0 10px #ff761866}50%{text-shadow:0 0 10px #ff7618,0 0 19px #ff7618}}
 .draw-modal{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,.85fr);gap:12px 22px;align-items:start}.draw-modal .draw-modal-title{grid-column:1/-1}.draw-modal .draw-sequence{grid-column:1;grid-row:2;max-width:none}.draw-modal .draw-instructions{grid-column:2;grid-row:2;align-self:start}.draw-modal .draw-tip-inline{grid-column:1/-1}@media(max-width:680px){.draw-modal .draw-instructions,.draw-modal .draw-sequence{grid-column:1;grid-row:auto}.draw-modal .draw-tip-inline{grid-column:1}.modal.craft-detail{grid-template-columns:1fr;gap:10px}.modal.craft-detail>#mPreview,.modal.craft-detail>.steps{grid-column:1;grid-row:auto}.modal.craft-detail>#mPreview{margin-top:4px}}
 </style>
-</head>
+<style id="craft-popup-layout-fix">
+.modal.craft-detail{grid-template-columns:minmax(0,1fr) minmax(270px,.9fr);grid-template-areas:"big big" "eyebrow eyebrow" "title title" "desc desc" "preview steps" "time time" "progress progress" "actions actions";grid-template-rows:auto auto auto auto minmax(220px,1fr) auto auto auto}
+.modal.craft-detail>.big{grid-area:big;grid-column:auto;font-size:42px;line-height:1;margin:0}
+.modal.craft-detail>.eyebrow{grid-area:eyebrow;grid-column:auto}
+.modal.craft-detail>h2{grid-area:title;grid-column:auto;margin:0}
+.modal.craft-detail>#mdesc{grid-area:desc;grid-column:auto;margin:0}
+.modal.craft-detail>#mPreview{grid-area:preview;grid-column:auto;grid-row:auto;min-width:0}
+.modal.craft-detail>.steps{grid-area:steps;grid-column:auto;grid-row:auto;min-width:0;align-self:stretch}
+.modal.craft-detail>#mtime{grid-area:time;grid-column:auto}
+.modal.craft-detail>#progress{grid-area:progress;grid-column:auto}
+.modal.craft-detail>.actions{grid-area:actions;grid-column:auto;margin-top:4px}
+@media(max-width:680px){.modal.craft-detail{grid-template-columns:minmax(0,1fr);grid-template-areas:"big" "eyebrow" "title" "desc" "preview" "steps" "time" "progress" "actions";grid-template-rows:auto}.modal.craft-detail>#mPreview,.modal.craft-detail>.steps{grid-column:auto;grid-row:auto}}
+</style></head>
 <body>
 <header class="top"><div class="topin"><a class="brand" href="https://fritidsparken.se/" aria-label="Gå till Fritidsparken.se"><span class="site-logo"><img src="./assets/fritidsparken-logo.jpg" alt=""></span><span class="site-name">Fritidsparken.se</span></a><span class="brand-switch" aria-hidden="true"></span><a class="brand plugg-brand" href="https://pluggparken.se/" aria-label="Gå till Pluggparken.se"><span class="plugg-icon"><img src="https://pluggparken.se/favicon.svg" alt=""></span><span class="plugg-name">Pluggparken.se</span></a><button type="button" class="iconbtn" id="theme" aria-label="Byt tema" aria-pressed="false">🌙</button><button type="button" class="iconbtn season-picker" id="seasonPicker" aria-label="Välj säsongstema" aria-expanded="false" title="Välj säsongstema">🎃</button><button type="button" class="iconbtn halloween-sound" id="halloweenSound" aria-label="Stäng av Halloween-ljud" aria-pressed="true" title="Stäng av Halloween-ljud" disabled>🔊</button><button type="button" class="profile" id="profile">🦊 Hej där!</button></div></header><div id="seasonMenu" class="season-menu" hidden></div>
 <main class="wrap">
