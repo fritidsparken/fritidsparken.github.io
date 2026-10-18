@@ -28,3 +28,7 @@
 .topin>.iconbtn#theme,.topin>#halloweenSound{order:2!important;margin:0!important}
 .topin>.profile{order:3!important;display:inline-flex!important;align-items:center;justify-content:center;flex:0 0 auto;min-width:0;margin:0;padding:5px 8px;font-size:12px;line-height:1.1;white-space:nowrap}
 }
+
+/* Rastbilder i popup: visa hela den kvadratiska bilden utan vita sidfält */
+#modalback #mPreview img.recess-activity-photo{width:auto!important;height:min(39dvh,390px)!important;max-width:100%!important;max-height:min(39dvh,390px)!important;aspect-ratio:1/1!important;object-fit:cover!important;background:transparent!important;border:0!important;margin:0 auto!important}
+@media(max-width:480px) and (orientation:portrait){#modalback #mPreview img.recess-activity-photo{width:min(75vw,420px)!important;height:auto!important;max-height:75dvh!important;aspect-ratio:1/1!important}}
