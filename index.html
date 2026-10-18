@@ -509,7 +509,7 @@ body.halloween .seasonal-craft-cta::after{content:"";position:absolute;inset:-13
 <footer class="footer">Fritidsparken · Idéer för lek, rörelse och skapande<br>Dina sparade favoriter finns kvar i den här webbläsaren.</footer>
 </main>
 <div class="modalback" id="modalback"><article class="modal" role="dialog" aria-modal="true"><button class="close" id="close" aria-label="Stäng">×</button><div class="big" id="memoji"></div><div class="eyebrow" id="mcat"></div><h2 id="mtitle"></h2><p id="mdesc"></p><div id="mPreview" class="modal-preview hide"></div><div class="steps"><strong>Så gör ni</strong><ol id="msteps"></ol></div><div class="pill" id="mtime"></div><p id="progress"></p><div class="actions"><button class="primary" id="complete">Vi har gjort den!</button><button class="secondary" id="fav">☆ Spara favorit</button></div></article></div><div class="toast" id="toast"></div>
-<script>
+<div id="themeCodeGate" class="theme-code-back" hidden role="presentation"><form id="themeCodeForm" class="theme-code-card" role="dialog" aria-modal="true" aria-labelledby="themeCodeTitle"><h2 id="themeCodeTitle">Lås upp tema</h2><p>Skriv in koden för att aktivera temat.</p><input id="themeCodeInput" type="password" autocomplete="off" aria-label="Kod" required><p id="themeCodeError" class="theme-code-error" aria-live="polite"></p><div class="theme-code-actions"><button id="themeCodeCancel" type="button" class="secondary">Avbryt</button><button type="submit" class="primary">Lås upp</button></div></form></div><script>
 const activities=[
 ["🎨","Skapa","Naturtryck","Gör färgglada avtryck av löv och blommor.","20–40 min",["Samla några olika löv.","Lägg dem under ett papper och gnugga med krita.","Jämför mönstren och skapa en bild."]],
 ["🧩","Skapa","Pappersbroar","Bygg en bro av papper som klarar en liten vikt.","15–30 min",["Vik eller rulla papper till olika former.","Bygg en bro mellan två böcker.","Testa hur många klossar den håller."]],
@@ -974,7 +974,7 @@ document.documentElement.style.setProperty("--halloween-web","url('"+halloweenPi
 document.documentElement.style.setProperty("--halloween-mark","url('"+halloweenPictures.mark+"')");
 function stockholmDateCode(){const parts=new Intl.DateTimeFormat("en-US",{timeZone:"Europe/Stockholm",month:"numeric",day:"numeric"}).formatToParts(new Date());return Number(parts.find(p=>p.type==="month").value)*100+Number(parts.find(p=>p.type==="day").value)}
 const todayCode=stockholmDateCode(),autoHalloween=todayCode>=1001&&todayCode<=1108,autoChristmas=todayCode>=1201||todayCode<=110;
-const savedTheme=localStorage.fpSeasonTheme||"",codeUnlocked=localStorage.fpSeasonCodeUnlocked==="1";
+const savedTheme=localStorage.fpSeasonTheme||"",codeUnlocked=localStorage.fpThemeCodeUnlocked==="1";
 const initialChristmas=codeUnlocked&&savedTheme==="christmas"||autoChristmas;
 const initialHalloween=codeUnlocked&&savedTheme==="halloween"||autoHalloween;
 document.body.classList.toggle("halloween",initialHalloween&&!initialChristmas);
@@ -1045,4 +1045,4 @@ body.halloween #seasonalCraftCta::after,body.christmas #seasonalCraftCta::after{
 body.halloween #seasonalCraftCta::after{background:radial-gradient(ellipse,#ff6a13b8 0%,#ff8a3566 46%,transparent 76%)!important}
 body.christmas #seasonalCraftCta::after{background:radial-gradient(ellipse,#e6bf58d9 0%,#f0c64c88 32%,#1d9b5d75 58%,transparent 78%)!important;animation:christmasGlow 2.4s ease-in-out infinite!important}\n@keyframes christmasTextGlow{0%,100%{text-shadow:0 0 5px #ffe88a,0 0 11px #ffd34f,0 0 22px #ffbd35,0 0 34px #f49a1c}50%{text-shadow:0 0 8px #fff1a8,0 0 17px #ffdb62,0 0 32px #ffc439,0 0 46px #f49a1c}}
 @media(prefers-reduced-motion:reduce){body.halloween #seasonalCraftCta::after,body.christmas #seasonalCraftCta::after{animation:none!important;opacity:.8}body.christmas #seasonalCraftCta{animation:none!important}}
-</style><div id="themeCodeGate" class="theme-code-back" hidden role="presentation"><form id="themeCodeForm" class="theme-code-card" role="dialog" aria-modal="true" aria-labelledby="themeCodeTitle"><h2 id="themeCodeTitle">Lås upp tema</h2><p>Skriv in koden för att aktivera temat.</p><input id="themeCodeInput" type="password" autocomplete="off" aria-label="Kod" required><p id="themeCodeError" class="theme-code-error" aria-live="polite"></p><div class="theme-code-actions"><button id="themeCodeCancel" type="button" class="secondary">Avbryt</button><button type="submit" class="primary">Lås upp</button></div></form></div></body></html>
+</style></body></html>
