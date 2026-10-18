@@ -848,10 +848,14 @@ const drawingAnimals=[
 ,{id:"blomma",name:"Blomma",article:"en",difficulty:"Lätt",emoji:"🌼",kind:"flower",subjectKind:"Saker"},
 {id:"hus",name:"Hus",article:"ett",difficulty:"Lätt",emoji:"🏠",kind:"house",subjectKind:"Saker"},
 {id:"raket",name:"Raket",article:"en",difficulty:"Medel",emoji:"🚀",kind:"rocket",subjectKind:"Saker"},
-{id:"bil",name:"Bil",article:"en",difficulty:"Medel",emoji:"🚗",kind:"car",subjectKind:"Saker"}
+{id:"bil",name:"Bil",article:"en",difficulty:"Medel",emoji:"🚗",kind:"car",subjectKind:"Saker"},
+{id:"paraply",name:"Paraply",article:"ett",difficulty:"Lätt",emoji:"☂️",kind:"umbrella",subjectKind:"Saker"},
+{id:"trad",name:"Träd",article:"ett",difficulty:"Lätt",emoji:"🌳",kind:"tree",subjectKind:"Saker"},
+{id:"bat",name:"Båt",article:"en",difficulty:"Lätt",emoji:"⛵",kind:"boat",subjectKind:"Saker"},
+{id:"pappersdrake",name:"Pappersdrake",article:"en",difficulty:"Lätt",emoji:"🪁",kind:"kite",subjectKind:"Saker"}
 ];
 let activeDrawing=null,drawingStep=1,drawingDifficulty="Alla",drawingKind="Alla";
-const drawingGuideAsset={katt:"cat-chalkboard.png",hund:"dog-chalkboard.png",kanin:"rabbit-chalkboard.png",fjaril:"butterfly.png",panda:"panda.png",lejon:"lion-guide.webp",rav:"fox-guide-final.webp",elefant:"elephant-chalkboard.png",uggla:"owl.png",skoldpadda:"turtle.png",dinosaurie:"dinosaur.png",giraff:"giraffe.png",hast:"horse.png",tiger:"tiger.png",drake:"dragon.png",varg:"wolf.png",pafagel:"peacock.png",delfin:"dolphin.png",pingvin:"penguin.png",koala:"koala.png",orm:"snake.png",fenix:"phoenix.png",blomma:"flower-chalkboard.png",hus:"house-chalkboard.png",raket:"rocket-chalkboard.png",bil:"car.png"};
+const drawingGuideAsset={katt:"cat-slate-guide.png",hund:"dog-chalkboard.png",kanin:"rabbit-chalkboard.png",fjaril:"butterfly.png",panda:"panda.png",lejon:"lion-guide.webp",rav:"fox-guide-final.webp",elefant:"elephant-chalkboard.png",uggla:"owl.png",skoldpadda:"turtle.png",dinosaurie:"dinosaur.png",giraff:"giraffe.png",hast:"horse.png",tiger:"tiger.png",drake:"dragon.png",varg:"wolf.png",pafagel:"peacock.png",delfin:"dolphin.png",pingvin:"penguin.png",koala:"koala.png",orm:"snake.png",fenix:"phoenix.png",blomma:"flower-chalkboard.png",hus:"house-chalkboard.png",raket:"rocket-chalkboard.png",bil:"car-chalkboard.png",paraply:"umbrella-chalkboard.png",trad:"tree-chalkboard.png",bat:"boat-chalkboard.png",pappersdrake:"kite-chalkboard.png"};
 const drawingDirections={
 katt:["Rita en cirkel för huvudet och en oval för kroppen. Lägg till en mittlinje.","Forma öron, bröst, bakdel, tassar och den böjda svansen.","Placera ögon, liten nos, mun och morrhår på hjälplinjen.","Gör konturen tydlig, lägg till pälsstreck och sudda hjälplinjerna."],
 hund:["Börja med huvud och kropp som två mjuka ovaler.","Rita hängande öron, nosparti, ben, tassar och svans.","Lägg till ögon, nos och ett vänligt litet leende.","Avsluta med päls, tasslinjer och en ren kontur."],
@@ -878,7 +882,11 @@ fenix:["Markera kropp, huvud och två stora vingriktningar.","Forma vingar, stj�
 blomma:["Börja med en liten cirkel för mitten och en linje för stjälken.","Rita fem eller sex stora kronblad runt mitten och två blad.","Lägg till mittprickar, bladnerver och en mjuk stjälk.","Gör kronbladens konturer tydliga och sudda hjälplinjerna."],
 hus:["Rita en fyrkant och en triangel ovanpå som tak.","Lägg till dörr, fönster och skorsten.","Rita takpannor, fönsterkarmar och en liten gång.","Rätta till linjerna och lägg till några enkla detaljer."],
 raket:["Börja med en lång oval kropp och en mittlinje.","Forma spetsig nos, två fenor och ett runt fönster.","Lägg till fönsterkant, motor och lågor.","Förstärk konturen och rita några små stjärnor runt raketen."],
-bil:["Rita en lång kropp och en mindre båge för taket.","Forma hjul, fönster, stötfångare och lampor.","Lägg till hjulnav, dörrlinje och vindruta.","Rätta till konturen och lägg till några enkla detaljer."]
+bil:["Rita en lång kropp och en rundad båge för taket.","Forma hjul, fönster, stötfångare och lampor.","Lägg till hjulnav, dörrlinje och vindruta.","Färglägg bilen blå med svarta däck och gula lampor."],
+paraply:["Rita ett handtag och en liten cirkel för paraplyets topp.","Forma paraplyets välvda tak och böjda handtag.","Dela taket i tygsektioner och lägg till en liten toppknopp.","Färglägg paraplyet rött, gult och blått med ett mörkt handtag."],
+trad:["Rita en rak stam och markera var grenarna ska sitta.","Forma en bred krona med flera rundade bladklungor.","Lägg till grenar, blad och några små detaljer.","Färglägg stammen brun och kronan i olika gröna nyanser."],
+bat:["Rita en lång vattenlinje och en enkel grundform för skrovet.","Forma en spetsig för, reling och en liten hytt.","Lägg till fönster, detaljer och mjuka vågor runt skrovet.","Färglägg båten röd och vit med blått vatten och fönster."],
+pappersdrake:["Rita en romb och en lodrät och vågrät mittlinje.","Forma drakens fyra sidor, lång lina och svans.","Lägg till färgfält och små rosetter på svansen och linan.","Färglägg pappersdraken med tydliga röda, gula och blå fält."]
 };
 drawingAnimals.forEach(a=>{a.guide=drawingGuideAsset[a.id];a.steps=drawingDirections[a.id];a.subjectKind=a.subjectKind||"Djur";});
 function drawingStepCount(){return 4}
