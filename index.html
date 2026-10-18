@@ -1102,4 +1102,19 @@ body.christmas #seasonalCraftCta::after{background:radial-gradient(ellipse,#e6bf
 .draw-card-image{height:140px!important;object-fit:contain!important;padding:5px!important}
 .draw-card-image.native-dark-guide,.draw-popup-image.native-dark-guide{filter:none!important;background:#18231e!important;border-color:#43574c}
 .draw-modal-guides .draw-popup-image.native-dark-guide{width:100%;max-height:64vh;object-fit:contain}
+</style><style id="drawing-background-unified">
+/* Samma mörkgröna yta bakom samtliga ritsteg och färgade slutbilder. */
+.draw-card{background:#18231e!important}
+.draw-card-image:not(.native-dark-guide),.draw-popup-image:not(.native-dark-guide){
+ background:transparent!important;
+ filter:grayscale(1) invert(1)!important;
+ mix-blend-mode:screen!important;
+ border-color:#43574c!important;
+}
+.draw-modal-guides{background:#18231e!important;border-radius:16px;padding:10px}
+.draw-colored-final .draw-svg{background:#18231e!important}
+.draw-colored-final .canvas{fill:#18231e!important;stroke:#43574c!important}
+.draw-card-image.native-dark-guide,.draw-popup-image.native-dark-guide{
+ background:#18231e!important;filter:none!important;mix-blend-mode:normal!important
+}
 </style></body></html>
