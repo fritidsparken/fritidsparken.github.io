@@ -1,11 +1,18 @@
 {
-  "generated": "2026-10-18",
+  "generated": "2026-10-19",
   "counts": {
     "Superhjältar": 2,
-    "Pokémon": 1,
+    "Pokémon": 2,
     "Fotbollsproffs": 27
   },
   "images": [
+    {
+      "id": "charizard",
+      "title": "Charizard",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Charizard, uppladdad av webbplatsens ägare."
+    },
     {
       "id": "skapa-egna-pokemonkort",
       "title": "Skapa egna Pokémonkort – 9 kort",
