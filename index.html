@@ -488,7 +488,7 @@ body.halloween .seasonal-craft-cta::after{content:"";position:absolute;inset:-13
 .craft-photo{aspect-ratio:195 / 200!important;background-size:400% 500%!important;background-position:var(--col) var(--row)!important;background-repeat:no-repeat!important}
 .halloween-craft-open .craft-photo{height:auto!important;min-height:0!important}
 .halloween-craft-open:hover .craft-photo{transform:none!important}
-</style></head>
+</style><style id="season-theme-button-visibility">body.halloween #theme,body.christmas #theme{display:none!important;visibility:hidden!important}</style></head>
 <body>
 <header class="top"><div class="topin"><a class="brand" href="https://fritidsparken.se/" aria-label="Gå till Fritidsparken.se"><span class="site-logo"><img src="./assets/fritidsparken-logo.jpg" alt=""></span><span class="site-name">Fritidsparken.se</span></a><span class="brand-switch" aria-hidden="true"></span><a class="brand plugg-brand" href="https://pluggparken.se/" aria-label="Gå till Pluggparken.se"><span class="plugg-icon"><img src="https://pluggparken.se/favicon.svg" alt=""></span><span class="plugg-name">Pluggparken.se</span></a><button type="button" class="iconbtn" id="theme" aria-label="Byt tema" aria-pressed="false">🌙</button><button type="button" class="iconbtn season-picker" id="seasonPicker" aria-label="Välj säsongstema" aria-expanded="false" title="Välj säsongstema">🎃</button><button type="button" class="iconbtn halloween-sound" id="halloweenSound" aria-label="Stäng av Halloween-ljud" aria-pressed="true" title="Stäng av Halloween-ljud" disabled>🔊</button><button type="button" class="profile" id="profile">🦊 Hej där!</button></div></header><div id="seasonMenu" class="season-menu" hidden></div>
 <main class="wrap">
