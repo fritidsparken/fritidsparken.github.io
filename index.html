@@ -929,7 +929,8 @@ if(n>=7)out+=finish+'<path d="M43 177h154" fill="none" stroke="#a5b98e" stroke-w
 return out+'</svg>'
 }
 function drawingGuideSprite(a){
- const image='assets/drawing-guides/'+a.id+'.png';
+ const file=drawingGuideAsset[a.id]||a.id+'.png';
+ const image='assets/drawing-guides/'+file+'?v=20261018';
  return '<img class="draw-guide-sprite" src="'+image+'" alt="Fem ritsteg för '+a.name+', med färglagd bild i sista steget" loading="lazy">';
 }
 function drawingGallery(q){
