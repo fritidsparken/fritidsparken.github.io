@@ -485,17 +485,20 @@ body.halloween .seasonal-craft-cta::after{content:"";position:absolute;inset:-13
 </style><style id="seasonal-menu-and-craft-proportions">
 .season-menu button:disabled{opacity:.36!important;filter:grayscale(1)!important;cursor:not-allowed!important}
 .season-menu button[aria-pressed="true"]{box-shadow:0 0 0 2px #ff9a3d66!important;border-color:var(--green)!important}
-.halloween-craft-grid{grid-template-columns:repeat(auto-fit,180px)!important;justify-content:center!important;gap:10px!important;align-items:start}
-.halloween-craft-card{width:180px!important;min-width:180px!important;height:auto;display:flex;overflow:hidden;border-radius:14px}
-.halloween-craft-open{display:flex!important;flex-direction:column!important;align-items:stretch!important;width:100%!important;min-width:180px;height:100%;padding:0!important;overflow:hidden;border-radius:14px}
-.halloween-craft-grid .craft-photo{display:block!important;width:180px!important;max-width:none!important;height:180px!important;min-height:180px!important;flex:none!important;align-self:center!important;margin:8px auto 0!important;border-radius:12px!important;aspect-ratio:1 / 1!important;object-fit:cover!important;object-position:center!important;background:none!important;background-image:none!important;background-size:auto!important;image-rendering:auto!important}
+.halloween-craft-grid{grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:10px!important;align-items:start}
+.halloween-craft-card{min-width:0;height:auto;display:flex;overflow:hidden;border-radius:14px}
+.halloween-craft-open{display:flex!important;flex-direction:column!important;align-items:stretch!important;min-width:0;height:100%;padding:0!important;overflow:hidden;border-radius:14px}
+.halloween-craft-grid .craft-photo{display:block!important;width:min(100%,180px)!important;max-width:180px!important;height:auto!important;min-height:0!important;flex:none!important;align-self:center!important;margin:8px auto 0!important;border-radius:12px!important;aspect-ratio:1 / 1!important;object-fit:cover!important;object-position:center!important;background:none!important;background-image:none!important;background-size:auto!important;image-rendering:auto!important}
 .halloween-craft-title{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;gap:2px!important;min-width:0;min-height:0!important;padding:7px 7px 9px!important;text-align:center!important}
 .halloween-craft-title>span{display:block!important;grid-row:auto!important;font-size:1.3rem!important;line-height:1.05}
 .halloween-craft-title strong{display:block!important;max-width:100%;font-size:.9rem!important;line-height:1.25!important;text-align:center!important;white-space:normal!important;word-break:normal!important;overflow-wrap:normal!important;hyphens:none!important}
 .halloween-craft-title small{display:block!important;margin:2px 0 0!important;padding:0!important;font-size:.78rem;line-height:1.2}
 .halloween-craft-open:hover .craft-photo{filter:none!important;transform:none!important}
 .modal.craft-detail .craft-detail-content .modal-craft-photo{display:block;width:100%;height:auto;max-height:560px;aspect-ratio:1/1;object-fit:contain;object-position:center;background:none;background-size:auto;margin:0;border-radius:12px}
-@media(max-width:560px){.halloween-craft-grid{gap:8px!important}.halloween-craft-title{padding:6px 5px 8px!important}.halloween-craft-title strong{font-size:.84rem!important}.halloween-craft-title>span{font-size:1.15rem!important}}
+@media(max-width:1100px){.halloween-craft-grid{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:9px!important}}
+@media(max-width:850px){.halloween-craft-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important}}
+@media(max-width:560px){.halloween-craft-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}.halloween-craft-title{padding:6px 5px 8px!important}.halloween-craft-title strong{font-size:.84rem!important}.halloween-craft-title>span{font-size:1.15rem!important}}
+@media(max-width:360px){.halloween-craft-grid{grid-template-columns:1fr!important}}
 </style><style id="season-theme-button-visibility">body.halloween #theme,body.christmas #theme{display:none!important;visibility:hidden!important}</style><style id="theme-code-gate-style">
 .theme-code-back{position:fixed;inset:0;z-index:120;display:grid;place-items:center;padding:18px;background:#101510bd;backdrop-filter:blur(5px)}
 .theme-code-back[hidden]{display:none}
