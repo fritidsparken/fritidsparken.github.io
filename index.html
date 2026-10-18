@@ -612,6 +612,17 @@ body.halloween .top::before{
  .topin>.brand-switch:before,.topin>.brand-switch:after{display:none!important;content:none!important}
  .topin>.brand.plugg-brand{transform:translateX(6px);font-size:clamp(10px,2.8vw,12px)}
 }
+</style><style id="portrait-brand-final-layout">
+@media(max-width:760px) and (orientation:portrait){
+ .topin{grid-template-columns:minmax(0,1fr) 0 minmax(0,1fr) auto!important;column-gap:4px!important}
+ .topin>.brand-switch{display:none!important;width:0!important;min-width:0!important}
+ .topin>.brand:first-child,.topin>.brand.plugg-brand{font-size:clamp(10px,2.8vw,12px)!important;gap:3px!important}
+ .topin>.brand:first-child .site-name,.topin>.brand.plugg-brand .plugg-name{
+  min-width:0!important;max-width:100%;overflow:visible!important;text-overflow:clip!important;
+  flex:0 1 auto!important;white-space:nowrap!important
+ }
+ .topin>.brand.plugg-brand{transform:translateX(4px)!important}
+}
 </style></head>
 <body>
 <header class="top"><div class="topin"><a class="brand" href="https://fritidsparken.se/" aria-label="Gå till Fritidsparken.se"><span class="site-logo"><img src="./assets/fritidsparken-logo.jpg" alt=""></span><span class="site-name">Fritidsparken.se</span></a><span class="brand-switch" aria-hidden="true"></span><a class="brand plugg-brand" href="https://pluggparken.se/" aria-label="Gå till Pluggparken.se"><span class="plugg-icon"><img src="https://pluggparken.se/favicon.svg" alt=""></span><span class="plugg-name">Pluggparken.se</span></a><button type="button" class="iconbtn" id="theme" aria-label="Byt tema" aria-pressed="false">🌙</button><button type="button" class="iconbtn season-picker" id="seasonPicker" aria-label="Välj säsongstema" aria-expanded="false" title="Välj säsongstema">🎃</button><button type="button" class="iconbtn halloween-sound" id="halloweenSound" aria-label="Stäng av Halloween-ljud" aria-pressed="true" title="Stäng av Halloween-ljud" disabled>🔊</button></div></header><div id="seasonMenu" class="season-menu" hidden></div>
