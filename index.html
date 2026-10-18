@@ -1218,6 +1218,12 @@ body.christmas #seasonalCraftCta::after{background:radial-gradient(ellipse,#e6bf
 }
 .draw-page .draw-card .draw-guide-sprite{border-radius:16px 16px 0 0!important}
 .draw-modal-guides{background:#100907!important}
+
+/* Compact popup image margins and give the guides 25% more desktop width. */
+.draw-modal{grid-template-columns:minmax(0,1.25fr) minmax(260px,.60fr)}
+.draw-modal-guides{padding:6px!important}
+.draw-modal-guides .draw-guide-sprite{aspect-ratio:1993 / 530!important;max-height:none!important}
+@media(max-width:900px){.draw-modal{grid-template-columns:minmax(0,1fr)!important}.draw-modal-guides,.draw-modal .draw-instructions{grid-column:1!important;grid-row:auto!important}}
 </style><script id="drawing-guides-unified-renderer">
 (()=>{
 const crops={
@@ -1275,9 +1281,10 @@ function paint(canvas){
  canvas.dataset.loading="1";
  const img=new Image();
  img.onload=()=>{
-  canvas.width=W;canvas.height=H;
+  const popup=!!canvas.closest(".draw-modal-guides"),renderTop=popup?16:TOP,renderHeight=popup?PH+32:H;
+  canvas.width=W;canvas.height=renderHeight;
   const ctx=canvas.getContext("2d",{willReadFrequently:true});
-  ctx.fillStyle="#100907";ctx.fillRect(0,0,W,H);
+  ctx.fillStyle="#100907";ctx.fillRect(0,0,W,renderHeight);
   const [sx0,sy0,sx1,sy1]=crop,sh=sy1-sy0,cuts=getPanelCuts(img,crop,file);
   for(let i=0;i<5;i++){
    const cellWidth=cuts[i+1]-cuts[i],inset=Math.max(5,Math.round(cellWidth*.025));
@@ -1296,10 +1303,10 @@ function paint(canvas){
     p[k]=p[k]*(1-amt)+7*amt;p[k+1]=p[k+1]*(1-amt)+43*amt;p[k+2]=p[k+2]*(1-amt)+28*amt;
    }
    tc.putImageData(frame,0,0);
-   const x=LEFT+i*(PW+GAP);ctx.drawImage(tile,x+2,TOP+2);
-   rounded(ctx,x,TOP,PW,PH,17);
+   const x=LEFT+i*(PW+GAP);ctx.drawImage(tile,x+2,renderTop+2);
+   rounded(ctx,x,renderTop,PW,PH,17);
    if(missingNumbers.has(file)){
-    const cx=x+44,cy=TOP+43;ctx.beginPath();ctx.arc(cx,cy,34,0,Math.PI*2);
+    const cx=x+44,cy=renderTop+43;ctx.beginPath();ctx.arc(cx,cy,34,0,Math.PI*2);
     ctx.fillStyle="#ff6818";ctx.fill();ctx.fillStyle="#fff9ef";
     ctx.font="700 46px system-ui,sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";
     ctx.fillText(String(i+1),cx,cy+1);
