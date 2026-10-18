@@ -1008,7 +1008,8 @@ document.querySelectorAll("[data-jump]").forEach(b=>b.onclick=()=>document.getEl
 @media(max-width:680px){.craft-detail-content{grid-template-columns:minmax(0,1fr)}}
 </style><style id="theme-button-and-halloween-glow-fix">
 #theme{display:inline-grid!important;visibility:visible!important;opacity:1!important;position:relative;z-index:4;flex:0 0 auto}
-.seasonal-craft-cta.is-halloween-cta{position:relative;isolation:isolate;overflow:visible;text-shadow:0 0 5px #ff7618,0 0 11px #ff761866;animation:halloweenTextGlow 1.7s ease-in-out infinite}
-.seasonal-craft-cta.is-halloween-cta::after{content:"";position:absolute;inset:-13px -23px;border-radius:28px;background:radial-gradient(ellipse,#ff6a13aa 0%,#ff8a353b 42%,transparent 74%);filter:blur(13px);z-index:-1;pointer-events:none;animation:halloweenGlow 1.7s ease-in-out infinite}
+.seasonal-craft-cta.is-halloween-cta{position:relative;isolation:isolate;overflow:visible;text-shadow:0 0 7px #ff7618,0 0 16px #ff7618;box-shadow:0 0 14px #ff7a22,0 0 32px #ff6a1380;animation:halloweenTextGlow 1.7s ease-in-out infinite,halloweenButtonGlow 1.7s ease-in-out infinite}
+.seasonal-craft-cta.is-halloween-cta::after{content:"";position:absolute;inset:-14px -25px;border-radius:30px;background:radial-gradient(ellipse,#ff6a1377 0%,#ff8a3530 48%,transparent 76%);filter:blur(15px);z-index:1;pointer-events:none;animation:halloweenGlow 1.7s ease-in-out infinite}
+@keyframes halloweenButtonGlow{0%,100%{box-shadow:0 0 12px #ff7a22,0 0 22px #ff6a1366}50%{box-shadow:0 0 22px #ff8a13,0 0 45px #ff6a13aa}}
 @media(prefers-reduced-motion:reduce){.seasonal-craft-cta.is-halloween-cta,.seasonal-craft-cta.is-halloween-cta::after{animation:none}}
 </style></body></html>
