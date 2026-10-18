@@ -1246,14 +1246,18 @@ function getPanelCuts(img,crop,file){
  const scan=document.createElement("canvas");scan.width=width;scan.height=height;
  const sc=scan.getContext("2d",{willReadFrequently:true});
  sc.drawImage(img,x0,y0,width,height,0,0,width,height);
- const pixels=sc.getImageData(0,0,width,height).data,means=new Float32Array(width);
- for(let x=0;x<width;x++){let sum=0,count=0;for(let y=0;y<height;y+=3){const k=(y*width+x)*4;sum+=Math.max(pixels[k],pixels[k+1],pixels[k+2]);count++}means[x]=sum/count}
+ const pixels=sc.getImageData(0,0,width,height).data,continuity=new Float32Array(width);
+ for(let x=0;x<width;x++){
+  let hits=0,count=0;
+  for(let y=0;y<height;y+=2){const k=(y*width+x)*4;if(Math.max(pixels[k],pixels[k+1],pixels[k+2])>80)hits++;count++}
+  continuity[x]=hits/count;
+ }
  const cuts=[x0];
  for(let i=1;i<5;i++){
   const ideal=width*i/5,radius=Math.ceil(width*.08),lo=Math.max(2,Math.floor(ideal-radius)),hi=Math.min(width-3,Math.ceil(ideal+radius));
-  let peak=lo;for(let x=lo+1;x<=hi;x++)if(means[x]>means[peak])peak=x;
-  const baseline=means[Math.round(ideal)];
-  cuts.push(means[peak]>190&&means[peak]-baseline>80?x0+peak:x0+Math.round(ideal));
+  let peak=lo;for(let x=lo+1;x<=hi;x++)if(continuity[x]>continuity[peak])peak=x;
+  const baseline=continuity[Math.round(ideal)];
+  cuts.push(continuity[peak]>.90&&continuity[peak]-baseline>.12?x0+peak:x0+Math.round(ideal));
  }
  cuts.push(x1);panelCutsCache.set(file,cuts);return cuts;
 }
