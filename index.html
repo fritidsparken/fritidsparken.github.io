@@ -931,8 +931,8 @@ return out+'</svg>'
 function drawingGuideSprite(a){
  const panels=a.subjectKind==="Saker"?[2,3,4,5,7]:[1,2,3,5,7],width=320,height=593;
  const cells=panels.map((step,i)=>{
-  const art=drawingSvg(a,step),content=art.slice(art.indexOf(">")+1,art.lastIndexOf("</svg>"));
-  return '<rect class="guide-panel-bg" x="'+(i*width+3)+'" y="3" width="314" height="587" rx="15"/><text class="guide-panel-num" x="'+(i*width+20)+'" y="48">'+(i+1)+'</text><svg class="draw-svg guide-panel-art '+(i<4?"sketch":"colored")+'" x="'+(i*width+10)+'" y="166" width="300" height="263" viewBox="0 0 240 210">'+content+'</svg>';
+  const art=drawingSvg(a,step),style=(art.match(/style="([^"]*)"/)||[])[1]||"",content=art.slice(art.indexOf(">")+1,art.lastIndexOf("</svg>"));
+  return '<rect class="guide-panel-bg" x="'+(i*width+3)+'" y="3" width="314" height="587" rx="15"/><text class="guide-panel-num" x="'+(i*width+20)+'" y="48">'+(i+1)+'</text><svg class="draw-svg guide-panel-art '+(i<4?"sketch":"colored")+'" style="'+style+'" x="'+(i*width+10)+'" y="166" width="300" height="263" viewBox="0 0 240 210">'+content+'</svg>';
  }).join("");
  return '<svg class="draw-guide-sprite" viewBox="0 0 '+(width*5)+' '+height+'" role="img" aria-label="Fem ritsteg för '+a.name+', med färglagd bild i sista steget">'+cells+'</svg>';
 }
