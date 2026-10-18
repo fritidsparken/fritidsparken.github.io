@@ -45,4 +45,4 @@
 @media(max-width:480px) and (orientation:portrait){#modalback #mPreview img.recess-activity-photo{width:min(75vw,420px)!important;height:auto!important;max-height:75dvh!important;aspect-ratio:1/1!important}}
 
 /* Centrera ljudsymbolen lodrätt i knapprutan */
-.topin>#halloweenSound{display:inline-grid!important;place-items:center!important;line-height:1!important;padding:4px 0 0!important}
+.topin>#halloweenSound{place-items:center!important;line-height:1!important;padding:4px 0 0!important}
