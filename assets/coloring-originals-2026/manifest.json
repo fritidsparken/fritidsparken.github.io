@@ -3,9 +3,178 @@
   "counts": {
     "Superhjältar": 2,
     "Pokémon": 2,
-    "Fotbollsproffs": 27
+    "Fotbollsproffs": 27,
+    "Djur": 24
   },
   "images": [
+    {
+      "id": "katt",
+      "title": "Katt",
+      "type": "Djur",
+      "directory": "djur",
+      "subject": "Svartvit färgläggningsbild: En liten fluffig katt som sitter och tittar framåt."
+    },
+    {
+      "id": "hund",
+      "title": "Hund",
+      "type": "Djur",
+      "directory": "djur",
+      "subject": "Svartvit färgläggningsbild: En glad valp med hängande öron."
+    },
+    {
+      "id": "kanin",
+      "title": "Kanin",
+      "type": "Djur",
+      "directory": "djur",
+      "subject": "Svartvit färgläggningsbild: En sittande kanin med långa öron."
+    },
+    {
+      "id": "rav",
+      "title": "Räv",
+      "type": "Djur",
+      "directory": "djur",
+      "subject": "Svartvit färgläggningsbild: En ung räv med stor yvig svans."
+    },
+    {
+      "id": "bjorn",
+      "title": "Björn",
+      "type": "Djur",
+      "directory": "djur",
+      "subject": "Svartvit färgläggningsbild: En liten björnunge med rundade öron."
+    },
+    {
+      "id": "lejon",
+      "title": "Lejon",
+      "type": "Djur",
+      "directory": "djur",
+      "subject": "Svartvit färgläggningsbild: En lejonunge med en mjuk, enkel man."
+    },
+    {
+      "id": "elefant",
+      "title": "Elefant",
+      "type": "Djur",
+      "directory": "djur",
+      "subject": "Svartvit färgläggningsbild: En elefantunge med stora öron och kort snabel."
+    },
+    {
+      "id": "giraff",
+      "title": "Giraff",
+      "type": "Djur",
+      "directory": "djur",
+      "subject": "Svartvit färgläggningsbild: En liten giraff med tydliga fläckar."
+    },
+    {
+      "id": "igelkott",
+      "title": "Igelkott",
+      "type": "Djur",
+      "directory": "djur",
+      "subject": "Svartvit färgläggningsbild: En rund liten igelkott med mjuka taggar."
+    },
+    {
+      "id": "uggla",
+      "title": "Uggla",
+      "type": "Djur",
+      "directory": "djur",
+      "subject": "Svartvit färgläggningsbild: En rund uggleunge med stora vänliga ögon."
+    },
+    {
+      "id": "pingvin",
+      "title": "Pingvin",
+      "type": "Djur",
+      "directory": "djur",
+      "subject": "Svartvit färgläggningsbild: En liten pingvin med utsträckta vingar."
+    },
+    {
+      "id": "skoldpadda",
+      "title": "Sköldpadda",
+      "type": "Djur",
+      "directory": "djur",
+      "subject": "Svartvit färgläggningsbild: En liten sköldpadda med stora enkla skalrutor."
+    },
+    {
+      "id": "groda",
+      "title": "Groda",
+      "type": "Djur",
+      "directory": "djur",
+      "subject": "Svartvit färgläggningsbild: En glad groda med stora ögon."
+    },
+    {
+      "id": "delfin",
+      "title": "Delfin",
+      "type": "Djur",
+      "directory": "djur",
+      "subject": "Svartvit färgläggningsbild: En ung delfin som hoppar lekfullt."
+    },
+    {
+      "id": "val",
+      "title": "Val",
+      "type": "Djur",
+      "directory": "djur",
+      "subject": "Svartvit färgläggningsbild: En valunge med en liten vattenstråle."
+    },
+    {
+      "id": "koala",
+      "title": "Koala",
+      "type": "Djur",
+      "directory": "djur",
+      "subject": "Svartvit färgläggningsbild: En sittande koala som håller ett blad."
+    },
+    {
+      "id": "panda",
+      "title": "Panda",
+      "type": "Djur",
+      "directory": "djur",
+      "subject": "Svartvit färgläggningsbild: En sittande pandaunge."
+    },
+    {
+      "id": "ekorre",
+      "title": "Ekorre",
+      "type": "Djur",
+      "directory": "djur",
+      "subject": "Svartvit färgläggningsbild: En liten ekorre som håller en ekollon."
+    },
+    {
+      "id": "radjur",
+      "title": "Rådjur",
+      "type": "Djur",
+      "directory": "djur",
+      "subject": "Svartvit färgläggningsbild: Ett rådjur med några stora fläckar på ryggen."
+    },
+    {
+      "id": "tvattbjorn",
+      "title": "Tvättbjörn",
+      "type": "Djur",
+      "directory": "djur",
+      "subject": "Svartvit färgläggningsbild: En liten tvättbjörn med randig svans."
+    },
+    {
+      "id": "lamm",
+      "title": "Lamm",
+      "type": "Djur",
+      "directory": "djur",
+      "subject": "Svartvit färgläggningsbild: Ett gulligt lamm med mjuka ulllockar."
+    },
+    {
+      "id": "ponny",
+      "title": "Ponny",
+      "type": "Djur",
+      "directory": "djur",
+      "subject": "Svartvit färgläggningsbild: En liten ponny med yvig pannlugg."
+    },
+    {
+      "id": "utter",
+      "title": "Utter",
+      "type": "Djur",
+      "directory": "djur",
+      "subject": "Svartvit färgläggningsbild: En utterunge som håller en liten sten."
+    },
+    {
+      "id": "sal",
+      "title": "Säl",
+      "type": "Djur",
+      "directory": "djur",
+      "subject": "Svartvit färgläggningsbild: En sittande sälunge med vänliga ögon."
+    },
     {
       "id": "charizard",
       "title": "Charizard",
