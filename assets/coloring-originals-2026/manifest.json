@@ -1,0 +1,247 @@
+{
+  "generated": "2026-10-18",
+  "counts": {
+    "Superhjältar": 2,
+    "Pokémon": 1,
+    "Fotbollsproffs": 27
+  },
+  "images": [
+    {
+      "id": "skapa-egna-pokemonkort",
+      "title": "Skapa egna Pokémonkort – 9 kort",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Ett A4-ark med nio förifyllda kortmallar; tomma bildrutor och namnlinjer för barnens egna figurer."
+    },
+    {
+      "id": "bamse",
+      "title": "Bamse",
+      "type": "Superhjältar",
+      "directory": "superhjaltar",
+      "subject": "Bamse the Swedish cartoon bear, accurate recognizable round bear design, blue cap and blue overalls rendered only in outlines, lifting a tree trunk easily in a meadow"
+    },
+    {
+      "id": "pippi-langstrump",
+      "title": "Pippi Långstrump",
+      "type": "Superhjältar",
+      "directory": "superhjaltar",
+      "subject": "Pippi Longstocking, recognizable freckles and two sticking-out braided pigtails, patchwork dress and mismatched long stockings, lifting her spotted horse Lilla Gubben overhead outside Villa Villekulla"
+    },
+    {
+      "id": "spelare-01",
+      "title": "Kylian Mbappé",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "Real Madrid",
+      "subject": "A recognizable illustrated likeness of football star Kylian Mbappé wearing Real Madrid club football kit without sponsor lettering; dribbling a ball. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Kylian Mbappé'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "spelare-02",
+      "title": "Vinícius Júnior",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "Real Madrid",
+      "subject": "A recognizable illustrated likeness of football star Vinícius Júnior wearing Real Madrid club football kit without sponsor lettering; taking a powerful shot toward a goal. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Vinícius Júnior'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "spelare-03",
+      "title": "Jude Bellingham",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "Real Madrid",
+      "subject": "A recognizable illustrated likeness of football star Jude Bellingham wearing Real Madrid club football kit without sponsor lettering; celebrating a goal with a football at his feet. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Jude Bellingham'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "spelare-04",
+      "title": "Federico Valverde",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "Real Madrid",
+      "subject": "A recognizable illustrated likeness of football star Federico Valverde wearing Real Madrid club football kit without sponsor lettering; controlling a ball with one foot on a training pitch. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Federico Valverde'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "spelare-05",
+      "title": "Lamine Yamal",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "FC Barcelona",
+      "subject": "A recognizable illustrated likeness of football star Lamine Yamal wearing FC Barcelona club football kit without sponsor lettering; dribbling a ball. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Lamine Yamal'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "spelare-06",
+      "title": "Raphinha",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "FC Barcelona",
+      "subject": "A recognizable illustrated likeness of football star Raphinha wearing FC Barcelona club football kit without sponsor lettering; taking a powerful shot toward a goal. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Raphinha'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "spelare-07",
+      "title": "Pedri",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "FC Barcelona",
+      "subject": "A recognizable illustrated likeness of football star Pedri wearing FC Barcelona club football kit without sponsor lettering; celebrating a goal with a football at his feet. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Pedri'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "spelare-08",
+      "title": "Gavi",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "FC Barcelona",
+      "subject": "A recognizable illustrated likeness of football star Gavi wearing FC Barcelona club football kit without sponsor lettering; controlling a ball with one foot on a training pitch. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Gavi'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "spelare-09",
+      "title": "Erling Haaland",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "Manchester City",
+      "subject": "A recognizable illustrated likeness of football star Erling Haaland wearing Manchester City club football kit without sponsor lettering; dribbling a ball. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Erling Haaland'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "spelare-10",
+      "title": "Phil Foden",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "Manchester City",
+      "subject": "A recognizable illustrated likeness of football star Phil Foden wearing Manchester City club football kit without sponsor lettering; taking a powerful shot toward a goal. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Phil Foden'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "spelare-11",
+      "title": "Rodri",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "Manchester City",
+      "subject": "A recognizable illustrated likeness of football star Rodri wearing Manchester City club football kit without sponsor lettering; celebrating a goal with a football at his feet. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Rodri'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "spelare-12",
+      "title": "Bukayo Saka",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "Arsenal",
+      "subject": "A recognizable illustrated likeness of football star Bukayo Saka wearing Arsenal club football kit without sponsor lettering; controlling a ball with one foot on a training pitch. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Bukayo Saka'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "spelare-13",
+      "title": "Martin Ødegaard",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "Arsenal",
+      "subject": "A recognizable illustrated likeness of football star Martin Ødegaard wearing Arsenal club football kit without sponsor lettering; dribbling a ball. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Martin Ødegaard'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "spelare-14",
+      "title": "Declan Rice",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "Arsenal",
+      "subject": "A recognizable illustrated likeness of football star Declan Rice wearing Arsenal club football kit without sponsor lettering; taking a powerful shot toward a goal. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Declan Rice'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "spelare-15",
+      "title": "Alexander Isak",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "Liverpool",
+      "subject": "A recognizable illustrated likeness of football star Alexander Isak wearing Liverpool club football kit without sponsor lettering; celebrating a goal with a football at his feet. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Alexander Isak'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "spelare-16",
+      "title": "Florian Wirtz",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "Liverpool",
+      "subject": "A recognizable illustrated likeness of football star Florian Wirtz wearing Liverpool club football kit without sponsor lettering; controlling a ball with one foot on a training pitch. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Florian Wirtz'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "spelare-17",
+      "title": "Mohamed Salah",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "Liverpool",
+      "subject": "A recognizable illustrated likeness of football star Mohamed Salah wearing Liverpool club football kit without sponsor lettering; dribbling a ball. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Mohamed Salah'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "spelare-18",
+      "title": "Harry Kane",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "Bayern München",
+      "subject": "A recognizable illustrated likeness of football star Harry Kane wearing Bayern München club football kit without sponsor lettering; taking a powerful shot toward a goal. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Harry Kane'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "spelare-19",
+      "title": "Jamal Musiala",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "Bayern München",
+      "subject": "A recognizable illustrated likeness of football star Jamal Musiala wearing Bayern München club football kit without sponsor lettering; celebrating a goal with a football at his feet. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Jamal Musiala'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "spelare-20",
+      "title": "Michael Olise",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "Bayern München",
+      "subject": "A recognizable illustrated likeness of football star Michael Olise wearing Bayern München club football kit without sponsor lettering; controlling a ball with one foot on a training pitch. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Michael Olise'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "spelare-21",
+      "title": "Ousmane Dembélé",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "Paris Saint-Germain",
+      "subject": "A recognizable illustrated likeness of football star Ousmane Dembélé wearing Paris Saint-Germain club football kit without sponsor lettering; dribbling a ball. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Ousmane Dembélé'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "spelare-22",
+      "title": "Désiré Doué",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "Paris Saint-Germain",
+      "subject": "A recognizable illustrated likeness of football star Désiré Doué wearing Paris Saint-Germain club football kit without sponsor lettering; taking a powerful shot toward a goal. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Désiré Doué'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "spelare-23",
+      "title": "Khvicha Kvaratskhelia",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "Paris Saint-Germain",
+      "subject": "A recognizable illustrated likeness of football star Khvicha Kvaratskhelia wearing Paris Saint-Germain club football kit without sponsor lettering; celebrating a goal with a football at his feet. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Khvicha Kvaratskhelia'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "spelare-24",
+      "title": "Cole Palmer",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "Chelsea",
+      "subject": "A recognizable illustrated likeness of football star Cole Palmer wearing Chelsea club football kit without sponsor lettering; controlling a ball with one foot on a training pitch. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Cole Palmer'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "spelare-25",
+      "title": "Viktor Gyökeres",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "Arsenal",
+      "subject": "A recognizable illustrated likeness of football star Viktor Gyökeres wearing Arsenal club kit without sponsor lettering, dribbling a ball on a football pitch. Recognizable slicked-back hair and face. Accurate anatomy. Name in large outlined heading at top: 'Viktor Gyökeres'. Simple stadium outline background."
+    },
+    {
+      "id": "spelare-26",
+      "title": "Lautaro Martínez",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "Inter",
+      "subject": "A recognizable illustrated likeness of football star Lautaro Martínez wearing Inter club football kit without sponsor lettering; taking a powerful shot toward a goal. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Lautaro Martínez'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "spelare-27",
+      "title": "Julián Álvarez",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "club": "Atlético Madrid",
+      "subject": "A recognizable illustrated likeness of football star Julián Álvarez wearing Atlético Madrid club football kit without sponsor lettering; celebrating a goal with a football at his feet. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Julián Álvarez'. Simple stadium outlines behind him."
+    }
+  ]
+}
