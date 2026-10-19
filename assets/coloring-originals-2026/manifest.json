@@ -2,7 +2,7 @@
   "generated": "2026-10-19",
   "counts": {
     "Superhjältar": 2,
-    "Pokémon": 2,
+    "Pokémon": 17,
     "Fotbollsproffs": 27,
     "Djur": 24
   },
@@ -181,6 +181,111 @@
       "type": "Pokémon",
       "directory": "pokemon",
       "subject": "Svartvit färgläggningsbild av Charizard, uppladdad av webbplatsens ägare."
+    },
+    {
+      "id": "arbok",
+      "title": "Arbok",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Arbok."
+    },
+    {
+      "id": "bellsprout",
+      "title": "Bellsprout",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Bellsprout."
+    },
+    {
+      "id": "bulbasaur",
+      "title": "Bulbasaur",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Bulbasaur."
+    },
+    {
+      "id": "charizard-eldklot",
+      "title": "Charizard med eldklot",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Charizard med eldklot."
+    },
+    {
+      "id": "charmander",
+      "title": "Charmander",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Charmander."
+    },
+    {
+      "id": "dragonite",
+      "title": "Dragonite",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Dragonite."
+    },
+    {
+      "id": "eevee",
+      "title": "Eevee",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Eevee."
+    },
+    {
+      "id": "flareon",
+      "title": "Flareon",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Flareon."
+    },
+    {
+      "id": "garchomp",
+      "title": "Garchomp",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Garchomp."
+    },
+    {
+      "id": "gardevoir",
+      "title": "Gardevoir",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Gardevoir."
+    },
+    {
+      "id": "gengar",
+      "title": "Gengar",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Gengar."
+    },
+    {
+      "id": "greninja",
+      "title": "Greninja",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Greninja."
+    },
+    {
+      "id": "gyarados",
+      "title": "Gyarados",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Gyarados."
+    },
+    {
+      "id": "jigglypuff",
+      "title": "Jigglypuff",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Jigglypuff."
+    },
+    {
+      "id": "koffing",
+      "title": "Koffing",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Koffing."
     },
     {
       "id": "skapa-egna-pokemonkort",
