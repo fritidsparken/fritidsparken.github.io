@@ -511,21 +511,18 @@ body.halloween .seasonal-craft-cta::after{content:"";position:absolute;inset:-13
 .theme-code-error{min-height:24px;margin:7px 0!important;color:#bd392d!important;font-weight:750}
 .theme-code-actions{display:flex;justify-content:flex-end;gap:9px}
 </style><style id="drawing-guides-unified-dark-theme">
-body:has(.draw-page){
-  --bg:#10251d;--paper:#182d23;--ink:#f4efe4;--muted:#c4d4c8;
-  --line:#45634e;--green:#59aa77;--mint:#203b2c;--shadow:0 14px 40px #07110c80;
-  background:#10251d;color:#f4efe4;
-}
-body:has(.draw-page) .top,body:has(.draw-page) .nav{background:#14291f;color:#f4efe4;border-color:#355642}
+body:has(.draw-page){background:var(--bg);color:var(--ink)}
 .draw-page{
-  color:#f2eee4;
-  background:linear-gradient(145deg,#15281f 0%,#1b3428 55%,#13251d 100%);
-  border:1px solid #355642;
-  border-radius:24px;
+  color:var(--ink);
+  background:transparent;
+  border:0;
+  border-radius:0;
   padding:clamp(16px,3vw,30px);
 }
-.draw-page .draw-title h2,.draw-page .draw-card-title,.draw-page .draw-step-copy h3{color:#f5f0e5}
-.draw-page .draw-title p,.draw-page .draw-card-title small,.draw-page .draw-step-count,.draw-page .draw-step-copy p,.draw-page .draw-tip,.draw-page .draw-sequence-step{color:#c4d4c8}
+.draw-page .draw-title h2{color:var(--ink)}
+.draw-page .draw-card-title,.draw-page .draw-step-copy h3{color:#f5f0e5}
+.draw-page .draw-title p{color:var(--muted)}
+.draw-page .draw-card-title small,.draw-page .draw-step-count,.draw-page .draw-step-copy p,.draw-page .draw-tip,.draw-page .draw-sequence-step{color:#c4d4c8}
 .draw-page .draw-card,.draw-page .draw-step-card,.draw-modal{
   background:#182d23;
   color:#f4efe4;
