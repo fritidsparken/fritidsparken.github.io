@@ -2,7 +2,7 @@
   "generated": "2026-10-19",
   "counts": {
     "Superhjältar": 2,
-    "Pokémon": 17,
+    "Pokémon": 29,
     "Fotbollsproffs": 27,
     "Djur": 24
   },
@@ -523,6 +523,90 @@
       "directory": "fotbollsproffs",
       "club": "Atlético Madrid",
       "subject": "A recognizable illustrated likeness of football star Julián Álvarez wearing Atlético Madrid club football kit without sponsor lettering; celebrating a goal with a football at his feet. Preserve his recognizable hairstyle and facial features; anatomically correct athlete. Include his name as a large outlined heading at top: 'Julián Álvarez'. Simple stadium outlines behind him."
+    },
+    {
+      "id": "lucario",
+      "title": "Lucario",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Lucario."
+    },
+    {
+      "id": "mimikyu",
+      "title": "Mimikyu",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Mimikyu."
+    },
+    {
+      "id": "mr-mime",
+      "title": "Mr. Mime",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Mr. Mime."
+    },
+    {
+      "id": "nidoran",
+      "title": "Nidoran",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Nidoran."
+    },
+    {
+      "id": "pikachu",
+      "title": "Pikachu",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Pikachu."
+    },
+    {
+      "id": "rayquaza",
+      "title": "Rayquaza",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Rayquaza."
+    },
+    {
+      "id": "scorbunny",
+      "title": "Scorbunny",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Scorbunny."
+    },
+    {
+      "id": "snorlax",
+      "title": "Snorlax",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Snorlax."
+    },
+    {
+      "id": "squirtle",
+      "title": "Squirtle",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Squirtle."
+    },
+    {
+      "id": "tentacool",
+      "title": "Tentacool",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Tentacool."
+    },
+    {
+      "id": "tyranitar",
+      "title": "Tyranitar",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Tyranitar."
+    },
+    {
+      "id": "venusaur",
+      "title": "Venusaur",
+      "type": "Pokémon",
+      "directory": "pokemon",
+      "subject": "Svartvit färgläggningsbild av Venusaur."
     }
   ]
 }
