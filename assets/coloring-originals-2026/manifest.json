@@ -1,9 +1,9 @@
 {
-  "generated": "2026-10-19",
+  "generated": "2026-10-20",
   "counts": {
     "Superhjältar": 2,
     "Pokémon": 29,
-    "Fotbollsproffs": 27,
+    "Fotbollsproffs": 39,
     "Djur": 24
   },
   "images": [
@@ -607,6 +607,90 @@
       "type": "Pokémon",
       "directory": "pokemon",
       "subject": "Svartvit färgläggningsbild av Venusaur."
+    },
+    {
+      "id": "spelare-28",
+      "title": "Fridolina Rolfö",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "subject": "Svartvit färgläggningsbild av Fridolina Rolfö som fotbollsspelare."
+    },
+    {
+      "id": "spelare-29",
+      "title": "Stina Blackstenius",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "subject": "Svartvit färgläggningsbild av Stina Blackstenius som fotbollsspelare."
+    },
+    {
+      "id": "spelare-30",
+      "title": "Kosovare Asllani",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "subject": "Svartvit färgläggningsbild av Kosovare Asllani som fotbollsspelare."
+    },
+    {
+      "id": "spelare-31",
+      "title": "Anthony Elanga",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "subject": "Svartvit färgläggningsbild av Anthony Elanga som fotbollsspelare."
+    },
+    {
+      "id": "spelare-32",
+      "title": "Dejan Kulusevski",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "subject": "Svartvit färgläggningsbild av Dejan Kulusevski som fotbollsspelare."
+    },
+    {
+      "id": "spelare-33",
+      "title": "Robert Lewandowski",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "subject": "Svartvit färgläggningsbild av Robert Lewandowski som fotbollsspelare."
+    },
+    {
+      "id": "spelare-34",
+      "title": "Ronaldinho",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "subject": "Svartvit färgläggningsbild av Ronaldinho som fotbollsspelare."
+    },
+    {
+      "id": "spelare-35",
+      "title": "Diego Maradona",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "subject": "Svartvit färgläggningsbild av Diego Maradona som fotbollsspelare."
+    },
+    {
+      "id": "spelare-36",
+      "title": "Lionel Messi",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "subject": "Svartvit färgläggningsbild av Lionel Messi som fotbollsspelare."
+    },
+    {
+      "id": "spelare-37",
+      "title": "Steven Gerrard",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "subject": "Svartvit färgläggningsbild av Steven Gerrard som fotbollsspelare."
+    },
+    {
+      "id": "spelare-38",
+      "title": "Cristiano Ronaldo",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "subject": "Svartvit färgläggningsbild av Cristiano Ronaldo som fotbollsspelare."
+    },
+    {
+      "id": "spelare-39",
+      "title": "Zlatan Ibrahimović",
+      "type": "Fotbollsproffs",
+      "directory": "fotbollsproffs",
+      "subject": "Svartvit färgläggningsbild av Zlatan Ibrahimović som fotbollsspelare."
     }
   ]
 }
