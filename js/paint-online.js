@@ -2,12 +2,70 @@
 const TARGET="Nidoking", IMAGE="./assets/coloring-originals-2026/pokemon-20261021/60-nidoking.jpeg";
 const colors=[["Röd","#ef4444"],["Orange","#fb923c"],["Gul","#facc15"],["Ljusgrön","#a3e635"],["Grön","#22c55e"],["Mörkgrön","#15803d"],["Turkos","#2dd4bf"],["Ljusblå","#7dd3fc"],["Blå","#3b82f6"],["Mörkblå","#1e3a8a"],["Lila","#8b5cf6"],["Rosa","#ec4899"],["Ljusrosa","#f9a8d4"],["Brun","#92400e"],["Beige","#e7d3a8"],["Grå","#9ca3af"],["Svart","#171717"],["Vit","#ffffff"],["Mint","#6ee7b7"],["Korall","#fb7185"]];
 const pokemonPalettes={"magikarp":["#d65b57","#e3b83e","#e8b5c3","#d889a5"],"lapras":["#79b5d7","#578db7","#eee2c8","#a391b6"],"charizard":["#e48c43","#55aaa6","#eee2c8","#e5c64a"],"venusaur":["#578db7","#579d91","#65945c","#d889a5"],"tentacool":["#578db7","#ce5555","#d3bb94"],"snorlax":["#478d89","#eee2c8","#d3bb94"],"scorbunny":["#f0e8d6","#e48c43","#e3b83e","#85898c"],"rayquaza":["#65945c","#ce5555","#e5c64a","#eee2c8"],"pikachu":["#e5c64a","#94674c","#353638","#ce5555"],"mr. mime":["#e8b5c3","#d889a5","#356b9e","#578db7"],"mimikyu":["#eee2c8","#36383b","#5c6167","#85898c"],"lucario":["#36383b","#5c6167","#85898c","#578db7"],"koffing":["#82659f","#f3f1eb","#eee2c8","#e9dc9e"],"jigglypuff":["#e8b5c3","#d889a5","#578db7","#579d91"],"gyarados":["#4e8fba","#ead58d","#eee2c8","#e5c64a"],"gengar":["#82659f","#d35e69"],"gardevoir":["#65945c","#d889a5","#ce5555","#f3f1eb"],"garchomp":["#578db7","#ce5555","#e5c64a","#f3f1eb"],"flareon":["#e99a58","#e8d49e","#eee2c8","#5c6167"],"eevee":["#94674c","#f0e8d6","#d3bb94"],"dragonite":["#dd963f","#94674c","#55aaa6","#eee2c8"],"bulbasaur":["#55aaa6","#65945c"],"arbok":["#82659f","#4b4d50","#ce5555","#e5c64a"],"charmander":["#e48c43","#eee2c8","#e5c64a","#ce5555"],"spoink":["#d889a5","#85898c","#c9ccce"],"seadra":["#4e8fba","#d8bc82"],"masquerain":["#df8a70","#e48c43","#f3f1eb","#82659f"],"metagross":["#578db7","#c9ccce","#85898c","#ce5555"],"torterra":["#65945c"],"cacturne":["#65954c","#477953","#e3b83e"],"mudkip":["#578db7","#e48c43","#e6eef0"],"pelipper":["#f3f1eb","#79b5d7","#578db7","#ead58d"],"seviper":["#344a68","#578db7","#e3b83e","#82659f"],"loudred":["#82659f","#a47c91","#d889a5","#ead58d"],"spiritomb":["#65945c","#82659f","#94674c"],"snorunt":["#e5c64a","#e48c43","#414348","#85898c"],"ledian":["#ce5555","#85898c","#578db7","#f3f1eb"],"xatu":["#65945c","#e5c64a","#f3f1eb","#85898c"],"wigglytuff":["#d889a5","#f0e8d6","#55aaa6"],"weedle":["#d8bc82","#d57398"],"voltorb":["#d65b57"],"wailord":["#578db7","#f3f1eb"],"venonat":["#a47c91","#d889a5","#d3bb94"],"tyranitar":["#65945c","#578db7","#737d87","#d889a5"],"dugtrio":["#d3bb94","#d889a5","#85898c"],"togepi":["#eee2c8","#f3f1eb","#e48c43","#578db7"],"diglett":["#94674c","#d889a5","#85898c"],"grimer":["#82659f","#5c6167","#85898c","#d889a5"],"poliwrath":["#578db7","#f3f1eb"],"stunfisk":["#94674c","#e5c64a","#f3f1eb"],"staryu":["#94674c","#e3b83e","#d889a5"],"starmie":["#a391b6","#82659f","#e3b83e","#d889a5"],"squirtle":["#578db7","#94674c","#eee2c8"],"drowzee":["#e5c64a","#94674c","#f3f1eb","#d889a5"],"sudowoodo":["#94674c","#65945c","#e5c64a","#d889a5"],"shuckle":["#e5c64a","#ce5555","#eee2c8","#36383b"],"sharpedo":["#4e8fba","#e3b83e","#c4c8c9","#85898c"],"lunatone":["#eee2c8","#e3b83e","#36383b","#5c6167"],"gligar":["#82659f","#578db7","#d889a5"],"scyther":["#609957","#f0e8d6","#ead58d","#e5c64a"],"tangela":["#8fc5df","#578db7","#414348","#85898c"],"sableye":["#82659f","#8fc5df","#578db7","#f0e8d6"],"sandshrew":["#eee2c8","#578db7"],"pidgey":["#eee2c8","#94674c","#4b4d50","#e8d49e"],"rhydon":["#737d87","#eee2c8","#d889a5"],"regirock":["#eee2c8","#e48c43","#94674c","#85898c"],"regice":["#8fc5df","#578db7","#e5c64a","#f0e8d6"],"raticate":["#94674c","#eee2c8","#d889a5","#85898c"],"slowpoke":["#d889a5","#d3bb94","#f3f1eb"],"raichu":["#dd963f","#eee2c8","#e5c64a","#94674c"],"vileplume":["#d35e69","#f0e8d6","#578db7","#775b77"],"geodude":["#85898c"],"porygon2":["#ce5555","#578db7"],"nidoking":["#82659f","#eee2c8","#55aaa6","#d889a5"],"nidorina":["#8fc5df","#578db7","#344a68","#ce5555"],"nidorino":["#82659f","#55aaa6"],"exeggutor":["#609957","#e3b83e","#94674c","#d889a5"],"noctowl":["#94674c","#eee2c8","#4b4d50","#ce5555"],"golbat":["#79b5d7","#578db7","#a47c91","#775b77"],"octillery":["#ce5555","#eee2c8"],"onix":["#85898c"],"marowak":["#f3f1eb","#94674c","#eee2c8"],"seel":["#e6eef0","#eee2c8","#d889a5"],"butterfree":["#82649e","#d65b57","#344a68","#578db7"],"parasect":["#ce5555","#ead58d","#eee2c8","#e5c64a"],"persian":["#eee2c8","#94674c","#f3f1eb","#ce5555"],"phanpy":["#8fc5df","#578db7","#e48c43","#f0e8d6"],"pineco":["#788b70","#578db7","#ce5555"],"pinsir":["#94674c","#c4c8c9","#85898c","#414348"],"plusle":["#ead58d","#eee2c8","#e5c64a","#d65b57"],"seaking":["#df785e","#414348","#85898c","#f0e8d6"]};
+const pokemonGuides={"magikarp":"coral red, golden yellow, pale pink, peach","lapras":"sky blue, cream, lavender grey, slate blue","charizard":"orange body; turquoise-blue wing interiors; cream-yellow belly; orange tail and flame; pale claws and eyes","venusaur":"blue-green, foliage green, bright pink, hazelnut brown","tentacool":"blue, red, beige","snorlax":"deep teal or navy body; warm cream belly and muzzle; beige shading; ivory claws; dark eyes","scorbunny":"ivory, orange, golden yellow, grey, pink, brown, dark brown","rayquaza":"green, red, yellow, cream, pink","pikachu":"yellow body; brown stripes and tail base; black ear tips; red cheeks; orange shading; dark eyes and nose","mr. mime":"pale pink, deep blue, pink, pearl grey","mimikyu":"cream, very dark grey, orange, brown","lucario":"very dark grey, blue, cream, white, red","koffing":"purple, white, cream, pale yellow green","jigglypuff":"pale pink body; warmer pink inside ears; blue-green eyes; white highlights","gyarados":"ocean blue, cream yellow, plum, pink","greninja":"","gengar":"purple, rosy red","gardevoir":"green, pink, red, white","garchomp":"navy blue, red, yellow, white","flareon":"soft orange, golden cream, dark grey","eevee":"chestnut-brown body; deeper brown legs and tail base; ivory ruff and tail tip; beige shading","dragonite":"golden orange, golden brown, turquoise, cream","bulbasaur":"turquoise body; darker green plant; pale spots","arbok":"serpent purple, charcoal hood mark, marking red, marking yellow","charmander":"orange body; pale-cream belly; yellow-to-red tail flame","spoink":"pearl pink, grey, light grey, soft pink, slate grey","meowstic":"","seadra":"ocean blue, golden beige","masquerain":"salmon orange, white, raspberry purple, very pale blue, coral orange","metagross":"steel blue, light grey, red, dark blue","torterra":"Green (only a general clue; no detailed palette)","cacturne":"cactus green, forest green, golden yellow","mudkip":"lagoon blue, orange, very pale blue, bluish white","pelipper":"white, sky blue, cream yellow","seviper":"midnight blue, golden yellow, greyish purple, coral red, venom pink","audino":"","loudred":"bluish purple, purple, mauve pink, cream yellow, plum, white","spiritomb":"green, purple, brown, light green","chespin":"","snorunt":"straw yellow, orange, charcoal grey, light blue, ivory","ledian":"red, dark gray, blue, white, cream, pink","salamence":"","xatu":"green, yellow, white, dark gray, red, pink, white, yellow, green, yellow","wigglytuff":"soft pink, ivory, turquoise blue, raspberry pink","weedle":"golden beige, raspberry pink","voltorb":"coral red","wailord":"blue, white","venonat":"mauve, ruby pink, greyish beige, dark mauve","tyranitar":"green, navy blue, steel grey, pink, deep pink, ivory","dugtrio":"beige, pink, gray, light gray","foongus":"","togepi":"cream, white, orange, white, blue, pink","diglett":"sandy brown, pink, stone grey","grimer":"purple, dark grey, pink","poliwrath":"blue, white, white","stunfisk":"brown, yellow, dark brown, white","staryu":"golden brown, warm brown, golden yellow, ruby pink","starmie":"lavender, greyish purple, golden yellow, ruby pink, ruby red","squirtle":"light-blue skin; brown shell; cream belly and shell edge","drowzee":"yellow, brown, white, pink, gray","sudowoodo":"brown, green, yellow, pink","shuckle":"yellow, red, cream, very dark grey","sharpedo":"ocean blue, golden yellow, pearl grey, deep pink","lunatone":"cream, golden yellow, very dark grey, pink","gligar":"purple, blue, pink","scyther":"leaf green, dark green, ivory, cream yellow","tangela":"light blue, charcoal grey, terracotta","sableye":"purple, light blue, ivory, blue, red","sandshrew":"sandy gold, soft cream, slate blue","pidgey":"vanilla cream, wing brown, charcoal brown, rufous brown, golden cream, beak pink","rhyperior":"","rhydon":"steel grey, cream, soft pink","regirock":"cream, orange, brown, grey, golden yellow","regice":"light blue, yellow, blue, ivory","raticate":"golden brown, belly cream, mouth pink, grey brown, tail cream, band brown, paw beige","slowpoke":"pink, beige, white, pink","raichu":"golden orange, belly cream, lightning yellow, ear yellow, ear-tip brown, cheek yellow, tail charcoal","vileplume":"rosy red, ivory, slate blue, plum","geodude":"gray","porygon2":"red, blue","nidoking":"orchid purple, belly cream, ear turquoise, mouth pink","nidorina":"light blue, blue, dark blue, midnight blue, red","nidorino":"orchid purple, ear turquoise, deep violet spots","exeggutor":"leaf green, golden yellow, sandy brown, warm brown, soft pink","noctowl":"brown body, cream crest, cream facial rings, charcoal facial contours, red irises, pink beak, dark brown wings, brown chest markings, golden talons","golbat":"sky blue, mauve, plum, pink","octillery":"red, cream","onix":"rock grey, shaded grey","marowak":"white, brown, cream","seel":"bluish white, cream, pink","butterfree":"slate violet, coral red, midnight blue, pale blue","paras":"","parasect":"brick red, cream yellow, soft orange","persian":"cream, brown, white, red, gray, dark gray","phanpy":"light blue, orange, ivory, very dark grey, deep pink","pineco":"grey green, navy blue, red","pinsir":"greyish brown, dark brown, pearl grey, charcoal grey","plusle":"cream yellow, coral red, red pink, mauve pink","seaking":"coral orange, charcoal grey, ivory, soft pink, dark grey","nidoran (fritidsparken image; sex unclear)":{"female":"medium blue body; lighter blue belly and muzzle; dark teal/navy spots; pale-pink inner ears; cream or light-gray horn","male":"violet/lavender body; deeper-purple spots; pale-cream belly; pink or turquoise ear details"}};
+function normalizedPokemonName(title){
+ return String(title||"").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+}
+function pokemonKey(title){
+ const key=normalizedPokemonName(title);
+ return Object.keys(pokemonGuides).find(name=>key===name||key.startsWith(name+" "))||"";
+}
+function pokemonGuide(title){const name=pokemonKey(title);return name?pokemonGuides[name]||"":""}
 function autoPalette(title){
- const key=String(title||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+ const key=normalizedPokemonName(title);
  const species=Object.keys(pokemonPalettes).find(name=>key===name||key.startsWith(name+" "));
- if(species)return pokemonPalettes[species].slice(0,4);
- const defaults=[["#6f9fc1","#6f9b70","#e4c46f","#d88a79"],["#719b91","#d59876","#e9ce89","#87789d"],["#718cbd","#d9a2b3","#82a576","#dfb77c"],["#76a6a0","#d0a06c","#b58ca9","#e1cc9a"]];
- let hash=0;for(const c of key)hash=(hash*31+c.charCodeAt(0))|0;return defaults[Math.abs(hash)%defaults.length];
+ if(species)return pokemonPalettes[species].slice(0,6);
+ const defaults=[["#6f9fc1","#6f9b70","#e4c46f"],["#719b91","#d59876","#e9ce89"],["#718cbd","#d9a2b3","#82a576"],["#76a6a0","#d0a06c","#b58ca9"]];
+ let hash=0;for(const c of key)hash=(hash*31+c.charCodeAt(0))|0;
+ return defaults[Math.abs(hash)%defaults.length];
+}
+const namedColorRules=[
+ [/very dark (?:grey|gray)|charcoal|black|dark (?:grey|gray)/i,"#353638"],
+ [/navy|midnight blue|deep blue|dark blue/i,"#344a68"],
+ [/blue[ -]?green|turquoise|teal|lagoon/i,"#55aaa6"],
+ [/sky blue|ocean blue|light blue|blue/i,"#578db7"],
+ [/purple|violet|plum|mauve|lilac/i,"#82659f"],
+ [/pink|rose|coral|salmon|raspberry/i,"#d889a5"],
+ [/red|scarlet|ruby/i,"#ce5555"],
+ [/orange|amber/i,"#e48c43"],
+ [/yellow|golden|gold/i,"#e5c64a"],
+ [/green|mint|foliage/i,"#65945c"],
+ [/brown|chestnut|hazelnut|tan/i,"#94674c"],
+ [/cream|ivory|beige|vanilla/i,"#eee2c8"],
+ [/white/i,"#f3f1eb"],
+ [/grey|gray|silver/i,"#85898c"]
+];
+function namedGuideColor(text){for(const [pattern,color] of namedColorRules)if(pattern.test(text))return color;return null}
+function roleGuideColor(guide,role){
+ if(!guide)return null;
+ const clauses=guide.toLowerCase().split(/[;,.]/).map(v=>v.trim()).filter(Boolean);
+ const clause=clauses.find(v=>new RegExp("\\b"+role+"\\b","i").test(v));
+ return clause?namedGuideColor(clause):null;
+}
+function autoRegionColor(region,regions,palette,guide){
+ const total=regions.reduce((sum,r)=>sum+r.area,0)||1;
+ const ratio=region.area/total,cx=(region.cx||0)/W,cy=(region.cy||0)/H;
+ const body=roleGuideColor(guide,"body")||palette[0];
+ const cheek=roleGuideColor(guide,"cheeks")||roleGuideColor(guide,"cheek");
+ if(cheek&&/cheek/i.test(guide)&&cy>.18&&cy<.48&&cx>.24&&cx<.76&&Math.abs(cx-.5)>.09&&ratio<.12)return cheek;
+ const ear=roleGuideColor(guide,"ears")||roleGuideColor(guide,"ear");
+ if(ear&&/ear/i.test(guide)&&cy<.23&&cx>.18&&cx<.82&&ratio<.1)return ear;
+ const belly=roleGuideColor(guide,"belly")||roleGuideColor(guide,"underside")||roleGuideColor(guide,"muzzle");
+ if(belly&&cx>.28&&cx<.72&&cy>.42&&ratio<.32)return belly;
+ const wing=roleGuideColor(guide,"wings")||roleGuideColor(guide,"wing");
+ if(wing&&(cx<.22||cx>.78)&&cy>.18&&cy<.76&&ratio<.36)return wing;
+ const tail=roleGuideColor(guide,"tail");
+ if(tail&&cy>.48&&(cx<.32||cx>.68)&&ratio<.18)return tail;
+ if(/eyes|nose|claws|spots|stripes|markings|tips/i.test(guide)&&ratio<.012){
+   const detail=namedGuideColor(guide.match(/(?:dark|black|charcoal|navy)[^;,]*/i)?.[0]||"");
+   if(detail)return detail;
+ }
+ if(ratio>.045)return body;
+ const colorCount=Math.min(palette.length,3);
+ if(cy>.76&&(cx<.24||cx>.76)&&colorCount>1)return palette[1];
+ if(cy<.19&&ratio<.035&&colorCount>2)return palette[2];
+ if(ratio<.006&&colorCount>2)return palette[Math.min(2,colorCount-1)];
+ return body;
 }
 const style=document.createElement("style");style.textContent=
 ".fp-online-actions{display:flex;flex-direction:column;gap:5px;margin:8px 0}.fp-online-actions button,.fp-online-actions a{box-sizing:border-box;display:flex;width:100%;min-width:0;align-items:center;justify-content:center;white-space:nowrap;border:1px solid #d7e2d7;border-radius:12px;padding:6px 7px;background:#edf3ed;color:#365443;font-family:inherit;font-size:12px;font-weight:600;line-height:1.15;text-decoration:none;cursor:pointer}.fp-online-actions button:hover,.fp-online-actions a:hover{background:#e2ece2;border-color:#c8d8c8}@media(max-width:700px){.fp-online-actions{gap:4px;margin:7px 0}.fp-online-actions button,.fp-online-actions a{padding:5px 5px;font-size:10px;border-radius:10px}}";
@@ -125,11 +183,11 @@ c.putImageData(out,0,0)
    const total=W*H,seen=new Uint8Array(total),queue=new Uint32Array(total),regions=[];
    for(let start=0;start<total;start++){
      if(seen[start]||luma[start]<220)continue;
-     let head=0,tail=0,minX=W,minY=H,maxX=0,maxY=0,touchesEdge=false;
+     let head=0,tail=0,minX=W,minY=H,maxX=0,maxY=0,sumX=0,sumY=0,touchesEdge=false;
      seen[start]=1;queue[tail++]=start;
      while(head<tail){
        const i=queue[head++],y=(i/W)|0,x=i-y*W;
-       if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y;
+       sumX+=x;sumY+=y;if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y;
        if(x===0||y===0||x===W-1||y===H-1)touchesEdge=true;
        let n;
        if(x>0&&(n=i-1,!seen[n]&&luma[n]>=220)){seen[n]=1;queue[tail++]=n}
@@ -137,7 +195,7 @@ c.putImageData(out,0,0)
        if(y>0&&(n=i-W,!seen[n]&&luma[n]>=220)){seen[n]=1;queue[tail++]=n}
        if(y<H-1&&(n=i+W,!seen[n]&&luma[n]>=220)){seen[n]=1;queue[tail++]=n}
      }
-     if(!touchesEdge&&tail>=36&&tail<total*.45)regions.push({pixels:queue.slice(0,tail),minX,minY,maxX,maxY,area:tail});
+     if(!touchesEdge&&tail>=36&&tail<total*.45)regions.push({pixels:queue.slice(0,tail),minX,minY,maxX,maxY,area:tail,cx:sumX/tail,cy:sumY/tail});
    }
    regions.sort((a,b)=>b.area-a.area);regions.length=Math.min(regions.length,160);
    regions.sort((a,b)=>a.minY-b.minY||a.minX-b.minX);
@@ -161,13 +219,8 @@ c.putImageData(out,0,0)
    else{
      status.textContent="Hittar slutna färgområden…";
      await new Promise(resolve=>requestAnimationFrame(()=>resolve()));
-     const regions=findAutoRegions(),paletteColors=autoPalette(TARGET),totalArea=regions.reduce((sum,region)=>sum+region.area,0);
-     let filledArea=0;
-     plan=regions.map(region=>{
-       const midpoint=(filledArea+region.area/2)/Math.max(1,totalArea);filledArea+=region.area;
-       const slot=midpoint<.68?0:midpoint<.88?1:midpoint<.97?2:3;
-       return {type:"region",region,color:paletteColors[Math.min(slot,paletteColors.length-1)]};
-     });
+     const regions=findAutoRegions(),paletteColors=autoPalette(TARGET),guide=pokemonGuide(TARGET);
+     plan=regions.map(region=>({type:"region",region,color:autoRegionColor(region,regions,paletteColors,guide)}));
    }
    if(!plan.length){
      autoRunning=false;autoButton.disabled=false;autoProgress.hidden=true;sheet.style.pointerEvents="";
