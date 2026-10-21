@@ -45,38 +45,17 @@ function roleGuideColor(guide,role){
  return clause?namedGuideColor(clause):null;
 }
 function autoRegionColor(region,regions,palette,guide,title){
- const species=normalizedPokemonName(title||"");
- if(species==="pikachu"){
-   const x=region.cx||0,y=region.cy||0,areaRatio=region.area/(regions.reduce((sum,r)=>sum+r.area,0)||1);
-   if(y>.79||x<.36||x>.75)return null;
-   if(y<.23&&(x<.47||x>.54))return "#302b2e";
-   if(x>.61&&y>.43&&y<.68)return "#985a3c";
-   if(y>.30&&y<.47&&((x>.405&&x<.465)||(x>.535&&x<.595))&&areaRatio<.16)return "#ed5945";
-   if(y>.38&&y<.51&&x>.46&&x<.54&&areaRatio<.12)return "#6a3d32";
-   if(y>.28&&y<.39&&x>.43&&x<.57&&areaRatio<.04)return "#302b2e";
-   if(y>.16&&y<.38)return "#f6cd35";
-   if(x>.385&&x<.625&&y>.30&&y<.78)return "#f6cd35";
-   return null;
- }
+ const species=pokemonKey(title||"");
  const total=regions.reduce((sum,r)=>sum+r.area,0)||1;
  const ratio=region.area/total,cx=region.cx||0,cy=region.cy||0;
- const body=roleGuideColor(guide,"body")||palette[0];
- const cheek=roleGuideColor(guide,"cheeks")||roleGuideColor(guide,"cheek");
- const ear=roleGuideColor(guide,"ears")||roleGuideColor(guide,"ear");
- const belly=roleGuideColor(guide,"belly")||roleGuideColor(guide,"underside")||roleGuideColor(guide,"muzzle");
- const wing=roleGuideColor(guide,"wings")||roleGuideColor(guide,"wing");
- const tail=roleGuideColor(guide,"tail");
- const markings=roleGuideColor(guide,"spots")||roleGuideColor(guide,"markings")||roleGuideColor(guide,"marking");
- const details=roleGuideColor(guide,"eyes")||roleGuideColor(guide,"nose")||roleGuideColor(guide,"claws")||roleGuideColor(guide,"tips");
- const nearCharacter=cx>.19&&cx<.81&&cy>.12&&cy<.81;
- if(!nearCharacter&&ratio<.18)return null;
- if(cheek&&cy>.13&&cy<.57&&cx>.20&&cx<.80&&Math.abs(cx-.5)>.055&&ratio<.16)return cheek;
- if(ear&&cy<.34&&cx>.12&&cx<.88&&ratio<.1)return ear;
- if(belly&&nearCharacter&&cx>.27&&cx<.73&&cy>.36&&ratio<.38)return belly;
- if(wing&&nearCharacter&&(cx<.28||cx>.72)&&cy>.16&&cy<.76&&ratio<.38)return wing;
- if(tail&&nearCharacter&&cy>.40&&(cx<.37||cx>.63)&&ratio<.22)return tail;
- if(markings&&nearCharacter&&ratio<.025&&cy>.22&&cy<.73&&cx>.28&&cx<.72)return markings;
- if(details&&nearCharacter&&ratio<.014)return details;
+ const body=roleGuideColor(guide,"body")||palette[0]||"#7f8c8d";
+ // Keep the automatic pass conservative: only color enclosed regions in the
+ // character's central drawing area. Ambiguous tiny regions stay white rather
+ // than receiving a guessed accent color (which previously colored flowers,
+ // props and limbs incorrectly).
+ const inSubject=cx>.18&&cx<.82&&cy>.10&&cy<.84;
+ if(!inSubject&&ratio<.20)return null;
+ if(species==="pikachu")return inSubject?"#f6cd35":null;
  return body;
 }
 const style=document.createElement("style");style.textContent=
