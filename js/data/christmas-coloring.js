@@ -2,10 +2,10 @@ mandalas.push(...[
   {
     "title": "Children Making Snowflakes and Paper Chains",
     "type": "Jul",
-    "img": "./assets/coloring-originals-2026/jul-20261021/Children%20Making%20Snowflakes%20and%20Paper%20Chains-5.png",
-    "preview": "./assets/coloring-originals-2026/jul-20261021/Children%20Making%20Snowflakes%20and%20Paper%20Chains-5.png",
+    "img": "./assets/coloring-originals-2026/jul-20261021/Children%20Making%20Snowflakes%20and%20Paper%20Chains-5-fixed-20261021.png",
+    "preview": "./assets/coloring-originals-2026/jul-20261021/Children%20Making%20Snowflakes%20and%20Paper%20Chains-5-fixed-20261021.png",
     "pdf": null,
-    "src": "./assets/coloring-originals-2026/jul-20261021/Children%20Making%20Snowflakes%20and%20Paper%20Chains-5.png",
+    "src": "./assets/coloring-originals-2026/jul-20261021/Children%20Making%20Snowflakes%20and%20Paper%20Chains-5-fixed-20261021.png",
     "sourceLabel": "Egen färgläggningsbild"
   },
   {
@@ -29,10 +29,10 @@ mandalas.push(...[
   {
     "title": "Kitten bats at a Christmas ornament",
     "type": "Jul",
-    "img": "./assets/coloring-originals-2026/jul-20261021/Kitten%20bats%20at%20a%20Christmas%20ornament-2.png",
-    "preview": "./assets/coloring-originals-2026/jul-20261021/Kitten%20bats%20at%20a%20Christmas%20ornament-2.png",
+    "img": "./assets/coloring-originals-2026/jul-20261021/Kitten%20bats%20at%20a%20Christmas%20ornament-2-fixed-20261021.png",
+    "preview": "./assets/coloring-originals-2026/jul-20261021/Kitten%20bats%20at%20a%20Christmas%20ornament-2-fixed-20261021.png",
     "pdf": null,
-    "src": "./assets/coloring-originals-2026/jul-20261021/Kitten%20bats%20at%20a%20Christmas%20ornament-2.png",
+    "src": "./assets/coloring-originals-2026/jul-20261021/Kitten%20bats%20at%20a%20Christmas%20ornament-2-fixed-20261021.png",
     "sourceLabel": "Egen färgläggningsbild"
   },
   {
@@ -65,28 +65,28 @@ mandalas.push(...[
   {
     "title": "Handmade star lantern over snowy village",
     "type": "Jul",
-    "img": "./assets/coloring-originals-2026/jul-20261021/Handmade%20star%20lantern%20over%20snowy%20village-7.png",
-    "preview": "./assets/coloring-originals-2026/jul-20261021/Handmade%20star%20lantern%20over%20snowy%20village-7.png",
+    "img": "./assets/coloring-originals-2026/jul-20261021/Handmade%20star%20lantern%20over%20snowy%20village-7-fixed-20261021.png",
+    "preview": "./assets/coloring-originals-2026/jul-20261021/Handmade%20star%20lantern%20over%20snowy%20village-7-fixed-20261021.png",
     "pdf": null,
-    "src": "./assets/coloring-originals-2026/jul-20261021/Handmade%20star%20lantern%20over%20snowy%20village-7.png",
+    "src": "./assets/coloring-originals-2026/jul-20261021/Handmade%20star%20lantern%20over%20snowy%20village-7-fixed-20261021.png",
     "sourceLabel": "Egen färgläggningsbild"
   },
   {
     "title": "Cozy cabin snow globe coloring page",
     "type": "Jul",
-    "img": "./assets/coloring-originals-2026/jul-20261021/Cozy%20cabin%20snow%20globe%20coloring%20page-6.png",
-    "preview": "./assets/coloring-originals-2026/jul-20261021/Cozy%20cabin%20snow%20globe%20coloring%20page-6.png",
+    "img": "./assets/coloring-originals-2026/jul-20261021/Cozy%20cabin%20snow%20globe%20coloring%20page-6-fixed-20261021.png",
+    "preview": "./assets/coloring-originals-2026/jul-20261021/Cozy%20cabin%20snow%20globe%20coloring%20page-6-fixed-20261021.png",
     "pdf": null,
-    "src": "./assets/coloring-originals-2026/jul-20261021/Cozy%20cabin%20snow%20globe%20coloring%20page-6.png",
+    "src": "./assets/coloring-originals-2026/jul-20261021/Cozy%20cabin%20snow%20globe%20coloring%20page-6-fixed-20261021.png",
     "sourceLabel": "Egen färgläggningsbild"
   },
   {
     "title": "Toy Train Under the Christmas Tree",
     "type": "Jul",
-    "img": "./assets/coloring-originals-2026/jul-20261021/Toy%20Train%20Under%20the%20Christmas%20Tree-5.png",
-    "preview": "./assets/coloring-originals-2026/jul-20261021/Toy%20Train%20Under%20the%20Christmas%20Tree-5.png",
+    "img": "./assets/coloring-originals-2026/jul-20261021/Toy%20Train%20Under%20the%20Christmas%20Tree-5-fixed-20261021.png",
+    "preview": "./assets/coloring-originals-2026/jul-20261021/Toy%20Train%20Under%20the%20Christmas%20Tree-5-fixed-20261021.png",
     "pdf": null,
-    "src": "./assets/coloring-originals-2026/jul-20261021/Toy%20Train%20Under%20the%20Christmas%20Tree-5.png",
+    "src": "./assets/coloring-originals-2026/jul-20261021/Toy%20Train%20Under%20the%20Christmas%20Tree-5-fixed-20261021.png",
     "sourceLabel": "Egen färgläggningsbild"
   },
   {
@@ -209,19 +209,19 @@ mandalas.push(...[
   {
     "title": "Cheerful Santa by the Christmas Tree",
     "type": "Jul",
-    "img": "./assets/coloring-originals-2026/jul-20261021/Cheerful%20Santa%20by%20the%20Christmas%20Tree-3.png",
-    "preview": "./assets/coloring-originals-2026/jul-20261021/Cheerful%20Santa%20by%20the%20Christmas%20Tree-3.png",
+    "img": "./assets/coloring-originals-2026/jul-20261021/Cheerful%20Santa%20by%20the%20Christmas%20Tree-3-fixed-20261021.png",
+    "preview": "./assets/coloring-originals-2026/jul-20261021/Cheerful%20Santa%20by%20the%20Christmas%20Tree-3-fixed-20261021.png",
     "pdf": null,
-    "src": "./assets/coloring-originals-2026/jul-20261021/Cheerful%20Santa%20by%20the%20Christmas%20Tree-3.png",
+    "src": "./assets/coloring-originals-2026/jul-20261021/Cheerful%20Santa%20by%20the%20Christmas%20Tree-3-fixed-20261021.png",
     "sourceLabel": "Egen färgläggningsbild"
   },
   {
     "title": "Snowman and Birds in Falling Snow",
     "type": "Jul",
-    "img": "./assets/coloring-originals-2026/jul-20261021/Snowman%20and%20Birds%20in%20Falling%20Snow-2.png",
-    "preview": "./assets/coloring-originals-2026/jul-20261021/Snowman%20and%20Birds%20in%20Falling%20Snow-2.png",
+    "img": "./assets/coloring-originals-2026/jul-20261021/Snowman%20and%20Birds%20in%20Falling%20Snow-2-fixed-20261021.png",
+    "preview": "./assets/coloring-originals-2026/jul-20261021/Snowman%20and%20Birds%20in%20Falling%20Snow-2-fixed-20261021.png",
     "pdf": null,
-    "src": "./assets/coloring-originals-2026/jul-20261021/Snowman%20and%20Birds%20in%20Falling%20Snow-2.png",
+    "src": "./assets/coloring-originals-2026/jul-20261021/Snowman%20and%20Birds%20in%20Falling%20Snow-2-fixed-20261021.png",
     "sourceLabel": "Egen färgläggningsbild"
   },
   {
