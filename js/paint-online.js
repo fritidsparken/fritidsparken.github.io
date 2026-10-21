@@ -18,22 +18,26 @@ function autoPalette(title){
  return ["#578db7","#eee2c8","#85898c"];
 }
 const namedColorRules=[
- [/very dark (?:grey|gray)|charcoal|black|dark (?:grey|gray)/i,"#353638"],
- [/navy|midnight blue|deep blue|dark blue/i,"#344a68"],
- [/blue[ -]?green|turquoise|teal|lagoon/i,"#55aaa6"],
- [/sky blue|ocean blue|light blue|blue/i,"#578db7"],
- [/purple|violet|plum|mauve|lilac/i,"#82659f"],
- [/pink|rose|coral|salmon|raspberry/i,"#d889a5"],
- [/red|scarlet|ruby/i,"#ce5555"],
- [/orange|amber/i,"#e48c43"],
- [/yellow|golden|gold/i,"#e5c64a"],
- [/green|mint|foliage/i,"#65945c"],
- [/brown|chestnut|hazelnut|tan/i,"#94674c"],
- [/cream|ivory|beige|vanilla/i,"#eee2c8"],
- [/white/i,"#f3f1eb"],
- [/grey|gray|silver/i,"#85898c"]
+ [/very dark (?:grey|gray)|charcoal|black|dark (?:grey|gray)/i,"#42434c"],
+ [/navy|midnight blue|deep blue|dark blue/i,"#3d546e"],
+ [/blue[ -]?green|turquoise|teal|lagoon/i,"#4997a7"],
+ [/sky blue|ocean blue|light blue|blue/i,"#71adc9"],
+ [/purple|violet|plum|mauve|lilac/i,"#987ab5"],
+ [/pink|rose|coral|salmon|raspberry/i,"#ed8b96"],
+ [/red|scarlet|ruby/i,"#ed5945"],
+ [/orange|amber/i,"#ee9957"],
+ [/yellow|golden|gold/i,"#f6cd35"],
+ [/green|mint|foliage/i,"#5e9d63"],
+ [/brown|chestnut|hazelnut|tan/i,"#985a3c"],
+ [/cream|ivory|beige|vanilla/i,"#f0dfb7"],
+ [/white/i,"#fffdf4"],
+ [/grey|gray|silver/i,"#a6a4b3"]
 ];
-function namedGuideColor(text){for(const [pattern,color] of namedColorRules)if(pattern.test(text))return color;return null}
+function namedGuideColor(text){
+ let match=null;
+ for(const [pattern,color] of namedColorRules){const found=pattern.exec(text);if(found&&(!match||found.index<match.index))match={index:found.index,color}}
+ return match?match.color:null;
+}
 function roleGuideColor(guide,role){
  if(!guide)return null;
  const clauses=guide.toLowerCase().split(/[;,.]/).map(v=>v.trim()).filter(Boolean);
@@ -45,24 +49,19 @@ function autoRegionColor(region,regions,palette,guide){
  const ratio=region.area/total,cx=(region.cx||0)/W,cy=(region.cy||0)/H;
  const body=roleGuideColor(guide,"body")||palette[0];
  const cheek=roleGuideColor(guide,"cheeks")||roleGuideColor(guide,"cheek");
- if(cheek&&/cheek/i.test(guide)&&cy>.18&&cy<.48&&cx>.24&&cx<.76&&Math.abs(cx-.5)>.09&&ratio<.12)return cheek;
+ if(cheek&&cy>.18&&cy<.48&&cx>.24&&cx<.76&&Math.abs(cx-.5)>.09&&ratio<.12)return cheek;
  const ear=roleGuideColor(guide,"ears")||roleGuideColor(guide,"ear");
- if(ear&&/ear/i.test(guide)&&cy<.23&&cx>.18&&cx<.82&&ratio<.1)return ear;
+ if(ear&&cy<.23&&cx>.18&&cx<.82&&ratio<.1)return ear;
  const belly=roleGuideColor(guide,"belly")||roleGuideColor(guide,"underside")||roleGuideColor(guide,"muzzle");
  if(belly&&cx>.28&&cx<.72&&cy>.42&&ratio<.32)return belly;
  const wing=roleGuideColor(guide,"wings")||roleGuideColor(guide,"wing");
  if(wing&&(cx<.22||cx>.78)&&cy>.18&&cy<.76&&ratio<.36)return wing;
  const tail=roleGuideColor(guide,"tail");
- if(tail&&cy>.48&&(cx<.32||cx>.68)&&ratio<.18)return tail;
- if(/eyes|nose|claws|spots|stripes|markings|tips/i.test(guide)&&ratio<.012){
-   const detail=namedGuideColor(guide.match(/(?:dark|black|charcoal|navy)[^;,]*/i)?.[0]||"");
-   if(detail)return detail;
- }
- if(ratio>.045)return body;
- const colorCount=Math.min(palette.length,3);
- if(cy>.76&&(cx<.24||cx>.76)&&colorCount>1)return palette[1];
- if(cy<.19&&ratio<.035&&colorCount>2)return palette[2];
- if(ratio<.006&&colorCount>2)return palette[Math.min(2,colorCount-1)];
+ if(tail&&cy>.42&&(cx<.35||cx>.65)&&ratio<.22)return tail;
+ const markings=roleGuideColor(guide,"stripes")||roleGuideColor(guide,"spots")||roleGuideColor(guide,"markings")||roleGuideColor(guide,"marking");
+ if(markings&&ratio<.08)return markings;
+ const details=roleGuideColor(guide,"eyes")||roleGuideColor(guide,"nose")||roleGuideColor(guide,"claws")||roleGuideColor(guide,"tips");
+ if(details&&ratio<.012)return details;
  return body;
 }
 const style=document.createElement("style");style.textContent=
