@@ -61,7 +61,7 @@ function addButton(){
 }
 const observer=new MutationObserver(addButton);observer.observe(document.body,{childList:true,subtree:true});addButton();
 function openPainter(IMAGE,TARGET){
- const back=document.createElement("div");back.className="fp-paint-back";back.innerHTML='<section class="fp-paint-dialog" role="dialog" aria-modal="true" aria-label="Måla online"><header class="fp-paint-head"><div><h2>🎨 Måla online</h2><p></p></div><button class="fp-paint-close" aria-label="Stäng">×</button></header><div class="fp-paint-tools"><button data-tool="fill" aria-pressed="true">🪣 Fyll</button><button data-tool="pen" aria-pressed="false">✏️ Penna</button><button data-tool="erase" aria-pressed="false">🧽 Sudd</button><select aria-label="Penselstorlek"><option value="5">● Liten</option><option value="14" selected>● Medium</option><option value="30">● Stor</option></select><button data-action="undo" disabled>↶ Ångra</button><button data-action="redo" disabled>↷ Gör om</button><button data-action="minus" aria-label="Zooma ut">−</button><button data-action="one">100%</button><button data-action="plus" aria-label="Zooma in">+</button><button data-action="reset">🗑️ Börja om</button>'+(TARGET==="Nidoking"?'<button data-action="auto">✨ Färglägg automatiskt</button>':'')+'<button data-action="save">💾 Spara bild</button></div><div class="fp-paint-palette" role="group" aria-label="Färgpalett"></div><div class="fp-paint-stage"><div class="fp-paint-sheet"><canvas class="fp-paint-layer"></canvas><canvas class="fp-line-layer"></canvas></div></div><div class="fp-paint-status">Välj färg och tryck på ett område. Två fingrar flyttar och zoomar. Dator: håll mellanslag och dra.</div></section>';
+ const back=document.createElement("div");back.className="fp-paint-back";back.innerHTML='<section class="fp-paint-dialog" role="dialog" aria-modal="true" aria-label="Måla online"><header class="fp-paint-head"><div><h2>🎨 Måla online</h2><p></p></div><button class="fp-paint-close" aria-label="Stäng">×</button></header><div class="fp-paint-tools"><button data-tool="fill" aria-pressed="true">🪣 Fyll</button><button data-tool="pen" aria-pressed="false">✏️ Penna</button><button data-tool="erase" aria-pressed="false">🧽 Sudd</button><select aria-label="Penselstorlek"><option value="5">● Liten</option><option value="14" selected>● Medium</option><option value="30">● Stor</option></select><button data-action="undo" disabled>↶ Ångra</button><button data-action="redo" disabled>↷ Gör om</button><button data-action="minus" aria-label="Zooma ut">−</button><button data-action="one">100%</button><button data-action="plus" aria-label="Zooma in">+</button><button data-action="reset">🗑️ Börja om</button>'+'<button data-action="auto">✨ Färglägg automatiskt</button>'+'<button data-action="save">💾 Spara bild</button></div><div class="fp-paint-palette" role="group" aria-label="Färgpalett"></div><div class="fp-paint-stage"><div class="fp-paint-sheet"><canvas class="fp-paint-layer"></canvas><canvas class="fp-line-layer"></canvas></div></div><div class="fp-paint-status">Välj färg och tryck på ett område. Två fingrar flyttar och zoomar. Dator: håll mellanslag och dra.</div></section>';
  back.querySelector(".fp-paint-head p").textContent=TARGET+" · Måla med färghink eller penna!";
  document.body.append(back);document.body.style.overflow="hidden";
  const $=s=>back.querySelector(s),dialog=$(".fp-paint-dialog"),stage=$(".fp-paint-stage"),sheet=$(".fp-paint-sheet"),paint=$(".fp-paint-layer"),lines=$(".fp-line-layer"),ctx=paint.getContext("2d",{willReadFrequently:true}),lctx=lines.getContext("2d"),undo=$('[data-action="undo"]'),redo=$('[data-action="redo"]');
@@ -79,7 +79,7 @@ function openPainter(IMAGE,TARGET){
  ];
  const autoButton=$('[data-action="auto"]'),autoProgress=document.createElement("progress"),status=$(".fp-paint-status");
  let autoRunning=false;
- autoProgress.className="fp-auto-progress";autoProgress.max=autoSteps.length;autoProgress.value=0;autoProgress.hidden=true;
+ autoProgress.className="fp-auto-progress";autoProgress.max=1;autoProgress.value=0;autoProgress.hidden=true;
  status.setAttribute("aria-live","polite");if(autoButton)dialog.insertBefore(autoProgress,stage);
 
  const img=new Image();if(new URL(IMAGE,location.href).origin!==location.origin)img.crossOrigin="anonymous";img.onload=()=>{
@@ -113,26 +113,73 @@ function openPainter(IMAGE,TARGET){
    }
 c.putImageData(out,0,0)
  }
+ function findAutoRegions(){
+   const total=W*H,seen=new Uint8Array(total),queue=new Uint32Array(total),regions=[];
+   for(let start=0;start<total;start++){
+     if(seen[start]||luma[start]<220)continue;
+     let head=0,tail=0,minX=W,minY=H,maxX=0,maxY=0,touchesEdge=false;
+     seen[start]=1;queue[tail++]=start;
+     while(head<tail){
+       const i=queue[head++],y=(i/W)|0,x=i-y*W;
+       if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y;
+       if(x===0||y===0||x===W-1||y===H-1)touchesEdge=true;
+       let n;
+       if(x>0&&(n=i-1,!seen[n]&&luma[n]>=220)){seen[n]=1;queue[tail++]=n}
+       if(x<W-1&&(n=i+1,!seen[n]&&luma[n]>=220)){seen[n]=1;queue[tail++]=n}
+       if(y>0&&(n=i-W,!seen[n]&&luma[n]>=220)){seen[n]=1;queue[tail++]=n}
+       if(y<H-1&&(n=i+W,!seen[n]&&luma[n]>=220)){seen[n]=1;queue[tail++]=n}
+     }
+     if(!touchesEdge&&tail>=36&&tail<total*.45)regions.push({pixels:queue.slice(0,tail),minX,minY,maxX,maxY,area:tail});
+   }
+   regions.sort((a,b)=>b.area-a.area);regions.length=Math.min(regions.length,160);
+   regions.sort((a,b)=>a.minY-b.minY||a.minX-b.minX);
+   return regions;
+ }
+ function paintAutoRegion(region,fillColor){
+   const width=region.maxX-region.minX+1,height=region.maxY-region.minY+1;
+   const image=ctx.createImageData(width,height),data=image.data;
+   const red=parseInt(fillColor.slice(1,3),16),green=parseInt(fillColor.slice(3,5),16),blue=parseInt(fillColor.slice(5,7),16);
+   for(const index of region.pixels){const x=index%W-region.minX,y=((index/W)|0)-region.minY,k=(y*width+x)*4;data[k]=red;data[k+1]=green;data[k+2]=blue;data[k+3]=255}
+   ctx.putImageData(image,region.minX,region.minY);
+ }
  async function runAutoColor(){
    if(!autoButton||autoRunning||!W)return;
    if(acts.length&&!confirm("Automatisk färgläggning börjar från en tom bild. Vill du rensa din målning och fortsätta?"))return;
-   acts=[];future=[];ctx.clearRect(0,0,W,H);historyUI();
-   autoRunning=true;autoButton.disabled=true;autoProgress.hidden=false;autoProgress.value=0;sheet.style.pointerEvents="none";toolSet("fill");
-   for(let i=0;i<autoSteps.length;i++){
+   acts=[];future=[];ctx.clearRect(0,0,W,H);historyUI();autoRunning=true;autoButton.disabled=true;
+   autoProgress.hidden=false;autoProgress.value=0;sheet.style.pointerEvents="none";toolSet("fill");
+   const isNidoking=TARGET.toLocaleLowerCase("sv")==="nidoking";
+   let plan;
+   if(isNidoking)plan=autoSteps.map(step=>({type:"seed",x:Math.min(W-1,Math.max(0,Math.round(step[0]*W))),y:Math.min(H-1,Math.max(0,Math.round(step[1]*H))),color:step[2]}));
+   else{
+     status.textContent="Hittar slutna färgområden…";
+     await new Promise(resolve=>requestAnimationFrame(()=>resolve()));
+     const regions=findAutoRegions(),paletteColors=colors.filter(entry=>!["#ffffff","#171717"].includes(entry[1])).map(entry=>entry[1]);
+     plan=regions.map((region,index)=>({type:"region",region,color:paletteColors[(index*7+3)%paletteColors.length]}));
+   }
+   if(!plan.length){
+     autoRunning=false;autoButton.disabled=false;autoProgress.hidden=true;sheet.style.pointerEvents="";
+     status.textContent="Jag hittade inga tydligt slutna områden i bilden. Du kan färglägga den med hink eller penna.";
+     return;
+   }
+   autoProgress.max=plan.length;
+   for(let i=0;i<plan.length;i++){
      if(!back.isConnected){autoRunning=false;return}
-     const [fx,fy,fillColor]=autoSteps[i],x=Math.min(W-1,Math.max(0,Math.round(fx*W))),y=Math.min(H-1,Math.max(0,Math.round(fy*H)));
-     if(luma[y*W+x]>=220){
-       const action={type:"fill",x,y,color:fillColor};acts.push(action);future=[];
-       const previous=color;color=fillColor;fillRegion(ctx,x,y);color=previous;
+     const step=plan[i];
+     if(step.type==="seed"){
+       if(luma[step.y*W+step.x]>=220){acts.push({type:"fill",x:step.x,y:step.y,color:step.color});const previous=color;color=step.color;fillRegion(ctx,step.x,step.y);color=previous}
+     }else{
+       paintAutoRegion(step.region,step.color);
+       acts.push({type:"region",region:step.region,color:step.color});
      }
-     autoProgress.value=i+1;status.textContent="Timelapse: färglägger Nidoking, steg "+(i+1)+" av "+autoSteps.length+"…";historyUI();
+     future=[];autoProgress.value=i+1;
+     status.textContent="Timelapse: färglägger "+TARGET+", steg "+(i+1)+" av "+plan.length+"…";historyUI();
      await new Promise(resolve=>setTimeout(resolve,115));
    }
-   autoRunning=false;sheet.style.pointerEvents="";autoButton.disabled=true;
-   status.textContent="Klart! Nidoking är färglagd. Du kan fortsätta måla eller spara bilden.";
+   autoRunning=false;sheet.style.pointerEvents="";
+   status.textContent="Klart! "+TARGET+" är färglagd. Du kan fortsätta måla eller spara bilden.";
  }
  if(autoButton)autoButton.addEventListener("click",runAutoColor);
- function redraw(){ctx.clearRect(0,0,W,H);for(const a of acts){if(a.type==="fill"){const old=color;color=a.color;fillRegion(ctx,a.x,a.y);color=old}else drawStroke(ctx,a)}historyUI()}
+ function redraw(){ctx.clearRect(0,0,W,H);for(const a of acts){if(a.type==="fill"){const old=color;color=a.color;fillRegion(ctx,a.x,a.y);color=old}else if(a.type==="region"){paintAutoRegion(a.region,a.color)}else drawStroke(ctx,a)}historyUI()}
  function pos(e){const r=sheet.getBoundingClientRect();return [(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H]}
  const pointers=new Map();
  sheet.addEventListener("pointerdown",e=>{if(!W)return;e.preventDefault();sheet.setPointerCapture(e.pointerId);pointers.set(e.pointerId,[e.clientX,e.clientY]);
