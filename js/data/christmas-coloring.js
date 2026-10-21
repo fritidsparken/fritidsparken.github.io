@@ -2,10 +2,10 @@ mandalas.push(...[
   {
     "title": "Children Making Snowflakes and Paper Chains",
     "type": "Jul",
-    "img": "./assets/coloring-originals-2026/jul-20261021/Children%20Making%20Snowflakes%20and%20Paper%20Chains-5-fixed-20261021.png",
-    "preview": "./assets/coloring-originals-2026/jul-20261021/Children%20Making%20Snowflakes%20and%20Paper%20Chains-5-fixed-20261021.png",
+    "img": "./assets/coloring-originals-2026/jul-20261021/Children%20Making%20Snowflakes%20and%20Paper%20Chains-5-fixed-20261021-v2.png",
+    "preview": "./assets/coloring-originals-2026/jul-20261021/Children%20Making%20Snowflakes%20and%20Paper%20Chains-5-fixed-20261021-v2.png",
     "pdf": null,
-    "src": "./assets/coloring-originals-2026/jul-20261021/Children%20Making%20Snowflakes%20and%20Paper%20Chains-5-fixed-20261021.png",
+    "src": "./assets/coloring-originals-2026/jul-20261021/Children%20Making%20Snowflakes%20and%20Paper%20Chains-5-fixed-20261021-v2.png",
     "sourceLabel": "Egen färgläggningsbild"
   },
   {
@@ -218,10 +218,10 @@ mandalas.push(...[
   {
     "title": "Snowman and Birds in Falling Snow",
     "type": "Jul",
-    "img": "./assets/coloring-originals-2026/jul-20261021/Snowman%20and%20Birds%20in%20Falling%20Snow-2-fixed-20261021.png",
-    "preview": "./assets/coloring-originals-2026/jul-20261021/Snowman%20and%20Birds%20in%20Falling%20Snow-2-fixed-20261021.png",
+    "img": "./assets/coloring-originals-2026/jul-20261021/Snowman%20and%20Birds%20in%20Falling%20Snow-2-fixed-20261021-v2.png",
+    "preview": "./assets/coloring-originals-2026/jul-20261021/Snowman%20and%20Birds%20in%20Falling%20Snow-2-fixed-20261021-v2.png",
     "pdf": null,
-    "src": "./assets/coloring-originals-2026/jul-20261021/Snowman%20and%20Birds%20in%20Falling%20Snow-2-fixed-20261021.png",
+    "src": "./assets/coloring-originals-2026/jul-20261021/Snowman%20and%20Birds%20in%20Falling%20Snow-2-fixed-20261021-v2.png",
     "sourceLabel": "Egen färgläggningsbild"
   },
   {
