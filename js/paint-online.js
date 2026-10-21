@@ -3,6 +3,7 @@ const TARGET="Nidoking", IMAGE="./assets/coloring-originals-2026/pokemon-2026102
 const colors=[["Röd","#ef4444"],["Orange","#fb923c"],["Gul","#facc15"],["Ljusgrön","#a3e635"],["Grön","#22c55e"],["Mörkgrön","#15803d"],["Turkos","#2dd4bf"],["Ljusblå","#7dd3fc"],["Blå","#3b82f6"],["Mörkblå","#1e3a8a"],["Lila","#8b5cf6"],["Rosa","#ec4899"],["Ljusrosa","#f9a8d4"],["Brun","#92400e"],["Beige","#e7d3a8"],["Grå","#9ca3af"],["Svart","#171717"],["Vit","#ffffff"],["Mint","#6ee7b7"],["Korall","#fb7185"]];
 const style=document.createElement("style");style.textContent=
 ".fp-online-actions{display:flex;flex-direction:column;gap:5px;margin:8px 0}.fp-online-actions button,.fp-online-actions a{box-sizing:border-box;display:flex;width:100%;min-width:0;align-items:center;justify-content:center;white-space:nowrap;border:1px solid #d7e2d7;border-radius:12px;padding:6px 7px;background:#edf3ed;color:#365443;font-family:inherit;font-size:12px;font-weight:600;line-height:1.15;text-decoration:none;cursor:pointer}.fp-online-actions button:hover,.fp-online-actions a:hover{background:#e2ece2;border-color:#c8d8c8}@media(max-width:700px){.fp-online-actions{gap:4px;margin:7px 0}.fp-online-actions button,.fp-online-actions a{padding:5px 5px;font-size:10px;border-radius:10px}}";
+style.textContent+=".fp-paint-tools [data-action=auto]{background:#f3bd43!important;color:#26392b!important;font-weight:700!important;border-color:#e7b331!important}.fp-auto-progress{display:block;width:100%;height:10px;margin:0 0 8px;accent-color:#5da96e}.fp-auto-progress[hidden]{display:none}";
 document.head.append(style);
 function addButton(){
  document.querySelectorAll(".mandala-card").forEach(card=>{
@@ -10,7 +11,7 @@ function addButton(){
   const links=card.querySelector(".mandala-links");if(!links)return;
   const heading=card.querySelector("h3");const title=heading?.textContent.trim()||"Färgläggningsbild";
   const thumb=card.querySelector("img");if(!thumb)return;
-  const imageUrl=thumb.currentSrc||thumb.src;
+  const imageUrl=title.trim().toLocaleLowerCase("sv")==="nidoking"?new URL(IMAGE,location.href).href:(thumb.currentSrc||thumb.src);
   const printLink=links.querySelector("a");
   const actions=document.createElement("div");actions.className="fp-online-actions";
   const paint=document.createElement("button");paint.type="button";paint.textContent="🎨 Måla online";paint.addEventListener("click",()=>openPainter(imageUrl,title));
@@ -21,11 +22,27 @@ function addButton(){
 }
 const observer=new MutationObserver(addButton);observer.observe(document.body,{childList:true,subtree:true});addButton();
 function openPainter(IMAGE,TARGET){
- const back=document.createElement("div");back.className="fp-paint-back";back.innerHTML='<section class="fp-paint-dialog" role="dialog" aria-modal="true" aria-label="Måla online"><header class="fp-paint-head"><div><h2>🎨 Måla online</h2><p></p></div><button class="fp-paint-close" aria-label="Stäng">×</button></header><div class="fp-paint-tools"><button data-tool="fill" aria-pressed="true">🪣 Fyll</button><button data-tool="pen" aria-pressed="false">✏️ Penna</button><button data-tool="erase" aria-pressed="false">🧽 Sudd</button><select aria-label="Penselstorlek"><option value="5">● Liten</option><option value="14" selected>● Medium</option><option value="30">● Stor</option></select><button data-action="undo" disabled>↶ Ångra</button><button data-action="redo" disabled>↷ Gör om</button><button data-action="minus" aria-label="Zooma ut">−</button><button data-action="one">100%</button><button data-action="plus" aria-label="Zooma in">+</button><button data-action="reset">🗑️ Börja om</button><button data-action="save">💾 Spara bild</button></div><div class="fp-paint-palette" role="group" aria-label="Färgpalett"></div><div class="fp-paint-stage"><div class="fp-paint-sheet"><canvas class="fp-paint-layer"></canvas><canvas class="fp-line-layer"></canvas></div></div><div class="fp-paint-status">Välj färg och tryck på ett område. Två fingrar flyttar och zoomar. Dator: håll mellanslag och dra.</div></section>';
+ const back=document.createElement("div");back.className="fp-paint-back";back.innerHTML='<section class="fp-paint-dialog" role="dialog" aria-modal="true" aria-label="Måla online"><header class="fp-paint-head"><div><h2>🎨 Måla online</h2><p></p></div><button class="fp-paint-close" aria-label="Stäng">×</button></header><div class="fp-paint-tools"><button data-tool="fill" aria-pressed="true">🪣 Fyll</button><button data-tool="pen" aria-pressed="false">✏️ Penna</button><button data-tool="erase" aria-pressed="false">🧽 Sudd</button><select aria-label="Penselstorlek"><option value="5">● Liten</option><option value="14" selected>● Medium</option><option value="30">● Stor</option></select><button data-action="undo" disabled>↶ Ångra</button><button data-action="redo" disabled>↷ Gör om</button><button data-action="minus" aria-label="Zooma ut">−</button><button data-action="one">100%</button><button data-action="plus" aria-label="Zooma in">+</button><button data-action="reset">🗑️ Börja om</button>'+(TARGET==="Nidoking"?'<button data-action="auto">✨ Färglägg automatiskt</button>':'')+'<button data-action="save">💾 Spara bild</button></div><div class="fp-paint-palette" role="group" aria-label="Färgpalett"></div><div class="fp-paint-stage"><div class="fp-paint-sheet"><canvas class="fp-paint-layer"></canvas><canvas class="fp-line-layer"></canvas></div></div><div class="fp-paint-status">Välj färg och tryck på ett område. Två fingrar flyttar och zoomar. Dator: håll mellanslag och dra.</div></section>';
  back.querySelector(".fp-paint-head p").textContent=TARGET+" · Måla med färghink eller penna!";
  document.body.append(back);document.body.style.overflow="hidden";
  const $=s=>back.querySelector(s),dialog=$(".fp-paint-dialog"),stage=$(".fp-paint-stage"),sheet=$(".fp-paint-sheet"),paint=$(".fp-paint-layer"),lines=$(".fp-line-layer"),ctx=paint.getContext("2d",{willReadFrequently:true}),lctx=lines.getContext("2d"),undo=$('[data-action="undo"]'),redo=$('[data-action="redo"]');
  let tool="fill",color="#ef4444",brush=14,acts=[],future=[],W=0,H=0,luma=null,zoom=1,tx=0,ty=0,space=false,active=null,pending=null,gesture=false,pinch=null;
+ const autoSteps=[
+  [.182,.278,"#e58aa5"],[.163,.323,"#e58aa5"],[.191,.310,"#e58aa5"],[.500,.311,"#e58aa5"],[.450,.320,"#e58aa5"],
+  [.344,.363,"#a654a0"],[.526,.357,"#f2d8ae"],[.673,.341,"#f2d8ae"],[.736,.409,"#a654a0"],[.330,.383,"#d83242"],
+  [.500,.427,"#a654a0"],[.921,.404,"#a654a0"],[.554,.411,"#a654a0"],[.442,.395,"#f2d8ae"],[.885,.428,"#f2d8ae"],
+  [.355,.427,"#f2d8ae"],[.409,.437,"#f2d8ae"],[.305,.446,"#a654a0"],[.623,.446,"#f2d8ae"],[.624,.478,"#a654a0"],
+  [.918,.476,"#a654a0"],[.436,.495,"#f2d8ae"],[.229,.475,"#a654a0"],[.694,.486,"#a654a0"],[.880,.472,"#a654a0"],
+  [.141,.531,"#a654a0"],[.199,.486,"#a654a0"],[.567,.496,"#a654a0"],[.804,.487,"#a654a0"],[.298,.509,"#a654a0"],
+  [.867,.520,"#a654a0"],[.765,.561,"#a654a0"],[.426,.556,"#f2d8ae"],[.596,.553,"#a654a0"],[.616,.606,"#a654a0"],
+  [.412,.626,"#f2d8ae"],[.287,.675,"#a654a0"],[.226,.633,"#a654a0"],[.111,.593,"#f2d8ae"],[.650,.685,"#a654a0"],
+  [.147,.603,"#f2d8ae"],[.494,.687,"#f2d8ae"],[.193,.714,"#a654a0"],[.671,.746,"#a654a0"]
+ ];
+ const autoButton=$('[data-action="auto"]'),autoProgress=document.createElement("progress"),status=$(".fp-paint-status");
+ let autoRunning=false;
+ autoProgress.className="fp-auto-progress";autoProgress.max=autoSteps.length;autoProgress.value=0;autoProgress.hidden=true;
+ status.setAttribute("aria-live","polite");if(autoButton)dialog.insertBefore(autoProgress,stage);
+
  const img=new Image();if(new URL(IMAGE,location.href).origin!==location.origin)img.crossOrigin="anonymous";img.onload=()=>{
    const scale=Math.min(1,2200/Math.max(img.naturalWidth,img.naturalHeight),Math.sqrt(2.5e6/(img.naturalWidth*img.naturalHeight)));
    W=Math.max(1,Math.round(img.naturalWidth*scale));H=Math.max(1,Math.round(img.naturalHeight*scale));
@@ -54,8 +71,28 @@ function openPainter(IMAGE,TARGET){
       if(y>0){let n=i-W,ok=!seen[n]&&luma[n]>=220;if(ok&&!up)stack.push(n);up=ok}else up=false;
       if(y<H-1){let n=i+W,ok=!seen[n]&&luma[n]>=220;if(ok&&!dn)stack.push(n);dn=ok}else dn=false
     }
-   }c.putImageData(out,0,0)
+   }
+c.putImageData(out,0,0)
  }
+ async function runAutoColor(){
+   if(!autoButton||autoRunning||!W)return;
+   if(acts.length&&!confirm("Automatisk färgläggning börjar från en tom bild. Vill du rensa din målning och fortsätta?"))return;
+   acts=[];future=[];ctx.clearRect(0,0,W,H);historyUI();
+   autoRunning=true;autoButton.disabled=true;autoProgress.hidden=false;autoProgress.value=0;sheet.style.pointerEvents="none";toolSet("fill");
+   for(let i=0;i<autoSteps.length;i++){
+     if(!back.isConnected){autoRunning=false;return}
+     const [fx,fy,fillColor]=autoSteps[i],x=Math.min(W-1,Math.max(0,Math.round(fx*W))),y=Math.min(H-1,Math.max(0,Math.round(fy*H)));
+     if(luma[y*W+x]>=220){
+       const action={type:"fill",x,y,color:fillColor};acts.push(action);future=[];
+       const previous=color;color=fillColor;fillRegion(ctx,x,y);color=previous;
+     }
+     autoProgress.value=i+1;status.textContent="Timelapse: färglägger Nidoking, steg "+(i+1)+" av "+autoSteps.length+"…";historyUI();
+     await new Promise(resolve=>setTimeout(resolve,115));
+   }
+   autoRunning=false;sheet.style.pointerEvents="";autoButton.disabled=true;
+   status.textContent="Klart! Nidoking är färglagd. Du kan fortsätta måla eller spara bilden.";
+ }
+ if(autoButton)autoButton.addEventListener("click",runAutoColor);
  function redraw(){ctx.clearRect(0,0,W,H);for(const a of acts){if(a.type==="fill"){const old=color;color=a.color;fillRegion(ctx,a.x,a.y);color=old}else drawStroke(ctx,a)}historyUI()}
  function pos(e){const r=sheet.getBoundingClientRect();return [(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H]}
  const pointers=new Map();
@@ -73,7 +110,7 @@ function openPainter(IMAGE,TARGET){
  undo.onclick=undoOne;redo.onclick=redoOne;
  back.querySelector('[data-action="minus"]').onclick=()=>setZoom(zoom-.25);back.querySelector('[data-action="plus"]').onclick=()=>setZoom(zoom+.25);back.querySelector('[data-action="one"]').onclick=()=>setZoom(1);
  stage.addEventListener("wheel",e=>{if(!e.ctrlKey&&!e.metaKey)return;e.preventDefault();setZoom(zoom+(e.deltaY<0?.15:-.15))},{passive:false});
- back.querySelector('[data-action="reset"]').onclick=()=>{if(confirm("Vill du radera hela målningen och börja om?")){acts=[];future=[];redraw()}};
+ back.querySelector('[data-action="reset"]').onclick=()=>{if(autoRunning)return;if(confirm("Vill du radera hela målningen och börja om?")){acts=[];future=[];autoProgress.hidden=true;autoProgress.value=0;if(autoButton)autoButton.disabled=false;status.textContent="Välj färg och tryck på ett område. Två fingrar flyttar och zoomar. Dator: håll mellanslag och dra.";redraw()}};
  back.querySelector('[data-action="save"]').onclick=()=>{if(!W)return;const out=document.createElement("canvas");out.width=img.naturalWidth;out.height=img.naturalHeight;const c=out.getContext("2d");c.drawImage(paint,0,0,out.width,out.height);c.drawImage(lines,0,0,out.width,out.height);out.toBlob(blob=>{if(!blob)return;const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="min-farglagda-"+TARGET.toLocaleLowerCase("sv").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")+".png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},"image/png")};
  function close(){window.removeEventListener("resize",fit);window.removeEventListener("keydown",keydown);window.removeEventListener("keyup",keyup);back.remove();document.body.style.overflow="";addButton()}
  back.querySelector(".fp-paint-close").onclick=close;back.addEventListener("click",e=>{if(e.target===back)close()});const keydown=e=>{if(e.code==="Space"){space=true;if(e.target===document.body||e.target===back)e.preventDefault()}if(e.key==="Escape")close();if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){e.preventDefault();e.shiftKey?redoOne():undoOne()}};const keyup=e=>{if(e.code==="Space")space=false};window.addEventListener("keydown",keydown);window.addEventListener("keyup",keyup);back.addEventListener("keydown",e=>{if(e.code==="Space")e.preventDefault()});back.tabIndex=-1;back.focus();
