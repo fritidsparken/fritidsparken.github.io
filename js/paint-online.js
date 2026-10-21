@@ -46,7 +46,7 @@ function roleGuideColor(guide,role){
 }
 function autoRegionColor(region,regions,palette,guide){
  const total=regions.reduce((sum,r)=>sum+r.area,0)||1;
- const ratio=region.area/total,cx=(region.cx||0)/W,cy=(region.cy||0)/H;
+ const ratio=region.area/total,cx=region.cx||0,cy=region.cy||0;
  const body=roleGuideColor(guide,"body")||palette[0];
  const cheek=roleGuideColor(guide,"cheeks")||roleGuideColor(guide,"cheek");
  if(cheek&&cy>.18&&cy<.48&&cx>.24&&cx<.76&&Math.abs(cx-.5)>.09&&ratio<.12)return cheek;
@@ -178,35 +178,43 @@ function openPainter(IMAGE,TARGET){
 c.putImageData(out,0,0)
  }
  function findAutoRegions(){
-   const total=W*H,seen=new Uint8Array(total),queue=new Uint32Array(total),regions=[];
+   const scale=Math.min(1,700/Math.max(W,H)),RW=Math.max(1,Math.round(W*scale)),RH=Math.max(1,Math.round(H*scale));
+   const reduced=new Uint8Array(RW*RH),stepX=W/RW,stepY=H/RH;
+   for(let y=0;y<RH;y++)for(let x=0;x<RW;x++){
+     const x0=Math.floor(x*stepX),x1=Math.min(W,Math.ceil((x+1)*stepX)),y0=Math.floor(y*stepY),y1=Math.min(H,Math.ceil((y+1)*stepY));
+     let value=255;for(let sy=y0;sy<y1;sy++)for(let sx=x0;sx<x1;sx++){const current=luma[sy*W+sx];if(current<value)value=current}
+     reduced[y*RW+x]=value;
+   }
+   const total=RW*RH,seen=new Uint8Array(total),queue=new Uint32Array(total),regions=[];
    for(let start=0;start<total;start++){
-     if(seen[start]||luma[start]<220)continue;
-     let head=0,tail=0,minX=W,minY=H,maxX=0,maxY=0,sumX=0,sumY=0,touchesEdge=false;
+     if(seen[start]||reduced[start]<220)continue;
+     let head=0,tail=0,minX=RW,minY=RH,maxX=0,maxY=0,sumX=0,sumY=0,touchesEdge=false;
      seen[start]=1;queue[tail++]=start;
      while(head<tail){
-       const i=queue[head++],y=(i/W)|0,x=i-y*W;
+       const i=queue[head++],y=(i/RW)|0,x=i-y*RW;
        sumX+=x;sumY+=y;if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y;
-       if(x===0||y===0||x===W-1||y===H-1)touchesEdge=true;
+       if(x===0||y===0||x===RW-1||y===RH-1)touchesEdge=true;
        let n;
-       if(x>0&&(n=i-1,!seen[n]&&luma[n]>=220)){seen[n]=1;queue[tail++]=n}
-       if(x<W-1&&(n=i+1,!seen[n]&&luma[n]>=220)){seen[n]=1;queue[tail++]=n}
-       if(y>0&&(n=i-W,!seen[n]&&luma[n]>=220)){seen[n]=1;queue[tail++]=n}
-       if(y<H-1&&(n=i+W,!seen[n]&&luma[n]>=220)){seen[n]=1;queue[tail++]=n}
+       if(x>0&&(n=i-1,!seen[n]&&reduced[n]>=220)){seen[n]=1;queue[tail++]=n}
+       if(x<RW-1&&(n=i+1,!seen[n]&&reduced[n]>=220)){seen[n]=1;queue[tail++]=n}
+       if(y>0&&(n=i-RW,!seen[n]&&reduced[n]>=220)){seen[n]=1;queue[tail++]=n}
+       if(y<RH-1&&(n=i+RW,!seen[n]&&reduced[n]>=220)){seen[n]=1;queue[tail++]=n}
      }
-     if(!touchesEdge&&tail>=36&&tail<total*.45)regions.push({pixels:queue.slice(0,tail),minX,minY,maxX,maxY,area:tail,cx:sumX/tail,cy:sumY/tail});
+     if(!touchesEdge&&tail>=9&&tail<total*.45)regions.push({pixels:queue.slice(0,tail),minX,minY,maxX,maxY,area:tail,cx:sumX/tail/RW,cy:sumY/tail/RH,scaleX:W/RW,scaleY:H/RH});
    }
    regions.sort((a,b)=>b.area-a.area);regions.length=Math.min(regions.length,160);
    regions.sort((a,b)=>a.minY-b.minY||a.minX-b.minX);
    return regions;
  }
  function paintAutoRegion(region,fillColor){
-   const width=region.maxX-region.minX+1,height=region.maxY-region.minY+1;
-   const image=ctx.createImageData(width,height),data=image.data;
-   const red=parseInt(fillColor.slice(1,3),16),green=parseInt(fillColor.slice(3,5),16),blue=parseInt(fillColor.slice(5,7),16);
-   for(const index of region.pixels){const x=index%W-region.minX,y=((index/W)|0)-region.minY,k=(y*width+x)*4;data[k]=red;data[k+1]=green;data[k+2]=blue;data[k+3]=255}
-   ctx.putImageData(image,region.minX,region.minY);
- }
- async function runAutoColor(){
+   const width=region.maxX-region.minX+1,height=region.maxY-region.minY+1,mask=document.createElement("canvas");
+   mask.width=width;mask.height=height;
+   const maskCtx=mask.getContext("2d"),image=maskCtx.createImageData(width,height),data=image.data;
+   const red=parseInt(fillColor.slice(1,3),16),green=parseInt(fillColor.slice(3,5),16),blue=parseInt(fillColor.slice(5,7),16),canvasW=Math.round(W/region.scaleX);
+   for(const index of region.pixels){const x=index%canvasW-region.minX,y=((index/canvasW)|0)-region.minY,k=(y*width+x)*4;data[k]=red;data[k+1]=green;data[k+2]=blue;data[k+3]=255}
+   maskCtx.putImageData(image,0,0);
+   ctx.drawImage(mask,region.minX*region.scaleX,region.minY*region.scaleY,width*region.scaleX,height*region.scaleY);
+ } async function runAutoColor(){
    if(!autoButton||autoRunning||!W)return;
    if(acts.length&&!confirm("Automatisk färgläggning börjar från en tom bild. Vill du rensa din målning och fortsätta?"))return;
    acts=[];future=[];ctx.clearRect(0,0,W,H);historyUI();autoRunning=true;autoButton.disabled=true;
