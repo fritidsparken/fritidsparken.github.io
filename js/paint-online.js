@@ -62,6 +62,7 @@ function autoRegionColor(region,regions,palette,guide){
  if(markings&&ratio<.08)return markings;
  const details=roleGuideColor(guide,"eyes")||roleGuideColor(guide,"nose")||roleGuideColor(guide,"claws")||roleGuideColor(guide,"tips");
  if(details&&ratio<.012)return details;
+ if((cx<.13||cx>.87)&&ratio<.14){if(cy<.30)return "#e6f2f8";if(cy>.67)return "#c8dfb6";return "#f2eee6"}
  return body;
 }
 const style=document.createElement("style");style.textContent=
