@@ -59,7 +59,7 @@ function autoRegionColor(region,regions,palette,guide,title){
  return body;
 }
 const style=document.createElement("style");style.textContent=
-".fp-online-actions{display:flex;flex-direction:column;gap:5px;margin:8px 0}.fp-online-actions button,.fp-online-actions a{box-sizing:border-box;display:flex;width:100%;min-width:0;align-items:center;justify-content:center;white-space:nowrap;border:1px solid #d7e2d7;border-radius:12px;padding:6px 7px;background:#edf3ed;color:#365443;font-family:inherit;font-size:12px;font-weight:600;line-height:1.15;text-decoration:none;cursor:pointer}.fp-online-actions button:hover,.fp-online-actions a:hover{background:#e2ece2;border-color:#c8d8c8}@media(max-width:700px){.fp-online-actions{gap:4px;margin:7px 0}.fp-online-actions button,.fp-online-actions a{padding:5px 5px;font-size:10px;border-radius:10px}}";
+".fp-online-actions{display:flex;flex-direction:column;gap:5px;margin:8px 0}.fp-online-actions button,.fp-online-actions a{box-sizing:border-box;display:flex;width:100%;min-width:0;align-items:center;justify-content:center;white-space:nowrap;border:1px solid #d7e2d7;border-radius:12px;padding:6px 7px;background:var(--bg);color:var(--ink);font-family:inherit;font-size:12px;font-weight:600;line-height:1.15;text-decoration:none;cursor:pointer}.fp-online-actions button:hover,.fp-online-actions a:hover{background:var(--bg);border-color:var(--line)}@media(max-width:700px){.fp-online-actions{gap:4px;margin:7px 0}.fp-online-actions button,.fp-online-actions a{padding:5px 5px;font-size:10px;border-radius:10px}}";
 
 style.textContent+=`
 .fp-paint-back{position:fixed;inset:0;z-index:99999;box-sizing:border-box;display:grid;place-items:center;padding:16px;background:rgba(24,34,27,.68)}
@@ -103,6 +103,8 @@ style.textContent+=".fp-paint-tools [data-action=auto]{background:#f3bd43!import
 document.head.append(style);
 function addButton(){
  document.querySelectorAll(".mandala-card").forEach(card=>{
+  const galleryIntro=document.querySelector("#catalog .mandala-intro strong");
+  if(galleryIntro?.textContent.trim().startsWith("Färglägg, klipp ut och klä på"))return;
   if(card.querySelector(".fp-online-actions"))return;
   const links=card.querySelector(".mandala-links");if(!links)return;
   const heading=card.querySelector("h3");const title=heading?.textContent.trim()||"Färgläggningsbild";
