@@ -8,12 +8,12 @@ function normalizedPokemonName(title){
 }
 function pokemonKey(title){
  const key=normalizedPokemonName(title);
- return Object.keys(pokemonGuides).find(name=>key===name||key.startsWith(name+" "))||"";
+ return Object.keys(pokemonGuides).find(name=>{const normalized=normalizedPokemonName(name);return key===normalized||key.startsWith(normalized+" ")})||"";
 }
-function pokemonGuide(title){const name=pokemonKey(title);return name?pokemonGuides[name]||"":""}
+function pokemonGuide(title){const name=pokemonKey(title),guide=name?pokemonGuides[name]:"";return typeof guide==="string"?guide:""}
 function autoPalette(title){
  const key=normalizedPokemonName(title);
- const species=Object.keys(pokemonPalettes).find(name=>key===name||key.startsWith(name+" "));
+ const species=Object.keys(pokemonPalettes).find(name=>{const normalized=normalizedPokemonName(name);return key===normalized||key.startsWith(normalized+" ")});
  if(species)return pokemonPalettes[species].slice(0,6);
  const defaults=[["#6f9fc1","#6f9b70","#e4c46f"],["#719b91","#d59876","#e9ce89"],["#718cbd","#d9a2b3","#82a576"],["#76a6a0","#d0a06c","#b58ca9"]];
  let hash=0;for(const c of key)hash=(hash*31+c.charCodeAt(0))|0;
