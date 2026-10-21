@@ -44,7 +44,20 @@ function roleGuideColor(guide,role){
  const clause=clauses.find(v=>new RegExp("\\b"+role+"\\b","i").test(v));
  return clause?namedGuideColor(clause):null;
 }
-function autoRegionColor(region,regions,palette,guide){
+function autoRegionColor(region,regions,palette,guide,title){
+ const species=normalizedPokemonName(title||"");
+ if(species==="pikachu"){
+   const x=region.cx||0,y=region.cy||0,areaRatio=region.area/(regions.reduce((sum,r)=>sum+r.area,0)||1);
+   if(y>.79||x<.36||x>.75)return null;
+   if(y<.23&&(x<.47||x>.54))return "#302b2e";
+   if(x>.61&&y>.43&&y<.68)return "#985a3c";
+   if(y>.30&&y<.47&&((x>.405&&x<.465)||(x>.535&&x<.595))&&areaRatio<.16)return "#ed5945";
+   if(y>.38&&y<.51&&x>.46&&x<.54&&areaRatio<.12)return "#6a3d32";
+   if(y>.28&&y<.39&&x>.43&&x<.57&&areaRatio<.04)return "#302b2e";
+   if(y>.16&&y<.38)return "#f6cd35";
+   if(x>.385&&x<.625&&y>.30&&y<.78)return "#f6cd35";
+   return null;
+ }
  const total=regions.reduce((sum,r)=>sum+r.area,0)||1;
  const ratio=region.area/total,cx=region.cx||0,cy=region.cy||0;
  const body=roleGuideColor(guide,"body")||palette[0];
@@ -232,7 +245,7 @@ c.putImageData(out,0,0)
      status.textContent="Hittar slutna färgområden…";
      await new Promise(resolve=>requestAnimationFrame(()=>resolve()));
      const regions=await findAutoRegions(),paletteColors=autoPalette(TARGET),guide=pokemonGuide(TARGET);
-     plan=regions.map(region=>({type:"region",region,color:autoRegionColor(region,regions,paletteColors,guide)})).filter(step=>step.color);
+     plan=regions.map(region=>({type:"region",region,color:autoRegionColor(region,regions,paletteColors,guide,TARGET)})).filter(step=>step.color);
    }
    if(!plan.length){
      autoRunning=false;autoButton.disabled=false;autoProgress.hidden=true;sheet.style.pointerEvents="";
