@@ -49,20 +49,21 @@ function autoRegionColor(region,regions,palette,guide){
  const ratio=region.area/total,cx=region.cx||0,cy=region.cy||0;
  const body=roleGuideColor(guide,"body")||palette[0];
  const cheek=roleGuideColor(guide,"cheeks")||roleGuideColor(guide,"cheek");
- if(cheek&&cy>.18&&cy<.48&&cx>.24&&cx<.76&&Math.abs(cx-.5)>.09&&ratio<.12)return cheek;
  const ear=roleGuideColor(guide,"ears")||roleGuideColor(guide,"ear");
- if(ear&&cy<.23&&cx>.18&&cx<.82&&ratio<.1)return ear;
  const belly=roleGuideColor(guide,"belly")||roleGuideColor(guide,"underside")||roleGuideColor(guide,"muzzle");
- if(belly&&cx>.28&&cx<.72&&cy>.42&&ratio<.32)return belly;
  const wing=roleGuideColor(guide,"wings")||roleGuideColor(guide,"wing");
- if(wing&&(cx<.22||cx>.78)&&cy>.18&&cy<.76&&ratio<.36)return wing;
  const tail=roleGuideColor(guide,"tail");
- if(tail&&cy>.42&&(cx<.35||cx>.65)&&ratio<.22)return tail;
- const markings=roleGuideColor(guide,"stripes")||roleGuideColor(guide,"spots")||roleGuideColor(guide,"markings")||roleGuideColor(guide,"marking");
- if(markings&&ratio<.08)return markings;
+ const markings=roleGuideColor(guide,"spots")||roleGuideColor(guide,"markings")||roleGuideColor(guide,"marking");
  const details=roleGuideColor(guide,"eyes")||roleGuideColor(guide,"nose")||roleGuideColor(guide,"claws")||roleGuideColor(guide,"tips");
- if(details&&ratio<.012)return details;
- if((cx<.13||cx>.87)&&ratio<.14){if(cy<.30)return "#e6f2f8";if(cy>.67)return "#c8dfb6";return "#f2eee6"}
+ const nearCharacter=cx>.19&&cx<.81&&cy>.12&&cy<.81;
+ if(!nearCharacter&&ratio<.18)return null;
+ if(cheek&&cy>.13&&cy<.57&&cx>.20&&cx<.80&&Math.abs(cx-.5)>.055&&ratio<.16)return cheek;
+ if(ear&&cy<.34&&cx>.12&&cx<.88&&ratio<.1)return ear;
+ if(belly&&nearCharacter&&cx>.27&&cx<.73&&cy>.36&&ratio<.38)return belly;
+ if(wing&&nearCharacter&&(cx<.28||cx>.72)&&cy>.16&&cy<.76&&ratio<.38)return wing;
+ if(tail&&nearCharacter&&cy>.40&&(cx<.37||cx>.63)&&ratio<.22)return tail;
+ if(markings&&nearCharacter&&ratio<.025&&cy>.22&&cy<.73&&cx>.28&&cx<.72)return markings;
+ if(details&&nearCharacter&&ratio<.014)return details;
  return body;
 }
 const style=document.createElement("style");style.textContent=
@@ -231,7 +232,7 @@ c.putImageData(out,0,0)
      status.textContent="Hittar slutna färgområden…";
      await new Promise(resolve=>requestAnimationFrame(()=>resolve()));
      const regions=await findAutoRegions(),paletteColors=autoPalette(TARGET),guide=pokemonGuide(TARGET);
-     plan=regions.map(region=>({type:"region",region,color:autoRegionColor(region,regions,paletteColors,guide)}));
+     plan=regions.map(region=>({type:"region",region,color:autoRegionColor(region,regions,paletteColors,guide)})).filter(step=>step.color);
    }
    if(!plan.length){
      autoRunning=false;autoButton.disabled=false;autoProgress.hidden=true;sheet.style.pointerEvents="";
