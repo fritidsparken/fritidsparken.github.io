@@ -224,7 +224,7 @@ c.putImageData(out,0,0)
  function ghostAlignedReference(){
    const c=document.createElement("canvas");c.width=W;c.height=H;const g=c.getContext("2d",{willReadFrequently:true});
    g.fillStyle="#fff";g.fillRect(0,0,W,H);
-   g.filter="blur("+Math.max(6,Math.round(H*.008))+"px)";
+   g.filter="blur("+Math.max(10,Math.round(H*.014))+"px)";
    g.drawImage(ghostReference,0,0,W,H);
    g.filter="none";
    return g.getImageData(0,0,W,H).data;
