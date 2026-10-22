@@ -132,7 +132,8 @@ function addButton(){
 }
 const observer=new MutationObserver(addButton);observer.observe(document.body,{childList:true,subtree:true});addButton();
 function openPainter(IMAGE,TARGET){
- const horseConfig=TARGET.toLocaleLowerCase("sv").trim()==="hästar under halloweenmånen"?window.FP_HORSE_COLORING:null;
+ const castleConfig=TARGET.toLocaleLowerCase("sv").trim()==="fladdermusslottet"?window.FP_CASTLE_COLORING:null;
+ const horseConfig=castleConfig|| (TARGET.toLocaleLowerCase("sv").trim()==="hästar under halloweenmånen"?window.FP_HORSE_COLORING:null);
  const back=document.createElement("div");back.className="fp-paint-back";back.innerHTML='<section class="fp-paint-dialog" role="dialog" aria-modal="true" aria-label="Måla online"><header class="fp-paint-head"><div><h2>🎨 Måla online</h2><p></p></div><button class="fp-paint-close" aria-label="Stäng">×</button></header><div class="fp-paint-tools"><button data-tool="fill" aria-pressed="true">🪣 Fyll</button><button data-tool="pen" aria-pressed="false">✏️ Penna</button><button data-tool="erase" aria-pressed="false">🧽 Sudd</button><select aria-label="Penselstorlek"><option value="5">● Liten</option><option value="14" selected>● Medium</option><option value="30">● Stor</option></select><button data-action="undo" disabled>↶ Ångra</button><button data-action="redo" disabled>↷ Gör om</button><button data-action="minus" aria-label="Zooma ut">−</button><button data-action="one">100%</button><button data-action="plus" aria-label="Zooma in">+</button><button data-action="reset">🗑️ Börja om</button>'+'<button data-action="auto">✨ Färglägg automatiskt</button>'+'<button data-action="save">💾 Spara bild</button></div><div class="fp-paint-palette" role="group" aria-label="Färgpalett"></div><div class="fp-paint-stage"><div class="fp-paint-sheet"><canvas class="fp-paint-layer"></canvas><canvas class="fp-line-layer"></canvas></div></div><div class="fp-paint-status">Välj färg och tryck på ett område. Två fingrar flyttar och zoomar. Dator: håll mellanslag och dra.</div></section>';
  back.querySelector(".fp-paint-head p").textContent=TARGET+" · Måla med färghink eller penna!";
  document.body.append(back);document.body.style.overflow="hidden";
@@ -233,6 +234,22 @@ c.putImageData(out,0,0)
      }
      if(y%80===79)await pause("Förbereder originalets slutna färgområden…");
    }
+   if(castleConfig?.closures){
+     // Bridge only small breaks between original contour endpoints. These
+     // segmentation barriers never alter the displayed original line layer.
+     for(const [ax,ay,bx,by] of castleConfig.closures){
+       const x0=ax/castleConfig.sourceWidth*W,y0=ay/castleConfig.sourceHeight*H,x1=bx/castleConfig.sourceWidth*W,y1=by/castleConfig.sourceHeight*H,steps=Math.ceil(Math.hypot(x1-x0,y1-y0)*2);
+       for(let n=0;n<=steps;n++){const x=Math.round(x0+(x1-x0)*n/Math.max(1,steps)),y=Math.round(y0+(y1-y0)*n/Math.max(1,steps));for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++)if(x+dx>=0&&x+dx<W&&y+dy>=0&&y+dy<H)barrier[(y+dy)*W+x+dx]=1}
+     }
+   }
+   if(castleConfig?.bridgeRuns){
+     // Sparse contour repairs derived from the original line drawing. Only
+     // its leaking background is closed; existing enclosed areas are kept.
+     for(const [row,left,right] of castleConfig.bridgeRuns){
+       const y=Math.round(row/castleConfig.bridgeHeight*H),x0=Math.round(left/castleConfig.bridgeWidth*W),x1=Math.round(right/castleConfig.bridgeWidth*W);
+       if(y>=0&&y<H)for(let x=Math.max(0,x0);x<=Math.min(W-1,x1);x++)barrier[y*W+x]=1;
+     }
+   }
    let visits=0;
    for(let start=0;start<total;start++){
      if(barrier[start]||labels[start])continue;
@@ -264,8 +281,25 @@ c.putImageData(out,0,0)
      const id=labels[i],r=regions[id-1],y=(i/W)|0,x=i-y*W;r.pixels[offsets[id]++]=i;
      if(x<r.minX)r.minX=x;if(x>r.maxX)r.maxX=x;if(y<r.minY)r.minY=y;if(y>r.maxY)r.maxY=y;
    }
-   if(horseConfig)setHorseColorHints(regions,labels);else setGhostColorHints(regions,labels);
+   if(castleConfig)setCastleColorHints(regions,labels);else if(horseConfig)setHorseColorHints(regions,labels);else setGhostColorHints(regions,labels);
    return regions.sort((a,b)=>a.minY-b.minY||a.minX-b.minX);
+ }
+ function setCastleColorHints(regions,labels){
+   const inside=(x,y,poly)=>{let yes=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++)if((poly[i][1]>y)!==(poly[j][1]>y)&&x<(poly[j][0]-poly[i][0])*(y-poly[i][1])/(poly[j][1]-poly[i][1])+poly[i][0])yes=!yes;return yes};
+   for(const r of regions){
+     const x=r.cx*castleConfig.sourceWidth,y=r.cy*castleConfig.sourceHeight;
+     if(r.area>200000)r.hint="background";
+     for(const zone of castleConfig.zones){
+       if(r.area>zone.limit)continue;
+       const hit=zone.poly?inside(x,y,zone.poly):((x-zone.ellipse[0])/zone.ellipse[2])**2+((y-zone.ellipse[1])/zone.ellipse[3])**2<1;
+       if(hit)r.hint=zone.role;
+     }
+   }
+   setHorseColorHints(regions,labels);
+   for(const r of regions){
+     const x=r.cx*castleConfig.sourceWidth,y=r.cy*castleConfig.sourceHeight;
+     if(r.area<2500&&castleConfig.windowBoxes.some(([x0,y0,x1,y1])=>x>=x0&&x<=x1&&y>=y0&&y<=y1))r.hint="glass";
+   }
  }
  function setHorseColorHints(regions,labels){
    // Color-family anchors use the original drawing's coordinates. Only the
@@ -417,6 +451,24 @@ c.putImageData(out,0,0)
        const light=ghostWarmLight(1-.65*Math.hypot((x/Math.max(1,width-1)-.5)*2,(y/Math.max(1,height-1)-.55)*1.5));
        data[k]=light[0];data[k+1]=light[1];data[k+2]=light[2];
      }
+     if(castleConfig){
+       const gx=x+region.minX,gy=y+region.minY;
+       if(region.hint==="background"){
+         const stops=castleConfig.background,t=gy/H;
+         let a=stops[0],b=stops[stops.length-1];
+         for(let i=1;i<stops.length;i++)if(t<=stops[i][0]){a=stops[i-1];b=stops[i];break}
+         const k=Math.max(0,Math.min(1,(t-a[0])/Math.max(.0001,b[0]-a[0])));
+         for(let c=0;c<3;c++)data[(y*width+x)*4+c]=a[c+1]+(b[c+1]-a[c+1])*k;
+       }
+       if(region.hint==="wall"||region.hint==="rock"||region.hint==="path"){
+         for(const glow of castleConfig.glows){
+           const dx=(gx/W-glow[0])/glow[2],dy=(gy/H-glow[1])/glow[3],d=Math.hypot(dx,dy);
+           if(d>=1)continue;
+           const mix=(1-d)**2*glow[4];
+           data[k]+=(255-data[k])*mix;data[k+1]+=(180-data[k+1])*mix;data[k+2]+=(65-data[k+2])*mix;
+         }
+       }
+     }
      const lightId=ghostPumpkinLightMap?.[index];
      if(lightId){
        const p=ghostPumpkinLights[lightId-1],light=ghostWarmLight(1-.72*Math.hypot((x+region.minX-p.cx)/p.rx,(y+region.minY-p.cy)/p.ry));
@@ -509,5 +561,6 @@ c.putImageData(out,0,0)
  back.querySelector(".fp-paint-close").onclick=close;back.addEventListener("click",e=>{if(e.target===back)close()});const keydown=e=>{if(e.code==="Space"){space=true;if(e.target===document.body||e.target===back)e.preventDefault()}if(e.key==="Escape")close();if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){e.preventDefault();e.shiftKey?redoOne():undoOne()}};const keyup=e=>{if(e.code==="Space")space=false};window.addEventListener("keydown",keydown);window.addEventListener("keyup",keyup);back.addEventListener("keydown",e=>{if(e.code==="Space")e.preventDefault()});back.tabIndex=-1;back.focus();
 }
 })();
+
 
 
