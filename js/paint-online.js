@@ -132,21 +132,22 @@ function addButton(){
 }
 const observer=new MutationObserver(addButton);observer.observe(document.body,{childList:true,subtree:true});addButton();
 function openPainter(IMAGE,TARGET){
+ const horseConfig=TARGET.toLocaleLowerCase("sv").trim()==="hästar under halloweenmånen"?window.FP_HORSE_COLORING:null;
  const back=document.createElement("div");back.className="fp-paint-back";back.innerHTML='<section class="fp-paint-dialog" role="dialog" aria-modal="true" aria-label="Måla online"><header class="fp-paint-head"><div><h2>🎨 Måla online</h2><p></p></div><button class="fp-paint-close" aria-label="Stäng">×</button></header><div class="fp-paint-tools"><button data-tool="fill" aria-pressed="true">🪣 Fyll</button><button data-tool="pen" aria-pressed="false">✏️ Penna</button><button data-tool="erase" aria-pressed="false">🧽 Sudd</button><select aria-label="Penselstorlek"><option value="5">● Liten</option><option value="14" selected>● Medium</option><option value="30">● Stor</option></select><button data-action="undo" disabled>↶ Ångra</button><button data-action="redo" disabled>↷ Gör om</button><button data-action="minus" aria-label="Zooma ut">−</button><button data-action="one">100%</button><button data-action="plus" aria-label="Zooma in">+</button><button data-action="reset">🗑️ Börja om</button>'+'<button data-action="auto">✨ Färglägg automatiskt</button>'+'<button data-action="save">💾 Spara bild</button></div><div class="fp-paint-palette" role="group" aria-label="Färgpalett"></div><div class="fp-paint-stage"><div class="fp-paint-sheet"><canvas class="fp-paint-layer"></canvas><canvas class="fp-line-layer"></canvas></div></div><div class="fp-paint-status">Välj färg och tryck på ett område. Två fingrar flyttar och zoomar. Dator: håll mellanslag och dra.</div></section>';
  back.querySelector(".fp-paint-head p").textContent=TARGET+" · Måla med färghink eller penna!";
  document.body.append(back);document.body.style.overflow="hidden";
- const $=s=>back.querySelector(s),dialog=$(".fp-paint-dialog"),stage=$(".fp-paint-stage"),sheet=$(".fp-paint-sheet"),paint=$(".fp-paint-layer"),lines=$(".fp-line-layer"),ctx=paint.getContext("2d",{willReadFrequently:true}),lctx=lines.getContext("2d"),undo=$('[data-action="undo"]'),redo=$('[data-action="redo"]');if(TARGET.toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset")dialog.classList.add("fp-paint-ghost");
+ const $=s=>back.querySelector(s),dialog=$(".fp-paint-dialog"),stage=$(".fp-paint-stage"),sheet=$(".fp-paint-sheet"),paint=$(".fp-paint-layer"),lines=$(".fp-line-layer"),ctx=paint.getContext("2d",{willReadFrequently:true}),lctx=lines.getContext("2d"),undo=$('[data-action="undo"]'),redo=$('[data-action="redo"]');if(horseConfig||TARGET.toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset")dialog.classList.add("fp-paint-ghost");
  let tool="fill",color="#ef4444",brush=14,acts=[],future=[],W=0,H=0,luma=null,zoom=1,tx=0,ty=0,space=false,active=null,pending=null,gesture=false,pinch=null;
  const autoButton=$('[data-action="auto"]'),autoProgress=document.createElement("progress"),status=$(".fp-paint-status");
  let autoRunning=false;
  let ghostReference=null,ghostReferencePixels=null,ghostOriginalInk=null,ghostPumpkinLightMap=null,ghostPumpkinLights=[];
- const getGhostReference=()=>new Promise((resolve,reject)=>{if(ghostReference?.complete&&ghostReference.naturalWidth){resolve(ghostReference);return}const ref=new Image();ref.onload=()=>{ghostReference=ref;resolve(ref)};ref.onerror=reject;const data=window.FP_GHOST_REFERENCE_BASE64;if(!data){reject(new Error("Reference data missing"));return}ref.src="data:image/webp;base64,"+data});
+ const getGhostReference=()=>new Promise((resolve,reject)=>{if(ghostReference?.complete&&ghostReference.naturalWidth){resolve(ghostReference);return}const ref=new Image();ref.onload=()=>{ghostReference=ref;resolve(ref)};ref.onerror=reject;const data=horseConfig?horseConfig.reference:window.FP_GHOST_REFERENCE_BASE64;if(!data){reject(new Error("Reference data missing"));return}ref.src="data:image/webp;base64,"+data});
  autoProgress.className="fp-auto-progress";autoProgress.max=1;autoProgress.value=0;autoProgress.hidden=true;
  status.setAttribute("aria-live","polite");if(autoButton)dialog.insertBefore(autoProgress,stage);
 
  const img=new Image();if(new URL(IMAGE,location.href).origin!==location.origin)img.crossOrigin="anonymous";img.onload=()=>{
    const prepareCanvas=()=>{
-     const isGhostTarget=String(TARGET||"").toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset";
+     const isGhostTarget=!!horseConfig||String(TARGET||"").toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset";
      if(isGhostTarget&&ghostReference?.naturalWidth){W=ghostReference.naturalWidth;H=ghostReference.naturalHeight}
      else {const scale=Math.min(1,2200/Math.max(img.naturalWidth,img.naturalHeight),Math.sqrt(2.5e6/(img.naturalWidth*img.naturalHeight)));W=Math.max(1,Math.round(img.naturalWidth*scale));H=Math.max(1,Math.round(img.naturalHeight*scale))}
      [paint,lines].forEach(c=>{c.width=W;c.height=H});
@@ -154,7 +155,7 @@ function openPainter(IMAGE,TARGET){
      const dat=sctx.getImageData(0,0,W,H),d=dat.data;luma=new Uint8Array(W*H);for(let i=0,j=0;i<d.length;i+=4,j++){const g=(d[i]*299+d[i+1]*587+d[i+2]*114)/1000;luma[j]=g;const a=Math.max(0,Math.min(255,Math.round((245-g)*1.7)));d[i]=d[i+1]=d[i+2]=0;d[i+3]=a}
      lctx.putImageData(dat,0,0);if(isGhostTarget)ghostOriginalInk=lctx.getImageData(0,0,W,H);fit();window.addEventListener("resize",fit);
    };
-   if(String(TARGET||"").toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset")getGhostReference().then(prepareCanvas).catch(()=>{status.textContent="Färgreferensen kunde inte öppnas. Stäng och försök igen."});
+   if(horseConfig||String(TARGET||"").toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset")getGhostReference().then(prepareCanvas).catch(()=>{status.textContent="Färgreferensen kunde inte öppnas. Stäng och försök igen."});
    else prepareCanvas();
  };img.onerror=()=>{$(".fp-paint-status").textContent="Bilden kunde inte öppnas. Stäng och försök igen.";};img.src=IMAGE;
  function fit(){if(!W)return;let r=W/H,aw=stage.clientWidth-24,ah=stage.clientHeight-24,w=Math.min(aw,ah*r);sheet.style.width=w+"px";sheet.style.height=w/r+"px";applyTransform()}
@@ -263,8 +264,20 @@ c.putImageData(out,0,0)
      const id=labels[i],r=regions[id-1],y=(i/W)|0,x=i-y*W;r.pixels[offsets[id]++]=i;
      if(x<r.minX)r.minX=x;if(x>r.maxX)r.maxX=x;if(y<r.minY)r.minY=y;if(y>r.maxY)r.maxY=y;
    }
-   setGhostColorHints(regions,labels);
+   if(horseConfig)setHorseColorHints(regions,labels);else setGhostColorHints(regions,labels);
    return regions.sort((a,b)=>a.minY-b.minY||a.minX-b.minX);
+ }
+ function setHorseColorHints(regions,labels){
+   // Color-family anchors use the original drawing's coordinates. Only the
+   // original's closed regions define masks; reference contours are never drawn.
+   const {sourceWidth,sourceHeight,seeds,limits}=horseConfig;
+   for(const [sx,sy,role,radius] of seeds){
+     const x=Math.round(sx/sourceWidth*W),y=Math.round(sy/sourceHeight*H),rx=Math.max(1,Math.round(radius/sourceWidth*W)),ry=Math.max(1,Math.round(radius/sourceHeight*H));
+     for(let yy=Math.max(0,y-ry);yy<=Math.min(H-1,y+ry);yy++)for(let xx=Math.max(0,x-rx);xx<=Math.min(W-1,x+rx);xx++){
+       if(((xx-x)/rx)**2+((yy-y)/ry)**2>1)continue;
+       const region=regions[labels[yy*W+xx]-1];if(region&&region.area<=limits[role])region.hint=role;
+     }
+   }
  }
  function setGhostColorHints(regions,labels){
    // Locations belong to the original 1054 x 1492 drawing, not the colored
@@ -324,6 +337,7 @@ c.putImageData(out,0,0)
    });
  }
  function ghostColorPalettes(){
+   if(horseConfig)return horseConfig.palettes;
    const boxes={
      moon:[.69,.025,.83,.14],ghost:[.29,.49,.43,.60],pink:[.344,.414,.369,.435],red:[.39,.451,.417,.469],
      bat:[.714,.035,.752,.082],wall:[.55,.28,.575,.32],roof:[.493,.084,.529,.124],
@@ -430,14 +444,14 @@ c.putImageData(out,0,0)
    if(acts.length&&!confirm("Automatisk färgläggning börjar från en tom bild. Vill du rensa din målning och fortsätta?"))return;
    acts=[];future=[];ctx.clearRect(0,0,W,H);if(ghostOriginalInk)lctx.putImageData(ghostOriginalInk,0,0);lines.style.opacity="";autoRunning=true;historyUI();autoButton.disabled=true;
    autoProgress.hidden=false;autoProgress.value=0;sheet.style.pointerEvents="none";toolSet("fill");
-   const isGhost=TARGET.toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset";
+   const isGhost=!!horseConfig||TARGET.toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset";
    let plan;
    if(isGhost){
      status.textContent="Hämtar färgreferensen…";
      try{await getGhostReference()}catch{autoRunning=false;autoButton.disabled=false;autoProgress.hidden=true;sheet.style.pointerEvents="";status.textContent="Färgreferensen kunde inte öppnas. Försök igen.";return}
      ghostReferencePixels=ghostAlignedReference();
      const regions=await findGhostRegions(),palettes=ghostColorPalettes();
-     prepareGhostPumpkinLights();
+     if(!horseConfig)prepareGhostPumpkinLights();
      for(const region of regions)region.shades=ghostRegionShades(region,palettes);
      plan=regions.map(region=>({type:"ghostRegion",region}));
    }else{
@@ -495,4 +509,5 @@ c.putImageData(out,0,0)
  back.querySelector(".fp-paint-close").onclick=close;back.addEventListener("click",e=>{if(e.target===back)close()});const keydown=e=>{if(e.code==="Space"){space=true;if(e.target===document.body||e.target===back)e.preventDefault()}if(e.key==="Escape")close();if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){e.preventDefault();e.shiftKey?redoOne():undoOne()}};const keyup=e=>{if(e.code==="Space")space=false};window.addEventListener("keydown",keydown);window.addEventListener("keyup",keyup);back.addEventListener("keydown",e=>{if(e.code==="Space")e.preventDefault()});back.tabIndex=-1;back.focus();
 }
 })();
+
 
