@@ -223,7 +223,7 @@ c.putImageData(out,0,0)
    acts=[];future=[];ctx.clearRect(0,0,W,H);historyUI();autoRunning=true;autoButton.disabled=true;
    autoProgress.hidden=false;autoProgress.value=0;sheet.style.pointerEvents="none";toolSet("fill");
    const isNidoking=TARGET.toLocaleLowerCase("sv")==="nidoking";
-   const isGhost=TARGET.toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset";
+   const isGhost=TARGET.toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset";if(isGhost)lines.style.opacity="0";
    let plan;
    if(isGhost){
      status.textContent="Hämtar färgreferensen…";
@@ -260,7 +260,7 @@ c.putImageData(out,0,0)
    status.textContent=isGhost?"Klart! "+TARGET+" är färglagd enligt färgreferensen. Du kan fortsätta måla eller spara bilden.":"Klart! "+TARGET+" är färglagd. Du kan fortsätta måla eller spara bilden.";
  }
  if(autoButton)autoButton.addEventListener("click",runAutoColor);
- function redraw(){ctx.clearRect(0,0,W,H);for(const a of acts){if(a.type==="reference"&&ghostReference)ctx.drawImage(ghostReference,0,0,W,H);else if(a.type==="fill"){const old=color;color=a.color;fillRegion(ctx,a.x,a.y);color=old}else if(a.type==="region"){paintAutoRegion(a.region,a.color)}else drawStroke(ctx,a)}historyUI()}
+ function redraw(){lines.style.opacity=acts.some(a=>a.type==="reference")?"0":"";ctx.clearRect(0,0,W,H);for(const a of acts){if(a.type==="reference"&&ghostReference)ctx.drawImage(ghostReference,0,0,W,H);else if(a.type==="fill"){const old=color;color=a.color;fillRegion(ctx,a.x,a.y);color=old}else if(a.type==="region"){paintAutoRegion(a.region,a.color)}else drawStroke(ctx,a)}historyUI()}
  function pos(e){const r=sheet.getBoundingClientRect();return [(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H]}
  const pointers=new Map();
  sheet.addEventListener("pointerdown",e=>{if(!W)return;e.preventDefault();sheet.setPointerCapture(e.pointerId);pointers.set(e.pointerId,[e.clientX,e.clientY]);
@@ -278,7 +278,7 @@ c.putImageData(out,0,0)
  back.querySelector('[data-action="minus"]').onclick=()=>setZoom(zoom-.25);back.querySelector('[data-action="plus"]').onclick=()=>setZoom(zoom+.25);back.querySelector('[data-action="one"]').onclick=()=>setZoom(1);
  stage.addEventListener("wheel",e=>{if(!e.ctrlKey&&!e.metaKey)return;e.preventDefault();setZoom(zoom+(e.deltaY<0?.15:-.15))},{passive:false});
  back.querySelector('[data-action="reset"]').onclick=()=>{if(autoRunning)return;if(confirm("Vill du radera hela målningen och börja om?")){acts=[];future=[];autoProgress.hidden=true;autoProgress.value=0;if(autoButton)autoButton.disabled=false;status.textContent="Välj färg och tryck på ett område. Två fingrar flyttar och zoomar. Dator: håll mellanslag och dra.";redraw()}};
- back.querySelector('[data-action="save"]').onclick=()=>{if(!W)return;const out=document.createElement("canvas");out.width=img.naturalWidth;out.height=img.naturalHeight;const c=out.getContext("2d");c.drawImage(paint,0,0,out.width,out.height);c.drawImage(lines,0,0,out.width,out.height);out.toBlob(blob=>{if(!blob)return;const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="min-farglagda-"+TARGET.toLocaleLowerCase("sv").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")+".png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},"image/png")};
+ back.querySelector('[data-action="save"]').onclick=()=>{if(!W)return;const out=document.createElement("canvas");out.width=img.naturalWidth;out.height=img.naturalHeight;const c=out.getContext("2d");c.drawImage(paint,0,0,out.width,out.height);if(!acts.some(a=>a.type==="reference"))c.drawImage(lines,0,0,out.width,out.height);out.toBlob(blob=>{if(!blob)return;const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="min-farglagda-"+TARGET.toLocaleLowerCase("sv").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")+".png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},"image/png")};
  function close(){window.removeEventListener("resize",fit);window.removeEventListener("keydown",keydown);window.removeEventListener("keyup",keyup);back.remove();document.body.style.overflow="";addButton()}
  back.querySelector(".fp-paint-close").onclick=close;back.addEventListener("click",e=>{if(e.target===back)close()});const keydown=e=>{if(e.code==="Space"){space=true;if(e.target===document.body||e.target===back)e.preventDefault()}if(e.key==="Escape")close();if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){e.preventDefault();e.shiftKey?redoOne():undoOne()}};const keyup=e=>{if(e.code==="Space")space=false};window.addEventListener("keydown",keydown);window.addEventListener("keyup",keyup);back.addEventListener("keydown",e=>{if(e.code==="Space")e.preventDefault()});back.tabIndex=-1;back.focus();
 }
