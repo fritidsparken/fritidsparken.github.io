@@ -175,8 +175,8 @@ function openPainter(IMAGE,TARGET){
    }
 c.putImageData(out,0,0)
  }
- async function findAutoRegions(){
-   const scale=Math.min(1,700/Math.max(W,H)),RW=Math.max(1,Math.round(W*scale)),RH=Math.max(1,Math.round(H*scale));
+ async function findAutoRegions(isGhost=false){
+   const scale=Math.min(1,(isGhost?Math.max(W,H):700)/Math.max(W,H)),RW=Math.max(1,Math.round(W*scale)),RH=Math.max(1,Math.round(H*scale));
    const reduced=new Uint8Array(RW*RH),stepX=W/RW,stepY=H/RH;
    for(let y=0;y<RH;y++){
      for(let x=0;x<RW;x++){
@@ -203,11 +203,28 @@ c.putImageData(out,0,0)
        if(y<RH-1&&(n=i+RW,!seen[n]&&reduced[n]>=220)){seen[n]=1;queue[tail++]=n}
        if(++visits%24000===0){status.textContent="Hittar slutna färgområden…";await new Promise(resolve=>setTimeout(resolve,0));}
      }
-     if(!touchesEdge&&tail>=9&&tail<total*.45)regions.push({pixels:queue.slice(0,tail),minX,minY,maxX,maxY,area:tail,cx:sumX/tail/RW,cy:sumY/tail/RH,scaleX:W/RW,scaleY:H/RH});
+     if(!touchesEdge&&tail>=(isGhost?3:9)&&(isGhost||tail<total*.45))regions.push({pixels:queue.slice(0,tail),minX,minY,maxX,maxY,area:tail,cx:sumX/tail/RW,cy:sumY/tail/RH,scaleX:W/RW,scaleY:H/RH});
    }
-   regions.sort((a,b)=>b.area-a.area);regions.length=Math.min(regions.length,160);
+   regions.sort((a,b)=>b.area-a.area);if(!isGhost)regions.length=Math.min(regions.length,160);
    regions.sort((a,b)=>a.minY-b.minY||a.minX-b.minX);
    return regions;
+ }
+ function ghostAlignedReference(){
+   const c=document.createElement("canvas");c.width=W;c.height=H;const g=c.getContext("2d",{willReadFrequently:true});
+   g.fillStyle="#fff";g.fillRect(0,0,W,H);
+   g.drawImage(ghostReference,W*.04245,H*.04319,W*.9151,H*.91196);
+   return g.getImageData(0,0,W,H).data;
+ }
+ function ghostRegionColor(region,referencePixels){
+   const canvasW=Math.round(W/region.scaleX),samples=[],stride=Math.max(1,Math.floor(region.pixels.length/700));
+   for(let n=0;n<region.pixels.length;n+=stride){
+     const i=region.pixels[n],x=i%canvasW,y=(i/canvasW)|0,k=(y*W+x)*4;
+     const r=referencePixels[k],g=referencePixels[k+1],b=referencePixels[k+2];
+     if(Math.max(r,g,b)>58)samples.push([r,g,b]);
+   }
+   if(!samples.length){const i=region.pixels[(region.pixels.length/2)|0],x=i%canvasW,y=(i/canvasW)|0,k=(y*W+x)*4;samples.push([referencePixels[k],referencePixels[k+1],referencePixels[k+2]])}
+   const channel=n=>{const a=samples.map(v=>v[n]).sort((x,y)=>x-y);return a[a.length>>1]};
+   return "#"+[channel(0),channel(1),channel(2)].map(v=>Math.round(v).toString(16).padStart(2,"0")).join("");
  }
  function paintAutoRegion(region,fillColor){
    const width=region.maxX-region.minX+1,height=region.maxY-region.minY+1,mask=document.createElement("canvas");
@@ -223,12 +240,15 @@ c.putImageData(out,0,0)
    acts=[];future=[];ctx.clearRect(0,0,W,H);historyUI();autoRunning=true;autoButton.disabled=true;
    autoProgress.hidden=false;autoProgress.value=0;sheet.style.pointerEvents="none";toolSet("fill");
    const isNidoking=TARGET.toLocaleLowerCase("sv")==="nidoking";
-   const isGhost=TARGET.toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset";if(isGhost)lines.style.opacity="0";
+   const isGhost=TARGET.toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset";
    let plan;
    if(isGhost){
      status.textContent="Hämtar färgreferensen…";
      try{await getGhostReference()}catch{autoRunning=false;autoButton.disabled=false;autoProgress.hidden=true;sheet.style.pointerEvents="";status.textContent="Färgreferensen kunde inte öppnas. Försök igen.";return}
-     const cols=12,rows=17,tiles=Array.from({length:cols*rows},(_,i)=>i);let seed=20261022;for(let i=tiles.length-1;i>0;i--){seed=(seed*1664525+1013904223)>>>0;const j=seed%(i+1);[tiles[i],tiles[j]]=[tiles[j],tiles[i]]}plan=tiles.map(index=>{const x=index%cols,y=Math.floor(index/cols),x0=Math.floor(x*W/cols),y0=Math.floor(y*H/rows),x1=Math.floor((x+1)*W/cols),y1=Math.floor((y+1)*H/rows);return{type:"referenceTile",x:x0,y:y0,width:x1-x0,height:y1-y0}});
+     status.textContent="Hittar alla slutna ytor i originalbilden…";
+     await new Promise(resolve=>requestAnimationFrame(()=>resolve()));
+     const regions=await findAutoRegions(true),referencePixels=ghostAlignedReference();
+     plan=regions.map(region=>({type:"region",region,color:ghostRegionColor(region,referencePixels)}));
    }else if(isNidoking)plan=autoSteps.map(step=>({type:"seed",x:Math.min(W-1,Math.max(0,Math.round(step[0]*W))),y:Math.min(H-1,Math.max(0,Math.round(step[1]*H))),color:step[2]}));
    else{
      status.textContent="Hittar slutna färgområden…";
@@ -250,17 +270,17 @@ c.putImageData(out,0,0)
      }else if(step.type==="region"){
        paintAutoRegion(step.region,step.color);
        acts.push({type:"region",region:step.region,color:step.color});
-     }else if(step.type==="referenceTile"){ctx.save();ctx.beginPath();ctx.rect(step.x,step.y,step.width,step.height);ctx.clip();ctx.drawImage(ghostReference,0,0,W,H);ctx.restore();}
+     }
      future=[];autoProgress.value=i+1;
      status.textContent="Timelapse: färglägger "+TARGET+", steg "+(i+1)+" av "+plan.length+"…";historyUI();
-     await new Promise(resolve=>setTimeout(resolve,isGhost?18:115));
+     await new Promise(resolve=>setTimeout(resolve,isGhost?Math.max(1,Math.min(16,4000/plan.length)):115));
    }
-   if(isGhost){acts=[{type:"reference"}];future=[];historyUI()}
+   if(isGhost){acts=[{type:"ghostRegions",regions:plan.map(step=>({region:step.region,color:step.color}))}];future=[];redraw()}
    autoRunning=false;sheet.style.pointerEvents="";
    status.textContent=isGhost?"Klart! "+TARGET+" är färglagd enligt färgreferensen. Du kan fortsätta måla eller spara bilden.":"Klart! "+TARGET+" är färglagd. Du kan fortsätta måla eller spara bilden.";
  }
  if(autoButton)autoButton.addEventListener("click",runAutoColor);
- function redraw(){lines.style.opacity=acts.some(a=>a.type==="reference")?"0":"";ctx.clearRect(0,0,W,H);for(const a of acts){if(a.type==="reference"&&ghostReference)ctx.drawImage(ghostReference,0,0,W,H);else if(a.type==="fill"){const old=color;color=a.color;fillRegion(ctx,a.x,a.y);color=old}else if(a.type==="region"){paintAutoRegion(a.region,a.color)}else drawStroke(ctx,a)}historyUI()}
+ function redraw(){lines.style.opacity="";ctx.clearRect(0,0,W,H);for(const a of acts){if(a.type==="ghostRegions"){for(const step of a.regions)paintAutoRegion(step.region,step.color)}else if(a.type==="fill"){const old=color;color=a.color;fillRegion(ctx,a.x,a.y);color=old}else if(a.type==="region"){paintAutoRegion(a.region,a.color)}else drawStroke(ctx,a)}historyUI()}
  function pos(e){const r=sheet.getBoundingClientRect();return [(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H]}
  const pointers=new Map();
  sheet.addEventListener("pointerdown",e=>{if(!W)return;e.preventDefault();sheet.setPointerCapture(e.pointerId);pointers.set(e.pointerId,[e.clientX,e.clientY]);
@@ -278,7 +298,7 @@ c.putImageData(out,0,0)
  back.querySelector('[data-action="minus"]').onclick=()=>setZoom(zoom-.25);back.querySelector('[data-action="plus"]').onclick=()=>setZoom(zoom+.25);back.querySelector('[data-action="one"]').onclick=()=>setZoom(1);
  stage.addEventListener("wheel",e=>{if(!e.ctrlKey&&!e.metaKey)return;e.preventDefault();setZoom(zoom+(e.deltaY<0?.15:-.15))},{passive:false});
  back.querySelector('[data-action="reset"]').onclick=()=>{if(autoRunning)return;if(confirm("Vill du radera hela målningen och börja om?")){acts=[];future=[];autoProgress.hidden=true;autoProgress.value=0;if(autoButton)autoButton.disabled=false;status.textContent="Välj färg och tryck på ett område. Två fingrar flyttar och zoomar. Dator: håll mellanslag och dra.";redraw()}};
- back.querySelector('[data-action="save"]').onclick=()=>{if(!W)return;const out=document.createElement("canvas");out.width=img.naturalWidth;out.height=img.naturalHeight;const c=out.getContext("2d");c.drawImage(paint,0,0,out.width,out.height);if(!acts.some(a=>a.type==="reference"))c.drawImage(lines,0,0,out.width,out.height);out.toBlob(blob=>{if(!blob)return;const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="min-farglagda-"+TARGET.toLocaleLowerCase("sv").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")+".png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},"image/png")};
+ back.querySelector('[data-action="save"]').onclick=()=>{if(!W)return;const out=document.createElement("canvas");out.width=img.naturalWidth;out.height=img.naturalHeight;const c=out.getContext("2d");c.drawImage(paint,0,0,out.width,out.height);c.drawImage(lines,0,0,out.width,out.height);out.toBlob(blob=>{if(!blob)return;const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="min-farglagda-"+TARGET.toLocaleLowerCase("sv").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")+".png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},"image/png")};
  function close(){window.removeEventListener("resize",fit);window.removeEventListener("keydown",keydown);window.removeEventListener("keyup",keyup);back.remove();document.body.style.overflow="";addButton()}
  back.querySelector(".fp-paint-close").onclick=close;back.addEventListener("click",e=>{if(e.target===back)close()});const keydown=e=>{if(e.code==="Space"){space=true;if(e.target===document.body||e.target===back)e.preventDefault()}if(e.key==="Escape")close();if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){e.preventDefault();e.shiftKey?redoOne():undoOne()}};const keyup=e=>{if(e.code==="Space")space=false};window.addEventListener("keydown",keydown);window.addEventListener("keyup",keyup);back.addEventListener("keydown",e=>{if(e.code==="Space")e.preventDefault()});back.tabIndex=-1;back.focus();
 }
