@@ -264,7 +264,6 @@ c.putImageData(out,0,0)
    autoProgress.hidden=false;autoProgress.value=0;sheet.style.pointerEvents="none";toolSet("fill");
    const isNidoking=TARGET.toLocaleLowerCase("sv")==="nidoking";
    const isGhost=TARGET.toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset";
-   if(isGhost)lines.style.opacity="0";
    let plan;
    if(isGhost){
      status.textContent="Hämtar färgreferensen…";
@@ -307,7 +306,7 @@ c.putImageData(out,0,0)
    status.textContent=isGhost?"Klart! "+TARGET+" är färglagd enligt färgreferensen. Du kan fortsätta måla eller spara bilden.":"Klart! "+TARGET+" är färglagd. Du kan fortsätta måla eller spara bilden.";
  }
  if(autoButton)autoButton.addEventListener("click",runAutoColor);
- function redraw(){const referencePass=acts.some(a=>a.type==="ghostFinal"||a.type==="ghostRegion"||a.type==="ghostRegions");lines.style.opacity=referencePass?"0":"";ctx.clearRect(0,0,W,H);for(const a of acts){if(a.type==="ghostFinal"){if(ghostReference)ctx.drawImage(ghostReference,0,0,W,H)}else if(a.type==="ghostRegions"){for(const region of a.regions)paintGhostRegion(region)}else if(a.type==="ghostRegion"){paintGhostRegion(a.region)}else if(a.type==="fill"){const old=color;color=a.color;fillRegion(ctx,a.x,a.y);color=old}else if(a.type==="region"){paintAutoRegion(a.region,a.color)}else drawStroke(ctx,a)}historyUI()}
+ function redraw(){const exactGhost=acts.some(a=>a.type==="ghostFinal");lines.style.opacity=exactGhost?"0":"";ctx.clearRect(0,0,W,H);for(const a of acts){if(a.type==="ghostFinal"){if(ghostReference)ctx.drawImage(ghostReference,0,0,W,H)}else if(a.type==="ghostRegions"){for(const region of a.regions)paintGhostRegion(region)}else if(a.type==="ghostRegion"){paintGhostRegion(a.region)}else if(a.type==="fill"){const old=color;color=a.color;fillRegion(ctx,a.x,a.y);color=old}else if(a.type==="region"){paintAutoRegion(a.region,a.color)}else drawStroke(ctx,a)}historyUI()}
  function pos(e){const r=sheet.getBoundingClientRect();return [(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H]}
  const pointers=new Map();
  sheet.addEventListener("pointerdown",e=>{if(!W)return;e.preventDefault();sheet.setPointerCapture(e.pointerId);pointers.set(e.pointerId,[e.clientX,e.clientY]);
