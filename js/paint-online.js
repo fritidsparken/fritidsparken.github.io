@@ -237,11 +237,20 @@ c.putImageData(out,0,0)
    const width=region.maxX-region.minX+1,height=region.maxY-region.minY+1,mask=document.createElement("canvas");
    mask.width=width;mask.height=height;
    const maskCtx=mask.getContext("2d"),image=maskCtx.createImageData(width,height),data=image.data,canvasW=Math.round(W/region.scaleX);
+   let red=0,green=0,blue=0,samples=0;
+   // Take color from the reference while keeping all ink exclusively from
+   // the original line-art layer.
    for(const index of region.pixels){
-     const x=index%canvasW,y=(index/canvasW)|0,source=(y*W+x)*4,dest=((y-region.minY)*width+x-region.minX)*4;
+     const x=index%canvasW,y=(index/canvasW)|0,source=(y*W+x)*4;
      const r=ghostReferencePixels[source],g=ghostReferencePixels[source+1],b=ghostReferencePixels[source+2];
-     data[dest]=r;data[dest+1]=g;data[dest+2]=b;
-     data[dest+3]=255;
+     const max=Math.max(r,g,b),min=Math.min(r,g,b),luma=(r*299+g*587+b*114)/1000;
+     if(luma>105&&(max-min>18||luma>205)){red+=r;green+=g;blue+=b;samples++}
+   }
+   if(!samples){red=green=blue=255;samples=1}
+   red=Math.round(red/samples);green=Math.round(green/samples);blue=Math.round(blue/samples);
+   for(const index of region.pixels){
+     const x=index%canvasW,y=(index/canvasW)|0,dest=((y-region.minY)*width+x-region.minX)*4;
+     data[dest]=red;data[dest+1]=green;data[dest+2]=blue;data[dest+3]=255;
    }
    maskCtx.putImageData(image,0,0);
    ctx.drawImage(mask,region.minX*region.scaleX,region.minY*region.scaleY,width*region.scaleX,height*region.scaleY);
