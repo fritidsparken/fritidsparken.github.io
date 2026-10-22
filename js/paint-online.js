@@ -211,7 +211,8 @@ c.putImageData(out,0,0)
  }
  function ghostAlignedReference(){
    const c=document.createElement("canvas");c.width=W;c.height=H;const g=c.getContext("2d",{willReadFrequently:true});
-   g.drawImage(ghostReference,0,0,W,H);
+   g.fillStyle="#fff";g.fillRect(0,0,W,H);
+   g.drawImage(ghostReference,W*.04245,H*.04319,W*.9151,H*.91196);
    return g.getImageData(0,0,W,H).data;
  }
  function paintGhostRegion(region){
