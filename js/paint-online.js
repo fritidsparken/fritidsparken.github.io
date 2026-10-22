@@ -157,12 +157,17 @@ function openPainter(IMAGE,TARGET){
  status.setAttribute("aria-live","polite");if(autoButton)dialog.insertBefore(autoProgress,stage);
 
  const img=new Image();if(new URL(IMAGE,location.href).origin!==location.origin)img.crossOrigin="anonymous";img.onload=()=>{
-   const scale=Math.min(1,2200/Math.max(img.naturalWidth,img.naturalHeight),Math.sqrt(2.5e6/(img.naturalWidth*img.naturalHeight)));
-   W=Math.max(1,Math.round(img.naturalWidth*scale));H=Math.max(1,Math.round(img.naturalHeight*scale));
-   [paint,lines].forEach(c=>{c.width=W;c.height=H});
-   const src=document.createElement("canvas");src.width=W;src.height=H;const sctx=src.getContext("2d",{willReadFrequently:true});sctx.drawImage(img,0,0,W,H);
-   const dat=sctx.getImageData(0,0,W,H),d=dat.data;luma=new Uint8Array(W*H);for(let i=0,j=0;i<d.length;i+=4,j++){const g=(d[i]*299+d[i+1]*587+d[i+2]*114)/1000;luma[j]=g;const a=Math.max(0,Math.min(255,Math.round((245-g)*1.7)));d[i]=d[i+1]=d[i+2]=0;d[i+3]=a}
-   lctx.putImageData(dat,0,0);fit();window.addEventListener("resize",fit);
+   const prepareCanvas=()=>{
+     const isGhostTarget=String(TARGET||"").toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset";
+     if(isGhostTarget&&ghostReference?.naturalWidth){W=ghostReference.naturalWidth;H=ghostReference.naturalHeight}
+     else {const scale=Math.min(1,2200/Math.max(img.naturalWidth,img.naturalHeight),Math.sqrt(2.5e6/(img.naturalWidth*img.naturalHeight)));W=Math.max(1,Math.round(img.naturalWidth*scale));H=Math.max(1,Math.round(img.naturalHeight*scale))}
+     [paint,lines].forEach(c=>{c.width=W;c.height=H});
+     const src=document.createElement("canvas");src.width=W;src.height=H;const sctx=src.getContext("2d",{willReadFrequently:true});sctx.drawImage(img,0,0,W,H);
+     const dat=sctx.getImageData(0,0,W,H),d=dat.data;luma=new Uint8Array(W*H);for(let i=0,j=0;i<d.length;i+=4,j++){const g=(d[i]*299+d[i+1]*587+d[i+2]*114)/1000;luma[j]=g;const a=Math.max(0,Math.min(255,Math.round((245-g)*1.7)));d[i]=d[i+1]=d[i+2]=0;d[i+3]=a}
+     lctx.putImageData(dat,0,0);fit();window.addEventListener("resize",fit);
+   };
+   if(String(TARGET||"").toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset")getGhostReference().then(prepareCanvas).catch(()=>{status.textContent="Färgreferensen kunde inte öppnas. Stäng och försök igen."});
+   else prepareCanvas();
  };img.onerror=()=>{$(".fp-paint-status").textContent="Bilden kunde inte öppnas. Stäng och försök igen.";};img.src=IMAGE;
  function fit(){if(!W)return;let r=W/H,aw=stage.clientWidth-24,ah=stage.clientHeight-24,w=Math.min(aw,ah*r);sheet.style.width=w+"px";sheet.style.height=w/r+"px";applyTransform()}
  function applyTransform(){sheet.style.transform="translate(calc(-50% + "+tx+"px),calc(-50% + "+ty+"px)) scale("+zoom+")"}
@@ -224,9 +229,7 @@ c.putImageData(out,0,0)
  function ghostAlignedReference(){
    const c=document.createElement("canvas");c.width=W;c.height=H;const g=c.getContext("2d",{willReadFrequently:true});
    g.fillStyle="#fff";g.fillRect(0,0,W,H);
-   g.filter="blur("+Math.max(10,Math.round(H*.014))+"px)";
    g.drawImage(ghostReference,0,0,W,H);
-   g.filter="none";
    return g.getImageData(0,0,W,H).data;
  }
  function paintGhostRegion(region){
