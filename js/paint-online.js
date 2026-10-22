@@ -99,6 +99,18 @@ style.textContent+=`
  .fp-paint-stage{min-height:100px;border-radius:12px}
  .fp-paint-status{font-size:11px}
 }
+@media(min-width:701px){
+ .fp-paint-dialog.fp-paint-ghost{width:min(1480px,calc(100vw - 12px));height:calc(100dvh - 12px);max-height:calc(100dvh - 12px);display:grid;grid-template-columns:260px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto auto auto;gap:8px;padding:12px;border-radius:14px}
+ .fp-paint-dialog.fp-paint-ghost .fp-paint-head{grid-column:1 / -1;grid-row:1}
+ .fp-paint-dialog.fp-paint-ghost .fp-paint-tools{grid-column:1;grid-row:2;display:grid;grid-template-columns:1fr 1fr;align-content:start;gap:6px;overflow:auto}
+ .fp-paint-dialog.fp-paint-ghost .fp-paint-tools button,.fp-paint-dialog.fp-paint-ghost .fp-paint-tools select{min-height:36px;padding:5px 6px;font-size:12px;white-space:nowrap}
+ .fp-paint-dialog.fp-paint-ghost .fp-paint-palette{grid-column:1;grid-row:3;display:grid;grid-template-columns:repeat(5,32px);align-content:start;gap:7px}
+ .fp-paint-dialog.fp-paint-ghost .fp-paint-swatch{width:30px;height:30px}
+ .fp-paint-dialog.fp-paint-ghost .fp-paint-custom{grid-column:1 / -1}
+ .fp-paint-dialog.fp-paint-ghost .fp-paint-stage{grid-column:2;grid-row:2 / 4;min-height:0}
+ .fp-paint-dialog.fp-paint-ghost .fp-auto-progress{grid-column:1 / -1;grid-row:4;margin:0}
+ .fp-paint-dialog.fp-paint-ghost .fp-paint-status{grid-column:1 / -1;grid-row:5}
+}
 `;
 style.textContent+=".fp-paint-tools [data-action=auto]{background:#f3bd43!important;color:#26392b!important;font-weight:700!important;border-color:#e7b331!important}.fp-auto-progress{display:block;width:100%;height:10px;margin:0 0 8px;accent-color:#5da96e}.fp-auto-progress[hidden]{display:none}";
 document.head.append(style);
@@ -124,7 +136,7 @@ function openPainter(IMAGE,TARGET){
  const back=document.createElement("div");back.className="fp-paint-back";back.innerHTML='<section class="fp-paint-dialog" role="dialog" aria-modal="true" aria-label="Måla online"><header class="fp-paint-head"><div><h2>🎨 Måla online</h2><p></p></div><button class="fp-paint-close" aria-label="Stäng">×</button></header><div class="fp-paint-tools"><button data-tool="fill" aria-pressed="true">🪣 Fyll</button><button data-tool="pen" aria-pressed="false">✏️ Penna</button><button data-tool="erase" aria-pressed="false">🧽 Sudd</button><select aria-label="Penselstorlek"><option value="5">● Liten</option><option value="14" selected>● Medium</option><option value="30">● Stor</option></select><button data-action="undo" disabled>↶ Ångra</button><button data-action="redo" disabled>↷ Gör om</button><button data-action="minus" aria-label="Zooma ut">−</button><button data-action="one">100%</button><button data-action="plus" aria-label="Zooma in">+</button><button data-action="reset">🗑️ Börja om</button>'+'<button data-action="auto">✨ Färglägg automatiskt</button>'+'<button data-action="save">💾 Spara bild</button></div><div class="fp-paint-palette" role="group" aria-label="Färgpalett"></div><div class="fp-paint-stage"><div class="fp-paint-sheet"><canvas class="fp-paint-layer"></canvas><canvas class="fp-line-layer"></canvas></div></div><div class="fp-paint-status">Välj färg och tryck på ett område. Två fingrar flyttar och zoomar. Dator: håll mellanslag och dra.</div></section>';
  back.querySelector(".fp-paint-head p").textContent=TARGET+" · Måla med färghink eller penna!";
  document.body.append(back);document.body.style.overflow="hidden";
- const $=s=>back.querySelector(s),dialog=$(".fp-paint-dialog"),stage=$(".fp-paint-stage"),sheet=$(".fp-paint-sheet"),paint=$(".fp-paint-layer"),lines=$(".fp-line-layer"),ctx=paint.getContext("2d",{willReadFrequently:true}),lctx=lines.getContext("2d"),undo=$('[data-action="undo"]'),redo=$('[data-action="redo"]');
+ const $=s=>back.querySelector(s),dialog=$(".fp-paint-dialog"),stage=$(".fp-paint-stage");if(TARGET.toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset")dialog.classList.add("fp-paint-ghost"),sheet=$(".fp-paint-sheet"),paint=$(".fp-paint-layer"),lines=$(".fp-line-layer"),ctx=paint.getContext("2d",{willReadFrequently:true}),lctx=lines.getContext("2d"),undo=$('[data-action="undo"]'),redo=$('[data-action="redo"]');
  let tool="fill",color="#ef4444",brush=14,acts=[],future=[],W=0,H=0,luma=null,zoom=1,tx=0,ty=0,space=false,active=null,pending=null,gesture=false,pinch=null;
  const autoSteps=[
   [.182,.278,"#e58aa5"],[.163,.323,"#e58aa5"],[.191,.310,"#e58aa5"],[.500,.311,"#e58aa5"],[.450,.320,"#e58aa5"],
