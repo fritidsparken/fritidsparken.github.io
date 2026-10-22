@@ -228,7 +228,7 @@ c.putImageData(out,0,0)
    if(isGhost){
      status.textContent="Hämtar färgreferensen…";
      try{await getGhostReference()}catch{autoRunning=false;autoButton.disabled=false;autoProgress.hidden=true;sheet.style.pointerEvents="";status.textContent="Färgreferensen kunde inte öppnas. Försök igen.";return}
-     const bands=28;plan=Array.from({length:bands},(_,i)=>({type:"referenceBand",y:Math.floor(H*i/bands),height:Math.ceil(H*(i+1)/bands)-Math.floor(H*i/bands)}));
+     const cols=12,rows=17,tiles=Array.from({length:cols*rows},(_,i)=>i);let seed=20261022;for(let i=tiles.length-1;i>0;i--){seed=(seed*1664525+1013904223)>>>0;const j=seed%(i+1);[tiles[i],tiles[j]]=[tiles[j],tiles[i]]}plan=tiles.map(index=>{const x=index%cols,y=Math.floor(index/cols),x0=Math.floor(x*W/cols),y0=Math.floor(y*H/rows),x1=Math.floor((x+1)*W/cols),y1=Math.floor((y+1)*H/rows);return{type:"referenceTile",x:x0,y:y0,width:x1-x0,height:y1-y0}});
    }else if(isNidoking)plan=autoSteps.map(step=>({type:"seed",x:Math.min(W-1,Math.max(0,Math.round(step[0]*W))),y:Math.min(H-1,Math.max(0,Math.round(step[1]*H))),color:step[2]}));
    else{
      status.textContent="Hittar slutna färgområden…";
@@ -250,12 +250,10 @@ c.putImageData(out,0,0)
      }else if(step.type==="region"){
        paintAutoRegion(step.region,step.color);
        acts.push({type:"region",region:step.region,color:step.color});
-     }else if(step.type==="referenceBand"){
-       ctx.save();ctx.beginPath();ctx.rect(0,step.y,W,step.height);ctx.clip();ctx.drawImage(ghostReference,0,0,W,H);ctx.restore();
-     }
+     }else if(step.type==="referenceTile"){ctx.save();ctx.beginPath();ctx.rect(step.x,step.y,step.width,step.height);ctx.clip();ctx.drawImage(ghostReference,0,0,W,H);ctx.restore();}
      future=[];autoProgress.value=i+1;
      status.textContent="Timelapse: färglägger "+TARGET+", steg "+(i+1)+" av "+plan.length+"…";historyUI();
-     await new Promise(resolve=>setTimeout(resolve,115));
+     await new Promise(resolve=>setTimeout(resolve,isGhost?18:115));
    }
    if(isGhost){acts=[{type:"reference"}];future=[];historyUI()}
    autoRunning=false;sheet.style.pointerEvents="";
