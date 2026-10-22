@@ -235,8 +235,7 @@ c.putImageData(out,0,0)
    for(const index of region.pixels){
      const x=index%canvasW,y=(index/canvasW)|0,source=(y*W+x)*4,dest=((y-region.minY)*width+x-region.minX)*4;
      const r=ghostReferencePixels[source],g=ghostReferencePixels[source+1],b=ghostReferencePixels[source+2];
-     if((Math.max(r,g,b)<80&&Math.max(r,g,b)-Math.min(r,g,b)<45)||(Math.max(r,g,b)<150&&Math.max(r,g,b)-Math.min(r,g,b)<22))data[dest]=data[dest+1]=data[dest+2]=255;
-     else {data[dest]=r;data[dest+1]=g;data[dest+2]=b}
+     data[dest]=r;data[dest+1]=g;data[dest+2]=b;
      data[dest+3]=255;
    }
    maskCtx.putImageData(image,0,0);
