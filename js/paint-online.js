@@ -294,7 +294,7 @@ c.putImageData(out,0,0)
      status.textContent="Timelapse: färglägger "+TARGET+", steg "+(i+1)+" av "+plan.length+"…";historyUI();
      await new Promise(resolve=>setTimeout(resolve,isGhost?Math.max(1,Math.min(16,4000/plan.length)):115));
    }
-   if(isGhost){acts=[{type:"ghostFinal"}];future=[];redraw()}
+   if(isGhost){future=[];redraw()}
    autoRunning=false;sheet.style.pointerEvents="";
    status.textContent=isGhost?"Klart! "+TARGET+" är färglagd enligt färgreferensen. Du kan fortsätta måla eller spara bilden.":"Klart! "+TARGET+" är färglagd. Du kan fortsätta måla eller spara bilden.";
  }
