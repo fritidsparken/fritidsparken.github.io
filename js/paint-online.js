@@ -178,7 +178,7 @@ function openPainter(IMAGE,TARGET){
  const custom=document.createElement("label");custom.className="fp-paint-custom";custom.textContent="Egen färg";const picker=document.createElement("input");picker.type="color";picker.value=color;picker.setAttribute("aria-label","Välj egen färg");picker.oninput=()=>choose(picker.value);custom.append(picker);palette.append(custom);
  function choose(c,b){color=c;picker.value=c;palette.querySelectorAll(".fp-paint-swatch").forEach(s=>s.setAttribute("aria-pressed",String(s===b)))}
  back.querySelector("select").onchange=e=>brush=+e.target.value;
- function historyUI(){undo.disabled=!acts.length;redo.disabled=!future.length}
+ function historyUI(){undo.disabled=autoRunning||!acts.length;redo.disabled=autoRunning||!future.length}
  function drawStroke(c,a){if(a.points.length<1)return;c.save();c.lineCap=c.lineJoin="round";c.lineWidth=a.size;c.globalCompositeOperation=a.erase?"destination-out":"source-over";c.strokeStyle=a.color;c.fillStyle=a.color;if(a.points.length===1){c.beginPath();c.arc(a.points[0][0],a.points[0][1],a.size/2,0,Math.PI*2);c.fill()}else{c.beginPath();c.moveTo(...a.points[0]);for(let i=1;i<a.points.length-1;i++){const p=a.points[i],n=a.points[i+1];c.quadraticCurveTo(p[0],p[1],(p[0]+n[0])/2,(p[1]+n[1])/2)}const q=a.points[a.points.length-1];c.lineTo(q[0],q[1]);c.stroke()}c.restore()}
  function fillRegion(c,sx,sy){
    sx=Math.floor(sx);sy=Math.floor(sy);if(sx<0||sy<0||sx>=W||sy>=H)return;
@@ -232,21 +232,147 @@ c.putImageData(out,0,0)
    g.drawImage(ghostReference,0,0,W,H);
    return g.getImageData(0,0,W,H).data;
  }
- function paintGhostRegion(region){
-   if(region.tile&&ghostReference){
-     ctx.drawImage(ghostReference,region.x,region.y,region.width,region.height,region.x,region.y,region.width,region.height);
-     return;
+ async function findGhostRegions(){
+   const total=W*H,barrier=new Uint8Array(total),labels=new Int32Array(total),queue=new Uint32Array(total),regions=[];
+   const pause=async text=>{status.textContent=text;await new Promise(resolve=>setTimeout(resolve,0))};
+   // Close one-pixel gaps for segmentation only. The displayed line drawing
+   // is never changed, erased or replaced.
+   for(let y=0;y<H;y++){
+     for(let x=0;x<W;x++){
+       const i=y*W+x;
+       barrier[i]=luma[i]<220||(x>0&&luma[i-1]<220)||(x<W-1&&luma[i+1]<220)||(y>0&&luma[i-W]<220)||(y<H-1&&luma[i+W]<220)?1:0;
+     }
+     if(y%80===79)await pause("Förbereder originalets slutna färgområden…");
    }
-   if(!ghostReferencePixels)return;
+   let visits=0;
+   for(let start=0;start<total;start++){
+     if(barrier[start]||labels[start])continue;
+     const id=regions.length+1;let head=0,tail=1,sumX=0,sumY=0;queue[0]=start;labels[start]=id;
+     while(head<tail){
+       const i=queue[head++],y=(i/W)|0,x=i-y*W;sumX+=x;sumY+=y;
+       const add=n=>{if(!barrier[n]&&!labels[n]){labels[n]=id;queue[tail++]=n}};
+       if(x>0)add(i-1);if(x<W-1)add(i+1);if(y>0)add(i-W);if(y<H-1)add(i+W);
+       if(++visits%60000===0)await pause("Hittar originalets färgområden…");
+     }
+     if(tail<3){for(let j=0;j<tail;j++)labels[queue[j]]=-1;continue}
+     regions.push({id,area:tail,cx:sumX/tail/W,cy:sumY/tail/H,scaleX:1,scaleY:1});
+   }
+   if(!regions.length)return [];
+   // Extend each fill beneath the original ink to avoid pale halos. Each
+   // pixel belongs to one original region; the black line layer stays on top.
+   let head=0,tail=0;
+   for(let i=0;i<total;i++){if(labels[i]>0)queue[tail++]=i;else labels[i]=0}
+   while(head<tail){
+     const i=queue[head++],id=labels[i],y=(i/W)|0,x=i-y*W;
+     const add=n=>{if(!labels[n]){labels[n]=id;queue[tail++]=n}};
+     if(x>0)add(i-1);if(x<W-1)add(i+1);if(y>0)add(i-W);if(y<H-1)add(i+W);
+     if(head%100000===0)await pause("Förbereder färgfyllning fram till konturerna…");
+   }
+   const counts=new Uint32Array(regions.length+1),offsets=new Uint32Array(regions.length+1);
+   for(let i=0;i<total;i++)counts[labels[i]]++;
+   for(const r of regions){r.pixels=new Uint32Array(counts[r.id]);r.area=counts[r.id];r.minX=W;r.minY=H;r.maxX=r.maxY=0}
+   for(let i=0;i<total;i++){
+     const id=labels[i],r=regions[id-1],y=(i/W)|0,x=i-y*W;r.pixels[offsets[id]++]=i;
+     if(x<r.minX)r.minX=x;if(x>r.maxX)r.maxX=x;if(y<r.minY)r.minY=y;if(y>r.maxY)r.maxY=y;
+   }
+   setGhostColorHints(regions,labels);
+   return regions.sort((a,b)=>a.minY-b.minY||a.minX-b.minX);
+ }
+ function setGhostColorHints(regions,labels){
+   // Locations belong to the original 1054 x 1492 drawing, not the colored
+   // reference. Hints keep small shifted features in the right color family.
+   const seeds=[
+     [820,190,"moon",1],[440,620,"ghost",1],[365,693,"pink",2],[510,739,"pink",2],[432,738,"red",2],
+     [400,640,"white",3],[493,687,"white",3],
+     [725,85,"bat",10],[852,135,"bat",10],[791,148,"bat",7],[908,235,"bat",8],[977,225,"bat",8],[940,265,"bat",6],[891,247,"bat",7],[999,219,"bat",6],
+     [330,364,"bat",7],[421,374,"bat",7],[370,392,"bat",6],[710,204,"bat",4],
+     [566,109,"cloud",8],[623,125,"cloud",8],[1020,61,"cloud",8],[1040,120,"cloud",6],[1027,350,"cloud",6],
+     [495,370,"wall",3],[490,440,"wall",3],[461,524,"wall",4],[544,614,"wall",4],
+     [490,184,"roof",6],[518,210,"roof",7],[613,244,"roof",7],[640,272,"roof",8],[752,378,"roof",6],[871,501,"roof",6],[947,529,"roof",6],[443,489,"roof",6],[531,559,"roof",6],
+     [509,319,"glass",5],[532,320,"glass",5],[513,352,"glass",5],[534,352,"glass",5],
+     [630,323,"glass",5],[646,324,"glass",5],[627,353,"glass",5],[645,353,"glass",5],
+     [613,456,"glass",5],[632,456,"glass",5],[608,485,"glass",5],[633,490,"glass",5],
+     [752,479,"glass",5],[779,488,"glass",5],[951,617,"glass",5],[977,638,"glass",5],[950,656,"glass",5],[977,675,"glass",5],
+     [578,809,"glass",5],[594,814,"glass",5],[580,842,"glass",5],[596,842,"glass",5],[570,800,"glass",3],[590,800,"glass",3],[570,831,"glass",3],[590,831,"glass",3],[451,529,"glass",4],
+     [939,805,"glass",5],[959,816,"glass",5],[941,840,"glass",5],[966,840,"glass",5],[1027,855,"glass",4],[1045,856,"glass",4],
+     [120,82,"leaf",7],[445,79,"leaf",7],[437,150,"leaf",7],[191,195,"leaf",5],[360,245,"leaf",7],
+     [176,290,"leaf",7],[80,325,"leaf",6],[224,428,"leaf",7],[391,464,"leaf",6],[353,565,"leaf",6],
+     [212,594,"leaf",6],[132,645,"leaf",5],[132,710,"leaf",5],[114,779,"leaf",6],[152,789,"leaf",5],
+     [40,816,"leaf",6],[1030,407,"leaf",4],[1027,533,"leaf",4],
+     [87,1340,"cream",5],[84,1296,"red",7],[922,1411,"cream",5],[932,1375,"red",7]
+   ];
+   const limits={moon:300000,ghost:300000,pink:2400,red:6500,white:2400,bat:15000,cloud:50000,wall:45000,roof:22000,glass:2600,leaf:5500,cream:6000};
+   for(const [sx,sy,role,radius] of seeds){
+     const x=Math.round(sx/1054*W),y=Math.round(sy/1492*H),rx=Math.max(1,Math.round(radius/1054*W)),ry=Math.max(1,Math.round(radius/1492*H));
+     for(let yy=Math.max(0,y-ry);yy<=Math.min(H-1,y+ry);yy++)for(let xx=Math.max(0,x-rx);xx<=Math.min(W-1,x+rx);xx++){
+       if(((xx-x)/rx)**2+((yy-y)/ry)**2>1)continue;
+       const region=regions[labels[yy*W+xx]-1];if(region&&region.area<=limits[role])region.hint=role;
+     }
+   }
+ }
+ function ghostSample(r,g,b){
+   const max=Math.max(r,g,b),min=Math.min(r,g,b),delta=max-min;let h=0;
+   if(delta){if(max===r)h=((g-b)/delta+6)%6;else if(max===g)h=(b-r)/delta+2;else h=(r-g)/delta+4;h/=6}
+   return {r,g,b,h,s:max?delta/max:0,v:max/255,l:r*.299+g*.587+b*.114};
+ }
+ function ghostShades(samples,forced=false){
+   let selected=samples;
+   if(!forced){
+     const histogram=new Float64Array(24);let neutral=0;
+     for(const c of samples){if(c.v<.09)continue;const w=.2+.8*Math.sqrt(c.v);if(c.s<.16)neutral+=w;else histogram[Math.floor(c.h*24)%24]+=w}
+     let best=0,score=-1;
+     for(let i=0;i<24;i++){const v=histogram[i]+.7*(histogram[(i+23)%24]+histogram[(i+1)%24]);if(v>score){score=v;best=i}}
+     selected=samples.filter(c=>{if(c.v<.09)return false;if(neutral>score)return c.s<.16;const bin=Math.floor(c.h*24)%24,d=Math.abs(bin-best);return c.s>=.16&&Math.min(d,24-d)<=1});
+   }
+   if(!selected.length)selected=samples;
+   if(!selected.length)return [[210,190,160],[225,210,185],[245,235,215]];
+   selected.sort((a,b)=>a.l-b.l);
+   return [.08,.60,.97].map(q=>{
+     const center=Math.min(selected.length-1,Math.floor(q*selected.length)),radius=Math.max(1,Math.floor(selected.length*.035));
+     let r=0,g=0,b=0,n=0;
+     for(let i=Math.max(0,center-radius);i<=Math.min(selected.length-1,center+radius);i++){const c=selected[i];r+=c.r;g+=c.g;b+=c.b;n++}
+     return [r/n,g/n,b/n];
+   });
+ }
+ function ghostColorPalettes(){
+   const boxes={
+     moon:[.69,.025,.83,.14],ghost:[.29,.49,.43,.60],pink:[.344,.414,.369,.435],red:[.39,.451,.417,.469],
+     bat:[.714,.035,.752,.082],wall:[.55,.28,.575,.32],roof:[.493,.084,.529,.124],
+     cloud:[.89,.14,.98,.22],glass:[.50,.17,.54,.25],leaf:[.37,.10,.48,.20],white:[.28,.43,.36,.55],cream:[.04,.91,.09,.94]
+   },palettes={};
+   for(const [role,box] of Object.entries(boxes)){
+     const samples=[];
+     for(let y=Math.floor(box[1]*H);y<Math.floor(box[3]*H);y+=2)for(let x=Math.floor(box[0]*W);x<Math.floor(box[2]*W);x+=2){
+       const k=(y*W+x)*4,c=ghostSample(ghostReferencePixels[k],ghostReferencePixels[k+1],ghostReferencePixels[k+2]);
+       if(role==="leaf"&&!(c.h<.18&&c.s>.4&&c.v>.25))continue;
+       if(role==="glass"&&!(c.h>.04&&c.h<.18&&c.s>.4&&c.v>.6))continue;
+       if(role==="cloud"&&!(c.h>.5&&c.h<.75&&c.s<.6&&c.v>.25))continue;
+       if(role==="white"&&!(c.s<.18&&c.v>.8))continue;
+       if(role==="bat"&&!(c.v<.35))continue;
+       if(c.v>.06)samples.push(c);
+     }
+     palettes[role]=ghostShades(samples,true);
+   }
+   return palettes;
+ }
+ function ghostRegionShades(region,palettes){
+   if(region.hint&&palettes[region.hint])return palettes[region.hint];
+   const samples=[],stride=Math.max(1,Math.floor(region.pixels.length/1600));
+   for(let i=0;i<region.pixels.length;i+=stride){const k=region.pixels[i]*4;samples.push(ghostSample(ghostReferencePixels[k],ghostReferencePixels[k+1],ghostReferencePixels[k+2]))}
+   return ghostShades(samples);
+ }
+ function paintGhostRegion(region){
+   if(!region.shades)return;
    const width=region.maxX-region.minX+1,height=region.maxY-region.minY+1,mask=document.createElement("canvas");
    mask.width=width;mask.height=height;
-   const maskCtx=mask.getContext("2d"),image=maskCtx.createImageData(width,height),data=image.data,canvasW=Math.round(W/region.scaleX);
+   const maskCtx=mask.getContext("2d"),image=maskCtx.createImageData(width,height),data=image.data,stops=region.shades;
    for(const index of region.pixels){
-     const x=index%canvasW,y=(index/canvasW)|0,source=(y*W+x)*4,dest=((y-region.minY)*width+x-region.minX)*4;
-     data[dest]=ghostReferencePixels[source];data[dest+1]=ghostReferencePixels[source+1];data[dest+2]=ghostReferencePixels[source+2];data[dest+3]=255;
+     const x=index%W-region.minX,y=((index/W)|0)-region.minY,k=(y*width+x)*4;
+     const t=Math.max(0,Math.min(1,.55+.50*(x/width-.5)-.60*(y/height-.5))),a=t<.5?stops[0]:stops[1],b=t<.5?stops[1]:stops[2],mix=t<.5?t*2:(t-.5)*2;
+     data[k]=a[0]+(b[0]-a[0])*mix;data[k+1]=a[1]+(b[1]-a[1])*mix;data[k+2]=a[2]+(b[2]-a[2])*mix;data[k+3]=255;
    }
    maskCtx.putImageData(image,0,0);
-   ctx.drawImage(mask,region.minX*region.scaleX,region.minY*region.scaleY,width*region.scaleX,height*region.scaleY);
+   ctx.drawImage(mask,region.minX,region.minY);
  }
  function paintAutoRegion(region,fillColor){
    const width=region.maxX-region.minX+1,height=region.maxY-region.minY+1,mask=document.createElement("canvas");
@@ -259,7 +385,7 @@ c.putImageData(out,0,0)
  } async function runAutoColor(){
    if(!autoButton||autoRunning||!W)return;
    if(acts.length&&!confirm("Automatisk färgläggning börjar från en tom bild. Vill du rensa din målning och fortsätta?"))return;
-   acts=[];future=[];ctx.clearRect(0,0,W,H);historyUI();autoRunning=true;autoButton.disabled=true;
+   acts=[];future=[];ctx.clearRect(0,0,W,H);lines.style.opacity="";autoRunning=true;historyUI();autoButton.disabled=true;
    autoProgress.hidden=false;autoProgress.value=0;sheet.style.pointerEvents="none";toolSet("fill");
    const isNidoking=TARGET.toLocaleLowerCase("sv")==="nidoking";
    const isGhost=TARGET.toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset";
@@ -267,21 +393,10 @@ c.putImageData(out,0,0)
    if(isGhost){
      status.textContent="Hämtar färgreferensen…";
      try{await getGhostReference()}catch{autoRunning=false;autoButton.disabled=false;autoProgress.hidden=true;sheet.style.pointerEvents="";status.textContent="Färgreferensen kunde inte öppnas. Försök igen.";return}
-     status.textContent="Förbereder referensen för stegvis visning…";
-     await new Promise(resolve=>requestAnimationFrame(()=>resolve()));
-     const tileSize=64,tiles=[];
-     for(let y=0;y<H;y+=tileSize)for(let x=0;x<W;x+=tileSize){
-       const width=Math.min(tileSize,W-x),height=Math.min(tileSize,H-y);
-       tiles.push({type:"ghostRegion",region:{tile:true,x,y,width,height}});
-     }
-     // Reveal exact reference pixels in small sections, starting near the
-     // center. Hide the different target line art during this pass.
-     tiles.sort((a,b)=>{
-       const ax=a.region.x+a.region.width/2-W/2,ay=a.region.y+a.region.height/2-H/2;
-       const bx=b.region.x+b.region.width/2-W/2,by=b.region.y+b.region.height/2-H/2;
-       return ax*ax+ay*ay-(bx*bx+by*by);
-     });
-     plan=tiles;lines.style.opacity="0";
+     ghostReferencePixels=ghostAlignedReference();
+     const regions=await findGhostRegions(),palettes=ghostColorPalettes();
+     for(const region of regions)region.shades=ghostRegionShades(region,palettes);
+     plan=regions.map(region=>({type:"ghostRegion",region}));
    }else if(isNidoking)plan=autoSteps.map(step=>({type:"seed",x:Math.min(W-1,Math.max(0,Math.round(step[0]*W))),y:Math.min(H-1,Math.max(0,Math.round(step[1]*H))),color:step[2]}));
    else{
      status.textContent="Hittar slutna färgområden…";
@@ -310,14 +425,14 @@ c.putImageData(out,0,0)
      }
      future=[];autoProgress.value=i+1;
      status.textContent="Timelapse: färglägger "+TARGET+", steg "+(i+1)+" av "+plan.length+"…";historyUI();
-     await new Promise(resolve=>setTimeout(resolve,isGhost?Math.max(1,Math.min(16,4000/plan.length)):115));
+     await new Promise(resolve=>setTimeout(resolve,isGhost?Math.max(8,Math.min(30,18000/plan.length)):115));
    }
-   if(isGhost){acts=[{type:"ghostFinal"}];future=[];redraw()}
-   autoRunning=false;sheet.style.pointerEvents="";
+   // Keep the actual region fills as the final result. Never swap in a photo.
+   autoRunning=false;sheet.style.pointerEvents="";historyUI();
    status.textContent=isGhost?"Klart! "+TARGET+" är färglagd enligt färgreferensen. Du kan fortsätta måla eller spara bilden.":"Klart! "+TARGET+" är färglagd. Du kan fortsätta måla eller spara bilden.";
  }
  if(autoButton)autoButton.addEventListener("click",runAutoColor);
- function redraw(){const exactGhost=acts.some(a=>a.type==="ghostFinal");lines.style.opacity=exactGhost?"0":"";ctx.clearRect(0,0,W,H);for(const a of acts){if(a.type==="ghostFinal"){if(ghostReference)ctx.drawImage(ghostReference,0,0,W,H)}else if(a.type==="ghostRegions"){for(const region of a.regions)paintGhostRegion(region)}else if(a.type==="ghostRegion"){paintGhostRegion(a.region)}else if(a.type==="fill"){const old=color;color=a.color;fillRegion(ctx,a.x,a.y);color=old}else if(a.type==="region"){paintAutoRegion(a.region,a.color)}else drawStroke(ctx,a)}historyUI()}
+ function redraw(){lines.style.opacity="";ctx.clearRect(0,0,W,H);for(const a of acts){if(a.type==="ghostRegions"){for(const region of a.regions)paintGhostRegion(region)}else if(a.type==="ghostRegion"){paintGhostRegion(a.region)}else if(a.type==="fill"){const old=color;color=a.color;fillRegion(ctx,a.x,a.y);color=old}else if(a.type==="region"){paintAutoRegion(a.region,a.color)}else drawStroke(ctx,a)}historyUI()}
  function pos(e){const r=sheet.getBoundingClientRect();return [(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H]}
  const pointers=new Map();
  sheet.addEventListener("pointerdown",e=>{if(!W)return;e.preventDefault();sheet.setPointerCapture(e.pointerId);pointers.set(e.pointerId,[e.clientX,e.clientY]);
@@ -330,12 +445,12 @@ c.putImageData(out,0,0)
  sheet.addEventListener("pointerup",e=>{pointers.delete(e.pointerId);if(gesture){if(!pointers.size){gesture=false;pinch=null}active=null;return}if(pending&&pending.pointer===e.pointerId){if(pending){const p=pending.p;const a={type:"fill",x:p[0],y:p[1],color};acts.push(a);future=[];fillRegion(ctx,a.x,a.y);historyUI()}pending=null}if(active&&!active.pan){active=null;historyUI()}else if(active?.pan)active=null});
  sheet.addEventListener("pointercancel",e=>{pointers.delete(e.pointerId);pending=null;gesture=true;active=null;if(!pointers.size){gesture=false;pinch=null}});
  sheet.addEventListener("contextmenu",e=>e.preventDefault());
- const undoOne=()=>{if(acts.length)future.push(acts.pop());redraw()},redoOne=()=>{if(future.length)acts.push(future.pop());redraw()};
+ const undoOne=()=>{if(autoRunning)return;if(acts.length)future.push(acts.pop());redraw()},redoOne=()=>{if(autoRunning)return;if(future.length)acts.push(future.pop());redraw()};
  undo.onclick=undoOne;redo.onclick=redoOne;
  back.querySelector('[data-action="minus"]').onclick=()=>setZoom(zoom-.25);back.querySelector('[data-action="plus"]').onclick=()=>setZoom(zoom+.25);back.querySelector('[data-action="one"]').onclick=()=>setZoom(1);
  stage.addEventListener("wheel",e=>{if(!e.ctrlKey&&!e.metaKey)return;e.preventDefault();setZoom(zoom+(e.deltaY<0?.15:-.15))},{passive:false});
  back.querySelector('[data-action="reset"]').onclick=()=>{if(autoRunning)return;if(confirm("Vill du radera hela målningen och börja om?")){acts=[];future=[];autoProgress.hidden=true;autoProgress.value=0;if(autoButton)autoButton.disabled=false;status.textContent="Välj färg och tryck på ett område. Två fingrar flyttar och zoomar. Dator: håll mellanslag och dra.";redraw()}};
- back.querySelector('[data-action="save"]').onclick=()=>{if(!W)return;const out=document.createElement("canvas");out.width=img.naturalWidth;out.height=img.naturalHeight;const c=out.getContext("2d");c.drawImage(paint,0,0,out.width,out.height);if(!acts.some(a=>a.type==="ghostFinal"))c.drawImage(lines,0,0,out.width,out.height);out.toBlob(blob=>{if(!blob)return;const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="min-farglagda-"+TARGET.toLocaleLowerCase("sv").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")+".png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},"image/png")};
+ back.querySelector('[data-action="save"]').onclick=()=>{if(!W)return;const out=document.createElement("canvas");const ghostTarget=dialog.classList.contains("fp-paint-ghost");out.width=ghostTarget?W:img.naturalWidth;out.height=ghostTarget?H:img.naturalHeight;const c=out.getContext("2d");c.drawImage(paint,0,0,out.width,out.height);c.drawImage(lines,0,0,out.width,out.height);out.toBlob(blob=>{if(!blob)return;const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="min-farglagda-"+TARGET.toLocaleLowerCase("sv").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")+".png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},"image/png")};
  function close(){window.removeEventListener("resize",fit);window.removeEventListener("keydown",keydown);window.removeEventListener("keyup",keyup);back.remove();document.body.style.overflow="";addButton()}
  back.querySelector(".fp-paint-close").onclick=close;back.addEventListener("click",e=>{if(e.target===back)close()});const keydown=e=>{if(e.code==="Space"){space=true;if(e.target===document.body||e.target===back)e.preventDefault()}if(e.key==="Escape")close();if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){e.preventDefault();e.shiftKey?redoOne():undoOne()}};const keyup=e=>{if(e.code==="Space")space=false};window.addEventListener("keydown",keydown);window.addEventListener("keyup",keyup);back.addEventListener("keydown",e=>{if(e.code==="Space")e.preventDefault()});back.tabIndex=-1;back.focus();
 }
