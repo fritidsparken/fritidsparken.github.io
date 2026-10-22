@@ -237,20 +237,14 @@ c.putImageData(out,0,0)
    const width=region.maxX-region.minX+1,height=region.maxY-region.minY+1,mask=document.createElement("canvas");
    mask.width=width;mask.height=height;
    const maskCtx=mask.getContext("2d"),image=maskCtx.createImageData(width,height),data=image.data,canvasW=Math.round(W/region.scaleX);
-   let red=0,green=0,blue=0,samples=0;
-   // Take color from the reference while keeping all ink exclusively from
-   // the original line-art layer.
+   // Copy the reference's real pixels into this enclosed area. This keeps
+   // the timelapse colors identical to the reference shown at the end.
    for(const index of region.pixels){
-     const x=index%canvasW,y=(index/canvasW)|0,source=(y*W+x)*4;
-     const r=ghostReferencePixels[source],g=ghostReferencePixels[source+1],b=ghostReferencePixels[source+2];
-     const max=Math.max(r,g,b),min=Math.min(r,g,b),luma=(r*299+g*587+b*114)/1000;
-     if(luma>105&&(max-min>18||luma>205)){red+=r;green+=g;blue+=b;samples++}
-   }
-   if(!samples){red=green=blue=255;samples=1}
-   red=Math.round(red/samples);green=Math.round(green/samples);blue=Math.round(blue/samples);
-   for(const index of region.pixels){
-     const x=index%canvasW,y=(index/canvasW)|0,dest=((y-region.minY)*width+x-region.minX)*4;
-     data[dest]=red;data[dest+1]=green;data[dest+2]=blue;data[dest+3]=255;
+     const x=index%canvasW,y=(index/canvasW)|0,source=(y*W+x)*4,dest=((y-region.minY)*width+x-region.minX)*4;
+     data[dest]=ghostReferencePixels[source];
+     data[dest+1]=ghostReferencePixels[source+1];
+     data[dest+2]=ghostReferencePixels[source+2];
+     data[dest+3]=255;
    }
    maskCtx.putImageData(image,0,0);
    ctx.drawImage(mask,region.minX*region.scaleX,region.minY*region.scaleY,width*region.scaleX,height*region.scaleY);
@@ -270,6 +264,7 @@ c.putImageData(out,0,0)
    autoProgress.hidden=false;autoProgress.value=0;sheet.style.pointerEvents="none";toolSet("fill");
    const isNidoking=TARGET.toLocaleLowerCase("sv")==="nidoking";
    const isGhost=TARGET.toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset";
+   if(isGhost)lines.style.opacity="0";
    let plan;
    if(isGhost){
      status.textContent="Hämtar färgreferensen…";
@@ -312,7 +307,7 @@ c.putImageData(out,0,0)
    status.textContent=isGhost?"Klart! "+TARGET+" är färglagd enligt färgreferensen. Du kan fortsätta måla eller spara bilden.":"Klart! "+TARGET+" är färglagd. Du kan fortsätta måla eller spara bilden.";
  }
  if(autoButton)autoButton.addEventListener("click",runAutoColor);
- function redraw(){const exactGhost=acts.some(a=>a.type==="ghostFinal");lines.style.opacity=exactGhost?"0":"";ctx.clearRect(0,0,W,H);for(const a of acts){if(a.type==="ghostFinal"){if(ghostReference)ctx.drawImage(ghostReference,0,0,W,H)}else if(a.type==="ghostRegions"){for(const region of a.regions)paintGhostRegion(region)}else if(a.type==="ghostRegion"){paintGhostRegion(a.region)}else if(a.type==="fill"){const old=color;color=a.color;fillRegion(ctx,a.x,a.y);color=old}else if(a.type==="region"){paintAutoRegion(a.region,a.color)}else drawStroke(ctx,a)}historyUI()}
+ function redraw(){const referencePass=acts.some(a=>a.type==="ghostFinal"||a.type==="ghostRegion"||a.type==="ghostRegions");lines.style.opacity=referencePass?"0":"";ctx.clearRect(0,0,W,H);for(const a of acts){if(a.type==="ghostFinal"){if(ghostReference)ctx.drawImage(ghostReference,0,0,W,H)}else if(a.type==="ghostRegions"){for(const region of a.regions)paintGhostRegion(region)}else if(a.type==="ghostRegion"){paintGhostRegion(a.region)}else if(a.type==="fill"){const old=color;color=a.color;fillRegion(ctx,a.x,a.y);color=old}else if(a.type==="region"){paintAutoRegion(a.region,a.color)}else drawStroke(ctx,a)}historyUI()}
  function pos(e){const r=sheet.getBoundingClientRect();return [(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H]}
  const pointers=new Map();
  sheet.addEventListener("pointerdown",e=>{if(!W)return;e.preventDefault();sheet.setPointerCapture(e.pointerId);pointers.set(e.pointerId,[e.clientX,e.clientY]);
