@@ -139,7 +139,7 @@ function openPainter(IMAGE,TARGET){
  ];
  const autoButton=$('[data-action="auto"]'),autoProgress=document.createElement("progress"),status=$(".fp-paint-status");
  let autoRunning=false;
- let ghostReference=null;
+ let ghostReference=null,ghostReferencePixels=null;
  const getGhostReference=()=>new Promise((resolve,reject)=>{if(ghostReference?.complete&&ghostReference.naturalWidth){resolve(ghostReference);return}const ref=new Image();ref.onload=()=>{ghostReference=ref;resolve(ref)};ref.onerror=reject;ref.src=new URL(GHOST_REFERENCE,location.href).href});
  autoProgress.className="fp-auto-progress";autoProgress.max=1;autoProgress.value=0;autoProgress.hidden=true;
  status.setAttribute("aria-live","polite");if(autoButton)dialog.insertBefore(autoProgress,stage);
@@ -203,7 +203,7 @@ c.putImageData(out,0,0)
        if(y<RH-1&&(n=i+RW,!seen[n]&&reduced[n]>=220)){seen[n]=1;queue[tail++]=n}
        if(++visits%24000===0){status.textContent="Hittar slutna färgområden…";await new Promise(resolve=>setTimeout(resolve,0));}
      }
-     if(!touchesEdge&&tail>=(isGhost?3:9)&&(isGhost||tail<total*.45))regions.push({pixels:queue.slice(0,tail),minX,minY,maxX,maxY,area:tail,cx:sumX/tail/RW,cy:sumY/tail/RH,scaleX:W/RW,scaleY:H/RH});
+     if((isGhost||!touchesEdge)&&tail>=(isGhost?3:9)&&(isGhost||tail<total*.45))regions.push({pixels:queue.slice(0,tail),minX,minY,maxX,maxY,area:tail,cx:sumX/tail/RW,cy:sumY/tail/RH,scaleX:W/RW,scaleY:H/RH});
    }
    regions.sort((a,b)=>b.area-a.area);if(!isGhost)regions.length=Math.min(regions.length,160);
    regions.sort((a,b)=>a.minY-b.minY||a.minX-b.minX);
@@ -215,16 +215,20 @@ c.putImageData(out,0,0)
    g.drawImage(ghostReference,W*.04245,H*.04319,W*.9151,H*.91196);
    return g.getImageData(0,0,W,H).data;
  }
- function ghostRegionColor(region,referencePixels){
-   const canvasW=Math.round(W/region.scaleX),samples=[],stride=Math.max(1,Math.floor(region.pixels.length/700));
-   for(let n=0;n<region.pixels.length;n+=stride){
-     const i=region.pixels[n],x=i%canvasW,y=(i/canvasW)|0,k=(y*W+x)*4;
-     const r=referencePixels[k],g=referencePixels[k+1],b=referencePixels[k+2];
-     if(Math.max(r,g,b)>58)samples.push([r,g,b]);
+ function paintGhostRegion(region){
+   if(!ghostReferencePixels)return;
+   const width=region.maxX-region.minX+1,height=region.maxY-region.minY+1,mask=document.createElement("canvas");
+   mask.width=width;mask.height=height;
+   const maskCtx=mask.getContext("2d"),image=maskCtx.createImageData(width,height),data=image.data,canvasW=Math.round(W/region.scaleX);
+   for(const index of region.pixels){
+     const x=index%canvasW,y=(index/canvasW)|0,source=(y*W+x)*4,dest=((y-region.minY)*width+x-region.minX)*4;
+     const r=ghostReferencePixels[source],g=ghostReferencePixels[source+1],b=ghostReferencePixels[source+2];
+     if(Math.max(r,g,b)<150&&Math.max(r,g,b)-Math.min(r,g,b)<22)data[dest]=data[dest+1]=data[dest+2]=255;
+     else {data[dest]=r;data[dest+1]=g;data[dest+2]=b}
+     data[dest+3]=255;
    }
-   if(!samples.length){const i=region.pixels[(region.pixels.length/2)|0],x=i%canvasW,y=(i/canvasW)|0,k=(y*W+x)*4;samples.push([referencePixels[k],referencePixels[k+1],referencePixels[k+2]])}
-   const channel=n=>{const a=samples.map(v=>v[n]).sort((x,y)=>x-y);return a[a.length>>1]};
-   return "#"+[channel(0),channel(1),channel(2)].map(v=>Math.round(v).toString(16).padStart(2,"0")).join("");
+   maskCtx.putImageData(image,0,0);
+   ctx.drawImage(mask,region.minX*region.scaleX,region.minY*region.scaleY,width*region.scaleX,height*region.scaleY);
  }
  function paintAutoRegion(region,fillColor){
    const width=region.maxX-region.minX+1,height=region.maxY-region.minY+1,mask=document.createElement("canvas");
@@ -247,8 +251,8 @@ c.putImageData(out,0,0)
      try{await getGhostReference()}catch{autoRunning=false;autoButton.disabled=false;autoProgress.hidden=true;sheet.style.pointerEvents="";status.textContent="Färgreferensen kunde inte öppnas. Försök igen.";return}
      status.textContent="Hittar alla slutna ytor i originalbilden…";
      await new Promise(resolve=>requestAnimationFrame(()=>resolve()));
-     const regions=await findAutoRegions(true),referencePixels=ghostAlignedReference();
-     plan=regions.map(region=>({type:"region",region,color:ghostRegionColor(region,referencePixels)}));
+     const regions=await findAutoRegions(true);ghostReferencePixels=ghostAlignedReference();
+     plan=regions.map(region=>({type:"ghostRegion",region}));
    }else if(isNidoking)plan=autoSteps.map(step=>({type:"seed",x:Math.min(W-1,Math.max(0,Math.round(step[0]*W))),y:Math.min(H-1,Math.max(0,Math.round(step[1]*H))),color:step[2]}));
    else{
      status.textContent="Hittar slutna färgområden…";
@@ -270,17 +274,20 @@ c.putImageData(out,0,0)
      }else if(step.type==="region"){
        paintAutoRegion(step.region,step.color);
        acts.push({type:"region",region:step.region,color:step.color});
+     }else if(step.type==="ghostRegion"){
+       paintGhostRegion(step.region);
+       acts.push({type:"ghostRegion",region:step.region});
      }
      future=[];autoProgress.value=i+1;
      status.textContent="Timelapse: färglägger "+TARGET+", steg "+(i+1)+" av "+plan.length+"…";historyUI();
      await new Promise(resolve=>setTimeout(resolve,isGhost?Math.max(1,Math.min(16,4000/plan.length)):115));
    }
-   if(isGhost){acts=[{type:"ghostRegions",regions:plan.map(step=>({region:step.region,color:step.color}))}];future=[];redraw()}
+   if(isGhost){acts=[{type:"ghostRegions",regions:plan.map(step=>step.region)}];future=[];redraw()}
    autoRunning=false;sheet.style.pointerEvents="";
    status.textContent=isGhost?"Klart! "+TARGET+" är färglagd enligt färgreferensen. Du kan fortsätta måla eller spara bilden.":"Klart! "+TARGET+" är färglagd. Du kan fortsätta måla eller spara bilden.";
  }
  if(autoButton)autoButton.addEventListener("click",runAutoColor);
- function redraw(){lines.style.opacity="";ctx.clearRect(0,0,W,H);for(const a of acts){if(a.type==="ghostRegions"){for(const step of a.regions)paintAutoRegion(step.region,step.color)}else if(a.type==="fill"){const old=color;color=a.color;fillRegion(ctx,a.x,a.y);color=old}else if(a.type==="region"){paintAutoRegion(a.region,a.color)}else drawStroke(ctx,a)}historyUI()}
+ function redraw(){lines.style.opacity="";ctx.clearRect(0,0,W,H);for(const a of acts){if(a.type==="ghostRegions"){for(const region of a.regions)paintGhostRegion(region)}else if(a.type==="ghostRegion"){paintGhostRegion(a.region)}else if(a.type==="fill"){const old=color;color=a.color;fillRegion(ctx,a.x,a.y);color=old}else if(a.type==="region"){paintAutoRegion(a.region,a.color)}else drawStroke(ctx,a)}historyUI()}
  function pos(e){const r=sheet.getBoundingClientRect();return [(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H]}
  const pointers=new Map();
  sheet.addEventListener("pointerdown",e=>{if(!W)return;e.preventDefault();sheet.setPointerCapture(e.pointerId);pointers.set(e.pointerId,[e.clientX,e.clientY]);
