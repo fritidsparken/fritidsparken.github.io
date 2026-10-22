@@ -272,6 +272,9 @@ c.putImageData(out,0,0)
      await new Promise(resolve=>requestAnimationFrame(()=>resolve()));
      const regions=await findAutoRegions(true);ghostReferencePixels=ghostAlignedReference();
      plan=regions.map(region=>({type:"ghostRegion",region}));
+     // Hide the mismatched target outline only after segmentation; reveal the
+     // reference itself through each region so contours never double up.
+     lines.style.opacity="0";
    }else if(isNidoking)plan=autoSteps.map(step=>({type:"seed",x:Math.min(W-1,Math.max(0,Math.round(step[0]*W))),y:Math.min(H-1,Math.max(0,Math.round(step[1]*H))),color:step[2]}));
    else{
      status.textContent="Hittar slutna färgområden…";
@@ -280,6 +283,7 @@ c.putImageData(out,0,0)
      plan=regions.map(region=>({type:"region",region,color:autoRegionColor(region,regions,paletteColors,guide,TARGET)})).filter(step=>step.color);
    }
    if(!plan.length){
+     if(isGhost)lines.style.opacity="";
      autoRunning=false;autoButton.disabled=false;autoProgress.hidden=true;sheet.style.pointerEvents="";
      status.textContent="Jag hittade inga tydligt slutna områden i bilden. Du kan färglägga den med hink eller penna.";
      return;
