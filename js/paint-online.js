@@ -233,18 +233,17 @@ c.putImageData(out,0,0)
    return g.getImageData(0,0,W,H).data;
  }
  function paintGhostRegion(region){
+   if(region.tile&&ghostReference){
+     ctx.drawImage(ghostReference,region.x,region.y,region.width,region.height,region.x,region.y,region.width,region.height);
+     return;
+   }
    if(!ghostReferencePixels)return;
    const width=region.maxX-region.minX+1,height=region.maxY-region.minY+1,mask=document.createElement("canvas");
    mask.width=width;mask.height=height;
    const maskCtx=mask.getContext("2d"),image=maskCtx.createImageData(width,height),data=image.data,canvasW=Math.round(W/region.scaleX);
-   // Copy the reference's real pixels into this enclosed area. This keeps
-   // the timelapse colors identical to the reference shown at the end.
    for(const index of region.pixels){
      const x=index%canvasW,y=(index/canvasW)|0,source=(y*W+x)*4,dest=((y-region.minY)*width+x-region.minX)*4;
-     data[dest]=ghostReferencePixels[source];
-     data[dest+1]=ghostReferencePixels[source+1];
-     data[dest+2]=ghostReferencePixels[source+2];
-     data[dest+3]=255;
+     data[dest]=ghostReferencePixels[source];data[dest+1]=ghostReferencePixels[source+1];data[dest+2]=ghostReferencePixels[source+2];data[dest+3]=255;
    }
    maskCtx.putImageData(image,0,0);
    ctx.drawImage(mask,region.minX*region.scaleX,region.minY*region.scaleY,width*region.scaleX,height*region.scaleY);
@@ -268,13 +267,21 @@ c.putImageData(out,0,0)
    if(isGhost){
      status.textContent="Hämtar färgreferensen…";
      try{await getGhostReference()}catch{autoRunning=false;autoButton.disabled=false;autoProgress.hidden=true;sheet.style.pointerEvents="";status.textContent="Färgreferensen kunde inte öppnas. Försök igen.";return}
-     status.textContent="Hittar alla slutna ytor i originalbilden…";
+     status.textContent="Förbereder referensen för stegvis visning…";
      await new Promise(resolve=>requestAnimationFrame(()=>resolve()));
-     const regions=await findAutoRegions(true);ghostReferencePixels=ghostAlignedReference();
-     plan=regions.map(region=>({type:"ghostRegion",region}));
-     // Hide the mismatched target outline only after segmentation; reveal the
-     // reference itself through each region so contours never double up.
-     lines.style.opacity="0";
+     const tileSize=64,tiles=[];
+     for(let y=0;y<H;y+=tileSize)for(let x=0;x<W;x+=tileSize){
+       const width=Math.min(tileSize,W-x),height=Math.min(tileSize,H-y);
+       tiles.push({type:"ghostRegion",region:{tile:true,x,y,width,height}});
+     }
+     // Reveal exact reference pixels in small sections, starting near the
+     // center. Hide the different target line art during this pass.
+     tiles.sort((a,b)=>{
+       const ax=a.region.x+a.region.width/2-W/2,ay=a.region.y+a.region.height/2-H/2;
+       const bx=b.region.x+b.region.width/2-W/2,by=b.region.y+b.region.height/2-H/2;
+       return ax*ax+ay*ay-(bx*bx+by*by);
+     });
+     plan=tiles;lines.style.opacity="0";
    }else if(isNidoking)plan=autoSteps.map(step=>({type:"seed",x:Math.min(W-1,Math.max(0,Math.round(step[0]*W))),y:Math.min(H-1,Math.max(0,Math.round(step[1]*H))),color:step[2]}));
    else{
      status.textContent="Hittar slutna färgområden…";
