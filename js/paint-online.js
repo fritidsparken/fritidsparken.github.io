@@ -139,7 +139,7 @@ function openPainter(IMAGE,TARGET){
  let tool="fill",color="#ef4444",brush=14,acts=[],future=[],W=0,H=0,luma=null,zoom=1,tx=0,ty=0,space=false,active=null,pending=null,gesture=false,pinch=null;
  const autoButton=$('[data-action="auto"]'),autoProgress=document.createElement("progress"),status=$(".fp-paint-status");
  let autoRunning=false;
- let ghostReference=null,ghostReferencePixels=null;
+ let ghostReference=null,ghostReferencePixels=null,ghostOriginalInk=null,ghostPumpkinLightMap=null,ghostPumpkinLights=[];
  const getGhostReference=()=>new Promise((resolve,reject)=>{if(ghostReference?.complete&&ghostReference.naturalWidth){resolve(ghostReference);return}const ref=new Image();ref.onload=()=>{ghostReference=ref;resolve(ref)};ref.onerror=reject;const data=window.FP_GHOST_REFERENCE_BASE64;if(!data){reject(new Error("Reference data missing"));return}ref.src="data:image/webp;base64,"+data});
  autoProgress.className="fp-auto-progress";autoProgress.max=1;autoProgress.value=0;autoProgress.hidden=true;
  status.setAttribute("aria-live","polite");if(autoButton)dialog.insertBefore(autoProgress,stage);
@@ -152,7 +152,7 @@ function openPainter(IMAGE,TARGET){
      [paint,lines].forEach(c=>{c.width=W;c.height=H});
      const src=document.createElement("canvas");src.width=W;src.height=H;const sctx=src.getContext("2d",{willReadFrequently:true});sctx.drawImage(img,0,0,W,H);
      const dat=sctx.getImageData(0,0,W,H),d=dat.data;luma=new Uint8Array(W*H);for(let i=0,j=0;i<d.length;i+=4,j++){const g=(d[i]*299+d[i+1]*587+d[i+2]*114)/1000;luma[j]=g;const a=Math.max(0,Math.min(255,Math.round((245-g)*1.7)));d[i]=d[i+1]=d[i+2]=0;d[i+3]=a}
-     lctx.putImageData(dat,0,0);fit();window.addEventListener("resize",fit);
+     lctx.putImageData(dat,0,0);if(isGhostTarget)ghostOriginalInk=lctx.getImageData(0,0,W,H);fit();window.addEventListener("resize",fit);
    };
    if(String(TARGET||"").toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset")getGhostReference().then(prepareCanvas).catch(()=>{status.textContent="Färgreferensen kunde inte öppnas. Stäng och försök igen."});
    else prepareCanvas();
@@ -273,6 +273,7 @@ c.putImageData(out,0,0)
      [820,190,"moon",1],[440,620,"ghost",1],[365,693,"pink",2],[510,739,"pink",2],[432,738,"red",2],
      [400,640,"white",3],[493,687,"white",3],
      [725,85,"bat",10],[852,135,"bat",10],[791,148,"bat",7],[908,235,"bat",8],[977,225,"bat",8],[940,265,"bat",6],[891,247,"bat",7],[999,219,"bat",6],
+     [755,123,"bat",1],[879,134,"bat",1],[1008,193,"bat",1],
      [330,364,"bat",7],[421,374,"bat",7],[370,392,"bat",6],[710,204,"bat",4],
      [566,109,"cloud",8],[623,125,"cloud",8],[1020,61,"cloud",8],[1040,120,"cloud",6],[1027,350,"cloud",6],
      [495,370,"wall",3],[490,440,"wall",3],[461,524,"wall",4],[544,614,"wall",4],
@@ -349,18 +350,72 @@ c.putImageData(out,0,0)
    for(let i=0;i<region.pixels.length;i+=stride){const k=region.pixels[i]*4;samples.push(ghostSample(ghostReferencePixels[k],ghostReferencePixels[k+1],ghostReferencePixels[k+2]))}
    return ghostShades(samples);
  }
+ function prepareGhostPumpkinLights(){
+   ghostPumpkinLightMap=new Uint8Array(W*H);ghostPumpkinLights=[];
+   // Only the carved facial openings, in original drawing coordinates.
+   const faces=[[75,1155,244,1275],[275,1257,379,1335],[798,1205,938,1325],[704,1292,793,1370],[929,1299,1038,1392],[864,984,921,1030],[804,1035,856,1081]];
+   for(const box of faces){
+     const x0=Math.round(box[0]/1054*W),y0=Math.round(box[1]/1492*H),x1=Math.round(box[2]/1054*W),y1=Math.round(box[3]/1492*H),width=x1-x0,height=y1-y0;
+     const distance=new Uint16Array(width*height),seen=new Uint8Array(width*height),queue=new Uint32Array(width*height),parts=[];
+     for(let y=0;y<height;y++)for(let x=0;x<width;x++){
+       const i=y*width+x;if(luma[(y+y0)*W+x+x0]>=110)continue;
+       distance[i]=Math.min(x?distance[i-1]+1:1,y?distance[i-width]+1:1);
+     }
+     for(let y=height-1;y>=0;y--)for(let x=width-1;x>=0;x--){
+       const i=y*width+x;if(distance[i])distance[i]=Math.min(distance[i],x<width-1?distance[i+1]+1:1,y<height-1?distance[i+width]+1:1);
+     }
+     for(let start=0;start<distance.length;start++){
+       if(seen[start]||distance[start]<3)continue;
+       let head=0,tail=1,minX=width,minY=height,maxX=0,maxY=0;queue[0]=start;seen[start]=1;
+       while(head<tail){
+         const i=queue[head++],y=(i/width)|0,x=i-y*width;
+         minX=Math.min(minX,x);minY=Math.min(minY,y);maxX=Math.max(maxX,x);maxY=Math.max(maxY,y);
+         const add=n=>{if(!seen[n]&&distance[n]>=3){seen[n]=1;queue[tail++]=n}};
+         if(x)add(i-1);if(x<width-1)add(i+1);if(y)add(i-width);if(y<height-1)add(i+width);
+       }
+       if(tail>=3)parts.push({pixels:queue.slice(0,tail),minX,minY,maxX,maxY});
+     }
+     // Thin pumpkin grooves are not lights. Retain only eyes, nose and mouth.
+     parts.sort((a,b)=>b.pixels.length-a.pixels.length);
+     for(const part of parts.slice(0,4)){
+       const id=ghostPumpkinLights.length+1;
+       ghostPumpkinLights.push({cx:x0+(part.minX+part.maxX)/2,cy:y0+(part.minY+part.maxY)/2,rx:(part.maxX-part.minX)/2+1,ry:(part.maxY-part.minY)/2+1});
+       for(const i of part.pixels){const y=(i/width)|0,x=i-y*width;ghostPumpkinLightMap[(y+y0)*W+x+x0]=id}
+     }
+   }
+ }
+ function ghostWarmLight(t){
+   t=Math.max(0,Math.min(1,t));
+   const low=[255,125,18],mid=[255,217,76],high=[255,255,220],a=t<.5?low:mid,b=t<.5?mid:high,mix=t<.5?t*2:(t-.5)*2;
+   return [a[0]+(b[0]-a[0])*mix,a[1]+(b[1]-a[1])*mix,a[2]+(b[2]-a[2])*mix];
+ }
  function paintGhostRegion(region){
    if(!region.shades)return;
    const width=region.maxX-region.minX+1,height=region.maxY-region.minY+1,mask=document.createElement("canvas");
    mask.width=width;mask.height=height;
    const maskCtx=mask.getContext("2d"),image=maskCtx.createImageData(width,height),data=image.data,stops=region.shades;
+   let cutout=null;
    for(const index of region.pixels){
      const x=index%W-region.minX,y=((index/W)|0)-region.minY,k=(y*width+x)*4;
      const t=Math.max(0,Math.min(1,.55+.50*(x/width-.5)-.60*(y/height-.5))),a=t<.5?stops[0]:stops[1],b=t<.5?stops[1]:stops[2],mix=t<.5?t*2:(t-.5)*2;
      data[k]=a[0]+(b[0]-a[0])*mix;data[k+1]=a[1]+(b[1]-a[1])*mix;data[k+2]=a[2]+(b[2]-a[2])*mix;data[k+3]=255;
+     if(region.hint==="glass"){
+       const light=ghostWarmLight(1-.65*Math.hypot((x/Math.max(1,width-1)-.5)*2,(y/Math.max(1,height-1)-.55)*1.5));
+       data[k]=light[0];data[k+1]=light[1];data[k+2]=light[2];
+     }
+     const lightId=ghostPumpkinLightMap?.[index];
+     if(lightId){
+       const p=ghostPumpkinLights[lightId-1],light=ghostWarmLight(1-.72*Math.hypot((x+region.minX-p.cx)/p.rx,(y+region.minY-p.cy)/p.ry));
+       data[k]=light[0];data[k+1]=light[1];data[k+2]=light[2];
+       if(!cutout)cutout=maskCtx.createImageData(width,height);cutout.data[k+3]=255;
+     }
    }
    maskCtx.putImageData(image,0,0);
    ctx.drawImage(mask,region.minX,region.minY);
+   if(cutout){
+     // Remove only ink inside the carved openings; retain their black edges.
+     maskCtx.putImageData(cutout,0,0);lctx.save();lctx.globalCompositeOperation="destination-out";lctx.drawImage(mask,region.minX,region.minY);lctx.restore();
+   }
  }
  function paintAutoRegion(region,fillColor){
    const width=region.maxX-region.minX+1,height=region.maxY-region.minY+1,mask=document.createElement("canvas");
@@ -373,7 +428,7 @@ c.putImageData(out,0,0)
  } async function runAutoColor(){
    if(!autoButton||autoRunning||!W)return;
    if(acts.length&&!confirm("Automatisk färgläggning börjar från en tom bild. Vill du rensa din målning och fortsätta?"))return;
-   acts=[];future=[];ctx.clearRect(0,0,W,H);lines.style.opacity="";autoRunning=true;historyUI();autoButton.disabled=true;
+   acts=[];future=[];ctx.clearRect(0,0,W,H);if(ghostOriginalInk)lctx.putImageData(ghostOriginalInk,0,0);lines.style.opacity="";autoRunning=true;historyUI();autoButton.disabled=true;
    autoProgress.hidden=false;autoProgress.value=0;sheet.style.pointerEvents="none";toolSet("fill");
    const isGhost=TARGET.toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset";
    let plan;
@@ -382,6 +437,7 @@ c.putImageData(out,0,0)
      try{await getGhostReference()}catch{autoRunning=false;autoButton.disabled=false;autoProgress.hidden=true;sheet.style.pointerEvents="";status.textContent="Färgreferensen kunde inte öppnas. Försök igen.";return}
      ghostReferencePixels=ghostAlignedReference();
      const regions=await findGhostRegions(),palettes=ghostColorPalettes();
+     prepareGhostPumpkinLights();
      for(const region of regions)region.shades=ghostRegionShades(region,palettes);
      plan=regions.map(region=>({type:"ghostRegion",region}));
    }else{
@@ -416,7 +472,7 @@ c.putImageData(out,0,0)
    status.textContent=isGhost?"Klart! "+TARGET+" är färglagd enligt färgreferensen. Du kan fortsätta måla eller spara bilden.":"Klart! "+TARGET+" är färglagd. Du kan fortsätta måla eller spara bilden.";
  }
  if(autoButton)autoButton.addEventListener("click",runAutoColor);
- function redraw(){lines.style.opacity="";ctx.clearRect(0,0,W,H);for(const a of acts){if(a.type==="ghostRegions"){for(const region of a.regions)paintGhostRegion(region)}else if(a.type==="ghostRegion"){paintGhostRegion(a.region)}else if(a.type==="fill"){const old=color;color=a.color;fillRegion(ctx,a.x,a.y);color=old}else if(a.type==="region"){paintAutoRegion(a.region,a.color)}else drawStroke(ctx,a)}historyUI()}
+ function redraw(){lines.style.opacity="";if(ghostOriginalInk)lctx.putImageData(ghostOriginalInk,0,0);ctx.clearRect(0,0,W,H);for(const a of acts){if(a.type==="ghostRegions"){for(const region of a.regions)paintGhostRegion(region)}else if(a.type==="ghostRegion"){paintGhostRegion(a.region)}else if(a.type==="fill"){const old=color;color=a.color;fillRegion(ctx,a.x,a.y);color=old}else if(a.type==="region"){paintAutoRegion(a.region,a.color)}else drawStroke(ctx,a)}historyUI()}
  function pos(e){const r=sheet.getBoundingClientRect();return [(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H]}
  const pointers=new Map();
  sheet.addEventListener("pointerdown",e=>{if(!W)return;e.preventDefault();sheet.setPointerCapture(e.pointerId);pointers.set(e.pointerId,[e.clientX,e.clientY]);
@@ -439,3 +495,4 @@ c.putImageData(out,0,0)
  back.querySelector(".fp-paint-close").onclick=close;back.addEventListener("click",e=>{if(e.target===back)close()});const keydown=e=>{if(e.code==="Space"){space=true;if(e.target===document.body||e.target===back)e.preventDefault()}if(e.key==="Escape")close();if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){e.preventDefault();e.shiftKey?redoOne():undoOne()}};const keyup=e=>{if(e.code==="Space")space=false};window.addEventListener("keydown",keydown);window.addEventListener("keyup",keyup);back.addEventListener("keydown",e=>{if(e.code==="Space")e.preventDefault()});back.tabIndex=-1;back.focus();
 }
 })();
+
