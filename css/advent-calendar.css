@@ -20,3 +20,29 @@ body:not(.christmas) .advent,body.halloween .advent,.advent[hidden],body:not(.ch
 @media(prefers-reduced-motion:reduce){.advent *, .advent *:before,.advent *:after,.advent-dialog *,.advent-dialog *:before,.advent-dialog *:after{animation:none!important;transition:none!important}.advent-door:hover{transform:none}.is-opening .advent-hinge{display:none}.is-opening .advent-animal,.is-opening .advent-message,.is-opening .advent-finale{opacity:1;transform:none}.advent-particles{display:none}}
 
 .advent-particles i:nth-child(n+29){display:none}.is-finale .advent-particles i:nth-child(n+29){display:block}
+
+/* Fit the complete joke, answer and controls inside the current viewport. */
+.advent-dialog{box-sizing:border-box;height:min(780px,calc(100dvh - 24px));max-height:calc(100dvh - 24px);overflow:hidden}
+.advent-popup{box-sizing:border-box;height:100%;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto auto auto auto;gap:10px;padding:18px 24px}
+.advent-popup h2{margin:0 40px 2px;font-size:23px}
+.advent-stage{box-sizing:border-box;align-self:center;justify-self:center;height:100%;max-height:410px;width:auto;max-width:100%;min-height:0;aspect-ratio:1;margin:0}
+.advent-message{margin:0 auto;max-width:100%;font-size:clamp(17px,2.6vw,23px);line-height:1.25;overflow-wrap:anywhere}
+.advent-answer{margin:0;color:#ffe0a0;font:600 clamp(17px,2.6vw,23px)/1.25 Georgia,serif;overflow-wrap:anywhere}
+.advent-answer[hidden]{display:none}
+.advent-finale{margin:0;font-size:13px;line-height:1.2}
+.advent-popup-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:8px}
+.advent-popup-actions button{min-height:44px;padding:10px 18px;font:700 14px/1.2 system-ui,sans-serif}
+.advent-show-answer{border:1px solid #eccb80;border-radius:25px;background:#f3d99d;color:#322618;cursor:pointer}
+.advent-show-answer:disabled{opacity:.45;cursor:default}
+.advent-show-answer[hidden]{display:none}
+@media(max-width:420px){.advent-popup{padding:14px;gap:9px}.advent-popup h2{font-size:20px}.advent-popup-actions button{padding:10px 13px}}
+@media(max-height:500px) and (min-width:500px){
+ .advent-dialog{width:min(840px,calc(100% - 24px));max-width:840px}
+ .advent-popup{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);grid-template-rows:auto minmax(0,1fr) auto auto auto;column-gap:20px;row-gap:8px;padding:12px 20px}
+ .advent-popup h2{grid-column:1/-1;font-size:20px}
+ .advent-stage{grid-column:1;grid-row:2/6;max-height:100%}
+ .advent-message,.advent-answer,.advent-finale,.advent-popup-actions{grid-column:2;align-self:center}
+ .advent-message,.advent-answer{font-size:18px;line-height:1.2}
+ .advent-popup-actions button{padding:8px 12px}
+ .advent-hinge span{font-size:25px}.advent-hinge b{font-size:65px}.advent-hinge small{font-size:10px;margin-top:8px}
+}

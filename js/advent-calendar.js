@@ -24,7 +24,7 @@
     grid.append(button);
   }
   const dialog=document.createElement('dialog');dialog.className='advent-dialog';dialog.setAttribute('aria-labelledby','advent-date');
-  dialog.innerHTML=`<article class="advent-popup"><div class="advent-snow" aria-hidden="true"></div><button type="button" class="advent-close" aria-label="Stäng luckan">×</button><h2 id="advent-date"></h2><div class="advent-stage"><div class="advent-light" aria-hidden="true"></div><div class="advent-animal"><img width="800" height="800" alt="" decoding="async"></div><div class="advent-hinge" aria-hidden="true"><span>✦</span><b></b><small>Lite julmagi väntar…</small></div><div class="advent-particles" aria-hidden="true"></div></div><p class="advent-message"></p><p class="advent-finale" hidden>En riktigt god jul från oss på Fritidsparken! ✨</p><button type="button" class="advent-shut">Stäng luckan</button></article>`;
+  dialog.innerHTML=`<article class="advent-popup"><div class="advent-snow" aria-hidden="true"></div><button type="button" class="advent-close" aria-label="Stäng luckan">×</button><h2 id="advent-date"></h2><div class="advent-stage"><div class="advent-light" aria-hidden="true"></div><div class="advent-animal"><img width="800" height="800" alt="" decoding="async"></div><div class="advent-hinge" aria-hidden="true"><span>✦</span><b></b><small>Lite julmagi väntar…</small></div><div class="advent-particles" aria-hidden="true"></div></div><p class="advent-message"></p><p class="advent-answer" id="advent-answer" hidden aria-live="polite"></p><p class="advent-finale" hidden>En riktigt god jul från oss på Fritidsparken! ✨</p><div class="advent-popup-actions"><button type="button" class="advent-show-answer" aria-controls="advent-answer" aria-expanded="false" disabled>Visa svaret</button><button type="button" class="advent-shut">Stäng luckan</button></div></article>`;
   document.body.append(dialog);
   const image=dialog.querySelector('img'),particles=dialog.querySelector('.advent-particles');
   for(let i=0;i<56;i++){const p=document.createElement('i');p.textContent=i%3?'✦':'❄';p.style.cssText=`--x:${(i*37)%100}%;--delay:${(i%7)*.12}s;--drift:${(i%2?1:-1)*(20+i%40)}px;--size:${9+i%10}px`;particles.append(p);}
@@ -90,7 +90,13 @@
     notice.textContent='';returnFocus=button;
     const entry=days[day-1];image.src=entry.image;image.alt=entry.animal;
     dialog.querySelector('#advent-date').textContent=`${day} december`;
-    dialog.querySelector('.advent-message').textContent=entry.message;
+    const separator=entry.message.indexOf(' – ');
+    dialog.querySelector('.advent-message').textContent=separator>=0?entry.message.slice(0,separator):entry.message;
+    dialog.querySelector('.advent-answer').textContent=separator>=0?entry.message.slice(separator+3):'';
+    dialog.querySelector('.advent-answer').hidden=true;
+    const answerButton=dialog.querySelector('.advent-show-answer');
+    answerButton.hidden=separator<0;answerButton.disabled=true;
+    answerButton.textContent='Visa svaret';answerButton.setAttribute('aria-expanded','false');
     dialog.querySelector('.advent-hinge b').textContent=day;
     dialog.querySelector('.advent-finale').hidden=day!==24;
     dialog.classList.toggle('is-finale',day===24);
@@ -102,11 +108,18 @@
     revealTimer=setTimeout(()=>{
       if(!dialog.open||!isChristmas()||day>availableDoors(now())){close();return;}
       dialog.classList.add('is-revealed');
+      dialog.querySelector('.advent-show-answer').disabled=false;
       if(isPreview()){if(!previewOpened.includes(day))previewOpened.push(day);}
       else if(!opened.includes(day)){opened.push(day);save();}render();
       if(storageWarning)notice.textContent='Webbläsaren kunde inte spara luckorna. De finns kvar så länge sidan är öppen.';
     },matchMedia('(prefers-reduced-motion: reduce)').matches?50:3600);
   }
+  dialog.querySelector('.advent-show-answer').addEventListener('click',()=>{
+    if(!dialog.classList.contains('is-revealed'))return;
+    const answer=dialog.querySelector('.advent-answer'),button=dialog.querySelector('.advent-show-answer');
+    answer.hidden=!answer.hidden;button.setAttribute('aria-expanded',String(!answer.hidden));
+    button.textContent=answer.hidden?'Visa svaret':'Dölj svaret';
+  });
   grid.addEventListener('click',e=>{const button=e.target.closest('.advent-door');if(button)openDoor(button);});
   section.querySelector('.advent-retry:not(.advent-preview)').addEventListener('click',syncClock);
   section.querySelector('.advent-preview').addEventListener('click',()=>{
