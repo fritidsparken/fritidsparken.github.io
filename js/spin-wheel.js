@@ -27,10 +27,10 @@
   function finish(index){if(!root.isConnected)return;lock(false);caption.textContent='Hjulet valde:';result.textContent=choices[index];}
   spin.addEventListener('click',()=>{
    if(busy||!update(false))return;const index=pick(choices.length),step=360/choices.length,target=(360-(index+.5)*step)%360;
-   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,duration=reduced?0:4600;
-   const disk=pictureRoot.querySelector('svg');rotation+=1800+((target-rotation%360+360)%360);lock(true);result.textContent='';caption.textContent='Hjulet snurrar…';
+   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,duration=reduced?0:10500;
+   const disk=pictureRoot.querySelector('svg');rotation+=4320+((target-rotation%360+360)%360);lock(true);result.textContent='';caption.textContent='Hjulet snurrar…';
    // Commit the starting frame before applying the rotation.
-   disk.getBoundingClientRect();disk.style.transition=duration?`transform ${duration}ms cubic-bezier(.12,.72,.10,1)`:'none';disk.style.transform=`rotate(${rotation}deg)`;
+   disk.getBoundingClientRect();disk.style.transition=duration?`transform ${duration}ms cubic-bezier(.15,.55,.25,1)`:'none';disk.style.transform=`rotate(${rotation}deg)`;
    if(reduced)finish(index);else timer=setTimeout(()=>finish(index),duration+80);
   });
   root.querySelector('form').addEventListener('submit',e=>{e.preventDefault();if(!busy)update();});
