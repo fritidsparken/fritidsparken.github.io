@@ -192,6 +192,7 @@ function gymGallery(q){let games=gymGames.filter(g=>g.min<=gymStudents&&g.max>=g
 
 
 const funTools=[
+{key:"wheel",icon:"🎡",name:"Snurrhjulet",image:"tool_wheel.svg",desc:"Spin the wheel – låt hjulet välja bland era egna alternativ."},
 {key:"challenge",icon:"🎯",name:"Rastutmaningar",image:"tool_challenge.jpg",desc:"Dra en snabb och rolig utmaning för rasten."},
 {key:"hunt",icon:"🗺️",name:"Skattjaktsskapare",image:"tool_hunt.jpg",desc:"Skapa en färdig skattjakt med ledtrådar."},
 {key:"today",icon:"🎲",name:"Dagens aktivitet",image:"tool_today.jpg",desc:"Få ett slumpat aktivitetstips för gruppen."},
@@ -209,6 +210,7 @@ function funHub(){return '<div class="fun-intro"><strong>Små verktyg som gör f
 function funPage(){
  const back='<button class="secondary fun-back" data-funback>← Alla verktyg</button>';
  if(!funTool)return funHub();
+ if(funTool==="wheel")return back+window.FPWheel.page();
  if(funTool==="challenge")return back+'<div class="fun-panel"><span class="fun-icon">🎯</span><h2>Rastutmaningar</h2><p>Dra ett kort när ni vill få en ny idé till rasten.</p><div class="fun-result" id="challengeResult">Redo för en utmaning?</div><button class="primary" data-challenge>Ge oss en utmaning!</button></div>';
  if(funTool==="hunt")return back+'<div class="fun-panel"><span class="fun-icon">🗺️</span><h2>Skattjaktsskapare</h2><p>Välj plats och antal ledtrådar så skapar vi en skattjakt att följa.</p><form class="fun-form" id="huntForm"><label>Var ska ni leta?<select name="place"><option>inomhus</option><option>på skolgården</option><option>i gympasalen</option><option>i naturen</option></select></label><label>Antal ledtrådar<select name="count"><option>3</option><option selected>5</option><option>7</option></select></label><button class="primary">Skapa skattjakt</button></form><div id="huntResult"></div></div>';
  if(funTool==="today")return back+'<div class="fun-panel"><span class="fun-icon">🎲</span><h2>Dagens aktivitet</h2><p>Tryck för ett nytt förslag som passar en vanlig fritidsgrupp.</p><div class="fun-result" id="todayResult">Vad ska vi hitta på?</div><button class="primary" data-today>Slumpa en aktivitet</button></div>';
@@ -220,7 +222,7 @@ function funPage(){
  const seasonal=season==="Vinter"?["Snöskulpturer eller inomhusbygge med papper och kartong","Vinterbingo: leta efter spår, frost och fåglar","Varm rörelsepaus med dansstopp i gympasalen"]:season==="Vår"?["Vårspaning: hitta knoppar, fåglar och vårtecken","Så frön i små krukor och följ hur de växer","Hoppa en bana som en groda mellan koner"]:season==="Sommar"?["Vattenstafett med muggar och hinkar","Skuggbingo under träd och lekredskap","Rita med gatukritor och gör en gemensam bana"]:["Lövjakt efter färg och form","Bygg små naturfigurer av pinnar och löv","Inomhus-skattjakt en regnig dag"];
  return back+'<div class="fun-panel"><span class="fun-icon">🍂</span><h2>Säsongstips · '+season+'</h2><p>Idéer för den här tiden på året. Anpassa efter väder och plats.</p><ul class="season-list">'+seasonal.map(x=>'<li>'+x+'</li>').join("")+'</ul><button class="secondary" data-seasons>Visa fler tips</button><div id="seasonMore"></div></div>'
 }
-function renderFun(){if(category==="Roliga verktyg")$("#catalog").innerHTML=funPage()}
+function renderFun(){if(category==="Roliga verktyg"){$("#catalog").innerHTML=funPage();if(funTool==="wheel")window.FPWheel.mount($("#fpWheel"))}}
 
 const rastActivityNames=new Set(activities.filter(a=>a[1]==="Rast").map(a=>a[2]));
 function createPreview(name){
