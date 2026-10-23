@@ -154,6 +154,8 @@ function addButton(){
 }
 const observer=new MutationObserver(addButton);observer.observe(document.body,{childList:true,subtree:true});addButton();
 function openPainter(IMAGE,TARGET){
+ const referenceKey=({"pumpalyktan":"pumpkin","häxans hatt":"hat","den busiga mumien":"mummy","den vänliga vampyren":"vampire","monsterkalas":"monster","godismandala":"candy"})[TARGET.toLocaleLowerCase("sv").trim()]||null;
+ let referenceConfig=null;
  const potionConfig=TARGET.toLocaleLowerCase("sv").trim()==="trolldrycksflaskorna"?POTION_COLORING:null;
  const wreathConfig=TARGET.toLocaleLowerCase("sv").trim()==="halloweenkrans"?WREATH_COLORING:null;
  const owlConfig=TARGET.toLocaleLowerCase("sv").trim()==="halloweenugglan"?OWL_COLORING:null;
@@ -166,7 +168,7 @@ function openPainter(IMAGE,TARGET){
  const back=document.createElement("div");back.className="fp-paint-back";back.innerHTML='<section class="fp-paint-dialog" role="dialog" aria-modal="true" aria-label="Måla online"><header class="fp-paint-head"><div><h2>🎨 Måla online</h2><p></p></div><button class="fp-paint-close" aria-label="Stäng">×</button></header><div class="fp-paint-tools"><button data-tool="fill" aria-pressed="true">🪣 Fyll</button><button data-tool="pen" aria-pressed="false">✏️ Penna</button><button data-tool="erase" aria-pressed="false">🧽 Sudd</button><select aria-label="Penselstorlek"><option value="5">● Liten</option><option value="14" selected>● Medium</option><option value="30">● Stor</option></select><button data-action="undo" disabled>↶ Ångra</button><button data-action="redo" disabled>↷ Gör om</button><button data-action="minus" aria-label="Zooma ut">−</button><button data-action="one">100%</button><button data-action="plus" aria-label="Zooma in">+</button><button data-action="reset">🗑️ Börja om</button>'+'<button data-action="auto">✨ Färglägg automatiskt</button>'+'<button data-action="save">💾 Spara bild</button></div><div class="fp-paint-palette" role="group" aria-label="Färgpalett"></div><div class="fp-paint-stage"><div class="fp-paint-sheet"><canvas class="fp-paint-layer"></canvas><canvas class="fp-line-layer"></canvas></div></div><div class="fp-paint-status">Välj färg och tryck på ett område. Två fingrar flyttar och zoomar. Dator: håll mellanslag och dra.</div></section>';
  back.querySelector(".fp-paint-head p").textContent=TARGET+" · Måla med färghink eller penna!";
  document.body.append(back);document.body.style.overflow="hidden";
- const $=s=>back.querySelector(s),dialog=$(".fp-paint-dialog"),stage=$(".fp-paint-stage"),sheet=$(".fp-paint-sheet"),paint=$(".fp-paint-layer"),lines=$(".fp-line-layer"),ctx=paint.getContext("2d",{willReadFrequently:true}),lctx=lines.getContext("2d"),undo=$('[data-action="undo"]'),redo=$('[data-action="redo"]');if(spokConfig||owlConfig||wreathConfig||potionConfig||bookConfig||graveConfig||trainConfig||horseConfig||TARGET.toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset")dialog.classList.add("fp-paint-ghost");
+ const $=s=>back.querySelector(s),dialog=$(".fp-paint-dialog"),stage=$(".fp-paint-stage"),sheet=$(".fp-paint-sheet"),paint=$(".fp-paint-layer"),lines=$(".fp-line-layer"),ctx=paint.getContext("2d",{willReadFrequently:true}),lctx=lines.getContext("2d"),undo=$('[data-action="undo"]'),redo=$('[data-action="redo"]');if(referenceKey||spokConfig||owlConfig||wreathConfig||potionConfig||bookConfig||graveConfig||trainConfig||horseConfig||TARGET.toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset")dialog.classList.add("fp-paint-ghost");
  let graveTreeToneMap=null;
  let tool="fill",color="#ef4444",brush=14,acts=[],future=[],W=0,H=0,luma=null,zoom=1,tx=0,ty=0,space=false,active=null,pending=null,gesture=false,pinch=null;
  const autoButton=$('[data-action="auto"]'),autoProgress=document.createElement("progress"),status=$(".fp-paint-status");
@@ -176,10 +178,15 @@ function openPainter(IMAGE,TARGET){
  autoProgress.className="fp-auto-progress";autoProgress.max=1;autoProgress.value=0;autoProgress.hidden=true;
  status.setAttribute("aria-live","polite");if(autoButton)dialog.insertBefore(autoProgress,stage);
 
- const img=new Image();if(new URL(IMAGE,location.href).origin!==location.origin)img.crossOrigin="anonymous";img.onload=()=>{
+ const img=new Image();if(new URL(IMAGE,location.href).origin!==location.origin)img.crossOrigin="anonymous";img.onload=async()=>{
+   if(referenceKey){
+     try{const response=await fetch(new URL("../assets/mandala-halloween-2026/"+referenceKey+"-coloring-v1.json",document.querySelector('script[src*="paint-online.js"]')?.src||new URL("js/paint-online.js",location.href)));if(!response.ok)throw new Error("Colour model missing");referenceConfig=await response.json()}
+     catch{status.textContent="Färganpassningen kunde inte öppnas. Stäng och försök igen.";return}
+   }
    const prepareCanvas=()=>{
-     const isGhostTarget=!!spokConfig||!!owlConfig||!!wreathConfig||!!potionConfig||!!bookConfig||!!graveConfig||!!trainConfig||!!horseConfig||String(TARGET||"").toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset";
-     if(spokConfig){W=spokConfig.width;H=spokConfig.height}
+     const isGhostTarget=!!referenceKey||!!spokConfig||!!owlConfig||!!wreathConfig||!!potionConfig||!!bookConfig||!!graveConfig||!!trainConfig||!!horseConfig||String(TARGET||"").toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset";
+     if(referenceConfig){W=referenceConfig.width;H=referenceConfig.height}
+     else if(spokConfig){W=spokConfig.width;H=spokConfig.height}
      else if(owlConfig){W=owlConfig.width;H=owlConfig.height}
      else if(wreathConfig){W=wreathConfig.width;H=wreathConfig.height}
      else if(potionConfig){W=potionConfig.width;H=potionConfig.height}
@@ -193,7 +200,7 @@ function openPainter(IMAGE,TARGET){
      const dat=sctx.getImageData(0,0,W,H),d=dat.data;luma=new Uint8Array(W*H);for(let i=0,j=0;i<d.length;i+=4,j++){const g=(d[i]*299+d[i+1]*587+d[i+2]*114)/1000;luma[j]=g;const a=Math.max(0,Math.min(255,Math.round((245-g)*1.7)));d[i]=d[i+1]=d[i+2]=0;d[i+3]=a}
      lctx.putImageData(dat,0,0);if(isGhostTarget)ghostOriginalInk=lctx.getImageData(0,0,W,H);fit();window.addEventListener("resize",fit);
    };
-   if(!spokConfig&&!owlConfig&&!wreathConfig&&!potionConfig&&!bookConfig&&!graveConfig&&!trainConfig&&(horseConfig||String(TARGET||"").toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset"))getGhostReference().then(prepareCanvas).catch(()=>{status.textContent="Färgreferensen kunde inte öppnas. Stäng och försök igen."});
+   if(!referenceKey&&!spokConfig&&!owlConfig&&!wreathConfig&&!potionConfig&&!bookConfig&&!graveConfig&&!trainConfig&&(horseConfig||String(TARGET||"").toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset"))getGhostReference().then(prepareCanvas).catch(()=>{status.textContent="Färgreferensen kunde inte öppnas. Stäng och försök igen."});
    else prepareCanvas();
  };img.onerror=()=>{$(".fp-paint-status").textContent="Bilden kunde inte öppnas. Stäng och försök igen.";};img.src=IMAGE;
  function fit(){if(!W)return;let r=W/H,aw=stage.clientWidth-24,ah=stage.clientHeight-24,w=Math.min(aw,ah*r);sheet.style.width=w+"px";sheet.style.height=w/r+"px";applyTransform()}
@@ -275,7 +282,7 @@ c.putImageData(out,0,0)
    // Keep the original star's fine tapered points; only its own faint outline
    // gaps are closed for segmentation. The visible line canvas is untouched.
    if(bookConfig)for(let y=640;y<=875;y++)for(let x=590;x<=780;x++){const i=y*W+x;barrier[i]=luma[i]<220?1:0}
-   const boundaryConfig=bookConfig||graveConfig||trainConfig||castleConfig;
+   const boundaryConfig=referenceConfig||bookConfig||graveConfig||trainConfig||castleConfig;
    if(boundaryConfig?.closures){
      // Bridge only small breaks between original contour endpoints. These
      // segmentation barriers never alter the displayed original line layer.
@@ -284,7 +291,7 @@ c.putImageData(out,0,0)
        for(let n=0;n<=steps;n++){const x=Math.round(x0+(x1-x0)*n/Math.max(1,steps)),y=Math.round(y0+(y1-y0)*n/Math.max(1,steps));for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++)if(x+dx>=0&&x+dx<W&&y+dy>=0&&y+dy<H)barrier[(y+dy)*W+x+dx]=1}
      }
    }
-   const bridgeConfig=spokConfig||owlConfig||wreathConfig||potionConfig||graveConfig||castleConfig;
+   const bridgeConfig=referenceConfig||spokConfig||owlConfig||wreathConfig||potionConfig||graveConfig||castleConfig;
    if(bridgeConfig?.bridgeRuns){
      // Sparse contour repairs derived from the original line drawing. Only
      // its leaking background is closed; existing enclosed areas are kept.
@@ -324,7 +331,10 @@ c.putImageData(out,0,0)
      const id=labels[i],r=regions[id-1],y=(i/W)|0,x=i-y*W;r.pixels[offsets[id]++]=i;
      if(x<r.minX)r.minX=x;if(x>r.maxX)r.maxX=x;if(y<r.minY)r.minY=y;if(y>r.maxY)r.maxY=y;
    }
-   if(spokConfig){
+   if(referenceConfig){
+     for(const [x,y,role,shades,surface] of referenceConfig.regions){const r=regions[labels[y*W+x]-1];if(r){r.hint=role;r.shades=shades;r.surface=surface}}
+     for(const r of regions)if(!r.shades){r.hint="fabric";r.shades=referenceConfig.palettes.fabric}
+   }else if(spokConfig){
      for(const [x,y,role,shades,surface] of spokConfig.regions){const r=regions[labels[y*W+x]-1];if(r){r.hint=role;r.shades=shades;r.surface=surface}}
      for(const r of regions)if(!r.shades){r.hint="purple";r.shades=spokConfig.palettes.purple}
    }else if(owlConfig){
@@ -818,7 +828,81 @@ c.putImageData(out,0,0)
    }
    g.putImageData(im,0,0);ctx.drawImage(mask,region.minX,region.minY);
  }
+ // Paint an original closed region from its material palette and a smooth
+ // six-coefficient colour model. No reference bitmap is used at runtime.
+ function paintReferenceRegion(region){
+   const width=region.maxX-region.minX+1,height=region.maxY-region.minY+1,mask=document.createElement("canvas");mask.width=width;mask.height=height;
+   const g=mask.getContext("2d"),im=g.createImageData(width,height),d=im.data,role=region.hint,pal=referenceConfig.palettes,stops=region.shades;
+   const mix=(a,b,t)=>a+(b-a)*t,clamp=(n,a=0,b=1)=>Math.max(a,Math.min(b,n));
+   // Distance from the original contour gives gentle edge shadows and satin
+   // highlights. The mask extends under the unchanged original ink layer.
+   const inset=new Uint16Array(width*height),queue=new Uint32Array(width*height);let head=0,tail=0;
+   for(const i of region.pixels)inset[(((i/W)|0)-region.minY)*width+i%W-region.minX]=65535;
+   for(let i=0;i<inset.length;i++)if(inset[i]&&(i%width===0||i%width===width-1||i<width||i>=inset.length-width||!inset[i-1]||!inset[i+1]||!inset[i-width]||!inset[i+width])){inset[i]=1;queue[tail++]=i}
+   while(head<tail){const i=queue[head++],add=j=>{if(inset[j]===65535){inset[j]=inset[i]+1;queue[tail++]=j}};if(i%width)add(i-1);if(i%width<width-1)add(i+1);if(i>=width)add(i-width);if(i<inset.length-width)add(i+width)}
+   for(const index of region.pixels){
+     const gx=index%W,gy=(index/W)|0,x=gx-region.minX,y=gy-region.minY,k=(y*width+x)*4,u=x/Math.max(1,width-1),v=y/Math.max(1,height-1),X=gx/W,Y=gy/H;
+     const t=clamp(.70-.48*v+.18*u),a=t<.5?stops[0]:stops[1],b=t<.5?stops[1]:stops[2],m=t<.5?t*2:(t-.5)*2;
+     let rgb=a.map((n,c)=>mix(n,b[c],m));
+     if(region.surface){const basis=[1,u,v,u*v,u*u,v*v];rgb=region.surface.map((co,c)=>clamp(co.reduce((sum,n,i)=>sum+n*basis[i],0),stops[0][c],stops[2][c]))}
+     const blend=(color,amount)=>{amount=clamp(amount);for(let c=0;c<3;c++)rgb[c]=mix(rgb[c],color[c],amount)};
+     const depth=inset[y*width+x],edge=Math.exp(-depth/4),spot=Math.exp(-((u-.30)**2/.032+(v-.22)**2/.075));
+     if(role==="paper")rgb=[255,255,255];
+     else if(role==="sky"||role==="scene"){
+       const sky=pal.sky,t=clamp(Y/.7),a=t<.5?sky[0]:sky[1],b=t<.5?sky[1]:sky[2],m=t<.5?t*2:(t-.5)*2;rgb=a.map((n,c)=>mix(n,b[c],m));
+       if(role==="scene")blend(pal.ground[1],clamp((Y-.59)/.20));
+       const moon=Math.exp(-((X-.79)**2/.024+(Y-.12)**2/.017));blend([245,207,122],moon*.20);
+       if(role==="scene"){
+         const light=Math.exp(-((X-.23)**2/.040+(Y-.78)**2/.023));blend([242,123,19],light*.29);
+         if(Y>.8){const grain=(Math.sin(gx*.044+gy*.13)+Math.sin(gx*.12-gy*.055))*2;rgb=rgb.map(n=>n+grain)}
+       }
+     }else if(role==="gold"){
+       const angle=Math.atan2(v-.5,u-.5),facet=.5+.5*Math.cos(angle*5-.4),shine=.30+.43*facet+.20*(1-v);rgb=pal.gold[0].map((n,c)=>mix(n,pal.gold[2][c],shine));blend([255,252,191],spot*.70);blend(pal.gold[0],edge*.15);
+     }else if(role==="ribbon"){
+       const fold=.5+.5*Math.sin(u*5-v*9+.4),spec=Math.exp(-((fold-.93)**2)/.006);blend(pal.ribbon[2],spec*.62);blend(pal.ribbon[0],edge*.34);blend([255,174,78],Math.exp(-((depth-4)**2)/3)*.48);
+     }else if(role==="fabric"){
+       const fold=(Math.sin(gx*.022+gy*.009)+1)*.055;blend([130,68,153],fold);blend([9,5,18],edge*.18);
+       // Sparse, deterministic golden flecks match the material, not the
+       // reference's positions. They are part of this region's fill/history.
+       const ix=Math.floor(gx/17),iy=Math.floor(gy/17),hash=Math.sin(ix*127.1+iy*311.7)*43758.5453,r=hash-Math.floor(hash),dx=gx%17-(2+r*12),dy=gy%17-(2+(r*7%1)*12);
+       if(r>.80)blend([253,175,66],Math.exp(-(dx*dx+dy*dy)/.9)*.7);
+     }else if(role==="bandage"||role==="bandageShadow"){
+       blend(stops[0],edge*.24);blend(stops[2],Math.exp(-((u-.65)**2/.12+(v-.20)**2/.018))*.20);
+       const thread=Math.sin(gx*.66+gy*.13)*Math.sin(gy*.85-gx*.12)*1.15;rgb=rgb.map(n=>n+thread);
+       const moonlight=Math.exp(-((X-.73)**2/.045+(Y-.39)**2/.12));blend([255,226,160],moonlight*.20);
+     }else if(role==="orange"||role==="yellow"||role==="red"||role==="green"||role==="blue"||role==="purple"||role==="pink"||role==="teal"){
+       blend(stops[0],edge*.23);blend(stops[2],spot*.52);
+       if(referenceKey==="candy")blend([255,255,238],Math.exp(-((u-.27)**2/.005+(v-.17)**2/.017))*.66);
+       else if(role==="orange"){
+         rgb=rgb.map(n=>n*(1+.065*Math.cos(u*22+v*.5)));
+         if(referenceKey==="pumpkin"){
+           const glow=Math.exp(-((X-.38)**2/.006+(Y-.48)**2/.004))+Math.exp(-((X-.67)**2/.006+(Y-.50)**2/.004))+Math.exp(-((X-.52)**2/.025+(Y-.64)**2/.006));blend([255,206,31],glow*.23);
+         }
+       }
+     }else if(role==="moon"||role==="crater"){
+       blend(stops[2],spot*.43);const clouds=(Math.sin(gx*.041+gy*.019)+Math.sin(gx*.019-gy*.043))*4;rgb=rgb.map(n=>n+clouds);
+     }else if(role==="leaf"&&referenceKey==="pumpkin"){
+       const green=pal.green,yellow=pal.yellow,red=pal.orange;
+       if(region.minX>W*.55){const t=clamp((u-.25)*1.6);rgb=green[1].map((n,c)=>mix(n,red[1][c],t));blend(yellow[1],Math.exp(-((u-.47)**2/.025+(v-.42)**2/.08))*.5)}
+       else{blend(pal.orange[0],clamp((v-.58)*1.6));blend(yellow[1],Math.exp(-((u-.5)**2/.065+(v-.42)**2/.08))*.43)}
+       blend(pal.leaf[0],edge*.30);
+     }else if(role==="cutedge"){
+       blend([255,142,9],Math.exp(-((depth-3)**2)/15)*.48);blend([94,21,0],v*.25);
+     }else if(role==="light"){
+       const t=clamp(.56+.44*(1-Math.hypot((u-.5)*1.4,(v-.50)*1.4)));rgb=pal.light[0].map((n,c)=>mix(n,pal.light[2][c],t));
+     }else if(role.startsWith("fur")){
+       blend(stops[0],edge*.25);blend(stops[2],spot*.30);const fur=Math.sin(gx*.41+gy*.22)*Math.sin(gx*.11-gy*.31)*2;rgb=rgb.map(n=>n+fur);
+     }else if(role==="wood"||role==="ground"||role==="belt"||role==="horn"){
+       const grain=Math.sin(gx*.11+gy*.023+Math.sin(gy*.014)*3)*2;rgb=rgb.map(n=>n+grain);blend(stops[2],spot*.15);blend(stops[0],edge*.20);
+     }else if(role==="skin"||role==="ear"||role==="white"||role==="stick"){
+       blend(stops[0],edge*.20);blend(stops[2],spot*.30);
+     }
+     for(let c=0;c<3;c++)d[k+c]=rgb[c];d[k+3]=255;
+   }
+   g.putImageData(im,0,0);ctx.drawImage(mask,region.minX,region.minY);
+ }
  function paintGhostRegion(region){
+   if(referenceConfig){paintReferenceRegion(region);return}
    if(spokConfig){paintSpokRegion(region);return}
    if(owlConfig){paintOwlRegion(region);return}
    if(wreathConfig){paintWreathRegion(region);return}
@@ -942,15 +1026,15 @@ c.putImageData(out,0,0)
    if(acts.length&&!confirm("Automatisk färgläggning börjar från en tom bild. Vill du rensa din målning och fortsätta?"))return;
    acts=[];future=[];ctx.clearRect(0,0,W,H);if(ghostOriginalInk)lctx.putImageData(ghostOriginalInk,0,0);lines.style.opacity="";autoRunning=true;historyUI();autoButton.disabled=true;
    autoProgress.hidden=false;autoProgress.value=0;sheet.style.pointerEvents="none";toolSet("fill");
-   const isGhost=!!spokConfig||!!owlConfig||!!wreathConfig||!!potionConfig||!!bookConfig||!!graveConfig||!!trainConfig||!!horseConfig||TARGET.toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset";
+   const isGhost=!!referenceKey||!!spokConfig||!!owlConfig||!!wreathConfig||!!potionConfig||!!bookConfig||!!graveConfig||!!trainConfig||!!horseConfig||TARGET.toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset";
    let plan;
    if(isGhost){
      status.textContent="Hämtar färgreferensen…";
-     try{if(!spokConfig&&!owlConfig&&!wreathConfig&&!potionConfig&&!bookConfig&&!graveConfig&&!trainConfig)await getGhostReference()}catch{autoRunning=false;autoButton.disabled=false;autoProgress.hidden=true;sheet.style.pointerEvents="";status.textContent="Färgreferensen kunde inte öppnas. Försök igen.";return}
-     if(!spokConfig&&!owlConfig&&!wreathConfig&&!potionConfig&&!bookConfig&&!graveConfig&&!trainConfig)ghostReferencePixels=ghostAlignedReference();
-     const regions=await findGhostRegions(),palettes=spokConfig?spokConfig.palettes:owlConfig?owlConfig.palettes:wreathConfig?wreathConfig.palettes:potionConfig?potionConfig.palettes:bookConfig?bookConfig.palettes:graveConfig?graveConfig.palettes:trainConfig?trainConfig.palettes:ghostColorPalettes();
-     if(!spokConfig&&!owlConfig&&!wreathConfig&&!potionConfig&&!bookConfig&&!graveConfig&&(trainConfig||!horseConfig))prepareGhostPumpkinLights();
-     for(const region of regions)if(!spokConfig&&!owlConfig&&!wreathConfig&&!potionConfig&&!bookConfig&&!graveConfig&&!trainConfig)region.shades=ghostRegionShades(region,palettes);
+     try{if(!referenceKey&&!spokConfig&&!owlConfig&&!wreathConfig&&!potionConfig&&!bookConfig&&!graveConfig&&!trainConfig)await getGhostReference()}catch{autoRunning=false;autoButton.disabled=false;autoProgress.hidden=true;sheet.style.pointerEvents="";status.textContent="Färgreferensen kunde inte öppnas. Försök igen.";return}
+     if(!referenceKey&&!spokConfig&&!owlConfig&&!wreathConfig&&!potionConfig&&!bookConfig&&!graveConfig&&!trainConfig)ghostReferencePixels=ghostAlignedReference();
+     const regions=await findGhostRegions(),palettes=referenceConfig?referenceConfig.palettes:spokConfig?spokConfig.palettes:owlConfig?owlConfig.palettes:wreathConfig?wreathConfig.palettes:potionConfig?potionConfig.palettes:bookConfig?bookConfig.palettes:graveConfig?graveConfig.palettes:trainConfig?trainConfig.palettes:ghostColorPalettes();
+     if(!referenceKey&&!spokConfig&&!owlConfig&&!wreathConfig&&!potionConfig&&!bookConfig&&!graveConfig&&(trainConfig||!horseConfig))prepareGhostPumpkinLights();
+     for(const region of regions)if(!referenceKey&&!spokConfig&&!owlConfig&&!wreathConfig&&!potionConfig&&!bookConfig&&!graveConfig&&!trainConfig)region.shades=ghostRegionShades(region,palettes);
      plan=regions.map(region=>({type:"ghostRegion",region}));
    }else{
      status.textContent="Hittar slutna färgområden…";
@@ -980,7 +1064,7 @@ c.putImageData(out,0,0)
      await new Promise(resolve=>setTimeout(resolve,isGhost?Math.max(8,Math.min(30,18000/plan.length)):115));
    }
    // Keep the actual region fills as the final result. Never swap in a photo.
-   autoRunning=false;sheet.style.pointerEvents="";if(spokConfig||owlConfig||wreathConfig||potionConfig||bookConfig||graveConfig||trainConfig)autoButton.disabled=false;historyUI();
+   autoRunning=false;sheet.style.pointerEvents="";if(referenceKey||spokConfig||owlConfig||wreathConfig||potionConfig||bookConfig||graveConfig||trainConfig)autoButton.disabled=false;historyUI();
    status.textContent=isGhost?"Klart! "+TARGET+" är färglagd enligt färgreferensen. Du kan fortsätta måla eller spara bilden.":"Klart! "+TARGET+" är färglagd. Du kan fortsätta måla eller spara bilden.";
  }
  if(autoButton)autoButton.addEventListener("click",runAutoColor);
@@ -1002,7 +1086,7 @@ c.putImageData(out,0,0)
  back.querySelector('[data-action="minus"]').onclick=()=>setZoom(zoom-.25);back.querySelector('[data-action="plus"]').onclick=()=>setZoom(zoom+.25);back.querySelector('[data-action="one"]').onclick=()=>setZoom(1);
  stage.addEventListener("wheel",e=>{if(!e.ctrlKey&&!e.metaKey)return;e.preventDefault();setZoom(zoom+(e.deltaY<0?.15:-.15))},{passive:false});
  back.querySelector('[data-action="reset"]').onclick=()=>{if(autoRunning)return;if(confirm("Vill du radera hela målningen och börja om?")){acts=[];future=[];autoProgress.hidden=true;autoProgress.value=0;if(autoButton)autoButton.disabled=false;status.textContent="Välj färg och tryck på ett område. Två fingrar flyttar och zoomar. Dator: håll mellanslag och dra.";redraw()}};
- back.querySelector('[data-action="save"]').onclick=()=>{if(!W)return;const out=document.createElement("canvas");const ghostTarget=dialog.classList.contains("fp-paint-ghost");out.width=ghostTarget?W:img.naturalWidth;out.height=ghostTarget?H:img.naturalHeight;const c=out.getContext("2d");if(spokConfig||owlConfig||wreathConfig||potionConfig){c.fillStyle="#fff";c.fillRect(0,0,out.width,out.height)}c.drawImage(paint,0,0,out.width,out.height);c.drawImage(lines,0,0,out.width,out.height);out.toBlob(blob=>{if(!blob)return;const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="min-farglagda-"+TARGET.toLocaleLowerCase("sv").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")+".png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},"image/png")};
+ back.querySelector('[data-action="save"]').onclick=()=>{if(!W)return;const out=document.createElement("canvas");const ghostTarget=dialog.classList.contains("fp-paint-ghost");out.width=ghostTarget?W:img.naturalWidth;out.height=ghostTarget?H:img.naturalHeight;const c=out.getContext("2d");if(referenceKey||spokConfig||owlConfig||wreathConfig||potionConfig){c.fillStyle="#fff";c.fillRect(0,0,out.width,out.height)}c.drawImage(paint,0,0,out.width,out.height);c.drawImage(lines,0,0,out.width,out.height);out.toBlob(blob=>{if(!blob)return;const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="min-farglagda-"+TARGET.toLocaleLowerCase("sv").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")+".png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},"image/png")};
  function close(){window.removeEventListener("resize",fit);window.removeEventListener("keydown",keydown);window.removeEventListener("keyup",keyup);back.remove();document.body.style.overflow="";addButton()}
  back.querySelector(".fp-paint-close").onclick=close;back.addEventListener("click",e=>{if(e.target===back)close()});const keydown=e=>{if(e.code==="Space"){space=true;if(e.target===document.body||e.target===back)e.preventDefault()}if(e.key==="Escape")close();if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){e.preventDefault();e.shiftKey?redoOne():undoOne()}};const keyup=e=>{if(e.code==="Space")space=false};window.addEventListener("keydown",keydown);window.addEventListener("keyup",keyup);back.addEventListener("keydown",e=>{if(e.code==="Space")e.preventDefault()});back.tabIndex=-1;back.focus();
 }
