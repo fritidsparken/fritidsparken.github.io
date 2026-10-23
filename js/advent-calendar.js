@@ -6,6 +6,7 @@
   if(!rules||days?.length!==24)return;
   const key='fpAdventProgress', maxClockAge=10*60*1000;
   let openingId=0,previewOpened=[];
+  let openingMotion=true;try{openingMotion=localStorage.getItem('fpAdventOpeningMotion')!=='off';}catch{}
   const isPreview=()=>window.FPChristmasPreview===true;
   const availableDoors=timestamp=>isPreview()?24:timestamp===null?0:rules.available(timestamp);
   let clock=null, syncing=null, opened=[],year=null,lastDate='',returnFocus=null,revealTimer=null,storageWarning=false;
@@ -13,7 +14,7 @@
   const section=document.createElement('section');
   section.id='julkalender';section.className='advent';section.hidden=true;
   section.setAttribute('aria-labelledby','advent-title');
-  section.innerHTML=`<div class="advent-snow" aria-hidden="true"></div><header class="advent-heading"><span class="advent-kicker">24 små stunder av julmagi</span><h2 id="advent-title">🎄 Fritidsparkens magiska julkalender</h2><p>En ny lucka varje dag fram till julafton!</p><div class="advent-meta"><span data-count>0 av 24 luckor öppnade</span><span data-countdown></span></div></header><p class="advent-clock" data-clock role="status">Kontrollerar dagens datum…</p><button class="advent-retry advent-preview" type="button">Lås upp alla luckor med kod</button><div class="advent-grid" aria-label="Luckor 1 till 24 december"></div><p class="advent-notice" aria-live="polite" aria-atomic="true"></p><button class="advent-retry" type="button" hidden>Kontrollera datum igen</button>`;
+  section.innerHTML=`<div class="advent-snow" aria-hidden="true"></div><header class="advent-heading"><span class="advent-kicker">24 små stunder av julmagi</span><h2 id="advent-title">🎄 Fritidsparkens magiska julkalender</h2><p>En ny lucka varje dag fram till julafton!</p><div class="advent-meta"><span data-count>0 av 24 luckor öppnade</span><span data-countdown></span></div></header><p class="advent-clock" data-clock role="status">Kontrollerar dagens datum…</p><button class="advent-retry advent-preview" type="button">Lås upp alla luckor med kod</button><button class="advent-retry advent-motion-toggle" type="button" aria-pressed="true">Öppningsanimation: på</button><div class="advent-grid" aria-label="Luckor 1 till 24 december"></div><p class="advent-notice" aria-live="polite" aria-atomic="true"></p><button class="advent-retry" type="button" hidden>Kontrollera datum igen</button>`;
   document.querySelector('.hero')?.after(section);
   const grid=section.querySelector('.advent-grid'),notice=section.querySelector('.advent-notice');
   const ornaments=['❄','✧','🎄','✶','🎁','❄','✦','☃'];
@@ -23,7 +24,7 @@
     button.innerHTML=`<span class="advent-door-inner"><span class="advent-ornament" aria-hidden="true">${ornaments[(entry.day-1)%ornaments.length]}</span><span class="advent-number">${entry.day}</span><span class="advent-door-status">Låst</span><span class="advent-today-star" aria-hidden="true">✦</span></span>`;
     grid.append(button);
   }
-  const dialog=document.createElement('dialog');dialog.className='advent-dialog';dialog.setAttribute('aria-labelledby','advent-date');
+  const dialog=document.createElement('dialog');dialog.className='advent-dialog';dialog.classList.toggle('advent-motion-enabled',openingMotion);dialog.setAttribute('aria-labelledby','advent-date');
   dialog.innerHTML=`<article class="advent-popup"><div class="advent-snow" aria-hidden="true"></div><button type="button" class="advent-close" aria-label="Stäng luckan">×</button><h2 id="advent-date"></h2><div class="advent-stage-space"><div class="advent-stage"><div class="advent-light" aria-hidden="true"></div><div class="advent-picture-frame"><div class="advent-animal"><img width="800" height="800" alt="" decoding="async"></div></div><div class="advent-hinge" aria-hidden="true"><span>✦</span><b></b><small>Lite julmagi väntar…</small></div><div class="advent-particles" aria-hidden="true"></div></div></div><p class="advent-message"></p><p class="advent-answer" id="advent-answer" hidden aria-live="polite"></p><p class="advent-finale" hidden>En riktigt god jul från oss på Fritidsparken! ✨</p><div class="advent-popup-actions"><button type="button" class="advent-show-answer" aria-controls="advent-answer" aria-expanded="false" disabled>Visa svaret</button><button type="button" class="advent-shut">Stäng luckan</button></div></article>`;
   document.body.append(dialog);
   const image=dialog.querySelector('img'),particles=dialog.querySelector('.advent-particles');
@@ -55,7 +56,7 @@
     section.hidden=!isChristmas();
     if(!isChristmas()){close();return;}
     const timestamp=now(),verified=timestamp!==null;
-    section.querySelector('.advent-retry:not(.advent-preview)').hidden=verified||isPreview();
+    section.querySelector('.advent-retry:not(.advent-preview):not(.advent-motion-toggle)').hidden=verified||isPreview();
     section.querySelector('.advent-preview').textContent=isPreview()?'Avsluta förhandsvisning':'Lås upp alla luckor med kod';
     section.querySelector('[data-clock]').textContent=isPreview()?'Förhandsvisning · alla 24 luckor är upplåsta':verified?'Datum kontrollerat · svensk tid':'Vi behöver kontrollera dagens datum innan luckorna kan öppnas. Anslut till internet och försök igen.';
     if(verified)progress(timestamp);
@@ -113,7 +114,7 @@
       if(isPreview()){if(!previewOpened.includes(day))previewOpened.push(day);}
       else if(!opened.includes(day)){opened.push(day);save();}render();
       if(storageWarning)notice.textContent='Webbläsaren kunde inte spara luckorna. De finns kvar så länge sidan är öppen.';
-    },matchMedia('(prefers-reduced-motion: reduce)').matches?50:3600);
+    },openingMotion?3600:50);
   }
   dialog.querySelector('.advent-show-answer').addEventListener('click',()=>{
     if(!dialog.classList.contains('is-revealed'))return;
@@ -121,6 +122,17 @@
     answer.hidden=!answer.hidden;button.setAttribute('aria-expanded',String(!answer.hidden));
     button.textContent=answer.hidden?'Visa svaret':'Dölj svaret';
   });
+  const motionButton=section.querySelector('.advent-motion-toggle');
+  function updateMotion(){
+    motionButton.textContent='Öppningsanimation: '+(openingMotion?'på':'av');
+    motionButton.setAttribute('aria-pressed',String(openingMotion));
+    dialog.classList.toggle('advent-motion-enabled',openingMotion);
+  }
+  motionButton.addEventListener('click',()=>{
+    openingMotion=!openingMotion;try{localStorage.setItem('fpAdventOpeningMotion',openingMotion?'on':'off');}catch{}
+    updateMotion();
+  });
+  updateMotion();
   grid.addEventListener('click',e=>{const button=e.target.closest('.advent-door');if(button)openDoor(button);});
   section.querySelector('.advent-retry:not(.advent-preview)').addEventListener('click',syncClock);
   section.querySelector('.advent-preview').addEventListener('click',()=>{

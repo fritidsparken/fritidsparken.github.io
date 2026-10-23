@@ -17,7 +17,11 @@ body:not(.christmas) .advent,body.halloween .advent,.advent[hidden],body:not(.ch
 @keyframes advent-snow{to{transform:translateY(250px)}}
 @media(max-width:700px){.advent-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.advent{border-radius:20px}.advent-number{font-size:35px}.advent-ornament{font-size:23px}}
 @media(max-width:420px){.advent-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}.advent-heading h2{font-size:27px}.advent-door{aspect-ratio:1}.advent-number{font-size:32px}.advent-ornament{font-size:19px}.advent-door-status{font-size:9px}.advent-meta{gap:8px}.advent-meta span{font-size:11px}.advent-popup{padding-top:18px}.advent-popup h2{font-size:20px}}
-@media(prefers-reduced-motion:reduce){.advent *, .advent *:before,.advent *:after,.advent-dialog *,.advent-dialog *:before,.advent-dialog *:after{animation:none!important;transition:none!important}.advent-door:hover{transform:none}.is-opening .advent-hinge{display:none}.is-opening .advent-animal,.is-opening .advent-message,.is-opening .advent-finale{opacity:1;transform:none}.advent-particles{display:none}}
+@media(prefers-reduced-motion:reduce){.advent *, .advent *:before,.advent *:after,.advent-dialog:not(.advent-motion-enabled) *,.advent-dialog:not(.advent-motion-enabled) *:before,.advent-dialog:not(.advent-motion-enabled) *:after{animation:none!important;transition:none!important}.advent-door:hover{transform:none}}
+.advent-dialog:not(.advent-motion-enabled).is-opening .advent-hinge{display:none}
+.advent-dialog:not(.advent-motion-enabled).is-opening .advent-animal,.advent-dialog:not(.advent-motion-enabled).is-opening .advent-message,.advent-dialog:not(.advent-motion-enabled).is-opening .advent-finale{animation:none;opacity:1;transform:none}
+.advent-dialog:not(.advent-motion-enabled) .advent-particles{display:none}
+
 
 .advent-particles i:nth-child(n+29){display:none}.is-finale .advent-particles i:nth-child(n+29){display:block}
 
