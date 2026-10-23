@@ -65,6 +65,7 @@
     for(const button of grid.children){
       const day=Number(button.dataset.day),unlocked=day<=available,today=p?.month===12&&day===p.day,seen=activeOpened.includes(day)&&unlocked;
       button.classList.toggle('is-opened',seen);button.classList.toggle('is-today',today);button.classList.toggle('is-locked',!unlocked);
+      button.classList.toggle('is-past-opened',seen&&p?.month===12&&day<p.day);
       button.setAttribute('aria-disabled',String(!unlocked));
       button.setAttribute('aria-label',`${day} december, ${seen?'öppnad':unlocked?'öppna luckan':'låst'}${today?', dagens lucka':''}`);
       button.querySelector('.advent-door-status').textContent=seen?'Öppnad ✓':today?'Idag':unlocked?'Öppna':'Låst';
