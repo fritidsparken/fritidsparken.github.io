@@ -5,13 +5,15 @@
   const rules=window.FPAdventRules, days=window.FPAdventDays;
   if(!rules||days?.length!==24)return;
   const key='fpAdventProgress', maxClockAge=10*60*1000;
-  let openingId=0;
+  let openingId=0,previewOpened=[];
+  const isPreview=()=>window.FPChristmasPreview===true;
+  const availableDoors=timestamp=>isPreview()?24:timestamp===null?0:rules.available(timestamp);
   let clock=null, syncing=null, opened=[],year=null,lastDate='',returnFocus=null,revealTimer=null,storageWarning=false;
   const isChristmas=()=>document.body.classList.contains('christmas')&&!document.body.classList.contains('halloween');
   const section=document.createElement('section');
   section.id='julkalender';section.className='advent';section.hidden=true;
   section.setAttribute('aria-labelledby','advent-title');
-  section.innerHTML=`<div class="advent-snow" aria-hidden="true"></div><header class="advent-heading"><span class="advent-kicker">24 små stunder av julmagi</span><h2 id="advent-title">🎄 Fritidsparkens magiska julkalender</h2><p>En ny lucka varje dag fram till julafton!</p><div class="advent-meta"><span data-count>0 av 24 luckor öppnade</span><span data-countdown></span></div></header><p class="advent-clock" data-clock role="status">Kontrollerar dagens datum…</p><div class="advent-grid" aria-label="Luckor 1 till 24 december"></div><p class="advent-notice" aria-live="polite" aria-atomic="true"></p><button class="advent-retry" type="button" hidden>Kontrollera datum igen</button>`;
+  section.innerHTML=`<div class="advent-snow" aria-hidden="true"></div><header class="advent-heading"><span class="advent-kicker">24 små stunder av julmagi</span><h2 id="advent-title">🎄 Fritidsparkens magiska julkalender</h2><p>En ny lucka varje dag fram till julafton!</p><div class="advent-meta"><span data-count>0 av 24 luckor öppnade</span><span data-countdown></span></div></header><p class="advent-clock" data-clock role="status">Kontrollerar dagens datum…</p><button class="advent-retry advent-preview" type="button">Lås upp alla luckor med kod</button><div class="advent-grid" aria-label="Luckor 1 till 24 december"></div><p class="advent-notice" aria-live="polite" aria-atomic="true"></p><button class="advent-retry" type="button" hidden>Kontrollera datum igen</button>`;
   document.querySelector('.hero')?.after(section);
   const grid=section.querySelector('.advent-grid'),notice=section.querySelector('.advent-notice');
   const ornaments=['❄','✧','🎄','✶','🎁','❄','✦','☃'];
@@ -53,20 +55,21 @@
     section.hidden=!isChristmas();
     if(!isChristmas()){close();return;}
     const timestamp=now(),verified=timestamp!==null;
-    section.querySelector('.advent-retry').hidden=verified;
-    section.querySelector('[data-clock]').textContent=verified?'Datum kontrollerat · svensk tid':'Vi behöver kontrollera dagens datum innan luckorna kan öppnas. Anslut till internet och försök igen.';
+    section.querySelector('.advent-retry:not(.advent-preview)').hidden=verified||isPreview();
+    section.querySelector('.advent-preview').textContent=isPreview()?'Avsluta förhandsvisning':'Lås upp alla luckor med kod';
+    section.querySelector('[data-clock]').textContent=isPreview()?'Förhandsvisning · alla 24 luckor är upplåsta':verified?'Datum kontrollerat · svensk tid':'Vi behöver kontrollera dagens datum innan luckorna kan öppnas. Anslut till internet och försök igen.';
     if(verified)progress(timestamp);
-    const available=verified?rules.available(timestamp):0,p=verified?rules.dateParts(timestamp):null;
+    const available=availableDoors(timestamp),activeOpened=isPreview()?previewOpened:opened,p=verified?rules.dateParts(timestamp):null;
     const date=p?`${p.year}-${p.month}-${p.day}`:'';
     if(lastDate&&lastDate!==date)close();lastDate=date;
     for(const button of grid.children){
-      const day=Number(button.dataset.day),unlocked=day<=available,today=p?.month===12&&day===p.day,seen=opened.includes(day)&&unlocked;
+      const day=Number(button.dataset.day),unlocked=day<=available,today=p?.month===12&&day===p.day,seen=activeOpened.includes(day)&&unlocked;
       button.classList.toggle('is-opened',seen);button.classList.toggle('is-today',today);button.classList.toggle('is-locked',!unlocked);
       button.setAttribute('aria-disabled',String(!unlocked));
       button.setAttribute('aria-label',`${day} december, ${seen?'öppnad':unlocked?'öppna luckan':'låst'}${today?', dagens lucka':''}`);
       button.querySelector('.advent-door-status').textContent=seen?'Öppnad ✓':today?'Idag':unlocked?'Öppna':'Låst';
     }
-    section.querySelector('[data-count]').textContent=`${opened.filter(d=>d<=available).length} av 24 luckor öppnade`;
+    section.querySelector('[data-count]').textContent=`${activeOpened.filter(d=>d<=available).length} av 24 luckor öppnade`;
     section.querySelector('[data-countdown]').textContent=verified?(p.month===12&&p.day===24?'Idag är det julafton! ✨':`${rules.daysLeft(timestamp)} dagar kvar till julafton`):'';
   }
   function close(){
@@ -77,12 +80,12 @@
   async function openDoor(button){
     if(!isChristmas()||dialog.open)return;
     const day=Number(button.dataset.day);
-    if(now()===null)await syncClock();
+    if(!isPreview()&&now()===null)await syncClock();
     if(!isChristmas())return;
     const timestamp=now();
-    if(timestamp===null){notice.textContent='Vi kunde inte kontrollera datumet. Försök igen när du är ansluten till internet.';return;}
-    progress(timestamp);
-    if(day>rules.available(timestamp)){notice.textContent=`Ho ho ho! Den här luckan öppnas först den ${day} december! 🎅`;return;}
+    if(!isPreview()&&timestamp===null){notice.textContent='Vi kunde inte kontrollera datumet. Försök igen när du är ansluten till internet.';return;}
+    if(timestamp!==null)progress(timestamp);
+    if(day>availableDoors(timestamp)){notice.textContent=`Ho ho ho! Den här luckan öppnas först den ${day} december! 🎅`;return;}
     const requestId=++openingId;
     notice.textContent='';returnFocus=button;
     const entry=days[day-1];image.src=entry.image;image.alt=entry.animal;
@@ -97,14 +100,20 @@
     if(requestId!==openingId||!dialog.open||!isChristmas())return;
     dialog.classList.add('is-opening');
     revealTimer=setTimeout(()=>{
-      if(!dialog.open||!isChristmas()||now()===null||day>rules.available(now())){close();return;}
+      if(!dialog.open||!isChristmas()||day>availableDoors(now())){close();return;}
       dialog.classList.add('is-revealed');
-      if(!opened.includes(day)){opened.push(day);save();}render();
+      if(isPreview()){if(!previewOpened.includes(day))previewOpened.push(day);}
+      else if(!opened.includes(day)){opened.push(day);save();}render();
       if(storageWarning)notice.textContent='Webbläsaren kunde inte spara luckorna. De finns kvar så länge sidan är öppen.';
     },matchMedia('(prefers-reduced-motion: reduce)').matches?50:3600);
   }
   grid.addEventListener('click',e=>{const button=e.target.closest('.advent-door');if(button)openDoor(button);});
-  section.querySelector('.advent-retry').addEventListener('click',syncClock);
+  section.querySelector('.advent-retry:not(.advent-preview)').addEventListener('click',syncClock);
+  section.querySelector('.advent-preview').addEventListener('click',()=>{
+    if(isPreview()){window.FPChristmasPreview=false;close();render();if(now()===null)syncClock();}
+    else window.dispatchEvent(new Event('fp:advent-preview-request'));
+  });
+  window.addEventListener('fp:christmas-preview',()=>{previewOpened=[];close();render();});
   dialog.querySelectorAll('.advent-close,.advent-shut').forEach(b=>b.addEventListener('click',close));
   dialog.addEventListener('cancel',e=>{e.preventDefault();close();});
   dialog.addEventListener('click',e=>{const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)close();});
