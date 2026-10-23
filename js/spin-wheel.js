@@ -18,7 +18,7 @@
  function pick(n){const data=new Uint32Array(1),limit=Math.floor(4294967296/n)*n;do{crypto.getRandomValues(data);}while(data[0]>=limit);return data[0]%n;}
  function page(){return `<section id="fpWheel" class="fun-panel fp-wheel" aria-labelledby="wheel-title"><header><span class="fun-icon" aria-hidden="true">🎡</span><h2 id="wheel-title">Snurrhjulet</h2><p>Spin the wheel! Skriv in namn, aktiviteter eller egna alternativ och låt hjulet välja.</p></header><div class="fp-wheel-layout"><div class="fp-wheel-play"><div class="fp-wheel-frame"><span class="fp-wheel-pointer" aria-hidden="true"></span><div data-wheel-picture></div></div><div class="fp-wheel-result" role="status" aria-live="polite" aria-atomic="true"><span data-wheel-caption>Vad väljer hjulet?</span><strong data-wheel-result></strong></div><button type="button" class="primary fp-wheel-spin" data-wheel-spin>Snurra hjulet</button></div><form class="fun-form fp-wheel-form" data-wheel-form><label for="wheel-choices">Dina alternativ – ett per rad</label><textarea id="wheel-choices" rows="8" maxlength="6000" spellcheck="false" aria-describedby="wheel-help wheel-error"></textarea><p id="wheel-help">2–40 alternativ. Varje rad har lika stor chans att väljas. Dina alternativ sparas i den här webbläsaren.</p><p data-wheel-numbers hidden>Numren på hjulet följer radordningen i listan.</p><p id="wheel-error" role="alert"></p><div class="fp-wheel-editor-actions"><button class="primary" type="submit">Uppdatera hjulet</button><button class="secondary" type="button" data-wheel-reset>Återställ exempel</button></div></form></div></section>`;}
  function mount(root){
-  cancelPrevious();if(!root)return;let choices=stored(),rotation=0,busy=false,timer=null;
+  cancelPrevious();if(!root)return;let choices=stored(),rotation=0,busy=false,frame=null;
   const input=root.querySelector('textarea'),pictureRoot=root.querySelector('[data-wheel-picture]'),spin=root.querySelector('[data-wheel-spin]'),error=root.querySelector('#wheel-error'),result=root.querySelector('[data-wheel-result]'),caption=root.querySelector('[data-wheel-caption]');
   input.value=choices.join('\n');
   function draw(){pictureRoot.innerHTML=picture(choices);rotation=0;root.querySelector('[data-wheel-numbers]').hidden=choices.length<=16;result.textContent='';caption.textContent='Vad väljer hjulet?';}
@@ -27,15 +27,25 @@
   function finish(index){if(!root.isConnected)return;lock(false);caption.textContent='Hjulet valde:';result.textContent=choices[index];}
   spin.addEventListener('click',()=>{
    if(busy||!update(false))return;const index=pick(choices.length),step=360/choices.length,target=(360-(index+.5)*step)%360;
-   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,duration=reduced?0:10500;
-   const disk=pictureRoot.querySelector('svg');rotation+=4320+((target-rotation%360+360)%360);lock(true);result.textContent='';caption.textContent='Hjulet snurrar…';
-   // Commit the starting frame before applying the rotation.
-   disk.getBoundingClientRect();disk.style.transition=duration?`transform ${duration}ms cubic-bezier(.15,.55,.25,1)`:'none';disk.style.transform=`rotate(${rotation}deg)`;
-   if(reduced)finish(index);else timer=setTimeout(()=>finish(index),duration+80);
+   const duration=10000;
+   const disk=pictureRoot.querySelector('svg'),from=rotation;
+   rotation+=4320+((target-rotation%360+360)%360);
+   const to=rotation;lock(true);result.textContent='';caption.textContent='Hjulet snurrar…';
+   // Drive every frame directly so browser transition overrides cannot skip the spin.
+   disk.style.transition='none';let started=null;
+   function tick(now){
+    if(!root.isConnected)return;
+    if(started===null)started=now;
+    const progress=Math.min((now-started)/duration,1),eased=1-Math.pow(1-progress,3);
+    disk.style.transform=`rotate(${from+(to-from)*eased}deg)`;
+    if(progress<1)frame=requestAnimationFrame(tick);
+    else{frame=null;finish(index);}
+   }
+   frame=requestAnimationFrame(tick);
   });
   root.querySelector('form').addEventListener('submit',e=>{e.preventDefault();if(!busy)update();});
   root.querySelector('[data-wheel-reset]').addEventListener('click',()=>{if(busy)return;input.value=defaults.join('\n');update();});
-  cancelPrevious=()=>{clearTimeout(timer);};draw();
+  cancelPrevious=()=>{cancelAnimationFrame(frame);};draw();
  }
  window.FPWheel=Object.freeze({page,mount});
 })();
