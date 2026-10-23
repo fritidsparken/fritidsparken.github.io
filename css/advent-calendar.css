@@ -46,3 +46,11 @@ body:not(.christmas) .advent,body.halloween .advent,.advent[hidden],body:not(.ch
  .advent-popup-actions button{padding:8px 12px}
  .advent-hinge span{font-size:25px}.advent-hinge b{font-size:65px}.advent-hinge small{font-size:10px;margin-top:8px}
 }
+
+/* Keep a centered square inside its grid slot; clip only the zooming picture. */
+.advent-stage-space{position:relative;min-width:0;min-height:0;container-type:size;align-self:stretch;justify-self:stretch}
+.advent-stage-space .advent-stage{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(100cqw,100cqh,410px);height:min(100cqw,100cqh,410px);max-width:none;max-height:none;min-width:0;min-height:0;margin:0;box-sizing:border-box}
+.advent-picture-frame{position:absolute;inset:0;border-radius:15px;overflow:hidden;isolation:isolate}
+.advent-picture-frame .advent-animal{border-radius:inherit}
+.advent-picture-frame img{position:absolute;inset:0;width:100%;height:100%;max-width:100%;max-height:100%;margin:0;padding:0;object-fit:contain;object-position:center;box-sizing:border-box}
+@media(max-height:500px) and (min-width:500px){.advent-stage-space{grid-column:1;grid-row:2/6}.advent-stage-space .advent-stage{grid-column:auto;grid-row:auto}}
