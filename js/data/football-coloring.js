@@ -347,9 +347,9 @@ mandalas.push(...[
     "type": "Fotbollslag",
     "league": "Premier League",
     "season": "2026/27",
-    "img": "./assets/coloring-originals-2026/fotbollslag-20261022/manchester-united.svg",
-    "preview": "./assets/coloring-originals-2026/fotbollslag-20261022/manchester-united.svg",
-    "pdf": "./assets/coloring-originals-2026/fotbollslag-20261022/manchester-united.pdf",
+    "img": "./assets/coloring-originals-2026/fotbollslag-20261022/manchester-united-v2.svg",
+    "preview": "./assets/coloring-originals-2026/fotbollslag-20261022/manchester-united-v2.svg",
+    "pdf": "./assets/coloring-originals-2026/fotbollslag-20261022/manchester-united-v2.pdf",
     "src": "https://github.com/JoseArroyave/football-logos/blob/main/logos/england/Manchester_United.svg",
     "sourceLabel": "Klubbmärke som färgläggningsbild"
   },
