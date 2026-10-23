@@ -1,12 +1,20 @@
 /* Local-only editable wheel; equal slices and a matching animated result. */
 (() => {
  'use strict';
- const defaults=['Rita','Bygga','Dansstopp','Utelek','Pyssel','Läsa','Spela spel','Skattjakt','Julia och Axel'];
+ const defaults=['Rita','Bygga','Dansstopp','Utelek','Pyssel','Läsa','Spela spel','Skattjakt'];
  const colors=['#f6ce70','#84cba5','#f0a5a9','#97c8e7','#c2abe0','#f3b57e','#b6d68c','#e9b8d0'];
  const key='fpSpinWheelChoices';let cancelPrevious=()=>{};
  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function read(text){const values=text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);if(values.length<2)throw Error('Skriv minst två alternativ, ett per rad.');if(values.length>40)throw Error('Hjulet kan ha högst 40 alternativ.');if(values.some(s=>[...s].length>80))throw Error('Varje alternativ får vara högst 80 tecken.');return values;}
- function stored(){try{return read(JSON.parse(localStorage.getItem(key)).join('\n'));}catch{return defaults.slice();}}
+ function stored(){try{
+  const saved=JSON.parse(localStorage.getItem(key));
+  if(localStorage.getItem('fpWheelRemoveJuliaAxel')!=='1'){
+   const cleaned=Array.isArray(saved)?saved.filter(value=>String(value).trim().toLocaleLowerCase('sv')!=='julia och axel'):[];
+   const values=cleaned.length>=2?read(cleaned.join('\n')):defaults.slice();
+   save(values);localStorage.setItem('fpWheelRemoveJuliaAxel','1');return values;
+  }
+  return read(saved.join('\n'));
+ }catch{return defaults.slice();}}
  function save(values){try{localStorage.setItem(key,JSON.stringify(values));}catch{/* Still works when browser storage is unavailable. */}}
  function picture(values){
   const step=360/values.length,point=(a,r)=>[250+Math.cos(a*Math.PI/180)*r,250+Math.sin(a*Math.PI/180)*r];
