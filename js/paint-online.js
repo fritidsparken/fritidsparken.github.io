@@ -164,7 +164,8 @@ const observer=new MutationObserver(addButton);observer.observe(document.body,{c
 function openPainter(IMAGE,TARGET){
  const flightHouseConfig=FLIGHT_HOUSE_COLORING[({"häxan på kvasten":"haxa","det tokiga spökhuset":"spokhus"})[TARGET.toLocaleLowerCase("sv").trim()]]||null;
  const motifConfig=({"spindelns nät":MOTIF_COLORING.spindel,"fladdermusen":MOTIF_COLORING.fladdermus,"halloweenkatten":MOTIF_COLORING.svartkatt,"den magiska kitteln":MOTIF_COLORING.kittel,"pumpafamiljen":MOTIF_COLORING.pumpafamilj})[TARGET.toLocaleLowerCase("sv").trim()]||null;
- const referenceKey=({"pumpalyktan":"pumpkin","häxans hatt":"hat","den busiga mumien":"mummy","den vänliga vampyren":"vampire","monsterkalas":"monster","godismandala":"candy"})[TARGET.toLocaleLowerCase("sv").trim()]||null;
+ const isCatTarget=TARGET.toLocaleLowerCase("sv").trim()==="katt"&&/\/djur\/katt(?:-preview)?\.webp(?:[?#]|$)/.test(new URL(IMAGE,location.href).pathname);
+ const referenceKey=isCatTarget?"animal-cat":({"pumpalyktan":"pumpkin","häxans hatt":"hat","den busiga mumien":"mummy","den vänliga vampyren":"vampire","monsterkalas":"monster","godismandala":"candy"})[TARGET.toLocaleLowerCase("sv").trim()]||null;
  let referenceConfig=null;
  const potionConfig=TARGET.toLocaleLowerCase("sv").trim()==="trolldrycksflaskorna"?POTION_COLORING:null;
  const wreathConfig=TARGET.toLocaleLowerCase("sv").trim()==="halloweenkrans"?WREATH_COLORING:null;
@@ -193,7 +194,7 @@ function openPainter(IMAGE,TARGET){
 
  const img=new Image();if(new URL(IMAGE,location.href).origin!==location.origin)img.crossOrigin="anonymous";img.onload=async()=>{
    if(referenceKey){
-     try{const response=await fetch(new URL("../assets/mandala-halloween-2026/"+referenceKey+"-coloring-v1.json",document.querySelector('script[src*="paint-online.js"]')?.src||new URL("js/paint-online.js",location.href)));if(!response.ok)throw new Error("Colour model missing");referenceConfig=await response.json()}
+     try{const response=await fetch(new URL((isCatTarget?"../assets/coloring-originals-2026/djur/katt-coloring-v1.json":"../assets/mandala-halloween-2026/"+referenceKey+"-coloring-v1.json"),document.querySelector('script[src*="paint-online.js"]')?.src||new URL("js/paint-online.js",location.href)));if(!response.ok)throw new Error("Colour model missing");referenceConfig=await response.json()}
      catch{status.textContent="Färganpassningen kunde inte öppnas. Stäng och försök igen.";return}
    }
    const prepareCanvas=()=>{
@@ -217,7 +218,7 @@ function openPainter(IMAGE,TARGET){
    };
    if(!flightHouseConfig&&!motifConfig&&!referenceKey&&!spokConfig&&!owlConfig&&!wreathConfig&&!potionConfig&&!bookConfig&&!graveConfig&&!trainConfig&&(horseConfig||String(TARGET||"").toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset"))getGhostReference().then(prepareCanvas).catch(()=>{status.textContent="Färgreferensen kunde inte öppnas. Stäng och försök igen."});
    else prepareCanvas();
- };img.onerror=()=>{$(".fp-paint-status").textContent="Bilden kunde inte öppnas. Stäng och försök igen.";};img.src=IMAGE;
+ };img.onerror=()=>{$(".fp-paint-status").textContent="Bilden kunde inte öppnas. Stäng och försök igen.";};img.src=isCatTarget?new URL("katt.webp",new URL(IMAGE,location.href)).href:IMAGE;
  function fit(){if(!W)return;let r=W/H,aw=stage.clientWidth-24,ah=stage.clientHeight-24,w=Math.min(aw,ah*r);sheet.style.width=w+"px";sheet.style.height=w/r+"px";applyTransform()}
  function applyTransform(){sheet.style.transform="translate(calc(-50% + "+tx+"px),calc(-50% + "+ty+"px)) scale("+zoom+")"}
  function setZoom(z){zoom=Math.max(1,Math.min(4,z));if(zoom===1)tx=ty=0;applyTransform()}
@@ -352,7 +353,7 @@ c.putImageData(out,0,0)
      for(const [x,y,role,shades] of motifConfig.regions){const r=regions[labels[y*W+x]-1];if(r){r.hint=role;r.shades=shades}}
      for(const r of regions)if(!r.shades){r.hint="sky";r.shades=motifConfig.palettes.sky}
    }else if(referenceConfig){
-     for(const [x,y,role,shades,surface] of referenceConfig.regions){const r=regions[labels[y*W+x]-1];if(r){r.hint=role;r.shades=shades;r.surface=surface}}
+     for(const [x,y,role,shades,surface,area,degree,coeff] of referenceConfig.regions){const r=regions[labels[y*W+x]-1];if(r&&(!isCatTarget||!r.seedArea||area>r.seedArea)){r.hint=role;r.shades=shades;r.surface=surface;if(isCatTarget){r.seedArea=area;r.degree=degree;r.coeff=coeff}}}
      for(const r of regions)if(!r.shades){r.hint="fabric";r.shades=referenceConfig.palettes.fabric}
    }else if(spokConfig){
      for(const [x,y,role,shades,surface] of spokConfig.regions){const r=regions[labels[y*W+x]-1];if(r){r.hint=role;r.shades=shades;r.surface=surface}}
@@ -853,7 +854,24 @@ c.putImageData(out,0,0)
  }
  // Paint an original closed region from its material palette and a smooth
  // six-coefficient colour model. No reference bitmap is used at runtime.
+ function paintCatRegion(region){
+   const w=region.maxX-region.minX+1,h=region.maxY-region.minY+1,mask=document.createElement("canvas");mask.width=w;mask.height=h;
+   const g=mask.getContext("2d"),im=g.createImageData(w,h),data=im.data;
+   const [nx,ny]=region.degree||[0,0],basis=(n,t)=>{const out=[1,t];for(let j=2;j<=n;j++)out[j]=2*t*out[j-1]-out[j-2];return out};
+   const bx=Array.from({length:w},(_,x)=>basis(nx,(x+region.minX)/(W-1)*2-1)),by=Array.from({length:h},(_,y)=>basis(ny,(y+region.minY)/(H-1)*2-1));
+   for(const index of region.pixels){
+     const gx=index%W,gy=(index/W)|0,x=gx-region.minX,y=gy-region.minY,k=(y*w+x)*4;let rgb=region.shades[1].slice();
+     if(region.hint==="paper")rgb=[255,255,255];
+     else if(region.coeff){rgb=region.coeff.map(co=>{let sum=0;for(let i=0;i<=nx;i++)for(let j=0;j<=ny;j++)sum+=co[i*(ny+1)+j]*bx[x][i]*by[y][j];return Math.max(0,Math.min(255,sum))})}
+     if(region.hint==="fur"){
+       const grain=.45*Math.sin(gx*.73+gy*.11+Math.sin(gy*.02)*4);rgb=rgb.map(v=>v+grain);
+     }
+     for(let c=0;c<3;c++)data[k+c]=rgb[c];data[k+3]=255;
+   }
+   g.putImageData(im,0,0);ctx.drawImage(mask,region.minX,region.minY);
+ }
  function paintReferenceRegion(region){
+   if(isCatTarget){paintCatRegion(region);return}
    const width=region.maxX-region.minX+1,height=region.maxY-region.minY+1,mask=document.createElement("canvas");mask.width=width;mask.height=height;
    const g=mask.getContext("2d"),im=g.createImageData(width,height),d=im.data,role=region.hint,pal=referenceConfig.palettes,stops=region.shades;
    const mix=(a,b,t)=>a+(b-a)*t,clamp=(n,a=0,b=1)=>Math.max(a,Math.min(b,n));
