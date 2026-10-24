@@ -1415,22 +1415,7 @@ c.putImageData(out,0,0)
      status.textContent="Hämtar bakverkets färgreferens…";
      try{
        const reference=await new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=reject;image.src=REFERENCE});
-       const regions=await findAutoRegions();
-       const rw=regions.length?Math.round(W/regions[0].scaleX):W,rh=regions.length?Math.round(H/regions[0].scaleY):H;
-       const sample=document.createElement("canvas");sample.width=rw;sample.height=rh;
-       const sampleContext=sample.getContext("2d",{willReadFrequently:true});sampleContext.drawImage(reference,0,0,rw,rh);
-       const pixels=sampleContext.getImageData(0,0,rw,rh).data;
-       plan=regions.map(region=>{
-         const bins=new Map();
-         for(const index of region.pixels){const k=index*4,r=pixels[k],g=pixels[k+1],b=pixels[k+2];
-           if(Math.max(r,g,b)<65||Math.min(r,g,b)>245)continue;
-           const key=(r>>4)*256+(g>>4)*16+(b>>4),entry=bins.get(key)||[0,0,0,0];
-           entry[0]++;entry[1]+=r;entry[2]+=g;entry[3]+=b;bins.set(key,entry);
-         }
-         const best=[...bins.values()].sort((a,b)=>b[0]-a[0])[0];
-         const color=best?"#"+best.slice(1).map(v=>Math.round(v/best[0]).toString(16).padStart(2,"0")).join(""):"#fff4df";
-         return {type:"region",region,color};
-       });
+       plan=[{type:"bakeryReference",image:reference}];
      }catch(error){
        autoRunning=false;autoButton.disabled=false;autoProgress.hidden=true;sheet.style.pointerEvents="";
        status.textContent="Färgreferensen kunde inte öppnas. Försök igen.";return;
@@ -1451,7 +1436,9 @@ c.putImageData(out,0,0)
    for(let i=0;i<plan.length;i++){
      if(!back.isConnected){autoRunning=false;return}
      const step=plan[i];
-     if(step.type==="region"){
+     if(step.type==="bakeryReference"){
+       ctx.drawImage(step.image,0,0,W,H);acts.push({type:"bakeryReference",image:step.image});
+     }else if(step.type==="region"){
        paintAutoRegion(step.region,step.color);
        acts.push({type:"region",region:step.region,color:step.color});
      }else if(step.type==="ghostRegion"){
@@ -1467,7 +1454,7 @@ c.putImageData(out,0,0)
    status.textContent=isGhost?"Klart! "+TARGET+" är färglagd enligt färgreferensen. Du kan fortsätta måla eller spara bilden.":"Klart! "+TARGET+" är färglagd. Du kan fortsätta måla eller spara bilden.";
  }
  if(autoButton)autoButton.addEventListener("click",runAutoColor);
- function redraw(){lines.style.opacity="";if(ghostOriginalInk)lctx.putImageData(ghostOriginalInk,0,0);ctx.clearRect(0,0,W,H);for(const a of acts){if(a.type==="ghostRegions"){for(const region of a.regions)paintGhostRegion(region)}else if(a.type==="ghostRegion"){paintGhostRegion(a.region)}else if(a.type==="fill"){const old=color;color=a.color;fillRegion(ctx,a.x,a.y);color=old}else if(a.type==="region"){paintAutoRegion(a.region,a.color)}else drawStroke(ctx,a)}historyUI()}
+ function redraw(){lines.style.opacity="";if(ghostOriginalInk)lctx.putImageData(ghostOriginalInk,0,0);ctx.clearRect(0,0,W,H);for(const a of acts){if(a.type==="bakeryReference"){ctx.drawImage(a.image,0,0,W,H)}else if(a.type==="ghostRegions"){for(const region of a.regions)paintGhostRegion(region)}else if(a.type==="ghostRegion"){paintGhostRegion(a.region)}else if(a.type==="fill"){const old=color;color=a.color;fillRegion(ctx,a.x,a.y);color=old}else if(a.type==="region"){paintAutoRegion(a.region,a.color)}else drawStroke(ctx,a)}historyUI()}
  function pos(e){const r=sheet.getBoundingClientRect();return [(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H]}
  const pointers=new Map();
  sheet.addEventListener("pointerdown",e=>{if(!W)return;e.preventDefault();sheet.setPointerCapture(e.pointerId);pointers.set(e.pointerId,[e.clientX,e.clientY]);
