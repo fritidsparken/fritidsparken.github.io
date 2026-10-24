@@ -1294,6 +1294,7 @@ c.putImageData(out,0,0)
    if(cutout){mask.getContext("2d").putImageData(cutout,0,0);lctx.save();lctx.globalCompositeOperation="destination-out";lctx.drawImage(mask,region.minX,region.minY);lctx.restore()}
  }
  function paintGhostRegion(region){
+   if(animalModel==="koala"){paintKoalaRegion(region);return}
    if(flightHouseConfig){paintFlightHouseRegion(region);return}
    if(motifConfig){paintMotifRegion(region);return}
    if(referenceConfig){paintReferenceRegion(region);return}
