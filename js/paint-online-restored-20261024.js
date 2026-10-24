@@ -386,7 +386,10 @@ c.putImageData(out,0,0)
      for(const r of regions)if(!r.shades){r.hint="sky";r.shades=motifConfig.palettes.sky}
    }else if(referenceConfig){
      for(const [x,y,role,shades,surface,area,degree,coeff,bounds] of referenceConfig.regions){const r=regions[labels[y*W+x]-1];if(r&&(!isAnimalTarget||!r.seedArea||area>r.seedArea)){r.hint=role;r.shades=shades;r.surface=surface;if(isWhaleTarget)r.spline=bounds;if(isGiraffeTarget||isTurtleTarget||isSquirrelTarget)r.giraffeDegree=degree;if(isAnimalTarget){r.seedArea=area;r.degree=degree;r.coeff=coeff;if(isNewAnimalTarget)r.modelBounds=bounds}}}
-     for(const r of regions)if(!r.shades){r.hint="fabric";r.shades=referenceConfig.palettes.fabric}
+     for(const r of regions)if(!r.shades){
+       if(isNewAnimalTarget&&animalModel==="koala"){r.hint=r.area>200000?"paper":"fur";r.shades=referenceConfig.palettes[r.hint]||referenceConfig.palettes.fur}
+       else {r.hint="fabric";r.shades=referenceConfig.palettes.fabric}
+     }
    }else if(spokConfig){
      for(const [x,y,role,shades,surface] of spokConfig.regions){const r=regions[labels[y*W+x]-1];if(r){r.hint=role;r.shades=shades;r.surface=surface}}
      for(const r of regions)if(!r.shades){r.hint="purple";r.shades=spokConfig.palettes.purple}
