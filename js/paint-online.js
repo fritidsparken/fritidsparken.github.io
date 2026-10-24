@@ -1410,6 +1410,30 @@ c.putImageData(out,0,0)
      if(!flightHouseConfig&&!motifConfig&&!referenceKey&&!spokConfig&&!owlConfig&&!wreathConfig&&!potionConfig&&!bookConfig&&!graveConfig&&(trainConfig||!horseConfig))prepareGhostPumpkinLights();
      for(const region of regions)if(!flightHouseConfig&&!motifConfig&&!referenceKey&&!spokConfig&&!owlConfig&&!wreathConfig&&!potionConfig&&!bookConfig&&!graveConfig&&!trainConfig)region.shades=ghostRegionShades(region,palettes);
      plan=regions.map(region=>({type:"ghostRegion",region}));
+   }else if(REFERENCE&&IMAGE.includes("/bakverk-uploads-20261020/")){
+     status.textContent="Hämtar bakverkets färgreferens…";
+     try{
+       const reference=await new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=reject;image.src=REFERENCE});
+       const regions=await findAutoRegions();
+       const rw=regions.length?Math.round(W/regions[0].scaleX):W,rh=regions.length?Math.round(H/regions[0].scaleY):H;
+       const sample=document.createElement("canvas");sample.width=rw;sample.height=rh;
+       const sampleContext=sample.getContext("2d",{willReadFrequently:true});sampleContext.drawImage(reference,0,0,rw,rh);
+       const pixels=sampleContext.getImageData(0,0,rw,rh).data;
+       plan=regions.map(region=>{
+         const bins=new Map();
+         for(const index of region.pixels){const k=index*4,r=pixels[k],g=pixels[k+1],b=pixels[k+2];
+           if(Math.max(r,g,b)<65||Math.min(r,g,b)>245)continue;
+           const key=(r>>4)*256+(g>>4)*16+(b>>4),entry=bins.get(key)||[0,0,0,0];
+           entry[0]++;entry[1]+=r;entry[2]+=g;entry[3]+=b;bins.set(key,entry);
+         }
+         const best=[...bins.values()].sort((a,b)=>b[0]-a[0])[0];
+         const color=best?"#"+best.slice(1).map(v=>Math.round(v/best[0]).toString(16).padStart(2,"0")).join(""):"#fff4df";
+         return {type:"region",region,color};
+       });
+     }catch(error){
+       autoRunning=false;autoButton.disabled=false;autoProgress.hidden=true;sheet.style.pointerEvents="";
+       status.textContent="Färgreferensen kunde inte öppnas. Försök igen.";return;
+     }
    }else{
      status.textContent="Hittar slutna färgområden…";
      await new Promise(resolve=>requestAnimationFrame(()=>resolve()));
