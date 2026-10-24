@@ -171,8 +171,9 @@ function openPainter(IMAGE,TARGET){
  const isElephantTarget=TARGET.toLocaleLowerCase("sv").trim()==="elefant"&&/\/djur\/elefant(?:-preview)?\.webp$/.test(new URL(IMAGE,location.href).pathname);
  const animalModel=({"kanin":"kanin","björn":"bjorn","groda":"groda"})[TARGET.toLocaleLowerCase("sv").trim()];
  const isNewAnimalTarget=!!animalModel&&new URL(IMAGE,location.href).pathname.endsWith("/djur/"+animalModel+"-preview.webp");
- const isAnimalTarget=isNewAnimalTarget||isCatTarget||isDogTarget||isFoxTarget||isElephantTarget;
- const referenceKey=isNewAnimalTarget?"animal-"+animalModel:isElephantTarget?"animal-elephant":isGiraffeTarget?"animal-giraffe":isFoxTarget?"animal-fox":isDogTarget?"animal-dog":isCatTarget?"animal-cat":({"pumpalyktan":"pumpkin","häxans hatt":"hat","den busiga mumien":"mummy","den vänliga vampyren":"vampire","monsterkalas":"monster","godismandala":"candy"})[TARGET.toLocaleLowerCase("sv").trim()]||null;
+ const isDolphinTarget=TARGET.toLocaleLowerCase("sv").trim()==="delfin"&&/\/djur\/delfin(?:-preview)?\.webp$/.test(new URL(IMAGE,location.href).pathname);
+ const isAnimalTarget=isNewAnimalTarget||isCatTarget||isDogTarget||isFoxTarget||isElephantTarget||isDolphinTarget;
+ const referenceKey=isDolphinTarget?"animal-dolphin":isNewAnimalTarget?"animal-"+animalModel:isElephantTarget?"animal-elephant":isGiraffeTarget?"animal-giraffe":isFoxTarget?"animal-fox":isDogTarget?"animal-dog":isCatTarget?"animal-cat":({"pumpalyktan":"pumpkin","häxans hatt":"hat","den busiga mumien":"mummy","den vänliga vampyren":"vampire","monsterkalas":"monster","godismandala":"candy"})[TARGET.toLocaleLowerCase("sv").trim()]||null;
  let referenceConfig=null;
  const potionConfig=TARGET.toLocaleLowerCase("sv").trim()==="trolldrycksflaskorna"?POTION_COLORING:null;
  const wreathConfig=TARGET.toLocaleLowerCase("sv").trim()==="halloweenkrans"?WREATH_COLORING:null;
@@ -201,7 +202,7 @@ function openPainter(IMAGE,TARGET){
 
  const img=new Image();if(new URL(IMAGE,location.href).origin!==location.origin)img.crossOrigin="anonymous";img.onload=async()=>{
    if(referenceKey){
-     try{const response=await fetch(new URL((isNewAnimalTarget?"../assets/coloring-originals-2026/djur/"+animalModel+"-coloring-v1.json":isElephantTarget?"../assets/coloring-originals-2026/djur/elefant-coloring-v1.json":isGiraffeTarget?"../assets/coloring-originals-2026/djur/giraff-coloring-v1.json":isFoxTarget?"../assets/coloring-originals-2026/djur/rav-coloring-v1.json":isDogTarget?"../assets/coloring-originals-2026/djur/hund-coloring-v1.json":isCatTarget?"../assets/coloring-originals-2026/djur/katt-coloring-v2.json":"../assets/mandala-halloween-2026/"+referenceKey+"-coloring-v1.json"),document.querySelector('script[src*="paint-online.js"]')?.src||new URL("js/paint-online.js",location.href)));if(!response.ok)throw new Error("Colour model missing");referenceConfig=await response.json()}
+     try{const response=await fetch(new URL((isDolphinTarget?"../assets/coloring-originals-2026/djur/delfin-coloring-v1.json":isNewAnimalTarget?"../assets/coloring-originals-2026/djur/"+animalModel+"-coloring-v1.json":isElephantTarget?"../assets/coloring-originals-2026/djur/elefant-coloring-v1.json":isGiraffeTarget?"../assets/coloring-originals-2026/djur/giraff-coloring-v1.json":isFoxTarget?"../assets/coloring-originals-2026/djur/rav-coloring-v1.json":isDogTarget?"../assets/coloring-originals-2026/djur/hund-coloring-v1.json":isCatTarget?"../assets/coloring-originals-2026/djur/katt-coloring-v2.json":"../assets/mandala-halloween-2026/"+referenceKey+"-coloring-v1.json"),document.querySelector('script[src*="paint-online.js"]')?.src||new URL("js/paint-online.js",location.href)));if(!response.ok)throw new Error("Colour model missing");referenceConfig=await response.json()}
      catch{status.textContent="Färganpassningen kunde inte öppnas. Stäng och försök igen.";return}
    }
    const prepareCanvas=()=>{
@@ -878,7 +879,7 @@ c.putImageData(out,0,0)
    }
    g.putImageData(im,0,0);ctx.drawImage(mask,region.minX,region.minY);
  }
- // Elephant uses only fitted smooth RGB coefficients and the original mask.
+ // Elephant and dolphin use only fitted smooth RGB coefficients and the original mask.
  // Normalize within the original region; generated contour pixels are absent.
  function paintElephantRegion(region){
    const w=region.maxX-region.minX+1,h=region.maxY-region.minY+1,mask=document.createElement("canvas");mask.width=w;mask.height=h;
@@ -892,7 +893,7 @@ c.putImageData(out,0,0)
    g.putImageData(im,0,0);ctx.drawImage(mask,region.minX,region.minY);
  }
  function paintReferenceRegion(region){
-   if(isElephantTarget){paintElephantRegion(region);return}
+   if(isElephantTarget||isDolphinTarget){paintElephantRegion(region);return}
    if(isGiraffeTarget){
      const width=region.maxX-region.minX+1,height=region.maxY-region.minY+1,c=document.createElement("canvas");c.width=width;c.height=height;
      const g=c.getContext("2d"),im=g.createImageData(width,height);
