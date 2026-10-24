@@ -177,8 +177,9 @@ function openPainter(IMAGE,TARGET,REFERENCE=""){
  const isFoxTarget=TARGET.toLocaleLowerCase("sv").trim()==="räv"&&/\/djur\/rav(?:-preview)?\.webp(?:[?#]|$)/.test(new URL(IMAGE,location.href).pathname);
  const isElephantTarget=TARGET.toLocaleLowerCase("sv").trim()==="elefant"&&/\/djur\/elefant(?:-preview)?\.webp$/.test(new URL(IMAGE,location.href).pathname);
  const isWhaleTarget=TARGET.toLocaleLowerCase("sv").trim()==="val"&&/\/djur\/val(?:-preview)?\.webp$/.test(new URL(IMAGE,location.href).pathname);
- const animalModel=({"uggla":"uggla","kanin":"kanin","björn":"bjorn","groda":"groda","rådjur":"radjur","utter":"utter"})[TARGET.toLocaleLowerCase("sv").trim()];
+ const animalModel=({"uggla":"uggla","kanin":"kanin","björn":"bjorn","groda":"groda","rådjur":"radjur","utter":"utter","koala":"koala"})[TARGET.toLocaleLowerCase("sv").trim()];
  const isNewAnimalTarget=!!animalModel&&new URL(IMAGE,location.href).pathname.endsWith("/djur/"+animalModel+"-preview.webp");
+ if(isNewAnimalTarget&&animalModel==="koala"&&!REFERENCE)REFERENCE=new URL("koala-reference-v1.svg",new URL(IMAGE,location.href)).href;
  const isDolphinTarget=TARGET.toLocaleLowerCase("sv").trim()==="delfin"&&/\/djur\/delfin(?:-preview)?\.webp$/.test(new URL(IMAGE,location.href).pathname);
  const isHedgehogTarget=TARGET.toLocaleLowerCase("sv").trim()==="igelkott"&&/\/djur\/igelkott(?:-preview)?\.webp(?:[?#]|$)/.test(new URL(IMAGE,location.href).pathname);
  const isPenguinTarget=TARGET.toLocaleLowerCase("sv").trim()==="pingvin"&&/\/djur\/pingvin(?:-preview)?\.webp(?:[?#]|$)/.test(new URL(IMAGE,location.href).pathname);
