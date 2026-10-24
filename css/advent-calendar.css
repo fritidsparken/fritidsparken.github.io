@@ -63,3 +63,8 @@ body:not(.christmas) .advent,body.halloween .advent,.advent[hidden],body:not(.ch
 .advent-door.is-past-opened{filter:grayscale(1);background:linear-gradient(145deg,#606662,#343a36);color:#e1e4e2;border-color:#919a94;outline-color:#919a94;box-shadow:0 5px 12px #0004,inset 0 1px #ffffff14}
 .advent-door.is-past-opened .advent-door-inner{border-color:#a0a9a380}
 .advent-door.is-past-opened .advent-ornament{color:#c5cdc8}
+
+/* Tighter spacing in the opened advent-door layout. */
+.advent-dialog .advent-popup h2{margin-bottom:8px}
+.advent-dialog .advent-message{margin-top:12px}
+.advent-dialog .advent-answer{margin-top:4px}
