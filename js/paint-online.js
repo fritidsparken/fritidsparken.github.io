@@ -165,6 +165,9 @@ function openPainter(IMAGE,TARGET){
  const flightHouseConfig=FLIGHT_HOUSE_COLORING[({"häxan på kvasten":"haxa","det tokiga spökhuset":"spokhus"})[TARGET.toLocaleLowerCase("sv").trim()]]||null;
  const motifConfig=({"spindelns nät":MOTIF_COLORING.spindel,"fladdermusen":MOTIF_COLORING.fladdermus,"halloweenkatten":MOTIF_COLORING.svartkatt,"den magiska kitteln":MOTIF_COLORING.kittel,"pumpafamiljen":MOTIF_COLORING.pumpafamilj})[TARGET.toLocaleLowerCase("sv").trim()]||null;
  const isCatTarget=TARGET.toLocaleLowerCase("sv").trim()==="katt"&&/\/djur\/katt(?:-preview)?\.webp(?:[?#]|$)/.test(new URL(IMAGE,location.href).pathname);
+ const isLionTarget=TARGET.toLocaleLowerCase("sv").trim()==="lejon"&&/\/djur\/lejon(?:-preview)?\.webp(?:[?#]|$)/.test(new URL(IMAGE,location.href).pathname);
+ const isPandaTarget=TARGET.toLocaleLowerCase("sv").trim()==="panda"&&/\/djur\/panda(?:-preview)?\.webp(?:[?#]|$)/.test(new URL(IMAGE,location.href).pathname);
+ const isLocalSurfaceTarget=isLionTarget||isPandaTarget;
  const isGiraffeTarget=TARGET.toLocaleLowerCase("sv").trim()==="giraff"&&/\/djur\/giraff(?:-preview)?\.webp$/.test(new URL(IMAGE,location.href).pathname);
  const isDogTarget=TARGET.toLocaleLowerCase("sv").trim()==="hund"&&/\/djur\/hund(?:-preview)?\.webp(?:[?#]|$)/.test(new URL(IMAGE,location.href).pathname);
  const isFoxTarget=TARGET.toLocaleLowerCase("sv").trim()==="räv"&&/\/djur\/rav(?:-preview)?\.webp(?:[?#]|$)/.test(new URL(IMAGE,location.href).pathname);
@@ -175,8 +178,8 @@ function openPainter(IMAGE,TARGET){
  const isDolphinTarget=TARGET.toLocaleLowerCase("sv").trim()==="delfin"&&/\/djur\/delfin(?:-preview)?\.webp$/.test(new URL(IMAGE,location.href).pathname);
  const isHedgehogTarget=TARGET.toLocaleLowerCase("sv").trim()==="igelkott"&&/\/djur\/igelkott(?:-preview)?\.webp(?:[?#]|$)/.test(new URL(IMAGE,location.href).pathname);
  const isPenguinTarget=TARGET.toLocaleLowerCase("sv").trim()==="pingvin"&&/\/djur\/pingvin(?:-preview)?\.webp(?:[?#]|$)/.test(new URL(IMAGE,location.href).pathname);
- const isAnimalTarget=isPenguinTarget||isHedgehogTarget||isNewAnimalTarget||isCatTarget||isDogTarget||isFoxTarget||isElephantTarget||isDolphinTarget;
- const referenceKey=isWhaleTarget?"animal-whale":isPenguinTarget?"animal-penguin":isHedgehogTarget?"animal-hedgehog":isDolphinTarget?"animal-dolphin":isNewAnimalTarget?"animal-"+animalModel:isElephantTarget?"animal-elephant":isGiraffeTarget?"animal-giraffe":isFoxTarget?"animal-fox":isDogTarget?"animal-dog":isCatTarget?"animal-cat":({"pumpalyktan":"pumpkin","häxans hatt":"hat","den busiga mumien":"mummy","den vänliga vampyren":"vampire","monsterkalas":"monster","godismandala":"candy"})[TARGET.toLocaleLowerCase("sv").trim()]||null;
+ const isAnimalTarget=isPenguinTarget||isHedgehogTarget||isNewAnimalTarget||isCatTarget||isDogTarget||isFoxTarget||isElephantTarget||isDolphinTarget||isLionTarget||isPandaTarget;
+ const referenceKey=isPandaTarget?"animal-panda":isLionTarget?"animal-lion":isWhaleTarget?"animal-whale":isPenguinTarget?"animal-penguin":isHedgehogTarget?"animal-hedgehog":isDolphinTarget?"animal-dolphin":isNewAnimalTarget?"animal-"+animalModel:isElephantTarget?"animal-elephant":isGiraffeTarget?"animal-giraffe":isFoxTarget?"animal-fox":isDogTarget?"animal-dog":isCatTarget?"animal-cat":({"pumpalyktan":"pumpkin","häxans hatt":"hat","den busiga mumien":"mummy","den vänliga vampyren":"vampire","monsterkalas":"monster","godismandala":"candy"})[TARGET.toLocaleLowerCase("sv").trim()]||null;
  let referenceConfig=null;
  const potionConfig=TARGET.toLocaleLowerCase("sv").trim()==="trolldrycksflaskorna"?POTION_COLORING:null;
  const wreathConfig=TARGET.toLocaleLowerCase("sv").trim()==="halloweenkrans"?WREATH_COLORING:null;
@@ -205,7 +208,7 @@ function openPainter(IMAGE,TARGET){
 
  const img=new Image();if(new URL(IMAGE,location.href).origin!==location.origin)img.crossOrigin="anonymous";img.onload=async()=>{
    if(referenceKey){
-     try{const response=await fetch(new URL((isWhaleTarget?"../assets/coloring-originals-2026/djur/val-coloring-v1.json":isPenguinTarget?"../assets/coloring-originals-2026/djur/pingvin-coloring/model.json":isHedgehogTarget?"../assets/coloring-originals-2026/djur/igelkott-coloring/model.json":isDolphinTarget?"../assets/coloring-originals-2026/djur/delfin-coloring-v1.json":isNewAnimalTarget?"../assets/coloring-originals-2026/djur/"+animalModel+"-coloring-v1.json":isElephantTarget?"../assets/coloring-originals-2026/djur/elefant-coloring-v1.json":isGiraffeTarget?"../assets/coloring-originals-2026/djur/giraff-coloring-v1.json":isFoxTarget?"../assets/coloring-originals-2026/djur/rav-coloring-v1.json":isDogTarget?"../assets/coloring-originals-2026/djur/hund-coloring-v1.json":isCatTarget?"../assets/coloring-originals-2026/djur/katt-coloring-v2.json":"../assets/mandala-halloween-2026/"+referenceKey+"-coloring-v1.json"),document.querySelector('script[src*="paint-online.js"]')?.src||new URL("js/paint-online.js",location.href)));if(!response.ok)throw new Error("Colour model missing");referenceConfig=await response.json()}
+     try{const response=await fetch(new URL((isPandaTarget?"../assets/coloring-originals-2026/djur/panda-coloring-v1.json":isLionTarget?"../assets/coloring-originals-2026/djur/lejon-coloring-v1.json":isWhaleTarget?"../assets/coloring-originals-2026/djur/val-coloring-v1.json":isPenguinTarget?"../assets/coloring-originals-2026/djur/pingvin-coloring/model.json":isHedgehogTarget?"../assets/coloring-originals-2026/djur/igelkott-coloring/model.json":isDolphinTarget?"../assets/coloring-originals-2026/djur/delfin-coloring-v1.json":isNewAnimalTarget?"../assets/coloring-originals-2026/djur/"+animalModel+"-coloring-v1.json":isElephantTarget?"../assets/coloring-originals-2026/djur/elefant-coloring-v1.json":isGiraffeTarget?"../assets/coloring-originals-2026/djur/giraff-coloring-v1.json":isFoxTarget?"../assets/coloring-originals-2026/djur/rav-coloring-v1.json":isDogTarget?"../assets/coloring-originals-2026/djur/hund-coloring-v1.json":isCatTarget?"../assets/coloring-originals-2026/djur/katt-coloring-v2.json":"../assets/mandala-halloween-2026/"+referenceKey+"-coloring-v1.json"),document.querySelector('script[src*="paint-online.js"]')?.src||new URL("js/paint-online.js",location.href)));if(!response.ok)throw new Error("Colour model missing");referenceConfig=await response.json()}
      catch{status.textContent="Färganpassningen kunde inte öppnas. Stäng och försök igen.";return}
    }
    const prepareCanvas=()=>{
@@ -229,7 +232,7 @@ function openPainter(IMAGE,TARGET){
    };
    if(!flightHouseConfig&&!motifConfig&&!referenceKey&&!spokConfig&&!owlConfig&&!wreathConfig&&!potionConfig&&!bookConfig&&!graveConfig&&!trainConfig&&(horseConfig||String(TARGET||"").toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset"))getGhostReference().then(prepareCanvas).catch(()=>{status.textContent="Färgreferensen kunde inte öppnas. Stäng och försök igen."});
    else prepareCanvas();
- };img.onerror=()=>{$(".fp-paint-status").textContent="Bilden kunde inte öppnas. Stäng och försök igen.";};img.src=isPenguinTarget?new URL("pingvin.webp",new URL(IMAGE,location.href)).href:isHedgehogTarget?new URL("igelkott.webp",new URL(IMAGE,location.href)).href:isNewAnimalTarget?new URL(animalModel+".webp",new URL(IMAGE,location.href)).href:isGiraffeTarget?new URL("giraff.webp",new URL(IMAGE,location.href)).href:isFoxTarget?new URL("rav.webp",new URL(IMAGE,location.href)).href:isDogTarget?new URL("hund.webp",new URL(IMAGE,location.href)).href:isCatTarget?new URL("katt.webp",new URL(IMAGE,location.href)).href:IMAGE;
+ };img.onerror=()=>{$(".fp-paint-status").textContent="Bilden kunde inte öppnas. Stäng och försök igen.";};img.src=isPandaTarget?new URL("panda.webp",new URL(IMAGE,location.href)).href:isLionTarget?new URL("lejon.webp",new URL(IMAGE,location.href)).href:isPenguinTarget?new URL("pingvin.webp",new URL(IMAGE,location.href)).href:isHedgehogTarget?new URL("igelkott.webp",new URL(IMAGE,location.href)).href:isNewAnimalTarget?new URL(animalModel+".webp",new URL(IMAGE,location.href)).href:isGiraffeTarget?new URL("giraff.webp",new URL(IMAGE,location.href)).href:isFoxTarget?new URL("rav.webp",new URL(IMAGE,location.href)).href:isDogTarget?new URL("hund.webp",new URL(IMAGE,location.href)).href:isCatTarget?new URL("katt.webp",new URL(IMAGE,location.href)).href:IMAGE;
  function fit(){if(!W)return;let r=W/H,aw=stage.clientWidth-24,ah=stage.clientHeight-24,w=Math.min(aw,ah*r);sheet.style.width=w+"px";sheet.style.height=w/r+"px";applyTransform()}
  function applyTransform(){sheet.style.transform="translate(calc(-50% + "+tx+"px),calc(-50% + "+ty+"px)) scale("+zoom+")"}
  function setZoom(z){zoom=Math.max(1,Math.min(4,z));if(zoom===1)tx=ty=0;applyTransform()}
@@ -875,6 +878,7 @@ c.putImageData(out,0,0)
      const gx=index%W,gy=(index/W)|0,x=gx-region.minX,y=gy-region.minY,k=(y*w+x)*4;let rgb=region.shades[1].slice();
      if(region.hint==="paper")rgb=[255,255,255];
      else if(region.coeff){rgb=region.coeff.map(co=>{let sum=0;for(let i=0;i<=nx;i++)for(let j=0;j<=ny;j++)sum+=co[i*(ny+1)+j]*bx[x][i]*by[y][j];return Math.max(0,Math.min(255,sum))})}
+     if(isLocalSurfaceTarget)rgb=rgb.map((v,c)=>Math.max(region.shades[0][c],Math.min(region.shades[2][c],v)));
      if(region.hint==="fur"){
        const grain=.45*Math.sin(gx*.73+gy*.11+Math.sin(gy*.02)*4);rgb=rgb.map(v=>v+grain);
      }
@@ -1369,7 +1373,7 @@ c.putImageData(out,0,0)
      }
      future=[];autoProgress.value=i+1;
      status.textContent="Timelapse: färglägger "+TARGET+", steg "+(i+1)+" av "+plan.length+"…";historyUI();
-     await new Promise(resolve=>setTimeout(resolve,isGhost?Math.max(8,Math.min(30,18000/plan.length)):115));
+     await new Promise(resolve=>setTimeout(resolve,isLocalSurfaceTarget?Math.max(80,Math.min(650,18000/plan.length)):isGhost?Math.max(8,Math.min(30,18000/plan.length)):115));
    }
    // Keep the actual region fills as the final result. Never swap in a photo.
    autoRunning=false;sheet.style.pointerEvents="";if(flightHouseConfig||motifConfig||referenceKey||spokConfig||owlConfig||wreathConfig||potionConfig||bookConfig||graveConfig||trainConfig)autoButton.disabled=false;historyUI();
