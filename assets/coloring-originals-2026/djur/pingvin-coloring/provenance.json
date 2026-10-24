@@ -1,0 +1,15 @@
+{
+  "original": "../pingvin.webp",
+  "reference": "reference.webp",
+  "result": "editor-result.png",
+  "method": "Connected original contour masks, per-region smooth RGB Chebyshev surfaces fit to the generated reference. Reference ink excluded. No reference pixels or outlines used by the editor.",
+  "generation": "Built-in image generation: preserve the exact original composition and contours; charcoal plumage, cream white face and belly, orange beak and feet, pink tongue; soft feather shading. White snowy ground.",
+  "tests": [
+    "actual editor timelapse",
+    "undo changes image",
+    "redo reproduces final image",
+    "reset clears history",
+    "zoom in and reset",
+    "PNG export byte-identical to composed editor canvas"
+  ]
+}
