@@ -1,0 +1,276 @@
+{
+  "category": "Färglägga → Bilar",
+  "status": "editor-implemented; static-verified; browser-verification-pending",
+  "items": [
+    {
+      "order": 1,
+      "title": "Bana-racer",
+      "original": "bil-01-preview.webp",
+      "reference": "bil-01-reference.webp",
+      "model": "bil-01-coloring-v1.json",
+      "dimensions": "360x478",
+      "regions": 96,
+      "status": "reference-generated; region-model-implemented; static-verified; browser-verification-pending",
+      "tests": [
+        "model JSON valid",
+        "reference PNG exists",
+        "original dimensions match model"
+      ]
+    },
+    {
+      "order": 2,
+      "title": "Rallybil",
+      "original": "bil-02-preview.webp",
+      "reference": "bil-02-reference.webp",
+      "model": "bil-02-coloring-v1.json",
+      "dimensions": "360x478",
+      "regions": 235,
+      "status": "reference-generated; region-model-implemented; static-verified; browser-verification-pending",
+      "tests": [
+        "model JSON valid",
+        "reference PNG exists",
+        "original dimensions match model"
+      ]
+    },
+    {
+      "order": 3,
+      "title": "Muskelbil",
+      "original": "bil-03-preview.webp",
+      "reference": "bil-03-reference.webp",
+      "model": "bil-03-coloring-v1.json",
+      "dimensions": "360x478",
+      "regions": 97,
+      "status": "reference-generated; region-model-implemented; static-verified; browser-verification-pending",
+      "tests": [
+        "model JSON valid",
+        "reference PNG exists",
+        "original dimensions match model"
+      ]
+    },
+    {
+      "order": 4,
+      "title": "Elektrisk hyperbil",
+      "original": "bil-04-preview.webp",
+      "reference": "bil-04-reference.webp",
+      "model": "bil-04-coloring-v1.json",
+      "dimensions": "360x478",
+      "regions": 109,
+      "status": "reference-generated; region-model-implemented; static-verified; browser-verification-pending",
+      "tests": [
+        "model JSON valid",
+        "reference PNG exists",
+        "original dimensions match model"
+      ]
+    },
+    {
+      "order": 5,
+      "title": "Klassisk roadster",
+      "original": "bil-05-preview.webp",
+      "reference": "bil-05-reference.webp",
+      "model": "bil-05-coloring-v1.json",
+      "dimensions": "360x478",
+      "regions": 129,
+      "status": "reference-generated; region-model-implemented; static-verified; browser-verification-pending",
+      "tests": [
+        "model JSON valid",
+        "reference PNG exists",
+        "original dimensions match model"
+      ]
+    },
+    {
+      "order": 6,
+      "title": "Terrängbil",
+      "original": "bil-06-preview.webp",
+      "reference": "bil-06-reference.webp",
+      "model": "bil-06-coloring-v1.json",
+      "dimensions": "360x478",
+      "regions": 344,
+      "status": "reference-generated; region-model-implemented; static-verified; browser-verification-pending",
+      "tests": [
+        "model JSON valid",
+        "reference PNG exists",
+        "original dimensions match model"
+      ]
+    },
+    {
+      "order": 7,
+      "title": "Formelbil",
+      "original": "bil-07-preview.webp",
+      "reference": "bil-07-reference.webp",
+      "model": "bil-07-coloring-v1.json",
+      "dimensions": "360x478",
+      "regions": 105,
+      "status": "reference-generated; region-model-implemented; static-verified; browser-verification-pending",
+      "tests": [
+        "model JSON valid",
+        "reference PNG exists",
+        "original dimensions match model"
+      ]
+    },
+    {
+      "order": 8,
+      "title": "Driftingbil",
+      "original": "bil-08-preview.webp",
+      "reference": "bil-08-reference.webp",
+      "model": "bil-08-coloring-v1.json",
+      "dimensions": "360x478",
+      "regions": 103,
+      "status": "reference-generated; region-model-implemented; static-verified; browser-verification-pending",
+      "tests": [
+        "model JSON valid",
+        "reference PNG exists",
+        "original dimensions match model"
+      ]
+    },
+    {
+      "order": 9,
+      "title": "Supersportbil",
+      "original": "bil-09-preview.webp",
+      "reference": "bil-09-reference.webp",
+      "model": "bil-09-coloring-v1.json",
+      "dimensions": "360x478",
+      "regions": 91,
+      "status": "reference-generated; region-model-implemented; static-verified; browser-verification-pending",
+      "tests": [
+        "model JSON valid",
+        "reference PNG exists",
+        "original dimensions match model"
+      ]
+    },
+    {
+      "order": 10,
+      "title": "Rund veteranbil",
+      "original": "bil-10-preview.webp",
+      "reference": "bil-10-reference.webp",
+      "model": "bil-10-coloring-v1.json",
+      "dimensions": "360x478",
+      "regions": 97,
+      "status": "reference-generated; region-model-implemented; static-verified; browser-verification-pending",
+      "tests": [
+        "model JSON valid",
+        "reference PNG exists",
+        "original dimensions match model"
+      ]
+    },
+    {
+      "order": 11,
+      "title": "Monstertruck",
+      "original": "bil-11-preview.webp",
+      "reference": "bil-11-reference.webp",
+      "model": "bil-11-coloring-v1.json",
+      "dimensions": "360x478",
+      "regions": 190,
+      "status": "reference-generated; region-model-implemented; static-verified; browser-verification-pending",
+      "tests": [
+        "model JSON valid",
+        "reference PNG exists",
+        "original dimensions match model"
+      ]
+    },
+    {
+      "order": 12,
+      "title": "Gammaldags taxi",
+      "original": "bil-12-preview.webp",
+      "reference": "bil-12-reference.webp",
+      "model": "bil-12-coloring-v1.json",
+      "dimensions": "360x478",
+      "regions": 141,
+      "status": "reference-generated; region-model-implemented; static-verified; browser-verification-pending",
+      "tests": [
+        "model JSON valid",
+        "reference PNG exists",
+        "original dimensions match model"
+      ]
+    },
+    {
+      "order": 13,
+      "title": "Äventyrsbil",
+      "original": "bil-13-preview.webp",
+      "reference": "bil-13-reference.webp",
+      "model": "bil-13-coloring-v1.json",
+      "dimensions": "360x478",
+      "regions": 295,
+      "status": "reference-generated; region-model-implemented; static-verified; browser-verification-pending",
+      "tests": [
+        "model JSON valid",
+        "reference PNG exists",
+        "original dimensions match model"
+      ]
+    },
+    {
+      "order": 14,
+      "title": "Lyxsedan",
+      "original": "bil-14-preview.webp",
+      "reference": "bil-14-reference.webp",
+      "model": "bil-14-coloring-v1.json",
+      "dimensions": "360x478",
+      "regions": 71,
+      "status": "reference-generated; region-model-implemented; static-verified; browser-verification-pending",
+      "tests": [
+        "model JSON valid",
+        "reference PNG exists",
+        "original dimensions match model"
+      ]
+    },
+    {
+      "order": 15,
+      "title": "Le Mans-racer",
+      "original": "bil-15-preview.webp",
+      "reference": "bil-15-reference.webp",
+      "model": "bil-15-coloring-v1.json",
+      "dimensions": "360x478",
+      "regions": 110,
+      "status": "reference-generated; region-model-implemented; static-verified; browser-verification-pending",
+      "tests": [
+        "model JSON valid",
+        "reference PNG exists",
+        "original dimensions match model"
+      ]
+    },
+    {
+      "order": 16,
+      "title": "Husbil",
+      "original": "bil-16-preview.webp",
+      "reference": "bil-16-reference.webp",
+      "model": "bil-16-coloring-v1.json",
+      "dimensions": "360x478",
+      "regions": 107,
+      "status": "reference-generated; region-model-implemented; static-verified; browser-verification-pending",
+      "tests": [
+        "model JSON valid",
+        "reference PNG exists",
+        "original dimensions match model"
+      ]
+    },
+    {
+      "order": 17,
+      "title": "Hot rod",
+      "original": "bil-17-preview.webp",
+      "reference": "bil-17-reference.webp",
+      "model": "bil-17-coloring-v1.json",
+      "dimensions": "360x478",
+      "regions": 181,
+      "status": "reference-generated; region-model-implemented; static-verified; browser-verification-pending",
+      "tests": [
+        "model JSON valid",
+        "reference PNG exists",
+        "original dimensions match model"
+      ]
+    },
+    {
+      "order": 18,
+      "title": "Vinterrallybil",
+      "original": "bil-18-preview.webp",
+      "reference": "bil-18-reference.webp",
+      "model": "bil-18-coloring-v1.json",
+      "dimensions": "360x478",
+      "regions": 152,
+      "status": "reference-generated; region-model-implemented; static-verified; browser-verification-pending",
+      "tests": [
+        "model JSON valid",
+        "reference PNG exists",
+        "original dimensions match model"
+      ]
+    }
+  ]
+}
