@@ -2,12 +2,13 @@
 (() => {
   function create(T){
     const domElement=document.createElement('canvas'),ctx=domElement.getContext('2d');if(!ctx)return null;
-    let width=1000,height=600,ratio=1,pixels,depthBuffer;
+    let width=1000,height=600,ratio=.4,pixels,depthBuffer;
+    const frustum=new T.Frustum(),vp=new T.Matrix4(),bounds=new T.Sphere();
     const matrix=new T.Matrix4(),instance=new T.Matrix4(),a=new T.Vector3(),b=new T.Vector3(),c=new T.Vector3(),normal=new T.Vector3(),edge=new T.Vector3(),light=new T.Vector3(-.4,.85,.3).normalize(),sky=new T.Color(),shadeColor=new T.Color();
     function render(scene,camera){
-      scene.updateMatrixWorld();camera.updateMatrixWorld();sky.copy(scene.background||new T.Color('#a8dceb'));ctx.setTransform(ratio,0,0,ratio,0,0);ctx.globalAlpha=1;ctx.fillStyle='#'+sky.getHexString();ctx.fillRect(0,0,width,height);const faces=[];
+      scene.updateMatrixWorld();camera.updateMatrixWorld();vp.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);frustum.setFromProjectionMatrix(vp);sky.copy(scene.background||new T.Color('#a8dceb'));ctx.setTransform(ratio,0,0,ratio,0,0);ctx.globalAlpha=1;ctx.fillStyle='#'+sky.getHexString();ctx.fillRect(0,0,width,height);const faces=[];
       function object(mesh,world){
-        const geom=mesh.geometry,pos=geom?.attributes?.position,index=geom?.index;if(!pos)return;const material=Array.isArray(mesh.material)?mesh.material[0]:mesh.material;if(!material||material.visible===false)return;
+        const geom=mesh.geometry,pos=geom?.attributes?.position,index=geom?.index;if(!pos)return;if(!geom.boundingSphere)geom.computeBoundingSphere();bounds.copy(geom.boundingSphere).applyMatrix4(world);if(!frustum.intersectsSphere(bounds))return;const material=Array.isArray(mesh.material)?mesh.material[0]:mesh.material;if(!material||material.visible===false)return;
         const count=index?index.count:pos.count,colors=geom.attributes.color;
         for(let i=0;i<count;i+=3){
           const ia=index?index.getX(i):i,ib=index?index.getX(i+1):i+1,ic=index?index.getX(i+2):i+2;
@@ -42,7 +43,7 @@
       }
       ctx.putImageData(pixels,0,0);
     }
-    return{domElement,shadowMap:{},isSoftware:true,setPixelRatio(v){ratio=Math.min(v,.6);},setSize(w,h){width=w;height=h;domElement.width=Math.round(w*ratio);domElement.height=Math.round(h*ratio);},render,dispose(){}};
+    return{domElement,shadowMap:{},isSoftware:true,setPixelRatio(v){ratio=Math.min(v,.4);},setSize(w,h){width=w;height=h;domElement.width=Math.round(w*ratio);domElement.height=Math.round(h*ratio);},render,dispose(){}};
   }
   window.FPSoftware3D={create};
 })();

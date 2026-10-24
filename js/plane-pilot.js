@@ -133,7 +133,7 @@
   }
   function account(){const delta=s.coins-credited;if(delta>0){data.coins+=delta;credited=s.coins;save();q('pilotWallet').textContent=data.coins;}data.best=Math.max(data.best,Math.floor(baseDistance+s.d));}
   function finish(){if(finished)return;finished=true;account();state='result';clearInput();if(s.phase==='done'){data.coins+=s.bonus;data.completed=[...new Set([...data.completed,s.stage+1])];data.landings[s.stage+1]=Math.max(Number(data.landings[s.stage+1])||0,s.bonus);overlay('Fantastisk landning!',`${s.grade} · ${s.bonus} bonusmynt<br>${Math.floor(s.d)} m · ${s.coins} insamlade mynt<br>Totalpoäng: ${Math.floor(s.d)+s.coins*10+s.bonus*10}`,s.stage===4?'Flyg de fem etapperna igen':'Nästa etapp','next');tone(660,.6);}else overlay('Vi provar igen!',`${s.reason}<br>Du flög ${Math.floor(s.d)} m och samlade ${s.coins} mynt.`,'Försök igen','start');save();shop();}
-  function loop(now){if(!root?.isConnected){destroy();return;}const dt=last?Math.min(.1,(now-last)/1000):1/60;last=now;
+  function loop(now){if(!root?.isConnected){destroy();return;}const dt=last?Math.min(view?.software?.5:.1,(now-last)/1000):1/60;last=now;
     if(state==='playing'){
       acc+=dt;const input={...keys};for(const k of pointers.values())if(typeof k==='string')input[k]=true;
       while(acc>=1/120){step(s,input,1/120);acc-=1/120;if(s.event==='coin'){tone(1100);account();}if(s.event==='crash')tone(140,.3);if(s.event==='landing')tone(560,.4);if(s.phase==='done'||s.phase==='crash'&&s.timer>1.1){finish();break;}}

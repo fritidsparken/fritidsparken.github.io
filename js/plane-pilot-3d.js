@@ -4,11 +4,11 @@
   function create(hostCanvas){
     const T=window.THREE,P=window.FPFlightPhysics;if(!T||!P)return null;
     let renderer;const surface=document.createElement('canvas');
-    try{renderer=new T.WebGLRenderer({canvas:surface,antialias:true,powerPreference:'high-performance'});}catch{renderer=window.FPSoftware3D?.create(T);}if(!renderer)return null;
+    let gl;try{gl=surface.getContext('webgl2',{antialias:true})||surface.getContext('webgl',{antialias:true});if(gl)renderer=new T.WebGLRenderer({canvas:surface,context:gl,antialias:true,powerPreference:'high-performance'});}catch{}if(!renderer)renderer=window.FPSoftware3D?.create(T);if(!renderer)return null;
     const software=!!renderer.isSoftware;
     renderer.domElement.className='flight3d-canvas';renderer.domElement.setAttribute('aria-hidden','true');hostCanvas.after(renderer.domElement);
     let ratio=Math.min(devicePixelRatio||1,1.65),width=1000,height=600;renderer.setPixelRatio(software?1:ratio);renderer.shadowMap.enabled=!software;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;
-    const scene=new T.Scene(),camera=new T.PerspectiveCamera(57,1,.2,2400);scene.background=new T.Color('#9ed9ed');scene.fog=new T.Fog('#c4e5db',450,1600);
+    const scene=new T.Scene(),camera=new T.PerspectiveCamera(57,1,.2,software?650:2400);scene.background=new T.Color('#9ed9ed');scene.fog=new T.Fog('#c4e5db',software?200:450,software?650:1600);
     const hemi=new T.HemisphereLight('#e6f5ff','#537a41',2.1);scene.add(hemi);
     const sun=new T.DirectionalLight('#fff2d2',3);sun.position.set(-130,190,80);sun.castShadow=!software;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-70,right:70,top:70,bottom:-70,near:1,far:500});sun.shadow.normalBias=.15;sun.shadow.bias=-.0001;scene.add(sun,sun.target);
     const geometries=new Set(),materials=new Set();
@@ -65,7 +65,7 @@
       box(8,15,8,mat('#e9dfc6'),a,32,7.5,-50).castShadow=true;box(12,5,11,mat('#54899d',{metalness:.3,roughness:.25}),a,32,17,-50);box(14,.8,13,ivory,a,32,20,-50);
       box(.2,12,.2,silver,a,21,6,-10);const sock=new T.Group();sock.position.set(21,12,-10);a.add(sock);windsocks.push(sock);
       for(let j=0;j<5;j++){const o=mesh(new T.CylinderGeometry(.5-j*.055,.55-j*.055,.65,10),mat(j%2?'#fff2dc':'#ee8658'),sock,j*.62,.1-j*.08,0);o.rotation.z=Math.PI/2;}
-      for(let i=0;i<2;i++){const p=plane.clone(true);p.position.set(-31,1.1,-125-i*17);p.rotation.y=.8;p.scale.setScalar(.8);a.add(p);parks.push(p);}
+      for(let i=0;i<(software?0:2);i++){const p=plane.clone(true);p.position.set(-31,1.1,-125-i*17);p.rotation.y=.8;p.scale.setScalar(.8);a.add(p);parks.push(p);}
       // Approach lights remain visible when the runway is still distant.
       for(let i=0;i<7;i++)box(3,.1,.7,mat('#fff0a8',{emissive:'#ffe6a0',emissiveIntensity:.5}),a,0,.32,25+i*10);
     }
@@ -73,7 +73,7 @@
       if(worldGroup){scene.remove(worldGroup);worldGroup.traverse(o=>{if(o.geometry&&!persistentGeometry.has(o.geometry)){o.geometry.dispose();geometries.delete(o.geometry);}});}
       worldRef=w;windViews=[];coinViews=[];clouds=[];windsocks=[];parks=[];cameraReady=false;worldGroup=new T.Group();scene.add(worldGroup);
       const c=w.c;scene.background.set(c.sky);scene.fog.color.set(c.fog);sun.color.set(c.sun);hemi.groundColor.set(c.grass);
-      const span=c.length+800,segmentsX=software?32:120,segmentsZ=software?70:Math.ceil(span/8);
+      const span=c.length+800,segmentsX=software?24:120,segmentsZ=software?40:Math.ceil(span/8);
       const g=new T.PlaneGeometry(1200,span,segmentsX,segmentsZ);g.rotateX(-Math.PI/2);g.translate(0,0,-c.length/2);
       const pos=g.attributes.position,colors=[];const base=new T.Color(c.grass),color=new T.Color();
       for(let i=0;i<pos.count;i++){const x=pos.getX(i),d=-pos.getZ(i),y=P.terrain(x,d,w.stage);pos.setY(i,y);const variation=.94+.08*Math.sin(x*.03+d*.04);color.copy(base).multiplyScalar(variation);if(y>60)color.lerp(new T.Color('#a3aaa1'),Math.min(.8,(y-60)/65));if(y>100)color.lerp(new T.Color('#f2eee3'),Math.min(.85,(y-100)/30));if(c.coast&&y<1.5)color.set('#dcd0a0');colors.push(color.r,color.g,color.b);}
@@ -111,7 +111,7 @@
         ellipsoid(rotor,hubMat,0,0,.2,.85,.85,.8);windViews.push(rotor);
       }
       const gold=mat('#ffcc43',{metalness:.72,roughness:.22,emissive:'#d99408',emissiveIntensity:.18}),coinGeo=new T.CylinderGeometry(1.25,1.25,.25,software?10:24);geometries.add(coinGeo);
-      for(const coin of w.coins){const group=new T.Group();group.position.set(coin.x,coin.y,-coin.d);worldGroup.add(group);const disk=mesh(coinGeo,gold,group);disk.rotation.x=Math.PI/2;const rim=mesh(new T.TorusGeometry(1.05,.09,6,20),mat('#fff0a1',{metalness:.4,roughness:.25}),group,0,0,.15);rim.userData.unique=true;box(.2,1.3,.08,mat('#fff0a1'),group,0,0,.19);coinViews.push(group);}
+      for(const coin of w.coins){const group=new T.Group();group.position.set(coin.x,coin.y,-coin.d);worldGroup.add(group);const disk=mesh(coinGeo,gold,group);disk.rotation.x=Math.PI/2;const rim=mesh(new T.TorusGeometry(1.05,.09,software?3:6,software?8:20),mat('#fff0a1',{metalness:.4,roughness:.25}),group,0,0,.15);rim.userData.unique=true;box(.2,1.3,.08,mat('#fff0a1'),group,0,0,.19);coinViews.push(group);}
       burst=new T.Group();worldGroup.add(burst);for(let i=0;i<12;i++)ellipsoid(burst,gold,0,0,0,.12,.12,.12);burst.visible=false;
       if(!software){
         // One static capture per course supplies terrain/sky reflections to water and metal.
