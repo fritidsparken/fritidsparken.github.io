@@ -1,0 +1,7 @@
+{
+  "source": "assets/coloring-originals-2026/djur/lamm.webp",
+  "reference": "assets/coloring-originals-2026/djur/lamm-coloring/reference.webp",
+  "region_model": "assets/coloring-originals-2026/djur/lamm-coloring-v1.json",
+  "region_count": 17,
+  "method": "4-connected original contour segmentation; per-region smooth RGB surface fitted from aligned color-reference pixels; original ink remains on top"
+}
