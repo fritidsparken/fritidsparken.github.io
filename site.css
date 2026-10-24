@@ -875,3 +875,5 @@ body.christmas #seasonalCraftCta::after{background:radial-gradient(ellipse,#e6bf
 .mandala-types.coloring-types{display:flex;flex-wrap:wrap;gap:9px;overflow:visible;max-width:100%;margin:14px 0 18px}
 .coloring-types .mandala-type{white-space:normal;max-width:100%;font-size:13px}
 
+
+.create-card[data-title="4 i rad"] .create-preview img{object-fit:contain;padding:2px}

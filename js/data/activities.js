@@ -56,6 +56,7 @@ const activities=[
 ["🏃","Rast","Starta och stanna","Spring eller gå mellan två linjer och reagera på olika tydliga signaler.","5–10 min",["Markera två linjer med tryggt avstånd och välj en person som leder.","På signalen gå rör sig alla mot den andra linjen. På signalen stanna stannar alla.","Variera med att gå baklänges endast på plats eller röra armarna. Spring inte in i varandra."]],
 ["🪨","Rast","Gissa föremålet","Beskriv något du ser på gården utan att säga vad det heter.","5–10 min",["En person väljer ett synligt föremål i närheten.","Beskriv färg, form eller vad föremålet används till utan att säga namnet.","Gruppen gissar. Byt beskrivare och välj bara saker som alla kan se från samma plats."]],
 ["📣","Rast","Rörelseeko","Hitta på korta rörelseserier som gruppen upprepar tillsammans.","5–10 min",["En person visar två eller tre enkla rörelser, till exempel klapp, knäböj och viftning.","Gruppen härmar rörelserna i samma ordning.","Byt ledare och välj rörelser som alla kan göra på sitt sätt."]]
+,["🎮","Spel","4 i rad","Tänk ett steg framåt och få fyra brickor i rad mot datorn eller en kompis.","5–15 min",["Välj Spela mot datorn eller Två spelare.","Tryck på pilen ovanför den kolumn där du vill släppa din bricka.","Brickan faller till den nedersta lediga platsen i kolumnen.","Turas om. Först med fyra brickor vågrätt, lodrätt eller diagonalt vinner.","Tryck på Nytt spel när ni vill börja en ny omgång."]]
 ];
 
 const gymGames=[

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+<title id="title">Fyra i rad</title><desc id="desc">En blå spelbricka med röda och gula spelpjäser</desc>
+<defs><linearGradient id="board" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#527fdb"/><stop offset="1" stop-color="#3155aa"/></linearGradient><linearGradient id="red" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#ff967e"/><stop offset="1" stop-color="#e84955"/></linearGradient><linearGradient id="gold" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#ffe88f"/><stop offset="1" stop-color="#f7b832"/></linearGradient><filter id="shadow" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#244076" flood-opacity=".2"/></filter></defs>
+<rect x="7" y="7" width="114" height="114" rx="34" fill="#eaf2ff"/>
+<g filter="url(#shadow)"><path d="M23 35q0-8 8-8h66q8 0 8 8v55q0 8-8 8H31q-8 0-8-8z" fill="url(#board)" stroke="#294889" stroke-width="3"/>
+<g fill="#edf3ff"><circle cx="40" cy="46" r="9"/><circle cx="64" cy="46" r="9"/><circle cx="88" cy="46" r="9"/><circle cx="40" cy="66" r="9"/><circle cx="64" cy="66" r="9"/><circle cx="88" cy="66" r="9"/><circle cx="40" cy="86" r="9"/><circle cx="64" cy="86" r="9"/><circle cx="88" cy="86" r="9"/></g>
+<circle cx="40" cy="46" r="7.3" fill="url(#red)"/><circle cx="64" cy="46" r="7.3" fill="url(#gold)"/><circle cx="88" cy="46" r="7.3" fill="url(#red)"/><circle cx="40" cy="66" r="7.3" fill="url(#gold)"/><circle cx="64" cy="66" r="7.3" fill="url(#red)"/><circle cx="88" cy="66" r="7.3" fill="url(#gold)"/><circle cx="40" cy="86" r="7.3" fill="url(#red)"/><circle cx="64" cy="86" r="7.3" fill="url(#gold)"/><circle cx="88" cy="86" r="7.3" fill="url(#red)"/></g>
+<path d="m100 18 2.5 6.5L109 27l-6.5 2.5L100 36l-2.5-6.5L91 27l6.5-2.5z" fill="#f2bd4c"/><circle cx="24" cy="23" r="3" fill="#79b98d"/>
+</svg>
