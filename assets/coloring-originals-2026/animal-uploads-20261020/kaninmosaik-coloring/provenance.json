@@ -5,10 +5,10 @@
   "method": "Same-size generated color reference fitted as smooth RGB Chebyshev surfaces inside connected masks derived from the original contour image. Generated contours are excluded from the runtime. The original line layer controls displayed boundaries.",
   "generation": "Built-in image generation using the original Kaninmosaik image as the edit reference; natural brown, gray, cream, and black-and-white rabbit coats with pink inner ears.",
   "tests": [
-    "Source and reference dimensions verified at 1054 x 1492.",
-    "330 original contour regions have unique seeds and smooth RGB surfaces.",
-    "Editor JavaScript syntax checked.",
-    "Editor result rendered from the same region model and original ink layer used by the editor.",
-    "Undo, redo, reset, zoom, and PNG export use the editor's existing action history and canvas composition paths."
-  ]
+    "Source and generated reference dimensions are 1054 × 1492.",
+    "330 original contour regions have unique seeds and RGB surface coefficients stored by channel.",
+    "Live timelapse completed in the editor across 451 original closed regions.",
+    "Undo, redo, reset, zoom, and PNG export were tested in the live editor."
+  ],
+  "model": "../kaninmosaik-coloring-v2.json"
 }
