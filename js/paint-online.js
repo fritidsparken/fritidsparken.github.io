@@ -169,13 +169,14 @@ function openPainter(IMAGE,TARGET){
  const isDogTarget=TARGET.toLocaleLowerCase("sv").trim()==="hund"&&/\/djur\/hund(?:-preview)?\.webp(?:[?#]|$)/.test(new URL(IMAGE,location.href).pathname);
  const isFoxTarget=TARGET.toLocaleLowerCase("sv").trim()==="räv"&&/\/djur\/rav(?:-preview)?\.webp(?:[?#]|$)/.test(new URL(IMAGE,location.href).pathname);
  const isElephantTarget=TARGET.toLocaleLowerCase("sv").trim()==="elefant"&&/\/djur\/elefant(?:-preview)?\.webp$/.test(new URL(IMAGE,location.href).pathname);
+ const isWhaleTarget=TARGET.toLocaleLowerCase("sv").trim()==="val"&&/\/djur\/val(?:-preview)?\.webp$/.test(new URL(IMAGE,location.href).pathname);
  const animalModel=({"kanin":"kanin","björn":"bjorn","groda":"groda"})[TARGET.toLocaleLowerCase("sv").trim()];
  const isNewAnimalTarget=!!animalModel&&new URL(IMAGE,location.href).pathname.endsWith("/djur/"+animalModel+"-preview.webp");
  const isDolphinTarget=TARGET.toLocaleLowerCase("sv").trim()==="delfin"&&/\/djur\/delfin(?:-preview)?\.webp$/.test(new URL(IMAGE,location.href).pathname);
  const isHedgehogTarget=TARGET.toLocaleLowerCase("sv").trim()==="igelkott"&&/\/djur\/igelkott(?:-preview)?\.webp(?:[?#]|$)/.test(new URL(IMAGE,location.href).pathname);
  const isPenguinTarget=TARGET.toLocaleLowerCase("sv").trim()==="pingvin"&&/\/djur\/pingvin(?:-preview)?\.webp(?:[?#]|$)/.test(new URL(IMAGE,location.href).pathname);
  const isAnimalTarget=isPenguinTarget||isHedgehogTarget||isNewAnimalTarget||isCatTarget||isDogTarget||isFoxTarget||isElephantTarget||isDolphinTarget;
- const referenceKey=isPenguinTarget?"animal-penguin":isHedgehogTarget?"animal-hedgehog":isDolphinTarget?"animal-dolphin":isNewAnimalTarget?"animal-"+animalModel:isElephantTarget?"animal-elephant":isGiraffeTarget?"animal-giraffe":isFoxTarget?"animal-fox":isDogTarget?"animal-dog":isCatTarget?"animal-cat":({"pumpalyktan":"pumpkin","häxans hatt":"hat","den busiga mumien":"mummy","den vänliga vampyren":"vampire","monsterkalas":"monster","godismandala":"candy"})[TARGET.toLocaleLowerCase("sv").trim()]||null;
+ const referenceKey=isWhaleTarget?"animal-whale":isPenguinTarget?"animal-penguin":isHedgehogTarget?"animal-hedgehog":isDolphinTarget?"animal-dolphin":isNewAnimalTarget?"animal-"+animalModel:isElephantTarget?"animal-elephant":isGiraffeTarget?"animal-giraffe":isFoxTarget?"animal-fox":isDogTarget?"animal-dog":isCatTarget?"animal-cat":({"pumpalyktan":"pumpkin","häxans hatt":"hat","den busiga mumien":"mummy","den vänliga vampyren":"vampire","monsterkalas":"monster","godismandala":"candy"})[TARGET.toLocaleLowerCase("sv").trim()]||null;
  let referenceConfig=null;
  const potionConfig=TARGET.toLocaleLowerCase("sv").trim()==="trolldrycksflaskorna"?POTION_COLORING:null;
  const wreathConfig=TARGET.toLocaleLowerCase("sv").trim()==="halloweenkrans"?WREATH_COLORING:null;
@@ -204,7 +205,7 @@ function openPainter(IMAGE,TARGET){
 
  const img=new Image();if(new URL(IMAGE,location.href).origin!==location.origin)img.crossOrigin="anonymous";img.onload=async()=>{
    if(referenceKey){
-     try{const response=await fetch(new URL((isPenguinTarget?"../assets/coloring-originals-2026/djur/pingvin-coloring/model.json":isHedgehogTarget?"../assets/coloring-originals-2026/djur/igelkott-coloring/model.json":isDolphinTarget?"../assets/coloring-originals-2026/djur/delfin-coloring-v1.json":isNewAnimalTarget?"../assets/coloring-originals-2026/djur/"+animalModel+"-coloring-v1.json":isElephantTarget?"../assets/coloring-originals-2026/djur/elefant-coloring-v1.json":isGiraffeTarget?"../assets/coloring-originals-2026/djur/giraff-coloring-v1.json":isFoxTarget?"../assets/coloring-originals-2026/djur/rav-coloring-v1.json":isDogTarget?"../assets/coloring-originals-2026/djur/hund-coloring-v1.json":isCatTarget?"../assets/coloring-originals-2026/djur/katt-coloring-v2.json":"../assets/mandala-halloween-2026/"+referenceKey+"-coloring-v1.json"),document.querySelector('script[src*="paint-online.js"]')?.src||new URL("js/paint-online.js",location.href)));if(!response.ok)throw new Error("Colour model missing");referenceConfig=await response.json()}
+     try{const response=await fetch(new URL((isWhaleTarget?"../assets/coloring-originals-2026/djur/val-coloring-v1.json":isPenguinTarget?"../assets/coloring-originals-2026/djur/pingvin-coloring/model.json":isHedgehogTarget?"../assets/coloring-originals-2026/djur/igelkott-coloring/model.json":isDolphinTarget?"../assets/coloring-originals-2026/djur/delfin-coloring-v1.json":isNewAnimalTarget?"../assets/coloring-originals-2026/djur/"+animalModel+"-coloring-v1.json":isElephantTarget?"../assets/coloring-originals-2026/djur/elefant-coloring-v1.json":isGiraffeTarget?"../assets/coloring-originals-2026/djur/giraff-coloring-v1.json":isFoxTarget?"../assets/coloring-originals-2026/djur/rav-coloring-v1.json":isDogTarget?"../assets/coloring-originals-2026/djur/hund-coloring-v1.json":isCatTarget?"../assets/coloring-originals-2026/djur/katt-coloring-v2.json":"../assets/mandala-halloween-2026/"+referenceKey+"-coloring-v1.json"),document.querySelector('script[src*="paint-online.js"]')?.src||new URL("js/paint-online.js",location.href)));if(!response.ok)throw new Error("Colour model missing");referenceConfig=await response.json()}
      catch{status.textContent="Färganpassningen kunde inte öppnas. Stäng och försök igen.";return}
    }
    const prepareCanvas=()=>{
@@ -363,7 +364,7 @@ c.putImageData(out,0,0)
      for(const [x,y,role,shades] of motifConfig.regions){const r=regions[labels[y*W+x]-1];if(r){r.hint=role;r.shades=shades}}
      for(const r of regions)if(!r.shades){r.hint="sky";r.shades=motifConfig.palettes.sky}
    }else if(referenceConfig){
-     for(const [x,y,role,shades,surface,area,degree,coeff,bounds] of referenceConfig.regions){const r=regions[labels[y*W+x]-1];if(r&&(!isAnimalTarget||!r.seedArea||area>r.seedArea)){r.hint=role;r.shades=shades;r.surface=surface;if(isGiraffeTarget)r.giraffeDegree=degree;if(isAnimalTarget){r.seedArea=area;r.degree=degree;r.coeff=coeff;if(isNewAnimalTarget)r.modelBounds=bounds}}}
+     for(const [x,y,role,shades,surface,area,degree,coeff,bounds] of referenceConfig.regions){const r=regions[labels[y*W+x]-1];if(r&&(!isAnimalTarget||!r.seedArea||area>r.seedArea)){r.hint=role;r.shades=shades;r.surface=surface;if(isWhaleTarget)r.spline=bounds;if(isGiraffeTarget)r.giraffeDegree=degree;if(isAnimalTarget){r.seedArea=area;r.degree=degree;r.coeff=coeff;if(isNewAnimalTarget)r.modelBounds=bounds}}}
      for(const r of regions)if(!r.shades){r.hint="fabric";r.shades=referenceConfig.palettes.fabric}
    }else if(spokConfig){
      for(const [x,y,role,shades,surface] of spokConfig.regions){const r=regions[labels[y*W+x]-1];if(r){r.hint=role;r.shades=shades;r.surface=surface}}
@@ -894,7 +895,19 @@ c.putImageData(out,0,0)
    }
    g.putImageData(im,0,0);ctx.drawImage(mask,region.minX,region.minY);
  }
+ // Val evaluates smooth cubic RGB surfaces inside the original region mask.
+ // The generated reference is an offline fitting input, never a runtime layer.
+ function paintWhaleRegion(region){
+   const model=region.spline,w=region.maxX-region.minX+1,h=region.maxY-region.minY+1,c=document.createElement("canvas");c.width=w;c.height=h;
+   const g=c.getContext("2d"),im=g.createImageData(w,h),d=im.data;
+   const weights=(t,knots)=>{const n=knots.length-4;let b=Array.from({length:knots.length-1},(_,i)=>t>=knots[i]&&t<knots[i+1]?1:0);if(t===1)b[n-1]=1;for(let p=1;p<=3;p++)b=Array.from({length:knots.length-p-1},(_,i)=>{const a=knots[i+p]-knots[i],z=knots[i+p+1]-knots[i+1];return(a?(t-knots[i])/a*b[i]:0)+(z?(knots[i+p+1]-t)/z*b[i+1]:0)});return b.map((v,i)=>[i,v]).filter(([,v])=>v>0)};
+   const [x0,y0,x1,y1]=model.bounds,clamp=t=>Math.max(0,Math.min(1,t));
+   const bx=Array.from({length:w},(_,x)=>weights(clamp((x+region.minX-x0)/Math.max(1,x1-x0)),model.knots[0])),by=Array.from({length:h},(_,y)=>weights(clamp((y+region.minY-y0)/Math.max(1,y1-y0)),model.knots[1]));
+   for(const index of region.pixels){const x=index%W-region.minX,y=((index/W)|0)-region.minY,k=(y*w+x)*4;for(let ch=0;ch<3;ch++){let value=0;for(const [i,a] of bx[x])for(const [j,b] of by[y])value+=a*b*model.coeff[ch][i*model.shape[1]+j];d[k+ch]=region.hint==="paper"?255:Math.max(0,Math.min(255,value))}d[k+3]=255}
+   g.putImageData(im,0,0);ctx.drawImage(c,region.minX,region.minY);
+ }
  function paintReferenceRegion(region){
+   if(isWhaleTarget){paintWhaleRegion(region);return}
    if(isElephantTarget||isDolphinTarget){paintElephantRegion(region);return}
    if(isGiraffeTarget){
      const width=region.maxX-region.minX+1,height=region.maxY-region.minY+1,c=document.createElement("canvas");c.width=width;c.height=height;
