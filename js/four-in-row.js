@@ -1,25 +1,89 @@
-(()=>{
- const ROWS=6,COLS=7,RED=1,YELLOW=2,storeKey="fp-four-in-row-scores-v1";
- let board,player,mode="computer",busy=false,over=false,scores=readScores(),winning=[];
- const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
- function readScores(){try{return JSON.parse(localStorage.getItem(storeKey))||{red:0,yellow:0,draw:0}}catch{return{red:0,yellow:0,draw:0}}}
- function icon(){return '<img class="four-icon" src="./assets/four-in-row-icon.svg" alt="">'}
- function gallery(){
-  board=Array.from({length:ROWS},()=>Array(COLS).fill(0));player=RED;busy=false;over=false;winning=[];
-  return '<section class="four-page"><div class="four-hero"><div class="four-hero-copy"><span class="four-kicker">SPELHÖRNAN</span><h2>Fyra i rad</h2><p>Släpp brickorna. Först med fyra i rad vinner!</p><div class="four-modes" role="group" aria-label="Välj spelläge"><button type="button" class="four-mode active" data-four-mode="computer" aria-pressed="true">Spela mot datorn</button><button type="button" class="four-mode" data-four-mode="local" aria-pressed="false">Två spelare</button></div></div><div class="four-hero-icon">'+icon()+'<span aria-hidden="true">✦</span></div></div><div class="four-layout"><section class="four-game-card" aria-label="Spelbräde för Fyra i rad"><div class="four-game-top"><div><span class="four-label">DIN TUR</span><p class="four-status" id="fourStatus" aria-live="polite">Röd börjar – välj en kolumn.</p></div><button type="button" class="four-new" data-four-new>↻ <span>Nytt spel</span></button></div><div class="four-board-wrap"><div class="four-drop-row" id="fourDrops" aria-label="Välj kolumn"></div><div class="four-board" id="fourBoard" role="grid" aria-label="Spelbräde, sex rader och sju kolumner"></div></div><div class="four-legend"><span><i class="four-dot red"></i><b>Du</b></span><span class="four-opponent"><i class="four-dot yellow"></i><b id="fourOpponent">Datorn</b></span></div></section><aside class="four-side"><div class="four-side-card"><span class="four-label">SÅ SPELAR NI</span><ol><li>Välj en kolumn med pilen.</li><li>Brickan faller till nedersta lediga plats.</li><li>Få fyra i rad vågrätt, lodrätt eller diagonalt.</li></ol></div><div class="four-side-card four-score"><span class="four-label">VINSTER PÅ DEN HÄR ENHETEN</span><div><span><i class="four-dot red"></i>Röd <b id="fourRedScore">'+scores.red+'</b></span><span><i class="four-dot yellow"></i>Gul <b id="fourYellowScore">'+scores.yellow+'</b></span><span>Oavgjort <b id="fourDrawScore">'+scores.draw+'</b></span></div></div></aside></div></section>';
- }
- function start(){const host=document.querySelector("#catalog");if(!host)return;const root=host.querySelector(".four-page");if(!root)return;const drops=root.querySelector("#fourDrops"),grid=root.querySelector("#fourBoard");drops.innerHTML=Array.from({length:COLS},(_,c)=>'<button type="button" class="four-drop" data-four-column="'+c+'" aria-label="Släpp bricka i kolumn '+(c+1)+'">⌄</button>').join("");grid.innerHTML=Array.from({length:ROWS},(_,r)=>Array.from({length:COLS},(_,c)=>'<div class="four-cell" role="gridcell" aria-label="Rad '+(r+1)+', kolumn '+(c+1)+'"><span class="four-piece"></span></div>').join("")).join("");render();
-  if(!root.dataset.bound){root.dataset.bound="true";root.addEventListener("click",onClick)}
- }
- function onClick(e){const m=e.target.closest("[data-four-mode]");if(m){mode=m.dataset.fourMode;document.querySelectorAll("[data-four-mode]").forEach(b=>{const active=b===m;b.classList.toggle("active",active);b.setAttribute("aria-pressed",String(active))});document.querySelector("#fourOpponent").textContent=mode==="computer"?"Datorn":"Gul spelare";newGame();return}if(e.target.closest("[data-four-new]")){newGame();return}const col=e.target.closest("[data-four-column]");if(col)move(Number(col.dataset.fourColumn),RED)}
- function newGame(){board=Array.from({length:ROWS},()=>Array(COLS).fill(0));player=RED;busy=false;over=false;winning=[];render();status("Röd börjar – välj en kolumn.")}
- function landing(c){for(let r=ROWS-1;r>=0;r--)if(!board[r][c])return r;return -1}
- function fourAt(r,c,p){const dirs=[[0,1],[1,0],[1,1],[1,-1]];for(const[dr,dc]of dirs){const cells=[[r,c]];for(const sign of [-1,1]){let y=r+dr*sign,x=c+dc*sign;while(y>=0&&y<ROWS&&x>=0&&x<COLS&&board[y][x]===p){cells.push([y,x]);y+=dr*sign;x+=dc*sign}}if(cells.length>=4)return cells}return null}
- function move(c,p){if(over||busy)return;const r=landing(c);if(r<0)return;board[r][c]=p;const win=fourAt(r,c,p);if(win){winning=win;over=true;scores[p===RED?"red":"yellow"]++;save();render();status((mode==="computer"?(p===RED?"Du vann!":"Datorn vann!"):(p===RED?"Röd spelare vann!":"Gul spelare vann!"))+" 🎉");return}if(board.every(row=>row.every(Boolean))){over=true;scores.draw++;save();render();status("Oavgjort! Bra spelat.");return}player=p===RED?YELLOW:RED;render();if(mode==="computer"&&p===RED){busy=true;status("Datorn tänker…");setTimeout(()=>{if(over)return;const next=chooseComputerMove();busy=false;move(next,YELLOW)},420)}else status(mode==="computer"?"Din tur – välj en kolumn.":(player===RED?"Röd spelare väljer en kolumn.":"Gul spelare väljer en kolumn."))}
- function immediate(c,p){const r=landing(c);if(r<0)return false;board[r][c]=p;const won=!!fourAt(r,c,p);board[r][c]=0;return won}
- function chooseComputerMove(){const legal=Array.from({length:COLS},(_,c)=>c).filter(c=>landing(c)>=0);for(const c of legal)if(immediate(c,YELLOW))return c;for(const c of legal)if(immediate(c,RED))return c;const center=[3,2,4,1,5,0,6].filter(c=>legal.includes(c));return center[Math.floor(Math.random()*Math.min(3,center.length))]}
- function status(text){const node=document.querySelector("#fourStatus");if(node)node.textContent=text}
- function save(){localStorage.setItem(storeKey,JSON.stringify(scores))}
- function render(){const grid=document.querySelector("#fourBoard");if(!grid)return;grid.innerHTML=Array.from({length:ROWS},(_,r)=>Array.from({length:COLS},(_,c)=>{const p=board[r][c],won=winning.some(([y,x])=>y===r&&x===c);return '<div class="four-cell" role="gridcell" aria-label="Rad '+(r+1)+', kolumn '+(c+1)+(p?' '+(p===RED?'röd':'gul'):" tom")+'"><span class="four-piece '+(p===RED?'is-red':p===YELLOW?'is-yellow':'')+(won?' is-winner':'')+'"></span></div>'}).join("")).join("");const drops=document.querySelectorAll(".four-drop");drops.forEach((b,c)=>{b.disabled=busy||over||landing(c)<0;b.classList.toggle("is-next",!busy&&!over&&landing(c)>=0);b.setAttribute("aria-label",(player===RED?"Röd":"Gul")+" bricka i kolumn "+(c+1))});document.querySelector("#fourRedScore").textContent=scores.red;document.querySelector("#fourYellowScore").textContent=scores.yellow;document.querySelector("#fourDrawScore").textContent=scores.draw}
- window.FPConnectFour={gallery,start};
+(() => {
+  const ROWS = 6, COLS = 7, KEY = 'fp-four-in-row-scores-v1';
+  let root, board, player = 1, mode = 'computer', busy = false, over = false;
+  let scores, moves = [], generation = 0, aiTimer = 0, animation, events;
+  function readScores() {
+    try { const s = JSON.parse(localStorage.getItem(KEY) || '{}'); return {red: +s.red || 0, yellow: +s.yellow || 0, draw: +s.draw || 0}; }
+    catch { return {red: 0, yellow: 0, draw: 0}; }
+  }
+  const label = p => p === 1 ? 'Röd' : 'Gul';
+  function gallery() {
+    return `<section class="four-page"><header class="four-heading"><div><span class="four-kicker">EN KLASSIKER. EN NY OMGÅNG.</span><h2>4 i rad<span aria-hidden="true">●●●●</span></h2><p>En smart placering kan ändra allt.</p></div><div class="four-modes" role="group" aria-label="Välj spelläge"><button class="active" data-four-mode="computer" aria-pressed="true">Mot datorn</button><button data-four-mode="local" aria-pressed="false">Två spelare</button></div></header><div class="four-arena"><div class="four-match-bar"><div class="four-player red" id="fourRedPlayer"><i></i><span id="fourRedName">Du</span><b id="fourRedScore">0</b></div><div class="four-versus">VS</div><div class="four-player yellow" id="fourYellowPlayer"><i></i><span id="fourYellowName">Datorn</span><b id="fourYellowScore">0</b></div></div><div class="four-live" aria-live="polite"><span class="four-turn-dot" id="fourTurnDot"></span><strong id="fourStatus">Din tur. Välj en kolumn.</strong></div><div class="four-board-wrap"><div class="four-drop-row" id="fourDrops" aria-label="Välj kolumn"></div><div class="four-board" id="fourBoard" role="grid" aria-label="Spelbräde med sex rader och sju kolumner"><div class="four-token-layer" id="fourTokens"></div><svg class="four-face" viewBox="0 0 700 600" aria-hidden="true"><defs><linearGradient id="fourBoardBlue" x2=".6" y2="1"><stop stop-color="#437bf2"/><stop offset="1" stop-color="#2445b0"/></linearGradient><mask id="fourBoardHoles"><rect width="700" height="600" fill="white"/>${Array.from({length: 42}, (_, i) => `<circle cx="${i%7*100+50}" cy="${Math.floor(i/7)*100+50}" r="40" fill="black"/>`).join('')}</mask></defs><rect width="700" height="600" rx="26" fill="url(#fourBoardBlue)" mask="url(#fourBoardHoles)"/>${Array.from({length: 42}, (_, i) => `<circle cx="${i%7*100+50}" cy="${Math.floor(i/7)*100+50}" r="41" fill="none" stroke="#122b72" stroke-opacity=".55" stroke-width="3"/>`).join('')}</svg><div class="four-grid-labels" id="fourGridLabels"></div></div><div class="four-feet" aria-hidden="true"><i></i><i></i></div></div><div class="four-bottom"><span>Fyra vågrätt, lodrätt eller diagonalt.</span><button class="four-new" data-four-new>↻ Ny omgång</button></div></div><p class="four-tip">TIPS: Håll koll på mitten. Där finns flest vägar till fyra i rad.</p></section>`;
+  }
+  function start() {
+    destroy(); root = document.querySelector('.four-page'); if (!root) return;
+    events = new AbortController(); scores = readScores(); mode = 'computer';
+    root.querySelector('#fourDrops').innerHTML = Array.from({length: 7}, (_, c) => `<button class="four-drop" data-four-column="${c}" aria-label="Släpp i kolumn ${c+1}"><span>↓</span></button>`).join('');
+    root.addEventListener('click', e => {
+      const m = e.target.closest('[data-four-mode]');
+      if (m) { mode = m.dataset.fourMode; reset(); return; }
+      if (e.target.closest('[data-four-new]')) { reset(); return; }
+      const c = e.target.closest('[data-four-column]');
+      if (c && !(mode === 'computer' && player === 2)) drop(+c.dataset.fourColumn);
+    }, {signal: events.signal});
+    root.addEventListener('keydown', e => {
+      const btn = e.target.closest('[data-four-column]'); if (!btn || !['ArrowLeft','ArrowRight'].includes(e.key)) return;
+      e.preventDefault(); const c = (+btn.dataset.fourColumn + (e.key === 'ArrowLeft' ? 6 : 1))%7;
+      root.querySelector(`[data-four-column="${c}"]`).focus();
+    }, {signal: events.signal});
+    reset();
+  }
+  function destroy() { generation++; clearTimeout(aiTimer); animation?.cancel(); events?.abort(); busy = false; }
+  function reset() {
+    generation++; clearTimeout(aiTimer); animation?.cancel(); board = Array.from({length: 6}, () => Array(7).fill(0));
+    player = 1; busy = over = false; moves = []; root.querySelector('#fourTokens').replaceChildren();
+    root.querySelectorAll('[data-four-mode]').forEach(b => { const active = b.dataset.fourMode === mode; b.classList.toggle('active', active); b.setAttribute('aria-pressed', active); });
+    root.querySelector('#fourRedName').textContent = mode === 'computer' ? 'Du' : 'Röd';
+    root.querySelector('#fourYellowName').textContent = mode === 'computer' ? 'Datorn' : 'Gul';
+    status(mode === 'computer' ? 'Din tur. Välj en kolumn.' : 'Röd börjar. Välj en kolumn.'); render();
+  }
+  function landing(c, b = board) { for (let r=5; r>=0; r--) if (!b[r][c]) return r; return -1; }
+  function winner(b = board) {
+    for (let r=0;r<6;r++) for(let c=0;c<7;c++) if(b[r][c]) for(const [dr,dc] of [[0,1],[1,0],[1,1],[1,-1]]) {
+      const cells=[]; for(let i=0;i<4;i++) {const y=r+i*dr,x=c+i*dc; if(y<0||y>5||x<0||x>6||b[y][x]!==b[r][c])break;cells.push([y,x]);}
+      if(cells.length===4)return {p:b[r][c],cells};
+    } return null;
+  }
+  async function drop(c) {
+    if(busy || over || !root?.isConnected) return; const r=landing(c); if(r<0)return;
+    const ticket=generation,p=player;busy=true;render();
+    const token=document.createElement('span');token.className='four-token '+(p===1?'red':'yellow');
+    token.style.left=`${(c+.5)/7*100}%`; token.style.top=`${(r+.5)/6*100}%`;token.dataset.row=r;token.dataset.col=c;
+    root.querySelector('#fourTokens').append(token);
+    const fall=(r+1)*root.querySelector('#fourBoard').clientHeight/6;
+    const duration=matchMedia('(prefers-reduced-motion: reduce)').matches?70:330+r*55;
+    animation=token.animate([{transform:`translate(-50%,calc(-50% - ${fall}px))`,offset:0},{transform:'translate(-50%,-50%)',offset:.78},{transform:'translate(-50%,calc(-50% - 9px))',offset:.9},{transform:'translate(-50%,-50%)',offset:1}],{duration,easing:'cubic-bezier(.4,0,.8,.5)'});
+    try { await animation.finished; } catch { return; }
+    if(ticket!==generation || !root.isConnected)return;
+    board[r][c]=p;moves.push({r,c,p});busy=false;
+    const win=winner();
+    if(win){over=true;scores[p===1?'red':'yellow']++;win.cells.forEach(([y,x])=>root.querySelector(`[data-row="${y}"][data-col="${x}"]`).classList.add('winner'));status(mode==='computer'?(p===1?'Du vann! Snyggt spelat.':'Datorn vann. En omgång till?'):`${label(p)} vann! Snyggt spelat.`);save();render();return;}
+    if(moves.length===42){over=true;scores.draw++;status('Oavgjort! Vilken jämn omgång.');save();render();return;}
+    player=3-p;
+    if(mode==='computer'&&player===2){busy=true;status('Datorn funderar…');render();aiTimer=setTimeout(()=>{if(ticket!==generation||!root.isConnected)return;busy=false;drop(chooseMove());},460);}
+    else {status(mode==='computer'?'Din tur. Välj en kolumn.':`${label(player)}s tur. Välj en kolumn.`);render();}
+  }
+  function evaluate(b) {
+    let n=0;for(let r=0;r<6;r++)n+=b[r][3]===2?5:b[r][3]===1?-5:0;
+    for(let r=0;r<6;r++)for(let c=0;c<7;c++)for(const [dr,dc] of [[0,1],[1,0],[1,1],[1,-1]]) {
+      let a=0,d=0,count=0;for(let i=0;i<4;i++){const y=r+dr*i,x=c+dc*i;if(y<0||y>5||x<0||x>6)break;count++;a+=b[y][x]===2;d+=b[y][x]===1;}
+      if(count===4){if(!d)n+=[0,1,8,70,5000][a];if(!a)n-=[0,1,10,85,5000][d];}
+    }return n;
+  }
+  function search(b, depth, maximize, alpha, beta) {
+    const w=winner(b);if(w)return w.p===2?10000+depth:-10000-depth;if(!depth)return evaluate(b);
+    const legal=[3,2,4,1,5,0,6].filter(c=>landing(c,b)>=0);if(!legal.length)return 0;
+    let best=maximize?-Infinity:Infinity;
+    for(const c of legal){const r=landing(c,b);b[r][c]=maximize?2:1;const v=search(b,depth-1,!maximize,alpha,beta);b[r][c]=0;best=maximize?Math.max(best,v):Math.min(best,v);if(maximize)alpha=Math.max(alpha,best);else beta=Math.min(beta,best);if(beta<=alpha)break;}return best;
+  }
+  function chooseMove(){let best=-Infinity,choice=3;for(const c of [3,2,4,1,5,0,6]){const r=landing(c);if(r<0)continue;board[r][c]=2;const v=search(board,3,false,-Infinity,Infinity);board[r][c]=0;if(v>best){best=v;choice=c;}}return choice;}
+  function status(s){root.querySelector('#fourStatus').textContent=s;}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(scores));}catch{}}
+  function render(){
+    root.querySelectorAll('.four-drop').forEach((b,c)=>{b.disabled=busy||over||landing(c)<0;b.dataset.player=player;b.setAttribute('aria-label',`${label(player)} bricka i kolumn ${c+1}`);});
+    root.querySelector('#fourTurnDot').dataset.player=player;root.querySelector('#fourRedPlayer').classList.toggle('is-turn',player===1&&!over);root.querySelector('#fourYellowPlayer').classList.toggle('is-turn',player===2&&!over);
+    root.querySelector('#fourRedScore').textContent=scores.red;root.querySelector('#fourYellowScore').textContent=scores.yellow;
+    root.querySelector('#fourGridLabels').innerHTML=board.map((row,r)=>row.map((p,c)=>`<span role="gridcell" aria-label="Rad ${r+1}, kolumn ${c+1}: ${p?label(p):'tom'}"></span>`).join('')).join('');
+  }
+  window.FPConnectFour={gallery,start,destroy};
 })();
