@@ -1,6 +1,6 @@
 (()=>{
  const loader=document.currentScript;
- const bundleUrl=new URL("./paint-online-restored-20261024.js?v=koala-20261024-1",loader.src);
+ const bundleUrl=new URL("./paint-online-restored-20261024.js?v=koala-render-20261024-2",loader.src);
  const replaceOnce=(source,before,after,label)=>{const first=source.indexOf(before);if(first<0||source.indexOf(before,first+before.length)!==-1)throw new Error("Could not safely patch car painter: "+label);return source.slice(0,first)+after+source.slice(first+before.length)};
  fetch(bundleUrl).then(response=>{if(!response.ok)throw new Error("Painter bundle could not be loaded");return response.text()}).then(source=>{
   source=replaceOnce(source,` let referenceConfig=null;`,` let referenceConfig=null;
