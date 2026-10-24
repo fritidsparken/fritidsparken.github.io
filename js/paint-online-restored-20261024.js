@@ -886,7 +886,30 @@ c.putImageData(out,0,0)
  }
  // Paint an original closed region from its material palette and a smooth
  // six-coefficient colour model. No reference bitmap is used at runtime.
+ function paintKoalaRegion(region){
+   const w=region.maxX-region.minX+1,h=region.maxY-region.minY+1,[nx,ny]=region.degree||[0,0],bounds=region.modelBounds||[region.minX,region.minY,region.maxX,region.maxY];
+   const mask=document.createElement("canvas");mask.width=w;mask.height=h;
+   const mg=mask.getContext("2d"),maskPixels=mg.createImageData(w,h),md=maskPixels.data;
+   for(const index of region.pixels){const x=index%W-region.minX,y=((index/W)|0)-region.minY,k=(y*w+x)*4;md[k]=md[k+1]=md[k+2]=md[k+3]=255}
+   mg.putImageData(maskPixels,0,0);
+   const sw=Math.min(w,192),sh=Math.min(h,192),surface=document.createElement("canvas");surface.width=sw;surface.height=sh;
+   const sg=surface.getContext("2d"),pixels=sg.createImageData(sw,sh),d=pixels.data;
+   const basis=(n,t)=>{const out=[1,t];for(let i=2;i<=n;i++)out[i]=2*t*out[i-1]-out[i-2];return out};
+   const bx=Array.from({length:sw},(_,x)=>basis(nx,Math.max(-1,Math.min(1,((region.minX+(x+.5)*w/sw-bounds[0])/Math.max(1,bounds[2]-bounds[0]))*2-1))));
+   const by=Array.from({length:sh},(_,y)=>basis(ny,Math.max(-1,Math.min(1,((region.minY+(y+.5)*h/sh-bounds[1])/Math.max(1,bounds[3]-bounds[1]))*2-1))));
+   for(let y=0;y<sh;y++)for(let x=0;x<sw;x++){
+     const k=(y*sw+x)*4,gx=region.minX+(x+.5)*w/sw,gy=region.minY+(y+.5)*h/sh;
+     let rgb=region.shades[1].slice();
+     if(region.hint==="paper")rgb=[255,255,255];
+     else if(region.coeff)rgb=region.coeff.map(co=>{let sum=0;for(let i=0;i<=nx;i++)for(let j=0;j<=ny;j++)sum+=co[i*(ny+1)+j]*bx[x][i]*by[y][j];return Math.max(0,Math.min(255,sum))});
+     rgb=rgb.map((v,c)=>Math.max(region.shades[0][c],Math.min(region.shades[2][c],v)));
+     if(region.hint==="fur"){const grain=.45*Math.sin(gx*.73+gy*.11+Math.sin(gy*.02)*4);rgb=rgb.map(v=>v+grain)}
+     d[k]=rgb[0];d[k+1]=rgb[1];d[k+2]=rgb[2];d[k+3]=255;
+   }
+   sg.putImageData(pixels,0,0);sg.globalCompositeOperation="destination-in";sg.drawImage(mask,0,0,sw,sh);ctx.drawImage(surface,region.minX,region.minY,w,h);
+ }
  function paintCatRegion(region){
+   if(animalModel==="koala"){paintKoalaRegion(region);return}
    const w=region.maxX-region.minX+1,h=region.maxY-region.minY+1,mask=document.createElement("canvas");mask.width=w;mask.height=h;
    const g=mask.getContext("2d"),im=g.createImageData(w,h),data=im.data;
    const [nx,ny]=region.degree||[0,0],basis=(n,t)=>{const out=[1,t];for(let j=2;j<=n;j++)out[j]=2*t*out[j-1]-out[j-2];return out};
