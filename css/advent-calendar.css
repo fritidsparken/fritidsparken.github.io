@@ -25,51 +25,42 @@ body:not(.christmas) .advent,body.halloween .advent,.advent[hidden],body:not(.ch
 
 .advent-particles i:nth-child(n+29){display:none}.is-finale .advent-particles i:nth-child(n+29){display:block}
 
-/* Fit the complete joke, answer and controls inside the current viewport. */
-.advent-dialog{box-sizing:border-box;height:min(780px,calc(100dvh - 24px));max-height:calc(100dvh - 24px);overflow:hidden}
-.advent-popup{box-sizing:border-box;height:100%;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto auto auto auto;gap:10px;padding:18px 24px}
-.advent-popup h2{margin:0 40px 2px;font-size:23px}
-.advent-stage{box-sizing:border-box;align-self:center;justify-self:center;height:100%;max-height:410px;width:auto;max-width:100%;min-height:0;aspect-ratio:1;margin:0}
-.advent-message{margin:0 auto;max-width:100%;font-size:clamp(17px,2.6vw,23px);line-height:1.25;overflow-wrap:anywhere}
-.advent-answer{margin:0;color:#ffe0a0;font:600 clamp(17px,2.6vw,23px)/1.25 Georgia,serif;overflow-wrap:anywhere}
-.advent-answer[hidden]{display:none}
-.advent-finale{margin:0;font-size:13px;line-height:1.2}
-.advent-popup-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:8px}
-.advent-popup-actions button{min-height:44px;padding:10px 18px;font:700 14px/1.2 system-ui,sans-serif}
-.advent-show-answer{border:1px solid #eccb80;border-radius:25px;background:#f3d99d;color:#322618;cursor:pointer}
-.advent-show-answer:disabled{opacity:.45;cursor:default}
-.advent-show-answer[hidden]{display:none}
-@media(max-width:420px){.advent-popup{padding:14px;gap:9px}.advent-popup h2{font-size:20px}.advent-popup-actions button{padding:10px 13px}}
-@media(max-height:500px) and (min-width:500px){
- .advent-dialog{width:min(840px,calc(100% - 24px));max-width:840px}
- .advent-popup{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);grid-template-rows:auto minmax(0,1fr) auto auto auto;column-gap:20px;row-gap:8px;padding:12px 20px}
- .advent-popup h2{grid-column:1/-1;font-size:20px}
- .advent-stage{grid-column:1;grid-row:2/6;max-height:100%}
- .advent-message,.advent-answer,.advent-finale,.advent-popup-actions{grid-column:2;align-self:center}
- .advent-message,.advent-answer{font-size:18px;line-height:1.2}
- .advent-popup-actions button{padding:8px 12px}
- .advent-hinge span{font-size:25px}.advent-hinge b{font-size:65px}.advent-hinge small{font-size:10px;margin-top:8px}
-}
-
-/* Keep a centered square inside its grid slot; clip only the zooming picture. */
-.advent-stage-space{position:relative;min-width:0;min-height:0;container-type:size;align-self:stretch;justify-self:stretch}
-.advent-stage-space .advent-stage{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(100cqw,100cqh,410px);height:min(100cqw,100cqh,410px);max-width:none;max-height:none;min-width:0;min-height:0;margin:0;box-sizing:border-box}
-.advent-picture-frame{position:absolute;inset:0;border-radius:15px;overflow:hidden;isolation:isolate}
-.advent-picture-frame .advent-animal{border-radius:inherit}
-.advent-picture-frame img{position:absolute;inset:0;width:100%;height:100%;max-width:100%;max-height:100%;margin:0;padding:0;object-fit:contain;object-position:center;box-sizing:border-box}
-@media(max-height:500px) and (min-width:500px){.advent-stage-space{grid-column:1;grid-row:2/6}.advent-stage-space .advent-stage{grid-column:auto;grid-row:auto}}
-
 /* Only previously opened doors become grey after their Stockholm date has passed. */
 .advent-door.is-past-opened{filter:grayscale(1);background:linear-gradient(145deg,#606662,#343a36);color:#e1e4e2;border-color:#919a94;outline-color:#919a94;box-shadow:0 5px 12px #0004,inset 0 1px #ffffff14}
 .advent-door.is-past-opened .advent-door-inner{border-color:#a0a9a380}
 .advent-door.is-past-opened .advent-ornament{color:#c5cdc8}
 
-/* Equal spacing around the date and between picture, question and answer. */
-.advent-dialog .advent-popup{height:auto;min-height:0;display:flex;flex-direction:column;align-items:stretch;gap:16px;padding:16px 24px}
-.advent-dialog .advent-popup h2{flex:none;margin:0 40px;font-size:23px}
-.advent-dialog .advent-stage-space{flex:none;width:100%;height:auto;aspect-ratio:1;max-width:410px;align-self:center;container-type:normal}
-.advent-dialog .advent-stage-space .advent-stage{position:relative;left:auto;top:auto;transform:none;width:100%;height:100%;max-width:none;max-height:none}
-.advent-dialog .advent-message,.advent-dialog .advent-answer{margin:0 auto}
-.advent-dialog{height:auto;overflow:auto}
-.advent-dialog .advent-close{display:grid;place-items:center;padding:0;line-height:1;font-family:Arial,sans-serif}
-@media(max-width:420px){.advent-dialog .advent-popup{padding:16px;gap:16px}.advent-dialog .advent-popup h2{font-size:20px}}
+/* Compact, content-sized popup. Keep spacing independent of picture size. */
+.advent-dialog{box-sizing:border-box;width:min(440px,calc(100% - 24px));max-width:440px;height:fit-content;min-height:0;max-height:calc(100dvh - 24px);overflow:auto}
+.advent-dialog .advent-popup{box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:12px;height:auto;min-height:0;padding:14px 20px 18px}
+.advent-dialog .advent-popup h2{flex:none;align-self:stretch;margin:0 38px;color:#f8dfa1;font-size:22px;line-height:28px}
+.advent-dialog .advent-close{top:8px;right:8px;display:grid;place-items:center;width:40px;height:40px;padding:0;line-height:1;font-family:Arial,sans-serif}
+.advent-dialog .advent-stage-space{--picture-size:min(320px,calc(100vw - 66px),calc(100dvh - 280px));position:relative;flex:none;width:var(--picture-size);height:var(--picture-size);min-width:0;min-height:0;max-width:100%;container-type:normal}
+.advent-dialog .advent-stage{box-sizing:border-box;position:relative;width:100%;height:100%;min-height:0;max-width:none;max-height:none;margin:0;aspect-ratio:1}
+.advent-picture-frame{position:absolute;inset:0;border-radius:15px;overflow:hidden;isolation:isolate}
+.advent-picture-frame .advent-animal{border-radius:inherit}
+.advent-picture-frame img{position:absolute;inset:0;width:100%;height:100%;max-width:100%;max-height:100%;margin:0;padding:0;object-fit:contain;object-position:center;box-sizing:border-box}
+.advent-copy{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;min-width:0}
+.advent-dialog .advent-message,.advent-dialog .advent-answer{margin:0;max-width:100%;font:500 20px/1.3 Georgia,serif;overflow-wrap:break-word;text-wrap:balance}
+.advent-dialog .advent-answer{color:#ffe0a0;font-weight:600}
+.advent-answer[hidden],.advent-show-answer[hidden]{display:none}
+.advent-dialog .advent-finale{margin:0;font-size:13px;line-height:1.3}
+.advent-popup-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:8px}
+.advent-popup-actions button{min-height:44px;padding:10px 16px;font:700 14px/1.2 system-ui,sans-serif}
+.advent-show-answer{border:1px solid #eccb80;border-radius:25px;background:#f3d99d;color:#322618;cursor:pointer}
+.advent-show-answer:disabled{opacity:.45;cursor:default}
+@media(max-width:420px){
+ .advent-dialog .advent-popup{padding:14px 16px 16px}
+ .advent-dialog .advent-popup h2{font-size:20px}
+ .advent-dialog .advent-message,.advent-dialog .advent-answer{font-size:18px}
+ .advent-popup-actions button{padding:10px 13px}
+}
+@media(max-height:500px) and (min-width:600px){
+ .advent-dialog{width:min(680px,calc(100% - 24px));max-width:680px}
+ .advent-dialog .advent-popup{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:12px 20px;padding:12px 18px 16px}
+ .advent-dialog .advent-popup h2{grid-column:1/-1;margin:0 38px;font-size:20px}
+ .advent-dialog .advent-stage-space{--picture-size:min(270px,calc(100dvh - 96px));grid-column:1;grid-row:2}
+ .advent-copy{grid-column:2;grid-row:2}
+ .advent-dialog .advent-message,.advent-dialog .advent-answer{font-size:18px}
+ .advent-hinge span{font-size:28px}.advent-hinge b{font-size:76px}.advent-hinge small{font-size:10px;margin-top:8px}
+}
