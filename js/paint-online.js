@@ -182,7 +182,7 @@ function openPainter(IMAGE,TARGET){
  const isHedgehogTarget=TARGET.toLocaleLowerCase("sv").trim()==="igelkott"&&/\/djur\/igelkott(?:-preview)?\.webp(?:[?#]|$)/.test(new URL(IMAGE,location.href).pathname);
  const isPenguinTarget=TARGET.toLocaleLowerCase("sv").trim()==="pingvin"&&/\/djur\/pingvin(?:-preview)?\.webp(?:[?#]|$)/.test(new URL(IMAGE,location.href).pathname);
  const isAnimalTarget=isPenguinTarget||isHedgehogTarget||isNewAnimalTarget||isCatTarget||isDogTarget||isFoxTarget||isElephantTarget||isDolphinTarget||isLionTarget||isPandaTarget;
- const referenceKey=isTurtleTarget?"animal-turtle":isSquirrelTarget?"animal-squirrel":isPandaTarget?"animal-panda":isLionTarget?"animal-lion":isWhaleTarget?"animal-whale":isPenguinTarget?"animal-penguin":isHedgehogTarget?"animal-hedgehog":isDolphinTarget?"animal-dolphin":isNewAnimalTarget?"animal-"+animalModel:isElephantTarget?"animal-elephant":isGiraffeTarget?"animal-giraffe":isFoxTarget?"animal-fox":isDogTarget?"animal-dog":isCatTarget?"animal-cat":({"pumpalyktan":"pumpkin","häxans hatt":"hat","den busiga mumien":"mummy","den vänliga vampyren":"vampire","monsterkalas":"monster","godismandala":"candy"})[TARGET.toLocaleLowerCase("sv").trim()]||null;
+ const referenceKey=isTurtleTarget?"animal-turtle":isSquirrelTarget?"animal-squirrel":isPandaTarget?"animal-panda":isLionTarget?"animal-lion":isWhaleTarget?"animal-whale":isPenguinTarget?"animal-penguin":isHedgehogTarget?"animal-hedgehog":isDolphinTarget?"animal-dolphin":isNewAnimalTarget?"animal-"+animalModel:isElephantTarget?"animal-elephant":isGiraffeTarget?"animal-giraffe":isFoxTarget?"animal-fox":isDogTarget?"animal-dog":isCatTarget?"animal-cat":({"pumpamandala":"pumpamandala","pumpalyktan":"pumpkin","häxans hatt":"hat","den busiga mumien":"mummy","den vänliga vampyren":"vampire","monsterkalas":"monster","godismandala":"candy"})[TARGET.toLocaleLowerCase("sv").trim()]||null;
  let referenceConfig=null;
  const potionConfig=TARGET.toLocaleLowerCase("sv").trim()==="trolldrycksflaskorna"?POTION_COLORING:null;
  const wreathConfig=TARGET.toLocaleLowerCase("sv").trim()==="halloweenkrans"?WREATH_COLORING:null;
@@ -316,6 +316,10 @@ c.putImageData(out,0,0)
      }
      if(y%80===79)await pause("Förbereder originalets slutna färgområden…");
    }
+   // Preserve the fine white channels in this original's narrow pumpkin smiles.
+   // Other drawings retain the existing one-pixel segmentation dilation.
+   const inkWindows=(referenceConfig||castleConfig)?.sourceInkWindows;
+   if(inkWindows)for(const [x0,y0,x1,y1] of inkWindows)for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)barrier[y*W+x]=luma[y*W+x]<220?1:0;
    if(trainConfig){for(let x=0;x<W;x++){barrier[x]=1;barrier[(H-1)*W+x]=1}for(let y=0;y<H;y++){barrier[y*W]=1;barrier[y*W+W-1]=1}}
    // Keep the original star's fine tapered points; only its own faint outline
    // gaps are closed for segmentation. The visible line canvas is untouched.
@@ -918,7 +922,52 @@ c.putImageData(out,0,0)
    for(const index of region.pixels){const x=index%W-region.minX,y=((index/W)|0)-region.minY,k=(y*w+x)*4;for(let ch=0;ch<3;ch++){let value=0;for(const [i,a] of bx[x])for(const [j,b] of by[y])value+=a*b*model.coeff[ch][i*model.shape[1]+j];d[k+ch]=region.hint==="paper"?255:Math.max(0,Math.min(255,value))}d[k+3]=255}
    g.putImageData(im,0,0);ctx.drawImage(c,region.minX,region.minY);
  }
+ // Pumpamandala evaluates continuous RGB material models inside original masks.
+ // The aligned reference supplies fitted colour coefficients, never a bitmap layer.
+ function paintPumpamandalaRegion(region){
+   const w=region.maxX-region.minX+1,h=region.maxY-region.minY+1,c=document.createElement("canvas");c.width=w;c.height=h;
+   const g=c.getContext("2d"),im=g.createImageData(w,h),d=im.data,role=region.hint,pal=referenceConfig.palettes;
+   const material=role.replace(/\d+$/,""),j=Number(role.match(/\d+$/)?.[0]||0),pumpkin=referenceConfig.pumpkins[j];
+   const clamp=(t,a=0,b=1)=>Math.max(a,Math.min(b,t)),mix=(a,b,t)=>a+(b-a)*t;
+   const depth=new Uint16Array(w*h),q=new Uint32Array(w*h);let head=0,tail=0;
+   for(const i of region.pixels)depth[(((i/W)|0)-region.minY)*w+i%W-region.minX]=65535;
+   for(let i=0;i<depth.length;i++)if(depth[i]&&(i%w===0||i%w===w-1||i<w||i>=depth.length-w||!depth[i-1]||!depth[i+1]||!depth[i-w]||!depth[i+w])){depth[i]=1;q[tail++]=i}
+   while(head<tail){const i=q[head++],add=k=>{if(depth[k]===65535){depth[k]=depth[i]+1;q[tail++]=k}};if(i%w)add(i-1);if(i%w<w-1)add(i+1);if(i>=w)add(i-w);if(i<depth.length-w)add(i+w)}
+   for(const i of region.pixels){
+     const gx=i%W,gy=(i/W)|0,x=gx-region.minX,y=gy-region.minY,u=x/Math.max(1,w-1),v=y/Math.max(1,h-1),k=(y*w+x)*4;
+     let rgb=region.shades[1].slice();
+     if(region.surface){const b=[1,u,v,u*v,u*u,v*v];rgb=region.surface.map(co=>clamp(co.reduce((a,n,t)=>a+n*b[t],0),0,255))}
+     const blend=(color,a)=>{a=clamp(a);rgb=rgb.map((n,ch)=>mix(n,color[ch],a))},edge=Math.exp(-depth[y*w+x]/4);
+     if(material==="paper")rgb=[255,255,255];
+     else if(material==="skin"){
+       const [cx,cy,rx,ry,angle]=pumpkin,cs=Math.cos(angle),sn=Math.sin(angle),dx=gx-cx,dy=gy-cy,px=(dx*cs+dy*sn)/rx,py=(-dx*sn+dy*cs)/ry;
+       const round=Math.sqrt(Math.max(0,1-px*px)),rib=.5+.5*Math.cos(px*13+py*.3),t=clamp(.25+.43*round-.09*py+.10*rib);
+       const a=t<.5?pal.skin[0]:pal.skin[1],b=t<.5?pal.skin[1]:pal.skin[2],m=t<.5?t*2:(t-.5)*2,base=a.map((n,ch)=>mix(n,b[ch],m));
+       rgb=rgb.map((n,ch)=>mix(base[ch],clamp(n,pal.skin[0][ch],pal.skin[2][ch]),.48));
+       const shine=Math.exp(-((px+.20)**2/.018+(py+.60)**2/.10));blend([255,220,69],shine*.48);
+       const glow=Math.exp(-((px+.39)**2/.040+(py+.18)**2/.030))+Math.exp(-((px-.39)**2/.040+(py+.18)**2/.030))+Math.exp(-(px*px/.23+(py-.47)**2/.050));
+       blend([255,197,21],glow*.26);blend([104,27,0],edge*.16);
+       const grain=Math.sin(gx*.28+gy*.013)*Math.sin(gx*.10-gy*.021)*.65;rgb=rgb.map(n=>n+grain);
+     }else if(material==="cavity"){
+       const t=clamp((v-.26)/.70),stops=[[46,12,0],[190,66,0],[255,197,4],[255,255,151]],z=t*3,a=Math.min(2,Math.floor(z)),base=stops[a].map((n,ch)=>mix(n,stops[a+1][ch],z-a));
+       rgb=rgb.map((n,ch)=>mix(base[ch],clamp(n,stops[0][ch],stops[3][ch]),.25));
+       blend([255,255,168],Math.exp(-((u-.5)**2/.18+(v-.88)**2/.06))*.58);
+     }else if(material==="gold"){
+       const facet=.5+.5*Math.cos(Math.atan2(v-.5,u-.5)*5-.4),t=clamp(.25+.53*facet+.22*(1-v));rgb=pal.gold[0].map((n,ch)=>mix(n,pal.gold[2][ch],t));blend([255,255,181],Math.exp(-((u-.36)**2/.05+(v-.27)**2/.06))*.64);
+     }else if(material==="vine"||material==="stem"){
+       rgb=rgb.map((n,ch)=>clamp(n,pal[material][0][ch],pal[material][2][ch]));blend(pal[material][0],edge*.35);
+       const ridge=Math.exp(-((depth[y*w+x]-4)**2)/10);blend([227,191,72],ridge*(.20+.17*(1-v)));blend([155,167,38],Math.exp(-((u-.36)**2/.05+(v-.27)**2/.15))*.18);
+     }else if(material.startsWith("leaf")){
+       const stops=pal[material];rgb=rgb.map((n,ch)=>clamp(n,stops[0][ch],stops[2][ch]));blend(stops[0],edge*.27);
+       blend(stops[2],Math.exp(-((u-.42)**2/.09+(v-.31)**2/.07))*.28);
+       const grain=Math.sin(gx*.19+gy*.23)*Math.sin(gx*.31-gy*.15)*.7;rgb=rgb.map(n=>n+grain);
+     }
+     for(let ch=0;ch<3;ch++)d[k+ch]=rgb[ch];d[k+3]=255;
+   }
+   g.putImageData(im,0,0);ctx.drawImage(c,region.minX,region.minY);
+ }
  function paintReferenceRegion(region){
+   if(referenceKey==="pumpamandala"){paintPumpamandalaRegion(region);return}
    if(isWhaleTarget){paintWhaleRegion(region);return}
    if(isElephantTarget||isDolphinTarget){paintElephantRegion(region);return}
    if(isGiraffeTarget||isTurtleTarget||isSquirrelTarget){
