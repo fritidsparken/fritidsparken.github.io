@@ -164,8 +164,6 @@ function addButton(){
 }
 const observer=new MutationObserver(addButton);observer.observe(document.body,{childList:true,subtree:true});addButton();
 function openPainter(IMAGE,TARGET,REFERENCE=""){
- const isSpringTarget=IMAGE.includes("/mandala-spring-2026/");
- if(isSpringTarget)REFERENCE=IMAGE.replace("/mandala-spring-2026/","/spring-references-20261024/").replace(/\.webp(?:\?.*)?$/,"-reference.webp");
  const flightHouseConfig=FLIGHT_HOUSE_COLORING[({"häxan på kvasten":"haxa","det tokiga spökhuset":"spokhus"})[TARGET.toLocaleLowerCase("sv").trim()]]||null;
  const motifConfig=({"spindelns nät":MOTIF_COLORING.spindel,"fladdermusen":MOTIF_COLORING.fladdermus,"halloweenkatten":MOTIF_COLORING.svartkatt,"den magiska kitteln":MOTIF_COLORING.kittel,"pumpafamiljen":MOTIF_COLORING.pumpafamilj})[TARGET.toLocaleLowerCase("sv").trim()]||null;
  const isCatTarget=TARGET.toLocaleLowerCase("sv").trim()==="katt"&&/\/djur\/katt(?:-preview)?\.webp(?:[?#]|$)/.test(new URL(IMAGE,location.href).pathname);
@@ -209,8 +207,7 @@ function openPainter(IMAGE,TARGET,REFERENCE=""){
  document.body.append(back);document.body.style.overflow="hidden";
  const $=s=>back.querySelector(s),dialog=$(".fp-paint-dialog"),stage=$(".fp-paint-stage"),sheet=$(".fp-paint-sheet"),paint=$(".fp-paint-layer"),lines=$(".fp-line-layer"),ctx=paint.getContext("2d",{willReadFrequently:true}),lctx=lines.getContext("2d"),undo=$('[data-action="undo"]'),redo=$('[data-action="redo"]');
  const referenceButton=$('[data-action="reference"]');
- if(REFERENCE&&!isSpringTarget){referenceButton.hidden=false;referenceButton.setAttribute("aria-haspopup","dialog");const viewer=document.createElement("div");viewer.className="fp-reference-backdrop";viewer.hidden=true;viewer.setAttribute("role","dialog");viewer.setAttribute("aria-modal","true");viewer.setAttribute("aria-label","Färglagt färgförslag för "+TARGET);const card=document.createElement("div");card.className="fp-reference-card";const refImage=document.createElement("img");refImage.src=REFERENCE;refImage.alt="Färglagt färgförslag: "+TARGET;const closeReference=document.createElement("button");closeReference.type="button";closeReference.className="fp-reference-close";closeReference.setAttribute("aria-label","Stäng färgförslaget");closeReference.textContent="×";card.append(refImage,closeReference);viewer.append(card);back.append(viewer);referenceButton.addEventListener("click",()=>{viewer.hidden=false;closeReference.focus()});closeReference.addEventListener("click",()=>{viewer.hidden=true;referenceButton.focus()});viewer.addEventListener("click",e=>{if(e.target===viewer){viewer.hidden=true;referenceButton.focus()}});viewer.addEventListener("keydown",e=>{if(e.key==="Escape"){viewer.hidden=true;referenceButton.focus()}})}if(flightHouseConfig||motifConfig||referenceKey||spokConfig||owlConfig||wreathConfig||potionConfig||bookConfig||graveConfig||trainConfig||horseConfig||TARGET.toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset")dialog.classList.add("fp-paint-ghost");
- if(isSpringTarget)dialog.classList.add("fp-paint-ghost");
+ if(REFERENCE){referenceButton.hidden=false;referenceButton.setAttribute("aria-haspopup","dialog");const viewer=document.createElement("div");viewer.className="fp-reference-backdrop";viewer.hidden=true;viewer.setAttribute("role","dialog");viewer.setAttribute("aria-modal","true");viewer.setAttribute("aria-label","Färglagt färgförslag för "+TARGET);const card=document.createElement("div");card.className="fp-reference-card";const refImage=document.createElement("img");refImage.src=REFERENCE;refImage.alt="Färglagt färgförslag: "+TARGET;const closeReference=document.createElement("button");closeReference.type="button";closeReference.className="fp-reference-close";closeReference.setAttribute("aria-label","Stäng färgförslaget");closeReference.textContent="×";card.append(refImage,closeReference);viewer.append(card);back.append(viewer);referenceButton.addEventListener("click",()=>{viewer.hidden=false;closeReference.focus()});closeReference.addEventListener("click",()=>{viewer.hidden=true;referenceButton.focus()});viewer.addEventListener("click",e=>{if(e.target===viewer){viewer.hidden=true;referenceButton.focus()}});viewer.addEventListener("keydown",e=>{if(e.key==="Escape"){viewer.hidden=true;referenceButton.focus()}})}if(flightHouseConfig||motifConfig||referenceKey||spokConfig||owlConfig||wreathConfig||potionConfig||bookConfig||graveConfig||trainConfig||horseConfig||TARGET.toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset")dialog.classList.add("fp-paint-ghost");
  let graveTreeToneMap=null;
  let tool="fill",color="#ef4444",brush=14,acts=[],future=[],W=0,H=0,luma=null,zoom=1,tx=0,ty=0,space=false,active=null,pending=null,gesture=false,pinch=null;
  const autoButton=$('[data-action="auto"]'),autoProgress=document.createElement("progress"),status=$(".fp-paint-status");
@@ -1387,18 +1384,6 @@ c.putImageData(out,0,0)
      maskCtx.putImageData(cutout,0,0);lctx.save();lctx.globalCompositeOperation="destination-out";lctx.drawImage(mask,region.minX,region.minY);lctx.restore();
    }
  }
- function paintSpringRegion(step){
-   const {region,reference}=step,rw=Math.round(W/region.scaleX);
-   const mask=document.createElement("canvas");mask.width=region.maxX-region.minX+1;mask.height=region.maxY-region.minY+1;
-   const mc=mask.getContext("2d"),pixels=mc.createImageData(mask.width,mask.height);
-   for(const index of region.pixels){const x=index%rw-region.minX,y=Math.floor(index/rw)-region.minY;pixels.data[(y*mask.width+x)*4+3]=255}
-   mc.putImageData(pixels,0,0);
-   const tile=document.createElement("canvas"),x=Math.floor(region.minX*region.scaleX),y=Math.floor(region.minY*region.scaleY);
-   tile.width=Math.ceil(mask.width*region.scaleX);tile.height=Math.ceil(mask.height*region.scaleY);
-   const tc=tile.getContext("2d");tc.drawImage(reference,x,y,tile.width,tile.height,0,0,tile.width,tile.height);
-   tc.globalCompositeOperation="destination-in";tc.drawImage(mask,0,0,tile.width,tile.height);
-   ctx.drawImage(tile,x,y);
- }
  function paintAutoRegion(region,fillColor){
    const width=region.maxX-region.minX+1,height=region.maxY-region.minY+1,mask=document.createElement("canvas");
    mask.width=width;mask.height=height;
@@ -1414,15 +1399,7 @@ c.putImageData(out,0,0)
    autoProgress.hidden=false;autoProgress.value=0;sheet.style.pointerEvents="none";toolSet("fill");
    const isGhost=!!flightHouseConfig||!!motifConfig||!!referenceKey||!!spokConfig||!!owlConfig||!!wreathConfig||!!potionConfig||!!bookConfig||!!graveConfig||!!trainConfig||!!horseConfig||TARGET.toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset";
    let plan;
-   if(isSpringTarget){
-     status.textContent="Hämtar vårbildens färgreferens…";
-     try{
-       const image=await new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=()=>reject(new Error("Reference missing"));i.src=REFERENCE});
-       const reference=document.createElement("canvas");reference.width=W;reference.height=H;reference.getContext("2d").drawImage(image,0,0,W,H);
-       const regions=await findAutoRegions();
-       plan=regions.map(region=>({type:"springRegion",region,reference}));
-     }catch(error){autoRunning=false;autoButton.disabled=false;autoProgress.hidden=true;sheet.style.pointerEvents="";status.textContent="Vårbildens färgreferens kunde inte laddas. Försök igen.";return}
-   }else if(isGhost){
+   if(isGhost){
      status.textContent="Hämtar färgreferensen…";
      try{if(!flightHouseConfig&&!motifConfig&&!referenceKey&&!spokConfig&&!owlConfig&&!wreathConfig&&!potionConfig&&!bookConfig&&!graveConfig&&!trainConfig)await getGhostReference()}catch{autoRunning=false;autoButton.disabled=false;autoProgress.hidden=true;sheet.style.pointerEvents="";status.textContent="Färgreferensen kunde inte öppnas. Försök igen.";return}
      if(!flightHouseConfig&&!motifConfig&&!referenceKey&&!spokConfig&&!owlConfig&&!wreathConfig&&!potionConfig&&!bookConfig&&!graveConfig&&!trainConfig)ghostReferencePixels=ghostAlignedReference();
@@ -1447,7 +1424,7 @@ c.putImageData(out,0,0)
    for(let i=0;i<plan.length;i++){
      if(!back.isConnected){autoRunning=false;return}
      const step=plan[i];
-     if(step.type==="springRegion"){paintSpringRegion(step);acts.push(step);}else if(step.type==="region"){
+     if(step.type==="region"){
        paintAutoRegion(step.region,step.color);
        acts.push({type:"region",region:step.region,color:step.color});
      }else if(step.type==="ghostRegion"){
@@ -1456,14 +1433,14 @@ c.putImageData(out,0,0)
      }
      future=[];autoProgress.value=i+1;
      status.textContent="Timelapse: färglägger "+TARGET+", steg "+(i+1)+" av "+plan.length+"…";historyUI();
-     await new Promise(resolve=>setTimeout(resolve,isSpringTarget?Math.max(35,Math.min(200,18000/plan.length)):isLocalSurfaceTarget?Math.max(80,Math.min(650,18000/plan.length)):isGhost?Math.max(8,Math.min(30,18000/plan.length)):115));
+     await new Promise(resolve=>setTimeout(resolve,isLocalSurfaceTarget?Math.max(80,Math.min(650,18000/plan.length)):isGhost?Math.max(8,Math.min(30,18000/plan.length)):115));
    }
    // Keep the actual region fills as the final result. Never swap in a photo.
    autoRunning=false;sheet.style.pointerEvents="";if(flightHouseConfig||motifConfig||referenceKey||spokConfig||owlConfig||wreathConfig||potionConfig||bookConfig||graveConfig||trainConfig)autoButton.disabled=false;historyUI();
    status.textContent=isGhost?"Klart! "+TARGET+" är färglagd enligt färgreferensen. Du kan fortsätta måla eller spara bilden.":"Klart! "+TARGET+" är färglagd. Du kan fortsätta måla eller spara bilden.";
  }
  if(autoButton)autoButton.addEventListener("click",runAutoColor);
- function redraw(){lines.style.opacity="";if(ghostOriginalInk)lctx.putImageData(ghostOriginalInk,0,0);ctx.clearRect(0,0,W,H);for(const a of acts){if(a.type==="springRegion"){paintSpringRegion(a)}else if(a.type==="ghostRegions"){for(const region of a.regions)paintGhostRegion(region)}else if(a.type==="ghostRegion"){paintGhostRegion(a.region)}else if(a.type==="fill"){const old=color;color=a.color;fillRegion(ctx,a.x,a.y);color=old}else if(a.type==="region"){paintAutoRegion(a.region,a.color)}else drawStroke(ctx,a)}historyUI()}
+ function redraw(){lines.style.opacity="";if(ghostOriginalInk)lctx.putImageData(ghostOriginalInk,0,0);ctx.clearRect(0,0,W,H);for(const a of acts){if(a.type==="ghostRegions"){for(const region of a.regions)paintGhostRegion(region)}else if(a.type==="ghostRegion"){paintGhostRegion(a.region)}else if(a.type==="fill"){const old=color;color=a.color;fillRegion(ctx,a.x,a.y);color=old}else if(a.type==="region"){paintAutoRegion(a.region,a.color)}else drawStroke(ctx,a)}historyUI()}
  function pos(e){const r=sheet.getBoundingClientRect();return [(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H]}
  const pointers=new Map();
  sheet.addEventListener("pointerdown",e=>{if(!W)return;e.preventDefault();sheet.setPointerCapture(e.pointerId);pointers.set(e.pointerId,[e.clientX,e.clientY]);
@@ -1481,7 +1458,7 @@ c.putImageData(out,0,0)
  back.querySelector('[data-action="minus"]').onclick=()=>setZoom(zoom-.25);back.querySelector('[data-action="plus"]').onclick=()=>setZoom(zoom+.25);back.querySelector('[data-action="one"]').onclick=()=>setZoom(1);
  stage.addEventListener("wheel",e=>{if(!e.ctrlKey&&!e.metaKey)return;e.preventDefault();setZoom(zoom+(e.deltaY<0?.15:-.15))},{passive:false});
  back.querySelector('[data-action="reset"]').onclick=()=>{if(autoRunning)return;if(confirm("Vill du radera hela målningen och börja om?")){acts=[];future=[];autoProgress.hidden=true;autoProgress.value=0;if(autoButton)autoButton.disabled=false;status.textContent="Välj färg och tryck på ett område. Två fingrar flyttar och zoomar. Dator: håll mellanslag och dra.";redraw()}};
- back.querySelector('[data-action="save"]').onclick=()=>{if(!W)return;const out=document.createElement("canvas");const ghostTarget=dialog.classList.contains("fp-paint-ghost");out.width=ghostTarget?W:img.naturalWidth;out.height=ghostTarget?H:img.naturalHeight;const c=out.getContext("2d");if(isSpringTarget||flightHouseConfig||motifConfig||referenceKey||materialConfig||wolfConfig||candyConfig||spokConfig||owlConfig||wreathConfig||potionConfig){c.fillStyle="#fff";c.fillRect(0,0,out.width,out.height)}c.drawImage(paint,0,0,out.width,out.height);c.drawImage(lines,0,0,out.width,out.height);out.toBlob(blob=>{if(!blob)return;const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="min-farglagda-"+TARGET.toLocaleLowerCase("sv").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")+".png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},"image/png")};
+ back.querySelector('[data-action="save"]').onclick=()=>{if(!W)return;const out=document.createElement("canvas");const ghostTarget=dialog.classList.contains("fp-paint-ghost");out.width=ghostTarget?W:img.naturalWidth;out.height=ghostTarget?H:img.naturalHeight;const c=out.getContext("2d");if(flightHouseConfig||motifConfig||referenceKey||materialConfig||wolfConfig||candyConfig||spokConfig||owlConfig||wreathConfig||potionConfig){c.fillStyle="#fff";c.fillRect(0,0,out.width,out.height)}c.drawImage(paint,0,0,out.width,out.height);c.drawImage(lines,0,0,out.width,out.height);out.toBlob(blob=>{if(!blob)return;const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="min-farglagda-"+TARGET.toLocaleLowerCase("sv").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")+".png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},"image/png")};
  function close(){window.removeEventListener("resize",fit);window.removeEventListener("keydown",keydown);window.removeEventListener("keyup",keyup);back.remove();document.body.style.overflow="";addButton()}
  back.querySelector(".fp-paint-close").onclick=close;back.addEventListener("click",e=>{if(e.target===back)close()});const keydown=e=>{if(e.code==="Space"){space=true;if(e.target===document.body||e.target===back)e.preventDefault()}if(e.key==="Escape")close();if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){e.preventDefault();e.shiftKey?redoOne():undoOne()}};const keyup=e=>{if(e.code==="Space")space=false};window.addEventListener("keydown",keydown);window.addEventListener("keyup",keyup);back.addEventListener("keydown",e=>{if(e.code==="Space")e.preventDefault()});back.tabIndex=-1;back.focus();
 }
