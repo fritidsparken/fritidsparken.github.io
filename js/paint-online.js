@@ -165,7 +165,10 @@ function openPainter(IMAGE,TARGET){
  const flightHouseConfig=FLIGHT_HOUSE_COLORING[({"häxan på kvasten":"haxa","det tokiga spökhuset":"spokhus"})[TARGET.toLocaleLowerCase("sv").trim()]]||null;
  const motifConfig=({"spindelns nät":MOTIF_COLORING.spindel,"fladdermusen":MOTIF_COLORING.fladdermus,"halloweenkatten":MOTIF_COLORING.svartkatt,"den magiska kitteln":MOTIF_COLORING.kittel,"pumpafamiljen":MOTIF_COLORING.pumpafamilj})[TARGET.toLocaleLowerCase("sv").trim()]||null;
  const isCatTarget=TARGET.toLocaleLowerCase("sv").trim()==="katt"&&/\/djur\/katt(?:-preview)?\.webp(?:[?#]|$)/.test(new URL(IMAGE,location.href).pathname);
- const referenceKey=isCatTarget?"animal-cat":({"pumpalyktan":"pumpkin","häxans hatt":"hat","den busiga mumien":"mummy","den vänliga vampyren":"vampire","monsterkalas":"monster","godismandala":"candy"})[TARGET.toLocaleLowerCase("sv").trim()]||null;
+ const isDogTarget=TARGET.toLocaleLowerCase("sv").trim()==="hund"&&/\/djur\/hund(?:-preview)?\.webp(?:[?#]|$)/.test(new URL(IMAGE,location.href).pathname);
+ const isFoxTarget=TARGET.toLocaleLowerCase("sv").trim()==="räv"&&/\/djur\/rav(?:-preview)?\.webp(?:[?#]|$)/.test(new URL(IMAGE,location.href).pathname);
+ const isAnimalTarget=isCatTarget||isDogTarget||isFoxTarget;
+ const referenceKey=isFoxTarget?"animal-fox":isDogTarget?"animal-dog":isCatTarget?"animal-cat":({"pumpalyktan":"pumpkin","häxans hatt":"hat","den busiga mumien":"mummy","den vänliga vampyren":"vampire","monsterkalas":"monster","godismandala":"candy"})[TARGET.toLocaleLowerCase("sv").trim()]||null;
  let referenceConfig=null;
  const potionConfig=TARGET.toLocaleLowerCase("sv").trim()==="trolldrycksflaskorna"?POTION_COLORING:null;
  const wreathConfig=TARGET.toLocaleLowerCase("sv").trim()==="halloweenkrans"?WREATH_COLORING:null;
@@ -194,7 +197,7 @@ function openPainter(IMAGE,TARGET){
 
  const img=new Image();if(new URL(IMAGE,location.href).origin!==location.origin)img.crossOrigin="anonymous";img.onload=async()=>{
    if(referenceKey){
-     try{const response=await fetch(new URL((isCatTarget?"../assets/coloring-originals-2026/djur/katt-coloring-v2.json":"../assets/mandala-halloween-2026/"+referenceKey+"-coloring-v1.json"),document.querySelector('script[src*="paint-online.js"]')?.src||new URL("js/paint-online.js",location.href)));if(!response.ok)throw new Error("Colour model missing");referenceConfig=await response.json()}
+     try{const response=await fetch(new URL((isFoxTarget?"../assets/coloring-originals-2026/djur/rav-coloring-v1.json":isDogTarget?"../assets/coloring-originals-2026/djur/hund-coloring-v1.json":isCatTarget?"../assets/coloring-originals-2026/djur/katt-coloring-v2.json":"../assets/mandala-halloween-2026/"+referenceKey+"-coloring-v1.json"),document.querySelector('script[src*="paint-online.js"]')?.src||new URL("js/paint-online.js",location.href)));if(!response.ok)throw new Error("Colour model missing");referenceConfig=await response.json()}
      catch{status.textContent="Färganpassningen kunde inte öppnas. Stäng och försök igen.";return}
    }
    const prepareCanvas=()=>{
@@ -218,7 +221,7 @@ function openPainter(IMAGE,TARGET){
    };
    if(!flightHouseConfig&&!motifConfig&&!referenceKey&&!spokConfig&&!owlConfig&&!wreathConfig&&!potionConfig&&!bookConfig&&!graveConfig&&!trainConfig&&(horseConfig||String(TARGET||"").toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset"))getGhostReference().then(prepareCanvas).catch(()=>{status.textContent="Färgreferensen kunde inte öppnas. Stäng och försök igen."});
    else prepareCanvas();
- };img.onerror=()=>{$(".fp-paint-status").textContent="Bilden kunde inte öppnas. Stäng och försök igen.";};img.src=isCatTarget?new URL("katt.webp",new URL(IMAGE,location.href)).href:IMAGE;
+ };img.onerror=()=>{$(".fp-paint-status").textContent="Bilden kunde inte öppnas. Stäng och försök igen.";};img.src=isFoxTarget?new URL("rav.webp",new URL(IMAGE,location.href)).href:isDogTarget?new URL("hund.webp",new URL(IMAGE,location.href)).href:isCatTarget?new URL("katt.webp",new URL(IMAGE,location.href)).href:IMAGE;
  function fit(){if(!W)return;let r=W/H,aw=stage.clientWidth-24,ah=stage.clientHeight-24,w=Math.min(aw,ah*r);sheet.style.width=w+"px";sheet.style.height=w/r+"px";applyTransform()}
  function applyTransform(){sheet.style.transform="translate(calc(-50% + "+tx+"px),calc(-50% + "+ty+"px)) scale("+zoom+")"}
  function setZoom(z){zoom=Math.max(1,Math.min(4,z));if(zoom===1)tx=ty=0;applyTransform()}
@@ -353,7 +356,7 @@ c.putImageData(out,0,0)
      for(const [x,y,role,shades] of motifConfig.regions){const r=regions[labels[y*W+x]-1];if(r){r.hint=role;r.shades=shades}}
      for(const r of regions)if(!r.shades){r.hint="sky";r.shades=motifConfig.palettes.sky}
    }else if(referenceConfig){
-     for(const [x,y,role,shades,surface,area,degree,coeff] of referenceConfig.regions){const r=regions[labels[y*W+x]-1];if(r&&(!isCatTarget||!r.seedArea||area>r.seedArea)){r.hint=role;r.shades=shades;r.surface=surface;if(isCatTarget){r.seedArea=area;r.degree=degree;r.coeff=coeff}}}
+     for(const [x,y,role,shades,surface,area,degree,coeff] of referenceConfig.regions){const r=regions[labels[y*W+x]-1];if(r&&(!isAnimalTarget||!r.seedArea||area>r.seedArea)){r.hint=role;r.shades=shades;r.surface=surface;if(isAnimalTarget){r.seedArea=area;r.degree=degree;r.coeff=coeff}}}
      for(const r of regions)if(!r.shades){r.hint="fabric";r.shades=referenceConfig.palettes.fabric}
    }else if(spokConfig){
      for(const [x,y,role,shades,surface] of spokConfig.regions){const r=regions[labels[y*W+x]-1];if(r){r.hint=role;r.shades=shades;r.surface=surface}}
@@ -871,7 +874,7 @@ c.putImageData(out,0,0)
    g.putImageData(im,0,0);ctx.drawImage(mask,region.minX,region.minY);
  }
  function paintReferenceRegion(region){
-   if(isCatTarget){paintCatRegion(region);return}
+   if(isAnimalTarget){paintCatRegion(region);return}
    const width=region.maxX-region.minX+1,height=region.maxY-region.minY+1,mask=document.createElement("canvas");mask.width=width;mask.height=height;
    const g=mask.getContext("2d"),im=g.createImageData(width,height),d=im.data,role=region.hint,pal=referenceConfig.palettes,stops=region.shades;
    const mix=(a,b,t)=>a+(b-a)*t,clamp=(n,a=0,b=1)=>Math.max(a,Math.min(b,n));
