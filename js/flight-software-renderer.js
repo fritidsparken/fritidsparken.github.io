@@ -1,26 +1,48 @@
-/* Small CPU triangle renderer for browsers without WebGL. Uses the same original 3D scene. */
+/* Reduced-detail CPU renderer for devices without WebGL; same 3D world and physics. */
 (() => {
-  function create(T) {
-    const domElement=document.createElement('canvas'),ctx=domElement.getContext('2d');let width=1000,height=600,ratio=1;
-    const vp=new T.Matrix4(),matrix=new T.Matrix4(),instance=new T.Matrix4(),a=new T.Vector3(),b=new T.Vector3(),c=new T.Vector3(),pa=new T.Vector3(),pb=new T.Vector3(),pc=new T.Vector3(),edge=new T.Vector3(),normal=new T.Vector3(),light=new T.Vector3(-.4,.85,.3).normalize();
-    const colorCache=new Map();
-    function color(material,shade,fog){const hex=material.color?.getHexString()||'eeeeee',key=hex+':'+Math.round(shade*20)+':'+Math.round(fog*30);if(colorCache.has(key))return colorCache.get(key);const v=parseInt(hex,16),sky=[190,221,212],rgb=[v>>16,(v>>8)&255,v&255].map((x,i)=>Math.round(Math.min(255,x*shade)*(1-fog)+sky[i]*fog));const value=`rgb(${rgb.join(',')})`;colorCache.set(key,value);return value;}
-    function project(v){return v.applyMatrix4(vp);}
-    function render(scene,camera){scene.updateMatrixWorld();camera.updateMatrixWorld();vp.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);ctx.setTransform(ratio,0,0,ratio,0,0);ctx.globalAlpha=1;ctx.fillStyle='#a8dceb';ctx.fillRect(0,0,width,height);
-      // Ground extends beyond the near clipping plane, so draw it as a clipped quad.
-      const ground=[new T.Vector3(-500,0,-250),new T.Vector3(500,0,-250),new T.Vector3(500,0,10),new T.Vector3(-500,0,10)].map(project);ctx.fillStyle='#8bb565';ctx.beginPath();ground.forEach((v,i)=>i?ctx.lineTo((v.x+1)*width/2,(1-v.y)*height/2):ctx.moveTo((v.x+1)*width/2,(1-v.y)*height/2));ctx.closePath();ctx.fill();
-      const faces=[];
-      function object(mesh,world){const geom=mesh.geometry,pos=geom?.attributes?.position,index=geom?.index;if(!pos)return;const material=Array.isArray(mesh.material)?mesh.material[0]:mesh.material;if(!material||material.visible===false)return;const count=index?index.count:pos.count;
-        for(let i=0;i<count;i+=3){const ia=index?index.getX(i):i,ib=index?index.getX(i+1):i+1,ic=index?index.getX(i+2):i+2;a.fromBufferAttribute(pos,ia).applyMatrix4(world);b.fromBufferAttribute(pos,ib).applyMatrix4(world);c.fromBufferAttribute(pos,ic).applyMatrix4(world);pa.copy(a);pb.copy(b);pc.copy(c);project(pa);project(pb);project(pc);
-          if(pa.z< -1||pb.z< -1||pc.z< -1||pa.z>1||pb.z>1||pc.z>1)continue;if((pa.x< -1&&pb.x< -1&&pc.x< -1)||(pa.x>1&&pb.x>1&&pc.x>1)||(pa.y< -1&&pb.y< -1&&pc.y< -1)||(pa.y>1&&pb.y>1&&pc.y>1))continue;
-          const cross=(pb.x-pa.x)*(pc.y-pa.y)-(pb.y-pa.y)*(pc.x-pa.x);if(material.side!==T.DoubleSide&&cross<0)continue;
-          normal.subVectors(b,a);edge.subVectors(c,a);normal.cross(edge).normalize();const shade=material.isMeshBasicMaterial?1:material.userData.cloud?.9+Math.max(0,normal.dot(light))*.1:.62+Math.max(0,normal.dot(light))*.46;const depth=(camera.position.z-(a.z+b.z+c.z)/3),fog=Math.min(.94,Math.max(0,(depth-60)/190));faces.push({z:(pa.z+pb.z+pc.z)/3,p:[(pa.x+1)*width/2,(1-pa.y)*height/2,(pb.x+1)*width/2,(1-pb.y)*height/2,(pc.x+1)*width/2,(1-pc.y)*height/2],fill:color(material,shade,fog),alpha:material.opacity});
+  function create(T){
+    const domElement=document.createElement('canvas'),ctx=domElement.getContext('2d');if(!ctx)return null;
+    let width=1000,height=600,ratio=1,pixels,depthBuffer;
+    const matrix=new T.Matrix4(),instance=new T.Matrix4(),a=new T.Vector3(),b=new T.Vector3(),c=new T.Vector3(),normal=new T.Vector3(),edge=new T.Vector3(),light=new T.Vector3(-.4,.85,.3).normalize(),sky=new T.Color(),shadeColor=new T.Color();
+    function render(scene,camera){
+      scene.updateMatrixWorld();camera.updateMatrixWorld();sky.copy(scene.background||new T.Color('#a8dceb'));ctx.setTransform(ratio,0,0,ratio,0,0);ctx.globalAlpha=1;ctx.fillStyle='#'+sky.getHexString();ctx.fillRect(0,0,width,height);const faces=[];
+      function object(mesh,world){
+        const geom=mesh.geometry,pos=geom?.attributes?.position,index=geom?.index;if(!pos)return;const material=Array.isArray(mesh.material)?mesh.material[0]:mesh.material;if(!material||material.visible===false)return;
+        const count=index?index.count:pos.count,colors=geom.attributes.color;
+        for(let i=0;i<count;i+=3){
+          const ia=index?index.getX(i):i,ib=index?index.getX(i+1):i+1,ic=index?index.getX(i+2):i+2;
+          a.fromBufferAttribute(pos,ia).applyMatrix4(world);b.fromBufferAttribute(pos,ib).applyMatrix4(world);c.fromBufferAttribute(pos,ic).applyMatrix4(world);
+          normal.subVectors(b,a);edge.subVectors(c,a);normal.cross(edge).normalize();const brightness=material.isMeshBasicMaterial?1:material.userData.cloud?.95:.64+Math.max(0,normal.dot(light))*.4;
+          let poly=[a.clone().applyMatrix4(camera.matrixWorldInverse),b.clone().applyMatrix4(camera.matrixWorldInverse),c.clone().applyMatrix4(camera.matrixWorldInverse)];
+          // Clip against near plane instead of dropping terrain triangles at the camera.
+          const clipped=[],near=-camera.near;
+          for(let j=0;j<poly.length;j++){const p=poly[j],q=poly[(j+1)%poly.length],inside=p.z<=near,next=q.z<=near;if(inside)clipped.push(p);if(inside!==next){const t=(near-p.z)/(q.z-p.z);clipped.push(p.clone().lerp(q,t));}}
+          poly=clipped;if(poly.length<3)continue;const depth=-poly.reduce((sum,p)=>sum+p.z,0)/poly.length;if(depth>camera.far)continue;
+          poly.forEach(p=>p.applyMatrix4(camera.projectionMatrix));if(poly.every(p=>p.x< -1)||poly.every(p=>p.x>1)||poly.every(p=>p.y< -1)||poly.every(p=>p.y>1))continue;
+          const cross=(poly[1].x-poly[0].x)*(poly[2].y-poly[0].y)-(poly[1].y-poly[0].y)*(poly[2].x-poly[0].x);if(material.side!==T.DoubleSide&&cross<0)continue;
+          shadeColor.copy(material.color||sky);if(colors&&material.vertexColors)shadeColor.multiply(new T.Color().setRGB(colors.getX(ia),colors.getY(ia),colors.getZ(ia)));
+          shadeColor.multiplyScalar(brightness);if(scene.fog)shadeColor.lerp(scene.fog.color,Math.max(0,Math.min(.97,(depth-scene.fog.near)/(scene.fog.far-scene.fog.near))));
+          faces.push({depth,p:poly.map(v=>[(v.x+1)*width/2,(1-v.y)*height/2,v.z]),color:shadeColor.getHex(),alpha:material.opacity});
         }
       }
-      scene.traverse(o=>{if(!o.isMesh||o.userData.softwareSkip)return;for(let p=o;p;p=p.parent)if(!p.visible)return;if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,instance);matrix.multiplyMatrices(o.matrixWorld,instance);object(o,matrix);}}else object(o,o.matrixWorld);});faces.sort((a,b)=>b.z-a.z);
-      for(const f of faces){ctx.globalAlpha=f.alpha;ctx.fillStyle=f.fill;ctx.beginPath();ctx.moveTo(f.p[0],f.p[1]);ctx.lineTo(f.p[2],f.p[3]);ctx.lineTo(f.p[4],f.p[5]);ctx.closePath();ctx.fill();if(f.alpha===1){ctx.strokeStyle=f.fill;ctx.lineWidth=.45;ctx.stroke();}}ctx.globalAlpha=1;
+      scene.traverse(o=>{if(!o.isMesh||o.userData.softwareSkip)return;for(let p=o;p;p=p.parent)if(!p.visible)return;if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,instance);matrix.multiplyMatrices(o.matrixWorld,instance);object(o,matrix);}}else object(o,o.matrixWorld);});
+      // A depth buffer keeps runway and terrain surfaces correctly ordered.
+      const W=domElement.width,H=domElement.height,n=W*H,skyHex=sky.getHex();
+      if(!pixels||pixels.width!==W||pixels.height!==H){pixels=ctx.createImageData(W,H);depthBuffer=new Float32Array(n);}
+      const bytes=pixels.data;depthBuffer.fill(Infinity);
+      for(let i=0;i<n;i++){bytes[i*4]=skyHex>>16;bytes[i*4+1]=(skyHex>>8)&255;bytes[i*4+2]=skyHex&255;bytes[i*4+3]=255;}
+      const edge2=(a,b,x,y)=>(x-a[0])*(b[1]-a[1])-(y-a[1])*(b[0]-a[0]);
+      for(const f of faces)for(let j=1;j<f.p.length-1;j++){
+        const tri=[f.p[0],f.p[j],f.p[j+1]].map(p=>[p[0]*ratio,p[1]*ratio,p[2]]),[a,b,c]=tri,area=edge2(a,b,c[0],c[1]);if(Math.abs(area)<.001)continue;
+        const minX=Math.max(0,Math.floor(Math.min(a[0],b[0],c[0]))),maxX=Math.min(W-1,Math.ceil(Math.max(a[0],b[0],c[0]))),minY=Math.max(0,Math.floor(Math.min(a[1],b[1],c[1]))),maxY=Math.min(H-1,Math.ceil(Math.max(a[1],b[1],c[1])));
+        for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++){
+          const wa=edge2(b,c,x+.5,y+.5)/area,wb=edge2(c,a,x+.5,y+.5)/area,wc=1-wa-wb;if(wa<0||wb<0||wc<0)continue;
+          const z=wa*a[2]+wb*b[2]+wc*c[2],i=y*W+x;if(z>=depthBuffer[i])continue;depthBuffer[i]=z;const k=i*4;bytes[k]=f.color>>16;bytes[k+1]=(f.color>>8)&255;bytes[k+2]=f.color&255;
+        }
+      }
+      ctx.putImageData(pixels,0,0);
     }
-    return{domElement,shadowMap:{},isSoftware:true,setPixelRatio(v){ratio=Math.min(v,1.25);},setSize(w,h){width=w;height=h;domElement.width=Math.round(w*ratio);domElement.height=Math.round(h*ratio);},render,dispose(){colorCache.clear();}};
+    return{domElement,shadowMap:{},isSoftware:true,setPixelRatio(v){ratio=Math.min(v,.6);},setSize(w,h){width=w;height=h;domElement.width=Math.round(w*ratio);domElement.height=Math.round(h*ratio);},render,dispose(){}};
   }
   window.FPSoftware3D={create};
 })();
