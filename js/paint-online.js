@@ -169,8 +169,10 @@ function openPainter(IMAGE,TARGET){
  const isDogTarget=TARGET.toLocaleLowerCase("sv").trim()==="hund"&&/\/djur\/hund(?:-preview)?\.webp(?:[?#]|$)/.test(new URL(IMAGE,location.href).pathname);
  const isFoxTarget=TARGET.toLocaleLowerCase("sv").trim()==="räv"&&/\/djur\/rav(?:-preview)?\.webp(?:[?#]|$)/.test(new URL(IMAGE,location.href).pathname);
  const isElephantTarget=TARGET.toLocaleLowerCase("sv").trim()==="elefant"&&/\/djur\/elefant(?:-preview)?\.webp$/.test(new URL(IMAGE,location.href).pathname);
- const isAnimalTarget=isCatTarget||isDogTarget||isFoxTarget||isElephantTarget;
- const referenceKey=isElephantTarget?"animal-elephant":isGiraffeTarget?"animal-giraffe":isFoxTarget?"animal-fox":isDogTarget?"animal-dog":isCatTarget?"animal-cat":({"pumpalyktan":"pumpkin","häxans hatt":"hat","den busiga mumien":"mummy","den vänliga vampyren":"vampire","monsterkalas":"monster","godismandala":"candy"})[TARGET.toLocaleLowerCase("sv").trim()]||null;
+ const animalModel=({"kanin":"kanin","björn":"bjorn","groda":"groda"})[TARGET.toLocaleLowerCase("sv").trim()];
+ const isNewAnimalTarget=!!animalModel&&new URL(IMAGE,location.href).pathname.endsWith("/djur/"+animalModel+"-preview.webp");
+ const isAnimalTarget=isNewAnimalTarget||isCatTarget||isDogTarget||isFoxTarget||isElephantTarget;
+ const referenceKey=isNewAnimalTarget?"animal-"+animalModel:isElephantTarget?"animal-elephant":isGiraffeTarget?"animal-giraffe":isFoxTarget?"animal-fox":isDogTarget?"animal-dog":isCatTarget?"animal-cat":({"pumpalyktan":"pumpkin","häxans hatt":"hat","den busiga mumien":"mummy","den vänliga vampyren":"vampire","monsterkalas":"monster","godismandala":"candy"})[TARGET.toLocaleLowerCase("sv").trim()]||null;
  let referenceConfig=null;
  const potionConfig=TARGET.toLocaleLowerCase("sv").trim()==="trolldrycksflaskorna"?POTION_COLORING:null;
  const wreathConfig=TARGET.toLocaleLowerCase("sv").trim()==="halloweenkrans"?WREATH_COLORING:null;
@@ -199,7 +201,7 @@ function openPainter(IMAGE,TARGET){
 
  const img=new Image();if(new URL(IMAGE,location.href).origin!==location.origin)img.crossOrigin="anonymous";img.onload=async()=>{
    if(referenceKey){
-     try{const response=await fetch(new URL((isElephantTarget?"../assets/coloring-originals-2026/djur/elefant-coloring-v1.json":isGiraffeTarget?"../assets/coloring-originals-2026/djur/giraff-coloring-v1.json":isFoxTarget?"../assets/coloring-originals-2026/djur/rav-coloring-v1.json":isDogTarget?"../assets/coloring-originals-2026/djur/hund-coloring-v1.json":isCatTarget?"../assets/coloring-originals-2026/djur/katt-coloring-v2.json":"../assets/mandala-halloween-2026/"+referenceKey+"-coloring-v1.json"),document.querySelector('script[src*="paint-online.js"]')?.src||new URL("js/paint-online.js",location.href)));if(!response.ok)throw new Error("Colour model missing");referenceConfig=await response.json()}
+     try{const response=await fetch(new URL((isNewAnimalTarget?"../assets/coloring-originals-2026/djur/"+animalModel+"-coloring-v1.json":isElephantTarget?"../assets/coloring-originals-2026/djur/elefant-coloring-v1.json":isGiraffeTarget?"../assets/coloring-originals-2026/djur/giraff-coloring-v1.json":isFoxTarget?"../assets/coloring-originals-2026/djur/rav-coloring-v1.json":isDogTarget?"../assets/coloring-originals-2026/djur/hund-coloring-v1.json":isCatTarget?"../assets/coloring-originals-2026/djur/katt-coloring-v2.json":"../assets/mandala-halloween-2026/"+referenceKey+"-coloring-v1.json"),document.querySelector('script[src*="paint-online.js"]')?.src||new URL("js/paint-online.js",location.href)));if(!response.ok)throw new Error("Colour model missing");referenceConfig=await response.json()}
      catch{status.textContent="Färganpassningen kunde inte öppnas. Stäng och försök igen.";return}
    }
    const prepareCanvas=()=>{
@@ -223,7 +225,7 @@ function openPainter(IMAGE,TARGET){
    };
    if(!flightHouseConfig&&!motifConfig&&!referenceKey&&!spokConfig&&!owlConfig&&!wreathConfig&&!potionConfig&&!bookConfig&&!graveConfig&&!trainConfig&&(horseConfig||String(TARGET||"").toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset"))getGhostReference().then(prepareCanvas).catch(()=>{status.textContent="Färgreferensen kunde inte öppnas. Stäng och försök igen."});
    else prepareCanvas();
- };img.onerror=()=>{$(".fp-paint-status").textContent="Bilden kunde inte öppnas. Stäng och försök igen.";};img.src=isGiraffeTarget?new URL("giraff.webp",new URL(IMAGE,location.href)).href:isFoxTarget?new URL("rav.webp",new URL(IMAGE,location.href)).href:isDogTarget?new URL("hund.webp",new URL(IMAGE,location.href)).href:isCatTarget?new URL("katt.webp",new URL(IMAGE,location.href)).href:IMAGE;
+ };img.onerror=()=>{$(".fp-paint-status").textContent="Bilden kunde inte öppnas. Stäng och försök igen.";};img.src=isNewAnimalTarget?new URL(animalModel+".webp",new URL(IMAGE,location.href)).href:isGiraffeTarget?new URL("giraff.webp",new URL(IMAGE,location.href)).href:isFoxTarget?new URL("rav.webp",new URL(IMAGE,location.href)).href:isDogTarget?new URL("hund.webp",new URL(IMAGE,location.href)).href:isCatTarget?new URL("katt.webp",new URL(IMAGE,location.href)).href:IMAGE;
  function fit(){if(!W)return;let r=W/H,aw=stage.clientWidth-24,ah=stage.clientHeight-24,w=Math.min(aw,ah*r);sheet.style.width=w+"px";sheet.style.height=w/r+"px";applyTransform()}
  function applyTransform(){sheet.style.transform="translate(calc(-50% + "+tx+"px),calc(-50% + "+ty+"px)) scale("+zoom+")"}
  function setZoom(z){zoom=Math.max(1,Math.min(4,z));if(zoom===1)tx=ty=0;applyTransform()}
@@ -358,7 +360,7 @@ c.putImageData(out,0,0)
      for(const [x,y,role,shades] of motifConfig.regions){const r=regions[labels[y*W+x]-1];if(r){r.hint=role;r.shades=shades}}
      for(const r of regions)if(!r.shades){r.hint="sky";r.shades=motifConfig.palettes.sky}
    }else if(referenceConfig){
-     for(const [x,y,role,shades,surface,area,degree,coeff] of referenceConfig.regions){const r=regions[labels[y*W+x]-1];if(r&&(!isAnimalTarget||!r.seedArea||area>r.seedArea)){r.hint=role;r.shades=shades;r.surface=surface;if(isGiraffeTarget)r.giraffeDegree=degree;if(isAnimalTarget){r.seedArea=area;r.degree=degree;r.coeff=coeff}}}
+     for(const [x,y,role,shades,surface,area,degree,coeff,bounds] of referenceConfig.regions){const r=regions[labels[y*W+x]-1];if(r&&(!isAnimalTarget||!r.seedArea||area>r.seedArea)){r.hint=role;r.shades=shades;r.surface=surface;if(isGiraffeTarget)r.giraffeDegree=degree;if(isAnimalTarget){r.seedArea=area;r.degree=degree;r.coeff=coeff;if(isNewAnimalTarget)r.modelBounds=bounds}}}
      for(const r of regions)if(!r.shades){r.hint="fabric";r.shades=referenceConfig.palettes.fabric}
    }else if(spokConfig){
      for(const [x,y,role,shades,surface] of spokConfig.regions){const r=regions[labels[y*W+x]-1];if(r){r.hint=role;r.shades=shades;r.surface=surface}}
@@ -863,7 +865,8 @@ c.putImageData(out,0,0)
    const w=region.maxX-region.minX+1,h=region.maxY-region.minY+1,mask=document.createElement("canvas");mask.width=w;mask.height=h;
    const g=mask.getContext("2d"),im=g.createImageData(w,h),data=im.data;
    const [nx,ny]=region.degree||[0,0],basis=(n,t)=>{const out=[1,t];for(let j=2;j<=n;j++)out[j]=2*t*out[j-1]-out[j-2];return out};
-   const bx=Array.from({length:w},(_,x)=>basis(nx,(x+region.minX)/(W-1)*2-1)),by=Array.from({length:h},(_,y)=>basis(ny,(y+region.minY)/(H-1)*2-1));
+   const bounds=region.modelBounds;
+   const bx=Array.from({length:w},(_,x)=>basis(nx,bounds?Math.max(-1,Math.min(1,(x+region.minX-bounds[0])/Math.max(1,bounds[2]-bounds[0])*2-1)):(x+region.minX)/(W-1)*2-1)),by=Array.from({length:h},(_,y)=>basis(ny,bounds?Math.max(-1,Math.min(1,(y+region.minY-bounds[1])/Math.max(1,bounds[3]-bounds[1])*2-1)):(y+region.minY)/(H-1)*2-1));
    for(const index of region.pixels){
      const gx=index%W,gy=(index/W)|0,x=gx-region.minX,y=gy-region.minY,k=(y*w+x)*4;let rgb=region.shades[1].slice();
      if(region.hint==="paper")rgb=[255,255,255];
