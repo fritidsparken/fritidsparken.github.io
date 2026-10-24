@@ -369,6 +369,13 @@ c.putImageData(out,0,0)
      regions.push({id,area:tail,cx:sumX/tail/W,cy:sumY/tail/H,scaleX:1,scaleY:1});
    }
    if(!regions.length)return [];
+   if(isNewAnimalTarget&&animalModel==="koala"){
+     const polygon=[[584,810],[618,801],[655,804],[684,817],[710,841],[735,867],[768,890],[792,914],[809,941],[810,970],[797,997],[774,1019],[748,1034],[718,1037],[691,1027],[673,1007],[659,983],[641,960],[620,945],[602,929],[589,911],[583,887],[583,858]];
+     const backgroundId=labels[876*W+136],id=regions.length+1,inside=(x,y)=>{let hit=false;for(let i=0,j=polygon.length-1;i<polygon.length;j=i++){const a=polygon[i],b=polygon[j];if((a[1]>y)!==(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])hit=!hit}return hit};
+     let area=0,sumX=0,sumY=0,minX=W,minY=H,maxX=0,maxY=0;
+     for(let y=800;y<=1040;y++)for(let x=580;x<=812;x++){const i=y*W+x;if(labels[i]!==backgroundId||luma[i]<220||!inside(x,y))continue;labels[i]=id;area++;sumX+=x;sumY+=y;minX=Math.min(minX,x);maxX=Math.max(maxX,x);minY=Math.min(minY,y);maxY=Math.max(maxY,y)}
+     if(area>100){const r={id,area,cx:sumX/area/W,cy:sumY/area/H,minX,minY,maxX,maxY,scaleX:1,scaleY:1,koalaHand:true};regions.push(r)}
+   }
    // Extend each fill beneath the original ink to avoid pale halos. Each
    // pixel belongs to one original region; the black line layer stays on top.
    let head=0,tail=0;
@@ -394,7 +401,10 @@ c.putImageData(out,0,0)
    }else if(referenceConfig){
      for(const [x,y,role,shades,surface,area,degree,coeff,bounds] of referenceConfig.regions){const r=regions[labels[y*W+x]-1];if(r&&(!isAnimalTarget||!r.seedArea||area>r.seedArea)){r.hint=role;r.shades=shades;r.surface=surface;if(isWhaleTarget)r.spline=bounds;if(isGiraffeTarget||isTurtleTarget||isSquirrelTarget)r.giraffeDegree=degree;if(isAnimalTarget){r.seedArea=area;r.degree=degree;r.coeff=coeff;if(isNewAnimalTarget)r.modelBounds=bounds}}}
      for(const r of regions)if(!r.shades){
-       if(isNewAnimalTarget&&animalModel==="koala"){r.hint=r.area>200000?"paper":"fur";r.shades=referenceConfig.palettes[r.hint]||referenceConfig.palettes.fur}
+       if(isNewAnimalTarget&&animalModel==="koala"){
+         r.hint=r.area>200000?"paper":"fur";r.shades=referenceConfig.palettes[r.hint]||referenceConfig.palettes.fur;
+         if(r.koalaHand){const body=referenceConfig.regions.find(row=>row[2]==="fur"&&row[6]?.[0]===6);if(body){r.degree=body[6];r.coeff=body[7];r.modelBounds=body[8]}}
+       }
        else {r.hint="fabric";r.shades=referenceConfig.palettes.fabric}
      }
    }else if(spokConfig){
@@ -1495,11 +1505,4 @@ c.putImageData(out,0,0)
  back.querySelector('[data-action="minus"]').onclick=()=>setZoom(zoom-.25);back.querySelector('[data-action="plus"]').onclick=()=>setZoom(zoom+.25);back.querySelector('[data-action="one"]').onclick=()=>setZoom(1);
  stage.addEventListener("wheel",e=>{if(!e.ctrlKey&&!e.metaKey)return;e.preventDefault();setZoom(zoom+(e.deltaY<0?.15:-.15))},{passive:false});
  back.querySelector('[data-action="reset"]').onclick=()=>{if(autoRunning)return;if(confirm("Vill du radera hela målningen och börja om?")){acts=[];future=[];autoProgress.hidden=true;autoProgress.value=0;if(autoButton)autoButton.disabled=false;status.textContent="Välj färg och tryck på ett område. Två fingrar flyttar och zoomar. Dator: håll mellanslag och dra.";redraw()}};
- back.querySelector('[data-action="save"]').onclick=()=>{if(!W)return;const out=document.createElement("canvas");const ghostTarget=dialog.classList.contains("fp-paint-ghost");out.width=ghostTarget?W:img.naturalWidth;out.height=ghostTarget?H:img.naturalHeight;const c=out.getContext("2d");if(flightHouseConfig||motifConfig||referenceKey||materialConfig||wolfConfig||candyConfig||spokConfig||owlConfig||wreathConfig||potionConfig){c.fillStyle="#fff";c.fillRect(0,0,out.width,out.height)}c.drawImage(paint,0,0,out.width,out.height);c.drawImage(lines,0,0,out.width,out.height);out.toBlob(blob=>{if(!blob)return;const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="min-farglagda-"+TARGET.toLocaleLowerCase("sv").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")+".png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},"image/png")};
- function close(){window.removeEventListener("resize",fit);window.removeEventListener("keydown",keydown);window.removeEventListener("keyup",keyup);back.remove();document.body.style.overflow="";addButton()}
- back.querySelector(".fp-paint-close").onclick=close;back.addEventListener("click",e=>{if(e.target===back)close()});const keydown=e=>{if(e.code==="Space"){space=true;if(e.target===document.body||e.target===back)e.preventDefault()}if(e.key==="Escape")close();if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){e.preventDefault();e.shiftKey?redoOne():undoOne()}};const keyup=e=>{if(e.code==="Space")space=false};window.addEventListener("keydown",keydown);window.addEventListener("keyup",keyup);back.addEventListener("keydown",e=>{if(e.code==="Space")e.preventDefault()});back.tabIndex=-1;back.focus();
-}
-})();
-
-
-
+ back.querySelector('[data-action="save"]').onclick=()=>{if(!W)return;const out=document.createElement("canvas");const ghostTarget=dialog.classList.contains("fp-paint-ghost");out.width=ghostTarget?W:img.naturalWidth;out.height=ghostTarget?H:img.naturalHeight;const c=out.getContext("2d");if(flightHouseConfig||motifConfig||referenceKey||materialConfig||wolfConfig||candyConfig||spokConfig||owlConfig||wreathConfig||potionConfig){c.fillStyle="#fff";c.fillRect(0,0,out.width,out.height)}c.drawImage(paint,0,0,out.width,out.height);c.drawImage(lines,0,0,out.width,out.height);out.toBlob(blob=>{if(!blob)return;const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="min-farglagda-"+TARGET.toLocaleLowerCase("sv").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").re
