@@ -15,7 +15,6 @@ const activities=[
 ["🕺","Fritidsgympa","Dansstopp","Rör er till musik och frys när den stannar.","10–15 min",["Sätt på en låt.","Alla dansar fritt medan musiken spelar.","Frys som en staty när musiken pausas."]],
 ["🧘","Fritidsgympa","Djur-yoga","Härma djur med lugna rörelser och balans.","10–15 min",["Välj ett djurkort eller ropa ett djur.","Gör djurets rörelse och ljud.","Håll varje position några andetag."]],
 ["⚽","Fritidsgympa","Prickboll","Sikta på mål tillsammans med mjuka bollar.","15–25 min",["Ställ upp koner eller hinkar som mål.","Rulla eller kasta från en markerad linje.","Räkna lagets gemensamma träffar."]],
-,
 ["🧻","Pyssel","Toarullefigurer","Förvandla tomma rullar till fantasifigurer eller små djur.","20–35 min",["Samla rena tomma rullar, papper och limstift.","Vik eller klipp öron, vingar och ben av papper.","Dekorera figuren och hitta på ett namn."]],
 ["🥚","Pyssel","Äggkartongens små världar","Gör små blommor, insekter eller fantasifigurer av äggkartong.","20–35 min",["Klipp isär äggkartongen i mindre delar.","Måla och låt torka.","Lägg till ben, blad eller vingar av papper."]],
 ["🧶","Pyssel","Garnbokstäver","Linda garn runt en kartongbokstav och gör en färgglad namnskylt.","20–30 min",["Klipp ut en stor bokstav i kartong.","Fäst garnänden med tejp och linda runt bokstaven.","Byt färg genom att knyta fast en ny garnbit."]],

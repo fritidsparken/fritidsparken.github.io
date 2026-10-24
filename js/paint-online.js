@@ -94,7 +94,7 @@ const style=document.createElement("style");style.textContent=
 style.textContent+=`
 .fp-paint-back{position:fixed;inset:0;z-index:99999;box-sizing:border-box;display:grid;place-items:center;padding:16px;background:rgba(24,34,27,.68)}
 .fp-paint-dialog{box-sizing:border-box;width:min(1240px,100%);height:min(920px,calc(100dvh - 32px));max-height:calc(100dvh - 32px);display:flex;flex-direction:column;gap:10px;overflow:hidden;padding:16px;border:1px solid #dce6dc;border-radius:22px;background:#f8faf7;color:#26392d;box-shadow:0 20px 70px rgba(0,0,0,.28);font-family:inherit}
-.fp-paint-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:0 0 auto}
+.fp-paint-head{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;flex:0 0 auto}
 .fp-paint-head h2{margin:0;color:#274632;font-size:22px;line-height:1.2}
 .fp-paint-head p{margin:4px 0 0;color:#65766a;font-size:13px}
 .fp-paint-close{flex:none;width:40px;height:40px;border:0;border-radius:50%;background:#eaf0e9;color:#31523c;font-size:28px;line-height:1;cursor:pointer}
@@ -142,6 +142,7 @@ style.textContent+=`
 }
 `;
 style.textContent+=".fp-paint-tools [data-action=auto]{background:#f3bd43!important;color:#26392b!important;font-weight:700!important;border-color:#e7b331!important}.fp-auto-progress{display:block;width:100%;height:10px;margin:0 0 8px;accent-color:#5da96e}.fp-auto-progress[hidden]{display:none}";
+style.textContent+=".fp-paint-navigation{position:absolute;left:50%;top:0;transform:translateX(-50%);display:flex;gap:8px}.fp-paint-navigation button{width:40px;height:40px;padding:0;display:grid;place-items:center;font:24px/1 Arial}.fp-paint-head>div{padding-top:46px}.fp-paint-close{align-self:flex-start}.fp-paint-navigation button:disabled{opacity:.35}";
 document.head.append(style);
 function addButton(){
  document.querySelectorAll(".mandala-card").forEach(card=>{
@@ -196,6 +197,11 @@ function openPainter(IMAGE,TARGET){
  const castleConfig=TARGET.toLocaleLowerCase("sv").trim()==="fladdermusslottet"?window.FP_CASTLE_COLORING:null;
  const horseConfig=castleConfig|| (TARGET.toLocaleLowerCase("sv").trim()==="hästar under halloweenmånen"?window.FP_HORSE_COLORING:null);
  const back=document.createElement("div");back.className="fp-paint-back";back.innerHTML='<section class="fp-paint-dialog" role="dialog" aria-modal="true" aria-label="Måla online"><header class="fp-paint-head"><div><h2>🎨 Måla online</h2><p></p></div><button class="fp-paint-close" aria-label="Stäng">×</button></header><div class="fp-paint-tools"><button data-tool="fill" aria-pressed="true">🪣 Fyll</button><button data-tool="pen" aria-pressed="false">✏️ Penna</button><button data-tool="erase" aria-pressed="false">🧽 Sudd</button><select aria-label="Penselstorlek"><option value="5">● Liten</option><option value="14" selected>● Medium</option><option value="30">● Stor</option></select><button data-action="undo" disabled>↶ Ångra</button><button data-action="redo" disabled>↷ Gör om</button><button data-action="minus" aria-label="Zooma ut">−</button><button data-action="one">100%</button><button data-action="plus" aria-label="Zooma in">+</button><button data-action="reset">🗑️ Börja om</button>'+'<button data-action="auto">✨ Färglägg automatiskt</button>'+'<button data-action="save">💾 Spara bild</button></div><div class="fp-paint-palette" role="group" aria-label="Färgpalett"></div><div class="fp-paint-stage"><div class="fp-paint-sheet"><canvas class="fp-paint-layer"></canvas><canvas class="fp-line-layer"></canvas></div></div><div class="fp-paint-status">Välj färg och tryck på ett område. Två fingrar flyttar och zoomar. Dator: håll mellanslag och dra.</div></section>';
+ const navigation=document.createElement("nav");navigation.className="fp-paint-navigation";navigation.setAttribute("aria-label","Bläddra färgläggningsbilder");
+ const cards=Array.from(document.querySelectorAll(".mandala-card")).map(card=>({title:card.querySelector("h3")?.textContent.trim(),image:card.querySelector("img")?.src})).filter(item=>item.title&&item.image);
+ const current=cards.findIndex(item=>item.title===TARGET);
+ for(const [direction,label,arrow] of [[-1,"Föregående färgläggningsbild","←"],[1,"Nästa färgläggningsbild","→"]]){const button=document.createElement("button");button.type="button";button.textContent=arrow;button.setAttribute("aria-label",label);button.disabled=current<0||current+direction<0||current+direction>=cards.length;button.addEventListener("click",()=>{const item=cards[current+direction];close();openPainter(item.image,item.title)});navigation.append(button)}
+ back.querySelector(".fp-paint-head").append(navigation);
  back.querySelector(".fp-paint-head p").textContent=TARGET+" · Måla med färghink eller penna!";
  document.body.append(back);document.body.style.overflow="hidden";
  const $=s=>back.querySelector(s),dialog=$(".fp-paint-dialog"),stage=$(".fp-paint-stage"),sheet=$(".fp-paint-sheet"),paint=$(".fp-paint-layer"),lines=$(".fp-line-layer"),ctx=paint.getContext("2d",{willReadFrequently:true}),lctx=lines.getContext("2d"),undo=$('[data-action="undo"]'),redo=$('[data-action="redo"]');if(flightHouseConfig||motifConfig||referenceKey||spokConfig||owlConfig||wreathConfig||potionConfig||bookConfig||graveConfig||trainConfig||horseConfig||TARGET.toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset")dialog.classList.add("fp-paint-ghost");

@@ -64,7 +64,12 @@ body:not(.christmas) .advent,body.halloween .advent,.advent[hidden],body:not(.ch
 .advent-door.is-past-opened .advent-door-inner{border-color:#a0a9a380}
 .advent-door.is-past-opened .advent-ornament{color:#c5cdc8}
 
-/* Tighter spacing in the opened advent-door layout. */
-.advent-dialog .advent-popup h2{margin-bottom:8px}
-.advent-dialog .advent-message{margin-top:12px}
-.advent-dialog .advent-answer{margin-top:4px}
+/* Equal spacing around the date and between picture, question and answer. */
+.advent-dialog .advent-popup{height:auto;min-height:0;display:flex;flex-direction:column;align-items:stretch;gap:16px;padding:16px 24px}
+.advent-dialog .advent-popup h2{flex:none;margin:0 40px;font-size:23px}
+.advent-dialog .advent-stage-space{flex:none;width:100%;height:auto;aspect-ratio:1;max-width:410px;align-self:center;container-type:normal}
+.advent-dialog .advent-stage-space .advent-stage{position:relative;left:auto;top:auto;transform:none;width:100%;height:100%;max-width:none;max-height:none}
+.advent-dialog .advent-message,.advent-dialog .advent-answer{margin:0 auto}
+.advent-dialog{height:auto;overflow:auto}
+.advent-dialog .advent-close{display:grid;place-items:center;padding:0;line-height:1;font-family:Arial,sans-serif}
+@media(max-width:420px){.advent-dialog .advent-popup{padding:16px;gap:16px}.advent-dialog .advent-popup h2{font-size:20px}}
