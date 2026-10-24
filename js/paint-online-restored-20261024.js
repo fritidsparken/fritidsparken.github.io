@@ -322,6 +322,13 @@ c.putImageData(out,0,0)
      }
      if(y%80===79)await pause("Förbereder originalets slutna färgområden…");
    }
+   if(isNewAnimalTarget&&animalModel==="koala"){
+     const firstPass=barrier.slice();
+     for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+       const i=y*W+x;
+       if((x>0&&firstPass[i-1])||(x<W-1&&firstPass[i+1])||(y>0&&firstPass[i-W])||(y<H-1&&firstPass[i+W]))barrier[i]=1;
+     }
+   }
    // Preserve the fine white channels in this original's narrow pumpkin smiles.
    // Other drawings retain the existing one-pixel segmentation dilation.
    const inkWindows=(referenceConfig||castleConfig)?.sourceInkWindows;
