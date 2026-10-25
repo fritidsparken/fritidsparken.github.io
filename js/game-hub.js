@@ -2,7 +2,7 @@
   const games=[
     {id:'four',title:'4 i rad',tag:'TÄNK ETT DRAG LÄNGRE',type:'1–2 spelare',image:'four-in-row-icon.svg',text:'Utmana datorn eller en kompis. Fyra brickor i rad avgör allt.',module:'FPConnectFour'},
     {id:'plane',title:'Flygpilot',tag:'MOLNJAKTEN',type:'Skicklighet',image:'plane-pilot-icon.svg',text:'Lyft över dalen, väj för vindhjulen och sätt nästa landning.',module:'FPPlanePilot'},
-    {id:'bike',title:'Stuntcykel',tag:'SKOG & STEN',type:'Fysik & balans',image:'stunt-bike-icon.svg',text:'Gasa, balansera och flyg över krönen på tre egna trialbanor.',module:'FPStuntBike'}
+    {id:'bike',title:'Stuntcykel',tag:'STADENS TAK',type:'Fysik & balans',image:'stunt-bike-city-icon.svg',text:'Sju stadsbanor i 3D. Hoppa, gör volter och slå ditt trickrekord.',module:'FPStuntBike'}
   ];
   let current=null;
   function gallery(){return `<section class="games-page"><header class="games-heading"><span class="games-eyebrow">EN LITEN SPELPAUS</span><h2>Redo för en omgång?</h2><p>Välj en utmaning och sätt igång.</p></header><div class="games-grid">${games.map(g=>`<article class="game-card game-card-${g.id}"><button class="game-cover" data-game-launch="${g.id}" aria-label="Spela ${g.title}"><img src="./assets/${g.image}?v=games-rebuild-1" alt=""/><span class="game-type">${g.type}</span><span class="game-cover-play" aria-hidden="true">▶</span></button><div class="game-card-copy"><span class="game-card-tag">${g.tag}</span><h3>${g.title}</h3><p>${g.text}</p><button class="game-launch" data-game-launch="${g.id}">Spela nu <span aria-hidden="true">→</span></button></div></article>`).join('')}</div><div class="game-stage" id="gameStage"></div></section>`;}
@@ -13,3 +13,4 @@
   window.FPGameHub={gallery,mount,render,open,stop};
   if(document.querySelector('#filters .active')?.dataset.cat==='Spel'){render();if(window.FPPendingGame){open(window.FPPendingGame);delete window.FPPendingGame;}}
 })();
+
