@@ -1,0 +1,20 @@
+const T=window.THREE;
+export function bindInput(canvas,engine,getTargets,getSettings,history,brush,onPaint,onGesture,checkpoint=()=>()=>{}){
+ const ray=new T.Raycaster(),pointer=new T.Vector2(),normal=new T.Vector3(),normalMatrix=new T.Matrix3(),brushAxis=new T.Vector3(0,0,1),pointers=new Map();let active=false,previous=null,previousObject=null,seen=new Set(),pinch=0,strokeUndo=null,restoreProgress=null;
+ function hit(e){const rect=canvas.getBoundingClientRect();pointer.set((e.clientX-rect.left)/rect.width*2-1,1-(e.clientY-rect.top)/rect.height*2);ray.setFromCamera(pointer,engine.camera);return ray.intersectObjects(getTargets(),false)[0];}
+ function reset(){active=false;previous=null;previousObject=null;seen.clear();brush.root.visible=false;}
+ function move(e){if(pointers.has(e.pointerId))pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size>1){const[a,b]=[...pointers.values()],d=Math.hypot(a.x-b.x,a.y-b.y);if(pinch)onGesture(d/pinch);pinch=d;previous=null;return;}const h=hit(e);if(!h){previous=null;brush.root.visible=false;return;}brush.root.visible=true;brush.root.position.copy(h.point);normalMatrix.getNormalMatrix(h.object.matrixWorld);normal.copy(h.face.normal).applyMatrix3(normalMatrix).normalize();brush.root.quaternion.setFromUnitVectors(brushAxis,normal);brush.bristles.scale.z=active?.62:1;
+ if(!active)return;const s=getSettings(),obj=h.object,surface=obj.userData.paint;if(!surface||!s.allowed.includes(obj.userData.kind))return;
+ // Face tools are restricted to anatomically appropriate zones, while application remains freehand.
+ if(obj.userData.kind==='face'){const local=obj.worldToLocal(h.point.clone());if(s.tool==='shadow'&&(local.y<.13||local.y>.42||Math.abs(local.x)<.09||Math.abs(local.x)>.51))return;if(s.tool==='liner'&&(local.y<.15||local.y>.29||Math.abs(local.x)<.1||Math.abs(local.x)>.5))return;if(s.tool==='mascara'&&(local.y<.18||local.y>.32||Math.abs(local.x)<.1||Math.abs(local.x)>.5))return;}
+ const layer=s.tool==='sticker'?'sticker':s.tool;
+ if(!seen.has(surface)){const snapshot=surface.snapshot(layer),m=obj.material,old={roughness:m.roughness,metalness:m.metalness,clearcoat:m.clearcoat,iridescence:m.iridescence};if(!strokeUndo){strokeUndo={bytes:0,steps:[],restore(){for(const restore of this.steps)restore();restoreProgress?.();}};const progress=restoreProgress;strokeUndo.restore=function(){for(const restore of this.steps)restore();progress?.();};history.push(strokeUndo);}strokeUndo.bytes+=snapshot.data.data.byteLength;strokeUndo.steps.push(()=>{surface.restore(snapshot);Object.assign(m,old);});seen.add(surface);}
+ if(s.tool==='sticker'){if(previousObject===obj)return;surface.sticker(h.uv,s.color);}else surface.paint(h.uv,layer,s.color,s.radius,s.alpha,previousObject===obj?previous:null);
+ if(obj.userData.kind==='nail'){const m=obj.material;m.roughness=s.finish==='matt'?.75:.18;m.metalness=s.finish==='metallic'?.65:.03;m.iridescence=s.finish==='holo'?1:0;m.iridescenceIOR=1.35;m.clearcoat=s.finish==='matt'?.05:1;}
+ previous=h.uv.clone();previousObject=obj;onPaint(obj,s);
+ }
+ function down(e){if(e.button>0)return;e.preventDefault();canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===1){active=true;seen.clear();strokeUndo=null;restoreProgress=checkpoint();previous=null;previousObject=null;move(e);}else{active=false;previous=null;}}
+ function up(e){history.trim();pointers.delete(e.pointerId);pinch=0;if(!pointers.size)reset();}
+ canvas.addEventListener('pointerdown',down);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);canvas.addEventListener('lostpointercapture',up);canvas.addEventListener('pointerleave',()=>{if(!active)brush.root.visible=false;});
+ return{reset,destroy(){canvas.removeEventListener('pointerdown',down);canvas.removeEventListener('pointermove',move);canvas.removeEventListener('pointerup',up);canvas.removeEventListener('pointercancel',up);canvas.removeEventListener('lostpointercapture',up);}};
+}
