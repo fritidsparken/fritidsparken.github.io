@@ -57,7 +57,7 @@
     const popular = [
       activityCard('Toarullefigurer','Pyssel',photo('Toarullefigurer'),'data-standard-activity="Toarullefigurer"'),
       activityCard('Pärlmönster','Pyssel',photo('Pärlmönster'),'data-standard-pearl'),
-      activityCard('Rita steg för steg','Färglägga','./assets/drawing-guides/cat-slate-guide.png','data-standard-category="Rita steg-för-steg"','color'),
+      activityCard('Rita steg för steg','Färglägga','./assets/standard/drawing-step-cover.jpg','data-standard-category="Rita steg-för-steg"','color'),
       activityCard('Hinderbana','Rörelse','./assets/'+obstacle.image,'data-standard-gym="'+esc(obstacle.name)+'"','move'),
       activityCard('Minifigurscen','Bygga',photo('Minifigurscen'),'data-standard-activity="Minifigurscen"','build'),
       activityCard('Stuntcykel – Staden','Spel','./assets/stunt-bike-city-icon.svg','data-standard-game="bike"','game')
