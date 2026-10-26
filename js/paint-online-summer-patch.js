@@ -9,6 +9,14 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
     source = source.slice(0, start) + after + source.slice(start + before.length);
   }
 
+  // The desktop backdrop already reserves 16px on each side. Size the
+  // expanded painter within that space, including when a scrollbar is present.
+  replaceOnce(
+    'width:min(1480px,calc(100vw - 12px));height:calc(100dvh - 12px);max-height:calc(100dvh - 12px);',
+    'width:min(1480px,100%);max-width:100%;height:calc(100dvh - 32px);max-height:calc(100dvh - 32px);min-width:0;min-height:0;',
+    "desktop popup viewport bounds"
+  );
+
   replaceOnce(
     ' const isSpringTarget=IMAGE.includes("/mandala-spring-2026/");',
     ' const isSummerTarget=IMAGE.includes("/mandala-summer-2026/");\n const isAutumnTarget=IMAGE.includes("/mandala-host-2026/");\n const isSpringTarget=IMAGE.includes("/mandala-spring-2026/");',
