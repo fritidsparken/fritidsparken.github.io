@@ -36,9 +36,9 @@ Automated tests run real geometry, raycasting, canvas painting, input, storage a
 
 The supplied cloud Chrome instance reports WebGL disabled (`Error creating WebGL context`). The failure state was verified, but the actual WebGL scene, GPU material/shader output and runtime FPS could not be tested here. Safari, Firefox, iPhone, iPad and Android were not available. Original geometry was also inspected through an offline diagnostic render; that is not a screenshot of the game and does not verify final GPU lighting/materials.
 
-This release completes a compact playable implementation in code. It should not be represented as having achieved the brief's high-end realism benchmark or as having passed physical-device QA. It uses stylized procedural characters, not artist-refined scanned/rigged models. Additional art refinement and actual GPU/device review remain necessary to substantiate that visual target.
+This release completes a compact playable implementation in code. It should not be represented as having achieved the brief's high-end realism benchmark or as having passed physical-device QA. The face station uses the single owner-supplied illustrated customer as a fixed, interactive portrait. Makeup is painted directly onto a masked canvas aligned to her lips, eyes, cheeks and face. The nail station remains locally rendered 3D.
 
-Known intentional compromises: canvas texture compositing instead of GPU render-target painting; environment reflections instead of a live planar mirror; no depth-of-field pass; no external GLB/KTX2/Draco asset pipeline because assets are procedural; synthesized ambient audio instead of a produced soundtrack; simplified wardrobe/body, facial rig and hair; local file stroke modifies nail edge width without physics simulation. Studio progression changes furnishing colors rather than loading four wholly different salon layouts. There are three customers and rotating wishes, not a large narrative campaign.
+Known intentional compromises: canvas texture compositing instead of GPU render-target painting; environment reflections instead of a live planar mirror; no depth-of-field pass; no external GLB/KTX2/Draco asset pipeline because assets are procedural; synthesized ambient audio instead of a produced soundtrack; a fixed 2D face portrait without head rotation or facial animation; local file stroke modifies nail edge width without physics simulation. Studio progression changes furnishing colors rather than loading four wholly different salon layouts. There is one customer, Mira, with rotating styling wishes. Starting a new styling keeps the same customer.
 
 ## Test commands
 
@@ -50,9 +50,9 @@ node --test tests/glow-studio.test.mjs tests/glow-flow.test.mjs
 
 Run `node --check` on the game modules and integration JavaScript. Dependency and original-asset provenance are in `LICENSES.md`.
 
-Before claiming device certification: verify real Chrome/Firefox/Safari rendering, portrait/landscape control occlusion, three visits, every tool/undo/material finish, photo framing, local storage quota, audio/background resume, context recovery, returning to the game hub, frame times and peak memory.
+Before claiming device certification: verify real Chrome/Firefox/Safari rendering, portrait/landscape control occlusion, repeated styling sessions, every tool/undo/material finish, photo framing, local storage quota, audio/background resume, context recovery, returning to the game hub, frame times and peak memory.
 
 
-## Reference art
+## Customer artwork
 
-`assets/glow-studio/reference-portrait.webp` and `reference-look.webp` are optimized crops of the visual reference supplied by the site owner. The portrait is used on the intro screen; the full composition opens as an optional inspiration card while styling. The active customer remains a locally rendered 3D character.
+`assets/glow-studio/single-customer.webp` and the matching `cover.webp` are optimized crops of the exact visual supplied by the site owner. This is the only customer shown in the intro, face station and face result. No alternate customer is selected by progression or repeat play.

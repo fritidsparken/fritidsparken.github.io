@@ -12,3 +12,17 @@
 @media(max-width:400px){.intro-copy{bottom:12%;}.intro h1{font-size:45px;margin:13px 0}.intro-visual{height:44%}.client-card{padding:9px 11px}.style-reference{gap:5px}.style-reference>img{width:32px;height:32px;flex-basis:32px}}
 
 @media(max-width:900px) and (min-width:701px){.intro-visual{width:49vw;right:3%;top:15%;height:66%}.intro-copy{left:5%;max-width:38%;top:29%}.intro h1{font-size:clamp(41px,5vw,62px)}}
+
+/* The supplied customer is the only face shown in Glow Studio. */
+.portrait-stage{position:absolute;z-index:2;top:70px;bottom:168px;left:50%;width:min(1100px,100%);transform:translateX(-50%);overflow:hidden;border-radius:30px;pointer-events:none;box-shadow:0 25px 80px #49352a22}
+.portrait-media{position:absolute;will-change:left,top,width,height;transition:left .65s cubic-bezier(.22,.85,.25,1),top .65s cubic-bezier(.22,.85,.25,1),width .65s cubic-bezier(.22,.85,.25,1),height .65s cubic-bezier(.22,.85,.25,1)}
+.portrait-media>img,.portrait-media>canvas{position:absolute;inset:0;display:block;width:100%;height:100%}
+.portrait-media>img{user-select:none;-webkit-user-drag:none}
+#portrait-paint{z-index:2;pointer-events:auto;touch-action:none;cursor:none}
+.portrait-cursor{position:absolute;z-index:3;transform:translate(-50%,-50%);border:1.5px solid #fff;border-radius:50%;box-shadow:0 0 0 1px #6d5364aa,0 3px 12px #3d26343d;pointer-events:none;min-width:9px;min-height:9px}
+.client-card,.stations,.view-controls,.bottom-ui,.nail-options,.result-card{z-index:4}
+.intro{z-index:3}
+.intro-visual img{content:url("../../assets/glow-studio/single-customer.webp")}
+@media(max-width:700px){.portrait-stage{top:138px;bottom:155px;width:100%;border-radius:0;box-shadow:none}.portrait-media{transition-duration:.4s}.client-card{z-index:5}}
+@media(max-height:550px) and (min-width:600px){.portrait-stage{top:58px;bottom:112px;width:min(820px,100%);border-radius:20px}.client-card,.stations,.view-controls,.bottom-ui,.nail-options{z-index:5}}
+@media(prefers-reduced-motion:reduce){.portrait-media{transition:none}}

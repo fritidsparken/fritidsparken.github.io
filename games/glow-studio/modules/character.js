@@ -1,7 +1,7 @@
 import{mat,mesh,ellipsoid,tube,surface,mergeMeshes,seeded}from'./geometry.js';
 import{PaintSurface}from'./paint.js';
 const T=window.THREE,G=(x,y,cx,cy,sx,sy)=>Math.exp(-(((x-cx)/sx)**2+((y-cy)/sy)**2));
-export const clients=[{name:'Mira',skin:'#c98f70',hair:0x302019,iris:0x658d77,cloth:0x456d66,shape:1,jaw:.2,nose:1,hairLength:1,hairStyle:'waves',freckles:true},{name:'Noor',skin:'#8e5b42',hair:0x171416,iris:0x73502b,cloth:0x87618c,shape:1.05,jaw:.13,nose:.9,hairLength:.7,hairStyle:'curls'},{name:'Alex',skin:'#e1b598',hair:0x98542f,iris:0x668a9c,cloth:0x6b7c97,shape:.95,jaw:.25,nose:1.08,hairLength:.2,hairStyle:'crop'}];
+export const clients=[{name:'Mira',skin:'#d79d7d',hair:0x4a2d22,iris:0x75866a,cloth:0x6b8878,shape:1,jaw:.2,nose:1,hairLength:1,hairStyle:'waves',freckles:true}];
 export const requests=['Jag ska på kalas! Jag vill prova rosa och glittriga naglar.','Jag gillar blått. Kan du göra en look med stjärnor?','Idag vill jag ha en färgglad look. Överraska mig!'];
 function complexion(paint,client){
  const c=paint.base.getContext('2d'),s=paint.size,at=(u,v)=>[u*s,(1-v)*s];
