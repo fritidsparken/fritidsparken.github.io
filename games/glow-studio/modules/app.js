@@ -1,5 +1,5 @@
 import{createEngine,createSalon,createBrush}from'./engine.js';
-import{createCharacter,createHand,clients,requests}from'./character.js';
+import{createCharacter,createHand,clients,requests}from'./character.js?v=blink-fix-20261026-2';
 import{bindInput}from'./input.js';
 import{UndoHistory}from'./paint.js';
 import{load,save,level}from'./storage.js';
