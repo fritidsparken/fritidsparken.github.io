@@ -1,9 +1,9 @@
 import{createEngine,createSalon,createBrush}from'./engine.js?v=glow-refine-20261026-1';
-import{createHand,clients,requests}from'./character.js?v=single-customer-20261026-1';
-import{createPortraitPainter}from'./portrait.js?v=single-customer-20261026-1';
+import{createHand,clients,requests}from'./character.js?v=cutout-customer-20261026-1';
+import{createPortraitPainter}from'./portrait.js?v=cutout-customer-20261026-1';
 import{bindInput}from'./input.js?v=glow-refine-20261026-1';
 import{UndoHistory}from'./paint.js';
-import{load,save,level}from'./storage.js?v=single-customer-20261026-1';
+import{load,save,level}from'./storage.js?v=cutout-customer-20261026-1';
 import{StudioAudio}from'./audio.js';
 import{icon,toolsets}from'./icons.js';
 import{palettes,finishes,studioFor,unlocksBetween,rewardFor}from'./progression.js';
@@ -51,7 +51,7 @@ $('#done').onclick=()=>{if(finished||faceStrokes<3||nailsDone.size<1||dryTime>0)
 $('#next').onclick=()=>{newClient();audio.tone(523,.2,.02);};
 $('#angle').oninput=e=>{if(photoView==='nails'&&hand)hand.group.rotation.y=Number(e.target.value)*Math.PI/180;};
 $('#result-view').onclick=()=>{photoView=photoView==='face'?'nails':'face';ensureHand();portrait.show(photoView==='face');hand.group.visible=photoView==='nails';brush.root.visible=false;celebration.points.visible=false;engine.go(photoView==='face'?'result':'nails');$('.angle-label').hidden=photoView==='face';$('.background-label').hidden=photoView==='face';$('#result-view').textContent=photoView==='face'?'Visa naglarna':'Visa sminket';};$('#background').onchange=e=>setBackground(e.target.value);
-$('#photo').onclick=()=>{try{brush.root.visible=false;engine.renderer.render(engine.scene,engine.camera);const c=document.createElement('canvas'),source=engine.renderer.domElement;c.width=photoView==='face'?900:800;c.height=photoView==='face'?600:Math.round(800*source.height/source.width);const ctx=c.getContext('2d');if(photoView==='face')portrait.renderTo(ctx,0,0,c.width,c.height);else ctx.drawImage(source,0,0,c.width,c.height);ctx.fillStyle='rgba(255,250,241,.8)';ctx.fillRect(0,c.height-48,c.width,48);ctx.fillStyle='#654052';ctx.font='20px Georgia';ctx.fillText('GLOW STUDIO · '+client.name,24,c.height-18);const photo=c.toDataURL('image/jpeg',.78);state.portfolio.push(photo);state.portfolio=state.portfolio.slice(-6);if(persist()){audio.tone(1300,.06,.03);toast('Fotot finns i din portfolio.');}}catch{toast('Fotot kunde inte sparas. Prova igen.');}};
+$('#photo').onclick=()=>{try{brush.root.visible=false;engine.renderer.render(engine.scene,engine.camera);const c=document.createElement('canvas'),source=engine.renderer.domElement;c.width=photoView==='face'?900:800;c.height=photoView==='face'?600:Math.round(800*source.height/source.width);const ctx=c.getContext('2d');ctx.drawImage(source,0,0,c.width,c.height);if(photoView==='face')portrait.renderTo(ctx,0,0,c.width,c.height);ctx.fillStyle='rgba(255,250,241,.8)';ctx.fillRect(0,c.height-48,c.width,48);ctx.fillStyle='#654052';ctx.font='20px Georgia';ctx.fillText('GLOW STUDIO · '+client.name,24,c.height-18);const photo=c.toDataURL('image/jpeg',.78);state.portfolio.push(photo);state.portfolio=state.portfolio.slice(-6);if(persist()){audio.tone(1300,.06,.03);toast('Fotot finns i din portfolio.');}}catch{toast('Fotot kunde inte sparas. Prova igen.');}};
 $('#portfolio').onclick=()=>{$('#photos').replaceChildren();if(!state.portfolio.length){const p=document.createElement('p');p.textContent='Här hamnar dina foton när du har stylat klart en kund.';$('#photos').append(p);}else for(const[src,i]of state.portfolio.map((s,i)=>[s,i])){const a=document.createElement('a'),img=document.createElement('img');a.href=src;a.download=`glow-studio-${i+1}.jpg`;a.title='Spara bilden';img.src=src;img.alt=`Din skapelse ${i+1}`;img.loading='lazy';a.append(img);$('#photos').append(a);}$('#album').showModal();};$('#close-album').onclick=()=>$('#album').close();
 document.addEventListener('visibilitychange',()=>{last=performance.now();if(document.hidden){input?.reset();audio.pause();}else audio.resume();});
 $('#scene').addEventListener('webglcontextlost',e=>{e.preventDefault();audio.pause();input?.reset();$('#error-message').textContent='3D-paus. Vi försöker återställa studion. Dina sparade framsteg finns kvar.';$('#error').hidden=false;});

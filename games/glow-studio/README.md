@@ -55,4 +55,4 @@ Before claiming device certification: verify real Chrome/Firefox/Safari renderin
 
 ## Customer artwork
 
-`assets/glow-studio/single-customer.webp` and the matching `cover.webp` are optimized crops of the exact visual supplied by the site owner. This is the only customer shown in the intro, face station and face result. No alternate customer is selected by progression or repeat play.
+`assets/glow-studio/single-customer.png` is a transparent extraction of the exact customer supplied by the site owner. Only the person is retained; the reference image's salon, furniture and interface are not used. The cutout is composited over Glow Studio's existing rendered salon in the intro, face station and result. `cover.webp` uses the same cutout over a newly created abstract background.

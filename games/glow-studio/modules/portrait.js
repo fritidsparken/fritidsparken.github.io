@@ -1,15 +1,15 @@
-const W=900,H=600;
+const W=1000,H=509;
 const zones={
- face:(x,y)=>((x-450)/218)**2+((y-332)/245)**2<=1,
- lip:(x,y)=>((x-450)/91)**2+((y-449)/31)**2<=1,
- blush:(x,y)=>((x-330)/82)**2+((y-368)/58)**2<=1||((x-570)/82)**2+((y-368)/58)**2<=1,
- eyes:(x,y)=>((x-360)/78)**2+((y-294)/42)**2<=1||((x-540)/78)**2+((y-294)/42)**2<=1
+ face:(x,y)=>((x-500)/145)**2+((y-220)/138)**2<=1,
+ lip:(x,y)=>((x-500)/57)**2+((y-283)/19)**2<=1,
+ blush:(x,y)=>((x-426)/54)**2+((y-244)/36)**2<=1||((x-574)/54)**2+((y-244)/36)**2<=1,
+ eyes:(x,y)=>((x-443)/57)**2+((y-194)/30)**2<=1||((x-557)/57)**2+((y-194)/30)**2<=1
 };
 const hexRgb=value=>{const h=String(value||'#d65f83').replace('#','');const v=parseInt(h.length===3?h.split('').map(c=>c+c).join(''):h,16);return[(v>>16)&255,(v>>8)&255,v&255];};
 export function createPortraitPainter({stage,media,canvas,image,cursor,history,getState,onStroke,checkpoint}){
  const ctx=canvas.getContext('2d',{willReadFrequently:true});canvas.width=W;canvas.height=H;
  let active=false,dirty=false,last=null,snapshot=null,restoreCounters=null,currentFocus='all',currentZoom=1;
- const focusPoints={all:[450,310,1],eyes:[450,295,1.48],lips:[450,445,1.72]};
+ const focusPoints={all:[500,255,1],eyes:[500,194,1.5],lips:[500,283,1.72]};
  function fit(){
   const r=stage.getBoundingClientRect(),f=focusPoints[currentFocus]||focusPoints.all;
   const scale=Math.max(r.width/W,r.height/H)*f[2]*currentZoom;
