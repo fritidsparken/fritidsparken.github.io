@@ -1,3 +1,4 @@
+/opt/homebrew/Library/Homebrew/cmd/shellenv.sh: line 27: /bin/ps: Operation not permitted
 // Extend the shared painter after its existing car and spring patches have run.
 // The original line drawing supplies the masks and visible contours.
 window.FP_patchSummerPainter = function patchSummerPainter(source) {
@@ -11,9 +12,15 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
 
   replaceOnce(
     ' const isSpringTarget=IMAGE.includes("/mandala-spring-2026/");',
-    ' const isSummerTarget=IMAGE.includes("/mandala-summer-2026/");\n const isSpringTarget=IMAGE.includes("/mandala-spring-2026/");',
-    "summer target"
+    ' const isSummerTarget=IMAGE.includes("/mandala-summer-2026/");\n const isAutumnTarget=IMAGE.includes("/mandala-host-2026/");\n const isSpringTarget=IMAGE.includes("/mandala-spring-2026/");',
+    "season targets"
   );
+  replaceOnce(' async function findAutoRegions(isGhost=false){', ' async function findAutoRegions(isGhost=false){\n   const autoInkThreshold=isAutumnTarget?244:220;', "autumn contour threshold");
+  replaceOnce('reduced[start]<220', 'reduced[start]<autoInkThreshold', "autumn region starts");
+  if(!source.includes('reduced[n]>=220'))throw new Error("Could not safely patch autumn painter: autumn region neighbors");
+  source=source.replaceAll('reduced[n]>=220','reduced[n]>=autoInkThreshold');
+  replaceOnce('if(!isGhost)regions.length=Math.min(regions.length,160);', 'if(!isGhost)regions.length=Math.min(regions.length,isAutumnTarget?600:160);', "autumn region limit");
+  replaceOnce('sheet.style.pointerEvents="";if(flightHouseConfig||motifConfig||referenceKey||spokConfig||owlConfig||wreathConfig||potionConfig||bookConfig||graveConfig||trainConfig)autoButton.disabled=false;historyUI();', 'sheet.style.pointerEvents="";autoButton.disabled=false;historyUI();', "re-enable auto coloring");
   replaceOnce(
     ' if(isSpringTarget)REFERENCE=IMAGE.replace("/mandala-spring-2026/","/spring-references-20261024/").replace(/\\.webp(?:\\?.*)?$/,"-reference.webp");',
     ' if(isSpringTarget)REFERENCE=IMAGE.replace("/mandala-spring-2026/","/spring-references-20261024/").replace(/\\.webp(?:\\?.*)?$/,"-reference.webp");\n if(isSummerTarget)REFERENCE=IMAGE.replace("/mandala-summer-2026/","/summer-references-20261025/").replace(/\\.webp(?:\\?.*)?$/,"-reference.webp");',
@@ -50,26 +57,15 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
    ctx.drawImage(tile,region.minX,region.minY);
  }
  function summerPaintingPlan(regions){
-   const result=[];
-   const tiles=new Map(),size=128,columns=Math.ceil(W/size);
-   const append=(pixels,minX,minY,maxX,maxY)=>{
+   return regions.filter(region=>{
      let colored=0;
-     for(const index of pixels){
+     for(const index of region.pixels){
        const k=index*4,r=summerReferencePixels[k],g=summerReferencePixels[k+1],b=summerReferencePixels[k+2];
        if(Math.min(r,g,b)<244||Math.max(r,g,b)-Math.min(r,g,b)>12)colored++;
+       if(colored>=5)return true;
      }
-     if(colored>=5)result.push({type:"summerRegion",region:{pixels,minX,minY,maxX,maxY}});
-   };
-   for(const region of regions)for(const index of region.pixels){
-     const x=index%W,y=Math.floor(index/W),key=Math.floor(y/size)*columns+Math.floor(x/size);
-     let tile=tiles.get(key);
-     if(!tile){tile={pixels:[],minX:x,maxX:x,minY:y,maxY:y};tiles.set(key,tile)}
-     tile.pixels.push(index);tile.minX=Math.min(tile.minX,x);tile.minY=Math.min(tile.minY,y);
-     tile.maxX=Math.max(tile.maxX,x);tile.maxY=Math.max(tile.maxY,y);
-   }
-   for(const [,tile] of [...tiles].sort((a,b)=>a[0]-b[0]))
-     append(tile.pixels,tile.minX,tile.minY,tile.maxX,tile.maxY);
-   return result;
+     return false;
+   }).map(region=>({type:"summerRegion",region}));
  }
  function paintSpringRegion(step){`, "summer masked painting");
 
