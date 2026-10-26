@@ -1,5 +1,6 @@
 (() => {
   const games=[
+    {id:'clinic',title:'Djurkliniken',tag:'SMÅ TASSAR. STOR OMSORG.',type:'Djur & omsorg',image:'djurkliniken/cover.webp',text:'Ta emot åtta gulliga vänner. Undersök, plåstra om, bada och fyll din Djurbok.',module:'FPDjurkliniken'},
     {id:'glow',title:'Glow Studio',tag:'DIN STUDIO. DIN KREATIVITET.',type:'3D · Skapa',image:'glow-studio/cover.webp',text:'Sminka med penseln, måla naglar och skapa en egen look i din studio.',module:'FPGlowStudio'},
     {id:'four',title:'4 i rad',tag:'TÄNK ETT DRAG LÄNGRE',type:'1–2 spelare',image:'four-in-row-icon.svg',text:'Utmana datorn eller en kompis. Fyra brickor i rad avgör allt.',module:'FPConnectFour'},
     {id:'plane',title:'Flygpilot',tag:'MOLNJAKTEN',type:'Skicklighet',image:'plane-pilot-icon.svg',text:'Lyft över dalen, väj för vindhjulen och sätt nästa landning.',module:'FPPlanePilot'},

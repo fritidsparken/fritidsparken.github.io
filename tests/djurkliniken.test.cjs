@@ -1,0 +1,21 @@
+const {test}=require('node:test');
+const assert=require('node:assert/strict');
+const fs=require('node:fs'),path=require('node:path');
+const {CareGame,patients,actions}=require('../games/djurkliniken/model.js');
+function perform(g){const a=g.action;g.choose(a.tool);const {x,y}=g.target;
+ if(a.mode==='hold'){g.down(x,y);g.tick(a.seconds+.1);g.up();}
+ if(a.mode==='pull'){g.down(x,y);for(let i=1;i<=12;i++)g.move(x,y-i*10);g.up();}
+ if(a.mode==='drop'){g.down(900,600);g.move(x,y);g.up();}
+ if(a.mode==='wrap'){g.down(x+65,y);for(let i=1;i<=170;i++)g.move(x+65*Math.cos(i*.1),y+65*Math.sin(i*.1));g.up();}
+ if(a.mode==='leaves'){for(const s of g.spots){g.down(s.x,s.y);g.move(s.x,s.y-80);g.up();}}
+ if(a.mode==='scrub'){for(const s of g.spots){g.down(s.x-12,s.y);for(let i=0;i<12;i++)g.move(s.x+(i%2?12:-12),s.y);g.up();}}
+ assert.equal(g.progress,1,`${g.patient.id}: ${a.key} must finish`);assert.equal(g.complete,true);assert.equal(g.next(),true);
+}
+test('all eight patients complete all 58 care actions and reach the reward',()=>{let total=0;const seen=new Set();for(const p of patients){const g=new CareGame();g.start(p.id);assert.equal(g.phase,'reception');assert.equal(g.next(),true);while(g.phase!=='reward'){seen.add(g.key);perform(g);total++;}assert.equal(g.mood,100);assert.equal(g.next(),false);}assert.equal(total,58);assert.deepEqual([...seen].sort(),Object.keys(actions).sort());});
+test('wrong tool, wrong position, and stationary sponge do not progress',()=>{const g=new CareGame();g.next();g.choose('temp');g.down(500,385);g.tick(10);assert.equal(g.progress,0);g.up();g.choose('heart');g.down(40,40);g.tick(10);assert.equal(g.progress,0);g.up();for(let i=0;i<4;i++)perform(g);assert.equal(g.key,'clean');g.choose('sponge');g.down(455,505);g.tick(10);assert.equal(g.progress,0);g.up(true);g.move(475,505);assert.equal(g.progress,0);});
+test('cleaning is local and there is no automatic completion between steps',()=>{const g=new CareGame();g.start('milo');g.next();perform(g);perform(g);g.choose('sponge');g.down(430,475);for(let i=0;i<4;i++)g.move(430+i%2*10,475);assert.ok(g.progress>0&&g.progress<1);assert.ok(g.spots.some(s=>s.value===0));assert.equal(g.next(),false);});
+test('cancelled or invalid plaster drops cannot finish; restart resets partial work',()=>{const g=new CareGame();g.next();while(g.key!=='plaster')perform(g);g.choose('plaster');g.down(455,505);g.up(true);assert.equal(g.complete,false);g.up();assert.equal(g.complete,false);g.down(20,20);g.up();assert.equal(g.complete,false);g.start('bella');assert.equal(g.index,-1);assert.equal(g.plastered,false);assert.equal(g.wrapped,0);});
+test('bath changes remain local: wet, foam, rinse, dry and brush',()=>{const g=new CareGame();g.start('maja');g.next();while(g.key!=='wet')perform(g);perform(g);assert.ok(g.wet.length>0);perform(g);assert.ok(g.foam.length>0);perform(g);assert.equal(g.foam.length,0);assert.ok(g.dirt.every(d=>d.opacity===0));perform(g);assert.equal(g.wet.length,0);perform(g);perform(g);assert.ok(g.brushed.length>0);});
+test('heartbeat timing is independent of render frequency and cancellation stops it',()=>{const g=new CareGame();g.next();g.choose('heart');g.down(500,385);g.tick(2.6);assert.equal(g.complete,true);const h=new CareGame();h.next();h.choose('heart');h.down(500,385);h.tick(.2);h.up(true);const before=h.progress;h.tick(10);assert.equal(h.progress,before);});
+test('directional pulling and circular bandaging require real movements',()=>{const g=new CareGame();g.next();while(g.key!=='thorn')perform(g);g.choose('tweezers');g.down(455,505);g.move(600,505);assert.equal(g.progress,0);g.up();const b=new CareGame();b.start('bosse');b.next();while(b.key!=='bandage')perform(b);b.choose('bandage');b.down(500,505);b.tick(8);assert.equal(b.progress,0);b.up();perform(b);assert.equal(b.wrapped,1);});
+test('all images are nonempty WebP files and website integration resolves',()=>{for(const p of [...patients,{id:'cover'}]){const b=fs.readFileSync(path.join(__dirname,'../assets/djurkliniken',p.id+'.webp'));assert.ok(b.length>1000);assert.equal(b.toString('ascii',8,12),'WEBP');}assert.match(fs.readFileSync(path.join(__dirname,'../index.html'),'utf8'),/js\/djurkliniken.js/);assert.match(fs.readFileSync(path.join(__dirname,'../js/game-hub.js'),'utf8'),/module:'FPDjurkliniken'/);});
