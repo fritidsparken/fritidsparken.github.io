@@ -1,4 +1,3 @@
-/opt/homebrew/Library/Homebrew/cmd/shellenv.sh: line 27: /bin/ps: Operation not permitted
 // Extend the shared painter after its existing car and spring patches have run.
 // The original line drawing supplies the masks and visible contours.
 window.FP_patchSummerPainter = function patchSummerPainter(source) {
