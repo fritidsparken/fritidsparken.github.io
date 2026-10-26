@@ -1,66 +1,53 @@
-# Glow Studio — first vertical slice (DRAFT)
+# Glow Studio
 
-Original browser-local makeup and nail painting game for Fritidsparken. This is a development vertical slice, **not the completed high-end game described in the brief**. Do not merge to production until the visual and device gates below are passed.
+Browser-local 3D makeup and nail styling game for Fritidsparken. Launch from the game hub or `games/glow-studio/`. Uses the repository's Three.js r160, with no installation or external runtime asset requests.
 
-## Included implementation
+## Implemented player flow
 
-- Independent full-viewport game, embedded by `FPGlowStudio` into the existing game hub. The Standard home and game hub each gain a cover and launch control. Removing the iframe disposes the game context.
-- One original procedurally modeled customer, Mira, with a continuous sculpted face, separate convex lips, almond eye surfaces, iris fibres, hair locks, eyelids and subtle breathing/head motion.
-- Original 3D salon, PBR materials, procedural PMREM environment, key/fill/rim lights and a shadow-casting key light.
-- One hand with five separate curved nail surfaces and independently paintable textures.
-- Raycast/UV painting on face, lips and nails. Interpolated brush stamps, named ordered layers, bounded stroke undo (24 MiB budget), mouse and Pointer Event support; two-pointer pinch stops painting.
-- Makeup tools, polish colors, simple nail finish settings, star stamps, nail-shape toggle, brief curing-lamp transition.
-- Studio → face → nails → result flow; repeated visits with three rotating wishes for the SAME customer pending art approval. Completion requires actual face and nail painting. Reward is for creative activity, not beauty scores.
-- Local versioned progression, settings and six reduced-size portfolio images. Storage failures are caught. No accounts, camera permission, purchases or external runtime requests.
-- Original SVG tool icons, Web Audio tones/ambient notes, mute/visibility handling.
-- Automatic resolution/shadow quality with cooldown and measured frame-time hysteresis. `?debug` shows renderer statistics; texture memory is only a rough estimate.
-- Dedicated responsive layouts, reduced-motion camera handling, keyboard-accessible UI and readable error state.
+Receive a customer → apply makeup by dragging → switch to manicure → paint individual nails → finish → earn creativity XP → save a photo → receive the next customer.
 
-## Critical validation status
+Three original customers have different complexions, hair color/length, face width, eyes and clothes. Wishes rotate. Rewards count creative activity, colors, tools and painted nails, never a beauty score. Twelve palette colors and five material finishes unlock with progression; studio furnishing colors change at levels 5, 10 and 20.
 
-The provided cloud Chrome instance cannot create ANY WebGL context (`GL_RENDERER = Disabled`, `BindToCurrentSequence failed`). This happened before scene construction. The error UI was observed in the browser; no rendered gameplay was observed. No Safari, Firefox, iPhone, iPad or Android device was available. The code's successful CPU tests DO NOT verify GPU shaders, rendered appearance, frame rate or real touch feel.
+### Makeup and manicure
 
-Do not claim high-end visual fidelity, mobile compatibility, 60 FPS, or full end-to-end browser testing from this draft. The first customer must be rendered and critically reviewed before adding more customers.
+- Genuine 3D raycast/UV painting; only touched areas receive pigment. Separate foundation, rouge, eyeshadow, eyeliner, mascara, lipstick and glitter layers.
+- Five separately paintable nails. Freehand edge filing, three nail shapes, base coat, color, two-color gradient strokes, glitter, star stamps, individually placed 3D crystals and top coat.
+- Roughness, metalness, iridescence and clearcoat texture maps apply locally with the brush. Matte, glossy, metallic, pearlescent and holographic finishes.
+- Original brush, sponge, lipstick, file and mascara tool geometry. Surface-aligned contact with brush compression.
+- Undo groups one pointer stroke across multiple surfaces, including material maps and geometric filing/decorations. A 24 MiB history budget prevents unbounded memory growth.
+- Animated curing lamp, camera transitions, eye/lip/nail camera presets, pinch zoom and two-finger rotation. Painting is suppressed during two-finger gestures.
+- Facial blinking, breathing and a lip-smile morph. Result rotation, three plain photo backdrops plus salon, portfolio download and local persistence.
 
-## Known scope gaps and compromises
+### Technical behavior
 
-- Procedural geometry is original and real 3D, but has not passed the requested premium art gate. No artist-refined/rigged GLB character, sculpted skin normal maps, subsurface scattering, facial morph rig or groom-quality hair yet.
-- Mascara/liner paint pigment in eye zones; mascara does not build individual coated lash geometry.
-- Brush is a shared 3D brush with contact compression, not a separate detailed physical tool for each product.
-- Nail finish controls currently affect the nail's material globally; pigment application is local. Per-texel roughness/metalness/top-coat maps and physically raised gel require further work.
-- Nail filing is a form toggle, not freehand filing. Star stickers are texture stamps, not individually selectable 3D gems. No dedicated gradient tool (colors can overlap freehand).
-- Curing moves the hand through an arch with light; must be visually checked for intersections.
-- One hand, one customer. Repeated visits rotate wishes; they do not introduce new people. Progression tracks XP and studio names only, with no unlockable content or changing salon yet.
-- Camera uses eased station transitions and pinch zoom. No two-finger rotation in styling, no separate eye/single-nail framing presets, no photo-background picker. Result rotation is available.
-- No depth-of-field pass, dynamic planar mirrors, advanced glitter shader, texture compression or GLB pipeline. Reflection comes from the procedural environment; mirror objects are reflective panels, not live reflected scenes.
-- Music and effects are simple original synthesized audio, not a professionally produced soundtrack.
-- Geometry and textures are created on demand at game launch; the hand is not lazy-loaded separately. Painting composites CPU canvas textures, not a GPU render-target brush system. Measure upload cost on actual mobile hardware.
-- WebGL is the renderer path (r160 supports WebGL2 with WebGL1 fallback). There is no WebGPU path. No-WebGL devices get an honest error instead of a fake 3D image.
-- Keyboard supports navigation and tool selection; canvas painting remains pointer-based.
+- Local WebGL rendering with Three.js's WebGL2/WebGL1 compatibility path. No WebGPU-only dependency, streaming server or flat-image replacement for 3D.
+- Original continuous face mesh, curved nail meshes, sculpted finger surfaces, hair/iris/lash detail, generated skin microtexture, PBR materials and procedural PMREM environment.
+- Key/fill/rim lighting and one shadow map. Four resolution/shadow presets; measured frame-time adaptation with cooldown; manual quality selection.
+- Hand assets are constructed when the manicure station is first entered. Real loading milestones count renderer/salon/customer/input setup rather than a fake timer.
+- Responsive tool tray, reduced-motion handling, touch-scoped scroll suppression and named keyboard-accessible UI controls. Painting itself requires a pointer.
+- Full-viewport iframe in the existing game hub. The logo and Escape return to games. Message source and origin are checked; closing releases the frame and restores page scrolling.
+- Versioned local progression, settings and six compressed portfolio images. Corrupt and unavailable storage are handled. Audio begins after a user gesture and suspends in the background.
+- Context-loss feedback, texture re-upload on context restore and bfcache-aware lifecycle handling.
+- `?debug` shows frame time, FPS, draw calls, triangles, texture count, rough memory estimate, renderer, preset and resolution.
 
-## Files
+## Verification and remaining limits
 
-`modules/engine.js`: renderer, framing, quality control, salon, brush.
-`modules/character.js`: original face/hair/eyes/hand meshes.
-`modules/paint.js`: texture layers, interpolation, undo.
-`modules/input.js`: raycasting, Pointer Events, gestures.
-`modules/app.js`: session flow and UI binding.
-`modules/storage.js`: versioned browser save.
-`modules/audio.js`: generated sound.
-`modules/icons.js`: original vector icon paths.
+Automated tests run real geometry, raycasting, canvas painting, input, storage and application flow. The application-flow test substitutes a renderer and audio, so it does **not** establish browser GPU correctness. It completes three consecutive customers, undo, finish, once-only reward, photo generation, portfolio and persisted XP.
 
-The game reuses `../../js/vendor/three.min.js` and its existing MIT license. No package installation is needed at runtime. Serve over HTTP, not `file:`.
+The supplied cloud Chrome instance reports WebGL disabled (`Error creating WebGL context`). The failure state was verified, but the actual WebGL scene, GPU material/shader output and runtime FPS could not be tested here. Safari, Firefox, iPhone, iPad and Android were not available. Original geometry was also inspected through an offline diagnostic render; that is not a screenshot of the game and does not verify final GPU lighting/materials.
 
-## Tests
+This release completes a compact playable implementation in code. It should not be represented as having achieved the brief's high-end realism benchmark or as having passed physical-device QA. It uses stylized procedural characters, not artist-refined scanned/rigged models. Additional art refinement and actual GPU/device review remain necessary to substantiate that visual target.
 
-`node --check` on all game modules, launcher and modified integration JS.
+Known intentional compromises: canvas texture compositing instead of GPU render-target painting; environment reflections instead of a live planar mirror; no depth-of-field pass; no external GLB/KTX2/Draco asset pipeline because assets are procedural; synthesized ambient audio instead of a produced soundtrack; simplified wardrobe/body, facial rig and hair; local file stroke modifies nail edge width without physics simulation. Studio progression changes furnishing colors rather than loading four wholly different salon layouts. There are three customers and rotating wishes, not a large narrative campaign.
 
-CPU tests require Node and `@napi-rs/canvas` as a **test-only** dependency:
+## Test commands
+
+Node 24 and test-only `@napi-rs/canvas`:
 
 ```sh
-node --test tests/glow-studio.test.mjs
+node --test tests/glow-studio.test.mjs tests/glow-flow.test.mjs
 ```
 
-Coverage: local paint vs untouched pixels, smooth stroke coverage/UV orientation, exact layer undo, finite character geometry, face/lip ray hits, five front-facing nail UVs, corrupt/versioned/quota-limited storage, pointer cancellation, two-finger paint suppression, bounded undo memory.
+Run `node --check` on the game modules and integration JavaScript. Dependency and original-asset provenance are in `LICENSES.md`.
 
-Before release: run actual desktop Chrome/Firefox/Safari and iOS/Android tests; inspect skin/eyes/hair/hand closeups; complete at least three visits; verify all tools/undo/portfolio/reload; test portrait and landscape and controls not obscuring targets; check page navigation after closing the iframe; background audio and resume; context loss/restore; measure frame times and memory. Fix results before broadening content.
+Before claiming device certification: verify real Chrome/Firefox/Safari rendering, portrait/landscape control occlusion, three visits, every tool/undo/material finish, photo framing, local storage quota, audio/background resume, context recovery, returning to the game hub, frame times and peak memory.
