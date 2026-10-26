@@ -31,11 +31,11 @@ export function createSalon(scene){
  for(let i=0;i<13;i++){const x=-4+i*.63;const m=mat([0x9f697c,0x6e9791,0xd2b87d,0xb3a1c2][i%4],.2);const bottle=mesh(new T.CylinderGeometry(.065,.075,.22,20),m,scene,[x,1.3,-1.05]);mesh(new T.CylinderGeometry(.04,.04,.1,16),gold,scene,[x,1.46,-1.05]);}
  ellipsoid(scene,sage,[0,.7,-.3],[.85,.55,.7]);box(scene,gold,[0,.3,-.3],[.12,.5,.12]);mesh(new T.CylinderGeometry(.5,.5,.04,48),gold,scene,[0,.06,-.3]);
  box(scene,stone,[3,.54,.9],[2.4,.14,1.5]);ellipsoid(scene,pink,[3,1,1],[.7,.13,.4]);
- // Freestanding manicure curing arch.
- const lamp=new T.Group();lamp.position.set(4.3,1,1);scene.add(lamp);box(lamp,mat(0xf0e8e0,.21),[0,.5,0],[1.75,.13,2.15]);for(const s of[-1,1])box(lamp,plaster,[s*.84,.2,0],[.08,.6,2.15]);const led=box(lamp,new T.MeshBasicMaterial({color:0x9584ff}),[0,.42,0],[1.5,.015,1.8]);led.visible=false;const uv=new T.PointLight(0x8d69ff,0,2);uv.position.set(4.3,1.15,1);scene.add(uv);
+ // Child-safe air-drying desk fan instead of a UV nail-curing lamp.
+ const fan=new T.Group();fan.position.set(4.3,1,1);scene.add(fan);box(fan,mat(0xf0e8e0,.3),[0,.03,.04],[.9,.13,.58]);box(fan,mat(0xd1c6bd,.32),[0,.27,.02],[.07,.48,.08]);const fanBlades=new T.Group();fanBlades.position.set(0,.58,.07);fan.add(fanBlades);mesh(new T.TorusGeometry(.34,.018,10,40),gold,fanBlades);ellipsoid(fanBlades,mat(0xb99361,.3,.35),[0,0,.015],[.055,.055,.04]);for(let i=0;i<3;i++){const a=i*Math.PI*2/3,blade=ellipsoid(fanBlades,mat(i%2?0xe7d7c9:0xf7eee5,.42),[Math.cos(a)*.13,Math.sin(a)*.13,.005],[.075,.19,.018]);blade.rotation.z=a-.4;}
  const plant=new T.Group();plant.position.set(-3.7,0,.3);scene.add(plant);mesh(new T.CylinderGeometry(.36,.23,.65,40),mat(0xc89475,.72),plant,[0,.33,0]);for(let i=0;i<18;i++){const a=i*2.4,h=.7+(i%6)*.24;const ex=Math.sin(a)*.5,ez=Math.cos(a)*.5;tube(plant,[[0,.5,0],[ex*.4,h,ez*.4],[ex,h+.3,ez]],.014,sage,12,5);const leaf=ellipsoid(plant,mat(i%2?0x52745c:0x6a8765,.57),[ex,h+.3,ez],[.15,.35,.025]);leaf.rotation.set(.3,a,.4*Math.sin(a));}
  const ceiling=mesh(new T.TorusGeometry(.8,.028,12,64),gold,scene,[.5,4.8,0]);ceiling.rotation.x=Math.PI/2;
- return{lamp,led,uv,sage};
+ return{fan,fanBlades,sage};
 }
 export function createBrush(scene){
  const root=new T.Group();scene.add(root);const gold=mat(0xc89e73,.22,.8),dark=mat(0x664251,.3),fiber=mat(0xc69b7f,.8);const groups={};

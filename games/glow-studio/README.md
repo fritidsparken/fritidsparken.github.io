@@ -6,7 +6,7 @@ Browser-local 3D makeup and nail styling game for Fritidsparken. Launch from the
 
 Receive a customer → apply makeup by dragging → switch to manicure → paint individual nails → finish → earn creativity XP → save a photo → receive the next customer.
 
-Three original customers have different complexions, hair color/length, face width, eyes and clothes. Wishes rotate. Rewards count creative activity, colors, tools and painted nails, never a beauty score. Twelve palette colors and five material finishes unlock with progression; studio furnishing colors change at levels 5, 10 and 20.
+Three original customers have distinct complexions, jaw/nose proportions, hair colors and styles (long waves, curls and a short crop), eyes and clothes. Wishes rotate. Rewards count creative activity, colors, tools and painted nails, never a beauty score. Twelve palette colors and five material finishes unlock with progression; studio furnishing colors change at levels 5, 10 and 20.
 
 ### Makeup and manicure
 
@@ -15,13 +15,13 @@ Three original customers have different complexions, hair color/length, face wid
 - Roughness, metalness, iridescence and clearcoat texture maps apply locally with the brush. Matte, glossy, metallic, pearlescent and holographic finishes.
 - Original brush, sponge, lipstick, file and mascara tool geometry. Surface-aligned contact with brush compression.
 - Undo groups one pointer stroke across multiple surfaces, including material maps and geometric filing/decorations. A 24 MiB history budget prevents unbounded memory growth.
-- Animated curing lamp, camera transitions, eye/lip/nail camera presets, pinch zoom and two-finger rotation. Painting is suppressed during two-finger gestures.
+- A rotating tabletop fan for child-safe air drying; no UV curing lamp. Camera transitions, eye/lip/nail camera presets, pinch zoom and two-finger rotation. Painting is suppressed during two-finger gestures.
 - Facial blinking, breathing and a lip-smile morph. Result rotation, three plain photo backdrops plus salon, portfolio download and local persistence.
 
 ### Technical behavior
 
 - Local WebGL rendering with Three.js's WebGL2/WebGL1 compatibility path. No WebGPU-only dependency, streaming server or flat-image replacement for 3D.
-- Original continuous face mesh, curved nail meshes, sculpted finger surfaces, hair/iris/lash detail, generated skin microtexture, PBR materials and procedural PMREM environment.
+- Original continuous face mesh with softly contoured complexion texture, curved nail plates with natural nail-bed tones, sculpted fingers, individual hair styles, iris/lash detail, generated skin microtexture, PBR materials and procedural PMREM environment. Makeup brush size starts large; pointer hit-testing accepts nearby strokes so children do not need to trace tiny contours precisely. A single nail is enough to complete the styling task; all five remain paintable.
 - Key/fill/rim lighting and one shadow map. Four resolution/shadow presets; measured frame-time adaptation with cooldown; manual quality selection.
 - Hand assets are constructed when the manicure station is first entered. Real loading milestones count renderer/salon/customer/input setup rather than a fake timer.
 - Responsive tool tray, reduced-motion handling, touch-scoped scroll suppression and named keyboard-accessible UI controls. Painting itself requires a pointer.
