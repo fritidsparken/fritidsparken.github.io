@@ -1,4 +1,4 @@
-// Extend the shared painter after its existing car and spring patches have run.
+// Add reference-based summer and autumn fills after the car and spring patches.
 // The original line drawing supplies the masks and visible contours.
 window.FP_patchSummerPainter = function patchSummerPainter(source) {
   function replaceOnce(before, after, label) {
@@ -22,17 +22,12 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
   replaceOnce('sheet.style.pointerEvents="";if(flightHouseConfig||motifConfig||referenceKey||spokConfig||owlConfig||wreathConfig||potionConfig||bookConfig||graveConfig||trainConfig)autoButton.disabled=false;historyUI();', 'sheet.style.pointerEvents="";autoButton.disabled=false;historyUI();', "re-enable auto coloring");
   replaceOnce(
     ' if(isSpringTarget)REFERENCE=IMAGE.replace("/mandala-spring-2026/","/spring-references-20261024/").replace(/\\.webp(?:\\?.*)?$/,"-reference.webp");',
-    ' if(isSpringTarget)REFERENCE=IMAGE.replace("/mandala-spring-2026/","/spring-references-20261024/").replace(/\\.webp(?:\\?.*)?$/,"-reference.webp");\n if(isSummerTarget)REFERENCE=IMAGE.replace("/mandala-summer-2026/","/summer-references-20261025/").replace(/\\.webp(?:\\?.*)?$/,"-reference.webp");',
+    ' if(isSpringTarget)REFERENCE=IMAGE.replace("/mandala-spring-2026/","/spring-references-20261024/").replace(/\\.webp(?:\\?.*)?$/,"-reference.webp");\n if(isAutumnTarget)REFERENCE=IMAGE.replace("/mandala-host-2026/","/autumn-references-20261025/").replace(/\\.webp(?:\\?.*)?$/,"-reference.webp");\n if(isSummerTarget)REFERENCE=IMAGE.replace("/mandala-summer-2026/","/summer-references-20261025/").replace(/\\.webp(?:\\?.*)?$/,"-reference.webp");',
     "summer reference path"
   );
   replaceOnce(
-    'if(REFERENCE&&!isSpringTarget){referenceButton.hidden=false;',
-    'if(REFERENCE&&!isSpringTarget&&!isSummerTarget){referenceButton.hidden=false;',
-    "summer controls"
-  );
-  replaceOnce(
     ' if(isSpringTarget)dialog.classList.add("fp-paint-ghost");',
-    ' if(isSpringTarget||isSummerTarget)dialog.classList.add("fp-paint-ghost");',
+    ' if(isSpringTarget||isSummerTarget||isAutumnTarget)dialog.classList.add("fp-paint-ghost");',
     "summer layout"
   );
   replaceOnce(' let carReferenceImage=null;',
@@ -70,22 +65,22 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
 
   replaceOnce('   let plan;\n   if(isSpringTarget||isCarTarget){', `
    let plan;
-   if(isSummerTarget){
-     status.textContent="Hämtar sommarbildens färgreferens…";
+   if(isSummerTarget||isAutumnTarget){
+     status.textContent="Hämtar bildens färgreferens…";
      try{
        const image=await new Promise((resolve,reject)=>{
          const ref=new Image();ref.onload=()=>resolve(ref);
          ref.onerror=()=>reject(new Error("Referens saknas"));ref.src=REFERENCE;
        });
-       if(image.naturalWidth!==W||image.naturalHeight!==H)throw new Error("Referensens mått stämmer inte");
+       if(!isAutumnTarget&&(image.naturalWidth!==W||image.naturalHeight!==H))throw new Error("Referensens mått stämmer inte");
        const refCanvas=document.createElement("canvas");refCanvas.width=W;refCanvas.height=H;
        const refCtx=refCanvas.getContext("2d",{willReadFrequently:true});
-       refCtx.drawImage(image,0,0);
+       refCtx.drawImage(image,0,0,W,H);
        summerReferencePixels=refCtx.getImageData(0,0,W,H).data;
        plan=summerPaintingPlan(await findAutoRegions(true));
      }catch(error){
        autoRunning=false;autoButton.disabled=false;autoProgress.hidden=true;
-       sheet.style.pointerEvents="";status.textContent="Sommarbildens färgreferens kunde inte laddas: "+error.message;
+       sheet.style.pointerEvents="";status.textContent="Bildens färgreferens kunde inte laddas: "+error.message;
        return;
      }
    }else if(isSpringTarget||isCarTarget){`, "summer reference loading");
@@ -101,17 +96,17 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
   );
   replaceOnce(
     'resolve,(isSpringTarget||isCarTarget)?Math.max(8,Math.min(150,18000/plan.length)):',
-    'resolve,isSummerTarget?Math.max(12,Math.min(150,18000/plan.length)):(isSpringTarget||isCarTarget)?Math.max(8,Math.min(150,18000/plan.length)):',
+    'resolve,(isSummerTarget||isAutumnTarget)?Math.max(12,Math.min(150,18000/plan.length)):(isSpringTarget||isCarTarget)?Math.max(8,Math.min(150,18000/plan.length)):',
     "summer animation pace"
   );
   replaceOnce(
     '||potionConfig||isCarTarget||isSpringTarget){c.fillStyle="#fff";',
-    '||potionConfig||isCarTarget||isSpringTarget||isSummerTarget){c.fillStyle="#fff";',
+    '||potionConfig||isCarTarget||isSpringTarget||isSummerTarget||isAutumnTarget){c.fillStyle="#fff";',
     "summer white export"
   );
   replaceOnce(
     'status.textContent=isCarTarget?"Klart! "',
-    'status.textContent=isSummerTarget?"Klart! "+TARGET+" är färglagd enligt färgreferensen. Du kan fortsätta måla eller spara bilden.":isCarTarget?"Klart! "',
+    'status.textContent=(isSummerTarget||isAutumnTarget)?"Klart! "+TARGET+" är färglagd enligt färgreferensen. Du kan fortsätta måla eller spara bilden.":isCarTarget?"Klart! "',
     "summer finished status"
   );
   return source;
