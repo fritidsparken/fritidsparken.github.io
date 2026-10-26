@@ -51,3 +51,8 @@ node --test tests/glow-studio.test.mjs tests/glow-flow.test.mjs
 Run `node --check` on the game modules and integration JavaScript. Dependency and original-asset provenance are in `LICENSES.md`.
 
 Before claiming device certification: verify real Chrome/Firefox/Safari rendering, portrait/landscape control occlusion, three visits, every tool/undo/material finish, photo framing, local storage quota, audio/background resume, context recovery, returning to the game hub, frame times and peak memory.
+
+
+## Reference art
+
+`assets/glow-studio/reference-portrait.webp` and `reference-look.webp` are optimized crops of the visual reference supplied by the site owner. The portrait is used on the intro screen; the full composition opens as an optional inspiration card while styling. The active customer remains a locally rendered 3D character.
