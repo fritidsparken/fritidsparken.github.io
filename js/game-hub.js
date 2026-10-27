@@ -1,5 +1,6 @@
 (() => {
   const games=[
+    {id:'waterpark',title:'Vattenparken 3D',tag:'ETT BLÖTT ÄVENTYR',type:'3D · Äventyr',image:'vattenparken/cover.webp',text:'Åk enorma vattenrutschbanor, samla stjärnor och kasta dig genom vattenparkens galnaste äventyr!',module:'FPWaterpark'},
     {id:'frog',title:'Grodhoppet',tag:'ÖVER VÄGEN!',type:'3D · Äventyr',image:'grodhoppet/cover.webp',text:'Hoppa över vägar, floder och järnvägar och hjälp grodan hela vägen till målet!',module:'FPGrodhoppet'},
     {id:'clinic',title:'Djurkliniken',tag:'SMÅ TASSAR. STOR OMSORG.',type:'Djur & omsorg',image:'djurkliniken/cover.webp',text:'Ta emot åtta gulliga vänner. Undersök, plåstra om, bada och fyll din Djurbok.',module:'FPDjurkliniken'},
     {id:'four',title:'4 i rad',tag:'TÄNK ETT DRAG LÄNGRE',type:'1–2 spelare',image:'four-in-row-icon.svg',text:'Utmana datorn eller en kompis. Fyra brickor i rad avgör allt.',module:'FPConnectFour'},
