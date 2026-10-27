@@ -1,5 +1,6 @@
 (() => {
   const games=[
+    {id:'frog',title:'Grodhoppet',tag:'ÖVER VÄGEN!',type:'3D · Äventyr',image:'grodhoppet/cover.webp',text:'Hoppa över vägar, floder och järnvägar och hjälp grodan hela vägen till målet!',module:'FPGrodhoppet'},
     {id:'clinic',title:'Djurkliniken',tag:'SMÅ TASSAR. STOR OMSORG.',type:'Djur & omsorg',image:'djurkliniken/cover.webp',text:'Ta emot åtta gulliga vänner. Undersök, plåstra om, bada och fyll din Djurbok.',module:'FPDjurkliniken'},
     {id:'glow',title:'Glow Studio',tag:'DIN STUDIO. DIN KREATIVITET.',type:'3D · Skapa',image:'glow-studio/cover.webp',text:'Sminka med penseln, måla naglar och skapa en egen look i din studio.',module:'FPGlowStudio'},
     {id:'four',title:'4 i rad',tag:'TÄNK ETT DRAG LÄNGRE',type:'1–2 spelare',image:'four-in-row-icon.svg',text:'Utmana datorn eller en kompis. Fyra brickor i rad avgör allt.',module:'FPConnectFour'},
