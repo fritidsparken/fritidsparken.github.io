@@ -42,7 +42,6 @@
   const categoryPanel = `<section class="std-categories" aria-label="Utforska kategorier">${categories.map(([label,cat,symbol],i)=>`<button type="button" data-standard-category="${cat}" style="--tile:${palettes[i]}">${icon(symbol)}<span>${label}</span></button>`).join('')}</section>`;
   const gameItems = [
     {id:'clinic',title:'Djurkliniken',image:'djurkliniken/cover.webp',tag:'Djur & omsorg · 8 små vänner'},
-    {id:'glow',title:'Glow Studio',image:'glow-studio/cover.webp',tag:'3D · Smink & nagelkonst'},
     {id:'bike',title:'Stuntcykel – Staden',image:'stunt-bike-city-icon.svg',tag:'3D · Fysik & balans'},
     {id:'plane',title:'Flygpilot',image:'plane-pilot-icon.svg',tag:'3D · Flygäventyr'},
     {id:'four',title:'4 i rad',image:'four-in-row-icon.svg',tag:'Strategi · 1–2 spelare'}
