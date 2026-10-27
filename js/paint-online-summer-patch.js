@@ -9,6 +9,14 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
     source = source.slice(0, start) + after + source.slice(start + before.length);
   }
 
+  // Winter references have not yet been aligned and verified against their
+  // originals. Do not substitute the generic palette or erase a child's work.
+  replaceOnce(
+    '   if(!autoButton||autoRunning||!W)return;',
+    '   if(!autoButton||autoRunning||!W)return;\n   if(new URL(IMAGE,location.href).pathname.includes("/mandala-vinter-2026/")){status.textContent="Den här vinterbildens färgreferens är inte tillgänglig ännu. Du kan fortsätta måla manuellt.";return;}',
+    "winter reference guard"
+  );
+
   // The desktop backdrop already reserves 16px on each side. Size the
   // expanded painter within that space, including when a scrollbar is present.
   replaceOnce(
