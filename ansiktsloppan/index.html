@@ -67,9 +67,10 @@ ol.steps li::before{content:counter(s);width:34px;height:34px;border-radius:50%;
 .stage canvas.tap{cursor:crosshair}
 .stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);background:#000}
 .stage svg.guide{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.tabs{display:flex;gap:6px;background:#DDE8FB;padding:5px;border-radius:999px;max-width:520px;margin:0 auto 12px}
+.embedded>header{display:none}
+.tabs{display:flex;gap:6px;background:var(--line);padding:5px;border-radius:999px;max-width:520px;margin:0 auto 12px}
 .tab{flex:1;border-radius:999px;padding:9px 6px;font-weight:800;font-size:.95rem;color:var(--muted)}
-.tab[aria-selected="true"]{background:var(--card);color:var(--ink);box-shadow:0 2px 0 var(--line)}
+.tab[aria-selected="true"]{background:var(--bg);color:var(--ink);box-shadow:0 2px 0 var(--line)}
 .tab small{display:block;font-weight:600;font-size:.72rem;line-height:1}
 .hint{font-size:.92rem;color:var(--muted);font-weight:600;text-align:center;max-width:520px;margin:10px auto 0}
 .ctl{display:grid;grid-template-columns:70px 1fr 44px;gap:10px;align-items:center;font-weight:700;max-width:520px;margin:10px auto 0}
@@ -85,7 +86,7 @@ select{font:inherit;font-weight:700;border:2px solid var(--line);background:var(
 .msg{min-height:1.4em;text-align:center;font-weight:700;color:var(--muted);margin-top:8px}
 details.fb{margin-top:10px;text-align:center;color:var(--muted);font-weight:600}
 details.fb img{width:100%;max-width:420px;border:2px solid var(--line);border-radius:8px;margin-top:8px}
-.badge{display:inline-block;font-size:.75rem;font-weight:800;color:var(--muted);background:#DDE8FB;padding:2px 10px;border-radius:99px}
+.badge{display:inline-block;font-size:.75rem;font-weight:800;color:var(--muted);background:var(--line);padding:2px 10px;border-radius:99px}
 .mouthbox{max-width:520px;margin:12px auto 0;background:var(--card);border-radius:16px;padding:10px 14px;box-shadow:0 3px 0 var(--line)}
 .mouthbox .tips{font-size:.88rem;color:var(--muted);font-weight:600;margin-top:6px}
 @media(max-width:420px){.bigact{font-size:1.05rem;padding:16px 6px}.hero svg{width:80px;height:80px}.hero h1{font-size:2rem}}
@@ -98,6 +99,7 @@ details.fb img{width:100%;max-width:420px;border:2px solid var(--line);border-ra
 (function(){
   if(window.parent===window)return;
   try{
+    document.body.classList.add("embedded");
     const parentBody=window.parent.document.body;
     function syncTheme(){
       const style=window.parent.getComputedStyle(parentBody), root=document.documentElement.style;
