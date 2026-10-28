@@ -193,21 +193,13 @@ function gymGallery(q){let games=gymGames.filter(g=>g.min<=gymStudents&&g.max>=g
 
 const funTools=[
 {key:"ansiktsloppa",icon:"👄",name:"Ansiktsloppan",image:"tool_ansiktsloppa.svg",desc:"Skapa en vikloppa med ett eget ansikte och skriv ut arket."},
-{key:"wheel",icon:"🎡",name:"Snurrhjulet",image:"tool_wheel.svg",desc:"Spin the wheel – låt hjulet välja bland era egna alternativ."},
-{key:"challenge",icon:"🎯",name:"Rastutmaningar",image:"tool_challenge.jpg",desc:"Dra en snabb och rolig utmaning för rasten."},
-{key:"hunt",icon:"🗺️",name:"Skattjaktsskapare",image:"tool_hunt.jpg",desc:"Skapa en färdig skattjakt med ledtrådar."},
-{key:"today",icon:"🎲",name:"Dagens aktivitet",image:"tool_today.jpg",desc:"Få ett slumpat aktivitetstips för gruppen."},
-{key:"music",icon:"🎵",name:"Musiklekar",image:"tool_music.jpg",desc:"Hitta lekar med musik, rörelse och skratt."},
-{key:"calm",icon:"🌿",name:"Lugn hörna",image:"tool_calm.jpg",desc:"Andningsövningar och korta pauser tillsammans."},
-{key:"teams",icon:"👥",name:"Lagindelare",image:"tool_teams.jpg",desc:"Dela gruppen snabbt och rättvist i lag."},
-{key:"cards",icon:"🃏",name:"Aktivitetskort",image:"tool_cards.jpg",desc:"Skriv ut kort med lekar och uppdrag."},
-{key:"season",icon:"🍂",name:"Säsongstips",image:"tool_season.jpg",desc:"Aktiviteter som passar årstiden."}
+{key:"wheel",icon:"🎡",name:"Snurrhjulet",image:"tool_wheel.svg",desc:"Spin the wheel – låt hjulet välja bland era egna alternativ."}
 ];
 let funTool=null, challengeSeen=[];
 const challengeList=["Gå som en krabba till nästa kon och tillbaka.","Gör en lagstaty som föreställer ett djur.","Hitta fem saker på gården som har olika färger.","Kasta en mjuk boll i en låda tre gånger.","Hitta på en hemlig hälsning med en kompis.","Gör tio gemensamma hopp utan att tappa takten.","Bygg det högsta tornet av naturmaterial.","Gå en mini-skattjakt och hitta något runt, mjukt och grönt.","Balansera en ärtpåse på huvudet till mållinjen.","Gör en rörelse som alla i gruppen härmar."];
 const musicGames=[["Dansstopp","Dans när musiken spelar. Frys som en staty när den stannar."],["Dans som…","Dra ett djur eller en figur och dansa som den tills musiken tystnar."],["Musikaliska öar","Lägg ut tidningar eller mattor. Dansa runt och hitta en ö när musiken stannar."],["Följ ledaren","En ledare visar dansrörelser som alla härmar. Byt ledare efter varje låt."],["Rytm-ekot","En person klappar en rytm och gruppen klappar tillbaka."],["Dans genom salen","Rör er på olika sätt genom salen: smyg, hoppa, gå stort eller snurra."]];
 const calmIdeas=[["Fyrkantsandning","Andas in medan ni räknar till fyra, håll mjukt till fyra, andas ut till fyra och vila till fyra."],["Fem saker","Sitt bekvämt. Lägg märke till fem saker ni ser, fyra ni känner och tre ni hör."],["Långsam ballong","Låtsas blåsa upp en ballong med ett lugnt andetag och släpp sedan ut luften långsamt."],["Spänn och slappna av","Krama händerna mjukt i tre sekunder och släpp. Upprepa med axlarna och fötterna."],["Tyst minut","Lyssna efter så många olika ljud ni kan under en minut."]];
-function funHub(){return '<div class="fun-intro"><strong>Små verktyg som gör fritidsdagen ännu roligare</strong><p>Välj ett verktyg för att slumpa lekar, skapa lag, planera en skattjakt eller ta en lugn paus.</p></div><div class="grid fun-grid">'+funTools.map(t=>'<button class="card fun-card" data-funtool="'+t.key+'"><span class="fun-photo"><img loading="lazy" src="./assets/'+t.image+'" alt="Fotografi av '+t.name+'"></span><span class="ctext"><strong>'+t.name+'</strong><small>'+t.desc+'</small></span><span class="arrow">›</span></button>').join("")+'</div>'}
+function funHub(){return '<div class="fun-intro"><strong>Små verktyg som gör fritidsdagen ännu roligare</strong><p>Skapa en ansiktsloppa eller låt snurrhjulet välja åt er.</p></div><div class="grid fun-grid">'+funTools.map(t=>'<button class="card fun-card" data-funtool="'+t.key+'"><span class="fun-photo"><img loading="lazy" src="./assets/'+t.image+'" alt="Fotografi av '+t.name+'"></span><span class="ctext"><strong>'+t.name+'</strong><small>'+t.desc+'</small></span><span class="arrow">›</span></button>').join("")+'</div>'}
 function funPage(){
  const back='<button class="secondary fun-back" data-funback>← Alla verktyg</button>';
  if(!funTool)return funHub();
