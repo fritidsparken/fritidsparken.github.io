@@ -5,3 +5,7 @@
 .level-select{margin:10px 0}.level-select strong{display:block;font-size:.8rem;color:#44775a}.level-select #levels{display:flex;flex-wrap:wrap;justify-content:center}.level-select button{font-size:.75rem;padding:7px 9px;margin:3px;border:2px solid transparent}.level-select button.selected{border-color:#32985d;background:#d5edc9}.level-select button:disabled{opacity:.46;cursor:not-allowed}.level-select small{display:block;color:#587663;font-weight:700;font-size:.72rem}@media(max-height:600px){.level-select,.character-select{margin:3px 0}.panel{padding:16px}.panel h1{margin:5px 0}.panel p{margin:5px}.hint{display:none}}
 
 .panel .record{margin:8px 0 0;color:#477256;font-size:.78rem;font-weight:800}
+
+.difficulty-select{margin:8px 0}.difficulty-select strong{display:block;font-size:.8rem;color:#44775a}.difficulty-select #difficulties{display:flex;justify-content:center;flex-wrap:wrap}.difficulty-select button{font-size:.8rem;padding:7px 14px;margin:3px;border:2px solid transparent}.difficulty-select button.selected{border-color:#32985d;background:#d5edc9}.difficulty-select small{display:block;color:#587663;font-weight:700;font-size:.72rem}#levels{max-height:112px;overflow-y:auto}@media(max-height:600px){.difficulty-select{margin:3px 0}#levels{max-height:74px}}
+
+.panel,#levels{touch-action:pan-y;overscroll-behavior:contain}
