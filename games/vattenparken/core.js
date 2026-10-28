@@ -16,6 +16,14 @@
     { id: 'regnbagen', name: 'Regnbågsfallet', label: 'PARKENS STORA FINAL', color: '#f36cab', accent: '#ffd9ec', x: 105, height: 65, pace: 15, par: 42, description: 'En hög spiral, en lysande tunnel och parkens allra största plask.', jump: [.76,.83,8], tunnel: [.55,.68],
       points: [[0,-96],[-12,-79],[-14,-56],[0,-42],[14,-56],[0,-70],[-14,-56],[0,-42],[14,-26],[-12,-4],[12,22],[0,60]] }
   ];
+  // Six different silhouettes and descent profiles; every chute stays continuous.
+  Object.assign(courses[0],{points:[[0,-96],[-13,-60],[-9,-20],[10,20],[0,60]],pace:10,description:'Lugna, långa svängar i en öppen lagunbana.'});
+  Object.assign(courses[2],{points:[[0,-96],[0,-80],[0,-58],[0,-25],[0,15],[0,60]],pace:19,description:'En rak störtloppsbana med brant start och maximal fart.'});
+  Object.assign(courses[3],{points:[[0,-96],[-14,-75],[-14,-35],[0,-18],[14,-35],[14,5],[0,60]],description:'En hårnålssväng genom vulkanens mörka tunnel.'});
+  Object.assign(courses[4],{points:[[0,-96],[12,-66],[12,-25],[-12,5],[-12,35],[0,60]],tunnel:[.04,.93],description:'En lång sluten neonbana med svepande kurvor och ljusringar.'});
+  Object.assign(courses[5],{points:[[0,-96],[-15,-82],[-15,-60],[0,-48],[15,-60],[15,-82],[0,-94],[-15,-82],[-15,-60],[0,-48],[14,-15],[0,60]],description:'En hög regnbågsspiral i två våningar med lång utförsfinal.'});
+  courses.forEach(c=>{c.jump=[0,0,0]});
+  function turnInput(left,right){return (right?1:0)-(left?1:0);}
   function createCourse(T, config, index) {
     const count = config.points.length;
     const points = config.points.map(([x,z], i) => {
@@ -84,6 +92,6 @@
     const newlyUnlocked=index+1===save.unlocked&&save.unlocked<6;if(newlyUnlocked)save.unlocked++;
     return newlyUnlocked;
   }
-  const api={courses,createCourse,jumpHeight,laneHeight,Ride,cleanSave,record,clamp};
+  const api={courses,turnInput,createCourse,jumpHeight,laneHeight,Ride,cleanSave,record,clamp};
   if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.WaterparkCore=api;
 })(typeof window!=='undefined'?window:globalThis);
