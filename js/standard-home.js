@@ -8,7 +8,7 @@
   const legacyTop = document.querySelector('.topin');
   const controls = ['theme','seasonPicker','halloweenSound'].map(id => document.getElementById(id));
   const palettes = ['#dcf2d6','#ffe5c6','#fff0b6','#ffdeea','#d4efff','#d7f2df','#e9dfff','#e1e4ff','#ffdeeb','#d2f4ee'];
-  const categories = [['Skapa','Skapa','scissors'],['Pyssel','Pyssel','palette'],['Färglägga','Mandala','pencils'],['Klippdockor','Klippdockor','dolls'],['Rörelse','Fritidsgympa','ball'],['Bygga','Bygga','brick'],['Klurigt','Klurigt','bulb'],['Lugnt','Lugnt','chair'],['Spel','Spel','game'],['Roliga verktyg','Roliga verktyg','tools']];
+  const categories = [['Skapa','Skapa','scissors'],['Pyssel','Pyssel','palette'],['Färglägga','Mandala','pencils'],['Klippdockor','Klippdockor','dolls'],['Rörelse','Fritidsgympa','ball'],['Spel','Spel','game'],['Roliga verktyg','Roliga verktyg','tools']];
   let iconId = 0, browseAll = false;
   function icon(kind) {
     const id = 'std-icon-' + (++iconId);
@@ -60,7 +60,7 @@
       activityCard('Pärlmönster','Pyssel',photo('Pärlmönster'),'data-standard-pearl'),
       activityCard('Rita steg för steg','Färglägga','./assets/standard/drawing-step-cover.jpg','data-standard-category="Rita steg-för-steg"','color'),
       activityCard('Hinderbana','Rörelse','./assets/'+obstacle.image,'data-standard-gym="'+esc(obstacle.name)+'"','move'),
-      activityCard('Minifigurscen','Bygga',photo('Minifigurscen'),'data-standard-activity="Minifigurscen"','build'),
+      activityCard('Minifigurscen','Pyssel',photo('Minifigurscen'),'data-standard-activity="Minifigurscen"','build'),
       activityCard('Stuntcykel – Staden','Spel','./assets/stunt-bike-city-icon.svg','data-standard-game="bike"','game')
     ].join('');
     // The catalogs have no publication timestamps. Use the last catalog entry
@@ -71,18 +71,6 @@
   home.innerHTML = homeMarkup();
   const results = document.createElement('div');results.className='std-results-heading standard-only';results.setAttribute('aria-live','polite');
   document.getElementById('catalog').before(results);
-  const collections = {
-    Bygga:['Pappersbroar','Små lerfigurer','Minifigurscen','Äggkartongens små världar'],
-    Klurigt:['Robot och programmerare','Gissa föremålet','Vad har ändrats?','Min egen serie'],
-    Lugnt:['Pärlmönster','Tidningscollage','Garnbokstäver','Mönsterstenar']
-  };
-  function renderCollection(name,q) {
-    const entries=activities.filter(a=>collections[name].includes(a[2])&&a.join(' ').toLocaleLowerCase('sv').includes(q));
-    let html=`<div class="std-collection-grid">${entries.map(a=>activityCard(a[2],name,photo(a[2]),`data-standard-activity="${esc(a[2])}"`)).join('')}</div>`;
-    if(name==='Lugnt')html+=`<button class="std-tool-shortcut" data-standard-tool="calm">Lugn stund · Andning och återhämtning →</button>`;
-    if(name==='Klurigt')html+=`<button class="std-tool-shortcut" data-standard-tool="challenge">Dagens utmaning →</button>`;
-    document.getElementById('catalog').innerHTML=html;
-  }
   function renderSearch(q) {
     const matches=value=>String(value).toLocaleLowerCase('sv').includes(q);
     const act=activities.filter(a=>matches(a.join(' ')));
@@ -106,12 +94,6 @@
     if(!standard){home.hidden=true;results.hidden=true;document.body.classList.remove('std-home','std-browsing');}
     return standard;
   }
-  drawFilters=function(){
-    originalFilters();
-    if(isStandard()){
-      for(const name of Object.keys(collections))document.getElementById('filters').insertAdjacentHTML('beforeend',`<button class="filter ${category===name?'active':''}" data-cat="${name}">${name}</button>`);
-    }
-  };
   draw=function(){
     if(!syncPresentation()){originalDraw();return;}
     const q=document.getElementById('search').value.trim().toLocaleLowerCase('sv');
@@ -123,7 +105,6 @@
     if(atHome){window.FPGameHub?.stop();document.getElementById('catalog').innerHTML='';return;}
     results.innerHTML=`<h2>${esc(pearlPage?'Pärlmönster':category==='Mandala'?'Färglägga':category==='Fritidsgympa'?'Rörelse & Fritidsgympa':category==='Alla'?'Alla aktiviteter':category)}</h2><button type="button" data-standard-category="Alla">← Till startsidan</button>`;
     if(category==='Alla'&&q&&!pearlPage){window.FPGameHub?.stop();renderSearch(q);return;}
-    if(collections[category]){window.FPGameHub?.stop();renderCollection(category,q);return;}
     originalDraw();
   };
   function navigate(cat,scroll=true){
