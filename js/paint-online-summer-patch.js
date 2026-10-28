@@ -80,7 +80,10 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
          const ref=new Image();ref.onload=()=>resolve(ref);
          ref.onerror=()=>reject(new Error("Referens saknas"));ref.src=REFERENCE;
        });
-       if(!isAutumnTarget&&(image.naturalWidth!==W||image.naturalHeight!==H))throw new Error("Referensens mått stämmer inte");
+       const sizeMismatch=image.naturalWidth!==W||image.naturalHeight!==H;
+       const aspectMismatch=Math.abs(image.naturalWidth/image.naturalHeight-W/H)>0.002;
+       if(!isAutumnTarget&&!isWinterTarget&&sizeMismatch)throw new Error("Referensens mått stämmer inte");
+       if(isWinterTarget&&aspectMismatch)throw new Error("Referensens proportioner stämmer inte");
        const refCanvas=document.createElement("canvas");refCanvas.width=W;refCanvas.height=H;
        const refCtx=refCanvas.getContext("2d",{willReadFrequently:true});
        refCtx.drawImage(image,0,0,W,H);
