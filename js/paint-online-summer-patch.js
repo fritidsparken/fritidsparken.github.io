@@ -9,14 +9,6 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
     source = source.slice(0, start) + after + source.slice(start + before.length);
   }
 
-  // Winter references have not yet been aligned and verified against their
-  // originals. Do not substitute the generic palette or erase a child's work.
-  replaceOnce(
-    '   if(!autoButton||autoRunning||!W)return;',
-    '   if(!autoButton||autoRunning||!W)return;\n   if(new URL(IMAGE,location.href).pathname.includes("/mandala-vinter-2026/")){status.textContent="Den här vinterbildens färgreferens är inte tillgänglig ännu. Du kan fortsätta måla manuellt.";return;}',
-    "winter reference guard"
-  );
-
   // The desktop backdrop already reserves 16px on each side. Size the
   // expanded painter within that space, including when a scrollbar is present.
   replaceOnce(
@@ -27,7 +19,7 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
 
   replaceOnce(
     ' const isSpringTarget=IMAGE.includes("/mandala-spring-2026/");',
-    ' const isSummerTarget=IMAGE.includes("/mandala-summer-2026/");\n const isAutumnTarget=IMAGE.includes("/mandala-host-2026/");\n const isSpringTarget=IMAGE.includes("/mandala-spring-2026/");',
+    ' const isSummerTarget=IMAGE.includes("/mandala-summer-2026/");\n const isAutumnTarget=IMAGE.includes("/mandala-host-2026/");\n const isWinterTarget=IMAGE.includes("/mandala-vinter-2026/");\n const isSpringTarget=IMAGE.includes("/mandala-spring-2026/");',
     "season targets"
   );
   replaceOnce(' async function findAutoRegions(isGhost=false){', ' async function findAutoRegions(isGhost=false){\n   const autoInkThreshold=isAutumnTarget?244:220;', "autumn contour threshold");
@@ -38,12 +30,12 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
   replaceOnce('sheet.style.pointerEvents="";if(flightHouseConfig||motifConfig||referenceKey||spokConfig||owlConfig||wreathConfig||potionConfig||bookConfig||graveConfig||trainConfig)autoButton.disabled=false;historyUI();', 'sheet.style.pointerEvents="";autoButton.disabled=false;historyUI();', "re-enable auto coloring");
   replaceOnce(
     ' if(isSpringTarget)REFERENCE=IMAGE.replace("/mandala-spring-2026/","/spring-references-20261024/").replace(/\\.webp(?:\\?.*)?$/,"-reference.webp");',
-    ' if(isSpringTarget)REFERENCE=IMAGE.replace("/mandala-spring-2026/","/spring-references-20261024/").replace(/\\.webp(?:\\?.*)?$/,"-reference.webp");\n if(isAutumnTarget)REFERENCE=IMAGE.replace("/mandala-host-2026/","/autumn-references-20261025/").replace(/\\.webp(?:\\?.*)?$/,"-reference.webp");\n if(isSummerTarget)REFERENCE=IMAGE.replace("/mandala-summer-2026/","/summer-references-20261025/").replace(/\\.webp(?:\\?.*)?$/,"-reference.webp");',
+    ' if(isSpringTarget)REFERENCE=IMAGE.replace("/mandala-spring-2026/","/spring-references-20261024/").replace(/\\.webp(?:\\?.*)?$/,"-reference.webp");\n if(isAutumnTarget)REFERENCE=IMAGE.replace("/mandala-host-2026/","/autumn-references-20261025/").replace(/\\.webp(?:\\?.*)?$/,"-reference.webp");\n if(isSummerTarget)REFERENCE=IMAGE.replace("/mandala-summer-2026/","/summer-references-20261025/").replace(/\\.webp(?:\\?.*)?$/,"-reference.webp");\n if(isWinterTarget)REFERENCE=IMAGE.replace("/mandala-vinter-2026/","/winter-references-20261028/").replace(/\\.webp(?:\\?.*)?$/,"-reference.webp");',
     "summer reference path"
   );
   replaceOnce(
     ' if(isSpringTarget)dialog.classList.add("fp-paint-ghost");',
-    ' if(isSpringTarget||isSummerTarget||isAutumnTarget)dialog.classList.add("fp-paint-ghost");',
+    ' if(isSpringTarget||isSummerTarget||isAutumnTarget||isWinterTarget)dialog.classList.add("fp-paint-ghost");',
     "summer layout"
   );
   replaceOnce(' let carReferenceImage=null;',
@@ -81,7 +73,7 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
 
   replaceOnce('   let plan;\n   if(isSpringTarget||isCarTarget){', `
    let plan;
-   if(isSummerTarget||isAutumnTarget){
+   if(isSummerTarget||isAutumnTarget||isWinterTarget){
      status.textContent="Hämtar bildens färgreferens…";
      try{
        const image=await new Promise((resolve,reject)=>{
@@ -112,17 +104,17 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
   );
   replaceOnce(
     'resolve,(isSpringTarget||isCarTarget)?Math.max(8,Math.min(150,18000/plan.length)):',
-    'resolve,(isSummerTarget||isAutumnTarget)?Math.max(12,Math.min(150,18000/plan.length)):(isSpringTarget||isCarTarget)?Math.max(8,Math.min(150,18000/plan.length)):',
+    'resolve,(isSummerTarget||isAutumnTarget||isWinterTarget)?Math.max(12,Math.min(150,18000/plan.length)):(isSpringTarget||isCarTarget)?Math.max(8,Math.min(150,18000/plan.length)):',
     "summer animation pace"
   );
   replaceOnce(
     '||potionConfig||isCarTarget||isSpringTarget){c.fillStyle="#fff";',
-    '||potionConfig||isCarTarget||isSpringTarget||isSummerTarget||isAutumnTarget){c.fillStyle="#fff";',
+    '||potionConfig||isCarTarget||isSpringTarget||isSummerTarget||isAutumnTarget||isWinterTarget){c.fillStyle="#fff";',
     "summer white export"
   );
   replaceOnce(
     'status.textContent=isCarTarget?"Klart! "',
-    'status.textContent=(isSummerTarget||isAutumnTarget)?"Klart! "+TARGET+" är färglagd enligt färgreferensen. Du kan fortsätta måla eller spara bilden.":isCarTarget?"Klart! "',
+    'status.textContent=(isSummerTarget||isAutumnTarget||isWinterTarget)?"Klart! "+TARGET+" är färglagd enligt färgreferensen. Du kan fortsätta måla eller spara bilden.":isCarTarget?"Klart! "',
     "summer finished status"
   );
   return source;
