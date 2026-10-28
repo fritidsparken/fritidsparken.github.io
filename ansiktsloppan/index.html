@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#EAF3FF;--ink:#1D2B53;--muted:#56668F;--card:#FFFFFF;--line:#C6D6F2;--good:#1E9E5E;--rose:#E5484D;--gold:#F2B707;--font:"Baloo 2","Trebuchet MS",system-ui,sans-serif}
+:root{--bg:#fffefa;--ink:#1D2B53;--muted:#56668F;--card:#FFFFFF;--line:#C6D6F2;--good:#1E9E5E;--rose:#E5484D;--gold:#F2B707;--font:"Baloo 2","Trebuchet MS",system-ui,sans-serif}
 *{box-sizing:border-box}
 html,body{overflow-x:clip;margin:0;min-height:100%}
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -93,6 +93,21 @@ details.fb img{width:100%;max-width:420px;border:2px solid var(--line);border-ra
 </style>
 </head>
 <body>
+<script>
+// Match the surrounding tool panel when embedded on Fritidsparken.
+(function(){
+  if(window.parent===window)return;
+  try{
+    const parentBody=window.parent.document.body;
+    function syncTheme(){
+      const style=window.parent.getComputedStyle(parentBody), root=document.documentElement.style;
+      [["--bg","--paper"],["--ink","--ink"],["--muted","--muted"],["--card","--bg"],["--line","--line"]].forEach(function(pair){const value=style.getPropertyValue(pair[1]).trim();if(value)root.setProperty(pair[0],value)});
+    }
+    syncTheme();
+    new MutationObserver(syncTheme).observe(parentBody,{attributes:true,attributeFilter:["class","style"]});
+  }catch(e){/* Standalone or cross-origin: use the default colors. */}
+})();
+</script>
 <header style="padding:12px 16px;background:white;text-align:center"><a href="/" style="color:#20563a;font-weight:800">🌳 Fritidsparken.se</a></header>
 <div class="wrap">
 
