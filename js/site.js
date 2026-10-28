@@ -192,6 +192,7 @@ function gymGallery(q){let games=gymGames.filter(g=>g.min<=gymStudents&&g.max>=g
 
 
 const funTools=[
+{key:"ansiktsloppa",icon:"👄",name:"Ansiktsloppan",image:"tool_ansiktsloppa.svg",desc:"Skapa en vikloppa med ett eget ansikte och skriv ut arket."},
 {key:"wheel",icon:"🎡",name:"Snurrhjulet",image:"tool_wheel.svg",desc:"Spin the wheel – låt hjulet välja bland era egna alternativ."},
 {key:"challenge",icon:"🎯",name:"Rastutmaningar",image:"tool_challenge.jpg",desc:"Dra en snabb och rolig utmaning för rasten."},
 {key:"hunt",icon:"🗺️",name:"Skattjaktsskapare",image:"tool_hunt.jpg",desc:"Skapa en färdig skattjakt med ledtrådar."},
@@ -210,6 +211,7 @@ function funHub(){return '<div class="fun-intro"><strong>Små verktyg som gör f
 function funPage(){
  const back='<button class="secondary fun-back" data-funback>← Alla verktyg</button>';
  if(!funTool)return funHub();
+ if(funTool==="ansiktsloppa")return back+'<div class="fun-panel"><h2>Ansiktsloppan</h2><p>Skapa en loppa med ett ansikte som öppnar och stänger munnen.</p><iframe title="Ansiktsloppan" src="./ansiktsloppan/" allow="camera" style="width:100%;height:1600px;border:0;border-radius:16px;background:#eaf3ff"></iframe><p><a href="./ansiktsloppan/">Öppna Ansiktsloppan på en egen sida</a></p></div>';
  if(funTool==="wheel")return back+window.FPWheel.page();
  if(funTool==="challenge")return back+'<div class="fun-panel"><span class="fun-icon">🎯</span><h2>Rastutmaningar</h2><p>Dra ett kort när ni vill få en ny idé till rasten.</p><div class="fun-result" id="challengeResult">Redo för en utmaning?</div><button class="primary" data-challenge>Ge oss en utmaning!</button></div>';
  if(funTool==="hunt")return back+'<div class="fun-panel"><span class="fun-icon">🗺️</span><h2>Skattjaktsskapare</h2><p>Välj plats och antal ledtrådar så skapar vi en skattjakt att följa.</p><form class="fun-form" id="huntForm"><label>Var ska ni leta?<select name="place"><option>inomhus</option><option>på skolgården</option><option>i gympasalen</option><option>i naturen</option></select></label><label>Antal ledtrådar<select name="count"><option>3</option><option selected>5</option><option>7</option></select></label><button class="primary">Skapa skattjakt</button></form><div id="huntResult"></div></div>';

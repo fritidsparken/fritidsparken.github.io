@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ansiktsloppan – Fritidsparken</title>
+<meta name="description" content="Ansiktsloppan: ta ett foto eller välj en bild, peka ut ögon och mun och skriv ut ett ark som du viker till en loppa där munnen öppnas och stängs. Allt sker i din webbläsare.">
+<link rel="canonical" href="https://fritidsparken.se/ansiktsloppan/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Fritidsparken">
+<meta property="og:locale" content="sv_SE">
+<meta property="og:title" content="Ansiktsloppan – Fritidsparken">
+<meta property="og:description" content="Gör en loppa med ett ansikte på: ta ett foto, skriv ut arket och vik. Munnen öppnas och stängs.">
+<meta property="og:url" content="https://fritidsparken.se/ansiktsloppan/">
+<meta property="og:image" content="https://pluggparken.se/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#E5484D">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/apple-touch-icon.png" sizes="180x180">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EAF3FF;--ink:#1D2B53;--muted:#56668F;--card:#FFFFFF;--line:#C6D6F2;--good:#1E9E5E;--rose:#E5484D;--gold:#F2B707;--font:"Baloo 2","Trebuchet MS",system-ui,sans-serif}
+*{box-sizing:border-box}
+html,body{overflow-x:clip;margin:0;min-height:100%}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:18px;line-height:1.4;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:680px;margin:0 auto;padding:12px 16px 48px}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation;border:0;background:none}
+button:focus-visible,select:focus-visible,input:focus-visible,label:focus-within{outline:3px solid var(--gold);outline-offset:3px}
+[hidden]{display:none !important}
+.vh{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0 0 0 0)}
+.hero{border-radius:24px;padding:20px 20px 18px;background:linear-gradient(135deg,#FF8A5C,#E5484D);color:#fff;box-shadow:0 6px 0 #A82A45;position:relative;overflow:hidden;margin:6px 0 18px}
+.hero h1{margin:0;font-size:2.3rem;line-height:1.05;text-shadow:0 2px 0 rgba(0,0,0,.18)}
+.hero p{margin:6px 0 0;font-weight:600;max-width:17em}
+.hero svg{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:110px;height:110px}
+h2{font-size:1.25rem;margin:18px 0 8px}
+.big2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bigact{background:var(--card);border-radius:22px;padding:20px 10px;text-align:center;box-shadow:0 5px 0 var(--line);font-weight:800;font-size:1.2rem;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;border:3px solid transparent}
+.bigact .em{font-size:2.6rem;line-height:1}
+.bigact small{color:var(--muted);font-weight:600;font-size:.85rem}
+.bigact:active{transform:translateY(4px);box-shadow:0 1px 0 var(--line)}
+.go{display:block;width:100%;margin-top:14px;background:linear-gradient(180deg,#4DDB93,#1E9E5E);color:#fff;border-radius:20px;padding:14px;font-size:1.3rem;font-weight:800;box-shadow:0 5px 0 #157548;text-align:center}
+.go:active{transform:translateY(4px);box-shadow:0 1px 0 #157548}
+.go[disabled]{opacity:.6}
+.pill{background:var(--card);border-radius:999px;padding:8px 18px;font-weight:800;box-shadow:0 3px 0 var(--line);font-size:1rem;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.pill:active{transform:translateY(2px)}
+.pill.on{background:#FFE9A3;box-shadow:0 3px 0 #E0BC4A}
+.acts{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+.link{display:block;margin:14px auto 0;color:var(--muted);font-weight:700;text-decoration:underline;font-size:1rem;text-align:center}
+.card{background:var(--card);border-radius:20px;padding:14px 16px;box-shadow:0 4px 0 var(--line);margin-top:16px}
+.card h2{margin:0 0 8px}
+.priv{margin-top:16px;display:flex;gap:10px;align-items:center;background:var(--card);border-radius:16px;padding:10px 14px;box-shadow:0 3px 0 var(--line);font-weight:600;color:var(--muted);font-size:.92rem}
+.priv b{color:var(--ink)}
+ol.steps{margin:0;padding:0;list-style:none;display:grid;gap:10px;counter-reset:s}
+ol.steps li{counter-increment:s;display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start;font-weight:600}
+ol.steps li::before{content:counter(s);width:34px;height:34px;border-radius:50%;background:var(--rose);color:#fff;display:grid;place-items:center;font-weight:800}
+.say{background:#FFF4CC;border:3px solid var(--gold);border-radius:18px;padding:10px 14px;font-weight:800;font-size:1.15rem;text-align:center;margin-bottom:10px}
+.say small{display:block;font-weight:600;color:var(--muted);font-size:.9rem}
+.stage{position:relative;width:100%;max-width:520px;margin:0 auto;aspect-ratio:1/1;border-radius:18px;overflow:hidden;background:#fff;border:3px solid var(--line);box-shadow:0 4px 0 var(--line)}
+.stage canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.stage canvas.tap{cursor:crosshair}
+.stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);background:#000}
+.stage svg.guide{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.tabs{display:flex;gap:6px;background:#DDE8FB;padding:5px;border-radius:999px;max-width:520px;margin:0 auto 12px}
+.tab{flex:1;border-radius:999px;padding:9px 6px;font-weight:800;font-size:.95rem;color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--card);color:var(--ink);box-shadow:0 2px 0 var(--line)}
+.tab small{display:block;font-weight:600;font-size:.72rem;line-height:1}
+.hint{font-size:.92rem;color:var(--muted);font-weight:600;text-align:center;max-width:520px;margin:10px auto 0}
+.ctl{display:grid;grid-template-columns:70px 1fr 44px;gap:10px;align-items:center;font-weight:700;max-width:520px;margin:10px auto 0}
+.ctl output{color:var(--muted);text-align:right;font-size:.85rem}
+input[type=range]{width:100%;accent-color:var(--rose);height:30px}
+.chk{display:inline-flex;gap:8px;align-items:center;font-weight:700;cursor:pointer}
+.chk input{width:22px;height:22px;accent-color:var(--rose)}
+select{font:inherit;font-weight:700;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:8px 10px;min-height:44px}
+.sw{display:flex;gap:8px;justify-content:center;margin-top:10px}
+.sw button{width:38px;height:38px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px var(--line)}
+.sw button.on{box-shadow:0 0 0 3px var(--ink)}
+.sheetbox canvas{display:block;width:100%;max-width:520px;margin:0 auto;height:auto;border:2px solid var(--line);border-radius:10px;background:#fff}
+.msg{min-height:1.4em;text-align:center;font-weight:700;color:var(--muted);margin-top:8px}
+details.fb{margin-top:10px;text-align:center;color:var(--muted);font-weight:600}
+details.fb img{width:100%;max-width:420px;border:2px solid var(--line);border-radius:8px;margin-top:8px}
+.badge{display:inline-block;font-size:.75rem;font-weight:800;color:var(--muted);background:#DDE8FB;padding:2px 10px;border-radius:99px}
+.mouthbox{max-width:520px;margin:12px auto 0;background:var(--card);border-radius:16px;padding:10px 14px;box-shadow:0 3px 0 var(--line)}
+.mouthbox .tips{font-size:.88rem;color:var(--muted);font-weight:600;margin-top:6px}
+@media(max-width:420px){.bigact{font-size:1.05rem;padding:16px 6px}.hero svg{width:80px;height:80px}.hero h1{font-size:2rem}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header style="padding:12px 16px;background:white;text-align:center"><a href="/" style="color:#20563a;font-weight:800">🌳 Fritidsparken.se</a></header>
+<div class="wrap">
+
+<section id="home" class="screen">
+  <div class="hero"><h1>Ansiktsloppan</h1><p>Gör en loppa med ett ansikte. Munnen öppnas och stängs!</p>
+    <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 8 92 50 50 92 8 50Z" fill="#fff" opacity=".92"/><path d="M50 8V92M8 50H92" stroke="#E5484D" stroke-width="2" stroke-dasharray="4 4" opacity=".6"/><circle cx="36" cy="38" r="6" fill="#1D2B53"/><circle cx="64" cy="38" r="6" fill="#1D2B53"/><path d="M32 56Q50 50 68 56Q50 78 32 56Z" fill="#E5484D"/><path d="M32 56Q50 62 68 56" stroke="#8B1E2E" stroke-width="2" fill="none"/></svg></div>
+  <h2>Börja med en bild på ett ansikte</h2>
+  <div class="big2">
+    <button class="bigact" id="hCam" type="button"><span class="em">📷</span>Ta foto<small>Med hjälplinjer</small></button>
+    <label class="bigact" for="file" id="hPick"><span class="em">🖼️</span>Välj bild<small>Ur bilderna</small></label>
+  </div>
+  <button class="link" id="hDemo" type="button">Prova först med en exempelbild</button>
+  <div class="card"><h2>Så går det till</h2>
+    <ol class="steps"><li>Ta ett foto eller välj en bild.</li><li>Tryck på ett öga, det andra ögat och munnen.</li><li>Skriv ut arket och vik det.</li></ol></div>
+  <div class="priv" role="note"><span aria-hidden="true">🔒</span><span><b>Bilden stannar hos dig.</b> Allt sker i din webbläsare. Inget laddas upp och inget sparas.</span></div>
+</section>
+
+<section id="punkt" class="screen" hidden>
+  <button data-home hidden type="button" onclick="MPLopp.hem()"></button>
+  <div class="say" id="pkSay"></div>
+  <div class="stage"><canvas id="pk" class="tap" width="720" height="720" aria-label="Bilden. Tryck på ögonen och munnen."></canvas></div>
+  <div class="acts"><button class="pill" id="pkUndo" type="button">↶ Ångra</button><button class="pill" id="pkSkip" type="button">Hoppa över</button></div>
+</section>
+
+<section id="kamera" class="screen" hidden>
+  <button data-home hidden type="button" onclick="MPLopp.hem()"></button>
+  <div class="say" id="camSay"></div>
+  <div class="stage"><video id="vid" autoplay playsinline muted></video>
+    <svg class="guide" viewBox="0 0 100 100" aria-hidden="true"><g id="gExt"><ellipse cx="50" cy="43.5" rx="29" ry="37" fill="none" stroke="#fff" stroke-width="1.2" stroke-dasharray="3 2" opacity=".95"/><line x1="24" y1="38" x2="76" y2="38" stroke="#FFE07A" stroke-width="1" stroke-dasharray="2 2"/><line x1="44" y1="65" x2="56" y2="65" stroke="#FFE07A" stroke-width="1"/><line x1="50" y1="60" x2="50" y2="70" stroke="#FFE07A" stroke-width="1"/><circle cx="37" cy="38" r="2" fill="none" stroke="#fff" stroke-width=".8"/><circle cx="63" cy="38" r="2" fill="none" stroke="#fff" stroke-width=".8"/></g><g id="gInt" style="display:none"><ellipse cx="50" cy="50" rx="38" ry="27" fill="none" stroke="#fff" stroke-width="1.2" stroke-dasharray="3 2"/><line x1="10" y1="50" x2="90" y2="50" stroke="#FFE07A" stroke-width="1" stroke-dasharray="2 2"/><line x1="50" y1="40" x2="50" y2="60" stroke="#FFE07A" stroke-width="1"/><circle cx="12" cy="50" r="2" fill="none" stroke="#fff" stroke-width=".8"/><circle cx="88" cy="50" r="2" fill="none" stroke="#fff" stroke-width=".8"/></g></svg></div>
+  <div class="acts"><button class="go" id="camShot" type="button" style="margin-top:0;width:auto;padding:12px 28px">📸 Ta bilden</button><button class="pill" id="camFlip" type="button">🔄 Byt kamera</button><button class="pill" id="camCancel" type="button">Avbryt</button></div>
+  <p class="msg" id="camMsg" role="status"></p>
+</section>
+
+<section id="edit" class="screen" hidden>
+  <button data-home hidden type="button" onclick="MPLopp.hem()"></button>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-ext" aria-selected="true" type="button">Utsida<small>Ansiktet</small></button>
+    <button class="tab" role="tab" id="tab-int" aria-selected="false" type="button">Insida<small>Öppen mun (valfritt)</small></button>
+  </div>
+  <div class="stage"><canvas id="ed" width="640" height="640" aria-label="Förhandsvisning av bilden"></canvas></div>
+  <p class="hint" id="edhint"></p>
+  <div id="swapBox" hidden style="text-align:center;margin:6px 0 10px"><label for="insMode" style="font-weight:800">Insidan visar: </label><select id="insMode"><option value="both">Min mun + färdig bild (hjärna, tänder, tunga)</option><option value="own">Bara min egen mun (som förut)</option><option value="pre">Bara den färdiga bilden</option></select><label class="chk" for="swapInt" id="swapLbl" style="margin-top:6px"><input type="checkbox" id="swapInt">Byt plats mellan de två öppningarna</label></div>
+  <label class="ctl" for="zoom">Zooma <input type="range" id="zoom" min="0.4" max="8" step="0.01" value="1"><output id="zoomv">1,0×</output></label>
+  <label class="ctl" for="hsize" id="hsizeBox" hidden>Huvud <input type="range" id="hsize" min="0.12" max="0.5" step="0.005" value="0.32"><output id="hsizev"></output></label>
+  <label class="ctl" for="fish" id="fishBox" hidden>Fisheye <input type="range" id="fish" min="0" max="1" step="0.05" value="0.4"><output id="fishv"></output></label>
+  <p class="hint" id="hsizeHint" hidden>Åt höger blir ansiktet större och fyller loppan. Åt vänster ryms hela huvudet. Fisheye trycker ihop det yttre så att mer ryms utan att ögon och mun blir små.</p>
+  <div class="acts">
+    <button class="pill" id="eFit" type="button">🎯 Peka ut ögon och mun</button>
+    <label class="pill" for="file">🖼️ Annan bild</label>
+    <button class="pill" id="eCam" type="button">📷 Ta foto</button>
+  </div>
+  <div class="acts"><label class="chk" for="flip"><input type="checkbox" id="flip">Spegelvänd</label><button class="pill" id="clear" type="button">Ta bort bild</button><span class="badge" id="sampleBadge" hidden>Exempelbild</span></div>
+
+  <div class="mouthbox" id="mouthbox">
+    <button class="pill" id="mToggle" type="button" aria-pressed="false">👄 Lägg på en tecknad mun</button>
+    <div id="mOpts" hidden>
+      <label class="ctl" for="msize" style="margin-top:8px">Storlek <input type="range" id="msize" min="0.18" max="0.6" step="0.01" value="0.34"><output id="msizev"></output></label>
+      <div class="sw" id="msw" role="group" aria-label="Färg på munnen"></div>
+    </div>
+    <p class="tips">Det går lika bra med en stängd mun. Det viktiga är att munnens linje ligger på den vågräta linjen.</p>
+  </div>
+
+  <div class="card sheetbox"><h2>Arket du skriver ut</h2>
+    <canvas id="sheet" width="800" height="800" aria-label="Förhandsvisning av utskriftsarket"></canvas>
+    <p class="hint">Bara de fyra hörnen används. De streckade linjerna visar var du viker.</p>
+    <div class="acts"><label for="size" class="hint" style="margin:0">Storlek</label>
+      <select id="size"><option value="20">20 cm</option><option value="15">15 cm</option><option value="10">10 cm</option></select>
+      <label class="chk" for="guides"><input type="checkbox" id="guides" checked>Vikhjälp</label></div>
+    <button class="go" id="dl" type="button">⬇ Ladda ner arket (A4)</button>
+    <p class="msg" id="msg" role="status"></p>
+    <details class="fb" id="fb"><summary>Fungerar inte nedladdningen?</summary><p>Håll ned på bilden och välj Spara.</p><img id="fbimg" alt="Utskriftsark att spara"></details>
+  </div>
+
+  <div class="card"><h2>Så viker du</h2>
+    <ol class="steps">
+      <li>Skriv ut i 100 % (ingen anpassning till sidan) och klipp ut kvadraten vid hörnmärkena.</li>
+      <li>Lägg arket med bilden nedåt. Vik alla fyra hörn in mot mitten.</li>
+      <li>Vänd på det. Vik de fyra hörnen in mot mitten en gång till.</li>
+      <li>Vik på mitten åt båda hållen och vik ut igen.</li>
+      <li>Stick tummar och pekfingrar under de fyra flikarna och tryck ihop. Ansiktet sitter nu utanpå!</li>
+    </ol></div>
+  <div class="priv" role="note"><span aria-hidden="true">🔒</span><span><b>Bilden stannar hos dig.</b> Inget laddas upp och inget sparas.</span></div>
+</section>
+
+<input type="file" id="file" class="vh" accept="image/*">
+</div>
+
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id)};
+function show(id){document.querySelectorAll('.screen').forEach(function(s){s.hidden=s.id!==id});window.scrollTo(0,0);if(window.MPS)MPS.visa(id)}
+
+/* ================= Geometrin: ÄNDRA INTE ================= */
+// Hörnen bildar utsidan, åtta trianglar bildar insidan. Koefficienterna kommer från en vikningssimulering.
+// Varje post: [a:[p,q,r], b:[p2,q2,r2], polygon i bildens koordinater (ex,ey) med y uppåt, -100..100]
+var EXT=[
+  [[0,1,-200],[1,0,200],[[-100,0],[0,0],[0,100],[-100,100]]],
+  [[0,-1,200],[-1,0,200],[[0,0],[100,0],[100,100],[0,100]]],
+  [[0,-1,-200],[-1,0,-200],[[-100,-100],[0,-100],[0,0],[-100,0]]],
+  [[0,1,200],[1,0,-200],[[0,-100],[100,-100],[100,0],[0,0]]]
+];
+var INT=[
+  [[0,-1,200],[1,0,0],[[0,0],[100,0],[100,100]]],
+  [[0,1,200],[-1,0,0],[[0,0],[100,0],[100,-100]]],
+  [[0,1,-200],[-1,0,0],[[0,0],[-100,0],[-100,100]]],
+  [[0,-1,-200],[1,0,0],[[0,0],[-100,0],[-100,-100]]],
+  [[0,1,0],[-1,0,200],[[0,0],[0,100],[100,100]]],
+  [[0,-1,0],[1,0,200],[[0,0],[0,100],[-100,100]]],
+  [[0,-1,0],[1,0,-200],[[0,0],[0,-100],[100,-100]]],
+  [[0,1,0],[-1,0,-200],[[0,0],[0,-100],[-100,-100]]]
+];
+var layers; // deklareras nedan, används av compose
+function iw(i){return i.naturalWidth||i.width} function ih(i){return i.naturalHeight||i.height}
+function renderInto(c,n,L){
+  c.save(); c.setTransform(1,0,0,1,0,0); c.fillStyle='#fff'; c.fillRect(0,0,n,n);
+  if(L.img){
+    var base=n/Math.min(iw(L.img),ih(L.img))*L.zoom;
+    c.translate(n/2+L.x*n,n/2+L.y*n); c.rotate(L.rot*Math.PI/180); c.scale(L.flip?-base:base,base);
+    c.drawImage(L.img,-iw(L.img)/2,-ih(L.img)/2);
+  }
+  c.restore();
+}
+function paint(g,src,table,k,n){
+  var ks=n/200, s=k/ks;
+  table.forEach(function(t){
+    var a=t[0],b=t[1],poly=t[2];
+    g.save();
+    g.setTransform(s*a[0],-s*b[0],-s*a[1],s*b[1],k*(-100*a[0]+100*a[1]+a[2]+200),k*(200+100*b[0]-100*b[1]-b[2]));
+    g.beginPath();
+    poly.forEach(function(p,i){var x=(p[0]+100)*ks,y=(100-p[1])*ks; if(i)g.lineTo(x,y); else g.moveTo(x,y)});
+    g.closePath(); g.clip(); g.drawImage(src,0,0); g.restore();
+  });
+}
+function compose(P,guides){
+  var k=P/400, n=Math.round(200*k);
+  var c=document.createElement('canvas'); c.width=c.height=P; var g=c.getContext('2d');
+  g.fillStyle='#fff'; g.fillRect(0,0,P,P);
+  if(layers.int.img){var ic=document.createElement('canvas'); ic.width=ic.height=n; renderInto(ic.getContext('2d'),n,layers.int); paint(g,ic,INT,k,n);}
+  var ec=document.createElement('canvas'); ec.width=ec.height=n; renderInto(ec.getContext('2d'),n,layers.ext); paint(g,ec,EXT,k,n);
+  if(guides){
+    g.save(); g.strokeStyle='rgba(90,90,90,.55)'; g.lineWidth=Math.max(1,P/600); g.setLineDash([P/60,P/90]);
+    g.beginPath(); g.moveTo(P/2,0); g.lineTo(P,P/2); g.lineTo(P/2,P); g.lineTo(0,P/2); g.closePath(); g.stroke(); g.restore();
+  }
+  return c;
+}
+/* ================= Slut på den ofarliga geometrin ================= */
+
+var ed=$('ed'), sheet=$('sheet');
+var ABST=0.32;   // standard för avståndet från ögonens mitt till munnen, som andel av rutans storlek: 0,32 fyller loppans ruta med ett stort ansikte (som på riktiga loppor); lägre värden ger plats för hela huvudet (ändra här)
+var ABST_MIN=0.12, ABST_MAX=0.5;   // gränser för reglaget Huvudets storlek
+
+function sample(kind){
+  var c=document.createElement('canvas'); c.width=c.height=600; var g=c.getContext('2d');
+  var gr=g.createLinearGradient(0,0,0,600); gr.addColorStop(0,'#E9B99C'); gr.addColorStop(1,'#DDA487');
+  g.fillStyle=gr; g.fillRect(0,0,600,600);
+  if(kind==='int'){   // insidan är bara en stor öppen mun (ögonen sitter på utsidan)
+    g.fillStyle='#C03355'; g.beginPath(); g.ellipse(300,300,285,215,0,0,7); g.fill();
+    g.save(); g.beginPath(); g.ellipse(300,300,232,162,0,0,7); g.clip();
+    g.fillStyle='#4A0F1B'; g.fillRect(0,0,600,600);
+    g.fillStyle='#F7F3EA'; g.fillRect(60,120,480,58);
+    g.fillStyle='#E0708A'; g.beginPath(); g.ellipse(300,420,170,105,0,0,7); g.fill();
+    g.fillStyle='rgba(255,255,255,.18)'; g.beginPath(); g.ellipse(300,396,70,18,0,0,7); g.fill();
+    g.restore();
+    g.strokeStyle='#8B1E2E'; g.lineWidth=14; g.beginPath(); g.ellipse(300,300,285,215,0,0,7); g.stroke();
+    return c;
+  }
+  g.fillStyle='#3B2A26'; g.fillRect(0,0,600,70);
+  function eye(x,y){
+    g.fillStyle='#fff'; g.beginPath(); g.ellipse(x,y,58,30,0,0,7); g.fill();
+    g.fillStyle='#4C7A5B'; g.beginPath(); g.arc(x,y,22,0,7); g.fill();
+    g.fillStyle='#111'; g.beginPath(); g.arc(x,y,11,0,7); g.fill();
+    g.strokeStyle='#3B2A26'; g.lineWidth=10; g.lineCap='round'; g.beginPath(); g.moveTo(x-62,y-52); g.quadraticCurveTo(x,y-70,x+62,y-52); g.stroke();
+  }
+  eye(185,125); eye(415,125);
+  g.fillStyle='rgba(120,60,50,.5)'; g.beginPath(); g.ellipse(275,225,13,9,0,0,7); g.ellipse(325,225,13,9,0,0,7); g.fill();
+  g.fillStyle='#C03355'; g.beginPath(); g.ellipse(300,300,92,44,0,0,7); g.fill();
+  g.strokeStyle='#6E1427'; g.lineWidth=6; g.beginPath(); g.moveTo(212,300); g.lineTo(388,300); g.stroke();
+  g.fillStyle='rgba(255,255,255,.35)'; g.beginPath(); g.ellipse(300,282,40,9,0,0,7); g.fill();
+  return c;
+}
+function mk(kind){return {img:sample(kind),sample:true,x:0,y:0,zoom:1,rot:0,flip:false,kind:kind}}
+layers={ext:mk('ext'),int:mk('int')};
+var cur='ext';
+
+/* ---------- tecknad mun (ritas på utsidans bild innan paint) ---------- */
+var mouth={on:false,size:.34,color:'#C03355'};
+var MCOL=['#C03355','#E0708A','#E8553F','#8E3FA8','#7A1230'];
+function shade(hex,f){var n=parseInt(hex.slice(1),16),r=n>>16,g=n>>8&255,b=n&255;function m(v){return Math.max(0,Math.min(255,Math.round(v*f)))}return 'rgb('+m(r)+','+m(g)+','+m(b)+')'}
+function drawMouth(c,n){
+  var w=n*mouth.size, ht=w*.19, hb=w*.27, cx=n/2, cy=n/2;
+  c.save(); c.translate(cx,cy); c.lineJoin='round'; c.lineCap='round';
+  // underläpp (munlinjen ligger exakt på y = 0, den vågräta vikningen)
+  c.beginPath(); c.moveTo(-w/2,0); c.bezierCurveTo(-w*.36,hb*1.0,-w*.17,hb,0,hb); c.bezierCurveTo(w*.17,hb,w*.36,hb*1.0,w/2,0); c.closePath();
+  c.fillStyle=mouth.color; c.fill();
+  c.fillStyle='rgba(255,255,255,.32)'; c.beginPath(); c.ellipse(0,hb*.45,w*.14,hb*.16,0,0,7); c.fill();
+  // överläpp med amorsbåge
+  c.beginPath(); c.moveTo(-w/2,0); c.bezierCurveTo(-w*.36,-ht*.9,-w*.14,-ht*1.3,0,-ht*.72); c.bezierCurveTo(w*.14,-ht*1.3,w*.36,-ht*.9,w/2,0); c.closePath();
+  c.fillStyle=shade(mouth.color,.86); c.fill();
+  // munlinjen
+  c.strokeStyle=shade(mouth.color,.4); c.lineWidth=Math.max(2,n/120); c.beginPath(); c.moveTo(-w/2,0); c.lineTo(w/2,0); c.stroke();
+  c.restore();
+}
+/* Bilden får aldrig lämna vita kanter: där fotot inte räcker till fylls rutan med en mjukt suddad, utsträckt kopia av fotot.
+   Samma förflyttning, zoom och rotation som renderInto (som är orörd), men bakgrunden ritas först. */
+function mjuk(img){   // liten, mjuk version (nedskalad i två steg) som cachas på bilden
+  if(img._mjuk)return img._mjuk;
+  var a=document.createElement('canvas');a.width=a.height=96;var g=a.getContext('2d');g.imageSmoothingQuality='high';
+  var s=Math.max(96/iw(img),96/ih(img));g.drawImage(img,(96-iw(img)*s)/2,(96-ih(img)*s)/2,iw(img)*s,ih(img)*s);
+  var b=document.createElement('canvas');b.width=b.height=24;var h=b.getContext('2d');h.imageSmoothingQuality='high';h.drawImage(a,0,0,24,24);
+  return img._mjuk=b;
+}
+/* Utvidgning: fotots kanter dras utåt och mjukas upp, så att fortsättningen ser ut som fotot (hår, bakgrund, kropp) i stället för en vit kant. */
+function padOf(img){
+  if(img._pad)return img._pad;
+  var W=iw(img),H=ih(img),m=Math.max(W,H),P=Math.round(m*.55),ps=Math.min(1,2400/(W+2*P));
+  var pw=Math.max(8,Math.round((W+2*P)*ps)),ph=Math.max(8,Math.round((H+2*P)*ps)),pp=Math.round(P*ps),w2=Math.round(W*ps),h2=Math.round(H*ps);
+  var E=document.createElement('canvas');E.width=pw;E.height=ph;var g=E.getContext('2d');g.imageSmoothingQuality='high';
+  var sw=Math.max(2,Math.round(W*.01)),sh=Math.max(2,Math.round(H*.01));   // smala kantremsor som dras ut
+  g.drawImage(img,0,0,sw,H,0,pp,pp,h2);g.drawImage(img,W-sw,0,sw,H,pp+w2,pp,pw-pp-w2,h2);
+  g.drawImage(img,0,0,W,sh,pp,0,w2,pp);g.drawImage(img,0,H-sh,W,sh,pp,pp+h2,w2,ph-pp-h2);
+  g.drawImage(img,0,0,sw,sh,0,0,pp,pp);g.drawImage(img,W-sw,0,sw,sh,pp+w2,0,pw-pp-w2,pp);
+  g.drawImage(img,0,H-sh,sw,sh,0,pp+h2,pp,ph-pp-h2);g.drawImage(img,W-sw,H-sh,sw,sh,pp+w2,pp+h2,pw-pp-w2,ph-pp-h2);
+  var t1=document.createElement('canvas');t1.width=Math.max(4,pw>>4);t1.height=Math.max(4,ph>>4);var a1=t1.getContext('2d');a1.imageSmoothingQuality='high';a1.drawImage(E,0,0,t1.width,t1.height);
+  var t2=document.createElement('canvas');t2.width=Math.max(4,pw>>2);t2.height=Math.max(4,ph>>2);var a2=t2.getContext('2d');a2.imageSmoothingQuality='high';a2.drawImage(t1,0,0,t2.width,t2.height);
+  var Sm=document.createElement('canvas');Sm.width=pw;Sm.height=ph;var s2=Sm.getContext('2d');s2.imageSmoothingQuality='high';s2.drawImage(t2,0,0,pw,ph);
+  s2.drawImage(img,0,0,W,H,pp,pp,w2,h2);   // själva fotot ovanpå den mjuka utvidgningen
+  return img._pad={c:Sm,ps:ps,P:P};
+}
+/* Fisheye: runt munnen (rutans mitt) trycks det yttre ihop, mitten behåller sin storlek. Bilden ritas först på en större duk (M) så att
+   det som trycks in är riktigt bildinnehåll (mer av fotot syns), inte utsmetade kanter. Görs före vikningen, så EXT/INT och vikgeometrin är orörda. */
+var fish=0.4;
+function drawExtM(c,n,L,M){
+  c.save();c.setTransform(1,0,0,1,0,0);c.fillStyle='#fff';c.fillRect(0,0,M,M);
+  if(L.img){
+    c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';c.drawImage(mjuk(L.img),0,0,M,M);   // reserv längst bak
+    var base=n/Math.min(iw(L.img),ih(L.img))*L.zoom,pd=padOf(L.img);
+    c.translate(M/2+L.x*n,M/2+L.y*n);c.rotate(L.rot*Math.PI/180);c.scale(L.flip?-base:base,base);
+    c.drawImage(pd.c,-iw(L.img)/2-pd.P,-ih(L.img)/2-pd.P,pd.c.width/pd.ps,pd.c.height/pd.ps);
+    c.drawImage(L.img,-iw(L.img)/2,-ih(L.img)/2);   // fotot i full skärpa ovanpå
+  }
+  c.restore();
+}
+function renderExt(c,n,L){
+  var k=(L.kind==='ext'&&L.pts)?fish*0.9:0;
+  if(k<=0){drawExtM(c,n,L,n);return}
+  var E=1+2*k,M=Math.ceil(n*E);if(M%2)M++;
+  var t=document.createElement('canvas');t.width=t.height=M;var tc=t.getContext('2d');
+  drawExtM(tc,n,L,M);
+  var S=tc.getImageData(0,0,M,M).data,out=c.createImageData(n,n),D=out.data,R=n/2,Mc=M/2,mm=M-1;
+  for(var y=0;y<n;y++)for(var x=0;x<n;x++){
+    var dx=(x+.5-R)/R,dy=(y+.5-R)/R,f=1+k*(dx*dx+dy*dy);
+    var sx=Mc+dx*f*R-.5,sy=Mc+dy*f*R-.5;
+    if(sx<0)sx=0;else if(sx>mm)sx=mm;if(sy<0)sy=0;else if(sy>mm)sy=mm;
+    var x0=sx|0,y0=sy|0,x1=x0<mm?x0+1:x0,y1=y0<mm?y0+1:y0,fx=sx-x0,fy=sy-y0,i=(y*n+x)*4;
+    var a=(y0*M+x0)*4,b=(y0*M+x1)*4,d=(y1*M+x0)*4,e=(y1*M+x1)*4;
+    for(var q=0;q<4;q++)D[i+q]=(S[a+q]*(1-fx)+S[b+q]*fx)*(1-fy)+(S[d+q]*(1-fx)+S[e+q]*fx)*fy;
+  }
+  c.setTransform(1,0,0,1,0,0);c.putImageData(out,0,0);
+}
+function bake(L,n){var bc=document.createElement('canvas');bc.width=bc.height=n;renderExt(bc.getContext('2d'),n,L);return {img:bc,x:0,y:0,zoom:1,rot:0,flip:false}}
+
+/* ===== Insidans färdiga bild: tänder längs mittsömmen, hjärna överst i mitten, tunga nederst i mitten (som på loppor man ser på film) =====
+   Läge (insMode): 'pre' = bara den färdiga bilden (alla åtta trianglar), 'own' = bara din egen mun (som förut),
+   'both' = din mun i ena öppningen (INT 4–7) och den färdiga bilden i den andra (INT 0–3); "Byt plats" växlar. */
+var insMode='both', swapInt=false, presetCv=null;
+function presetInt(){
+  if(presetCv)return presetCv;
+  var c=document.createElement('canvas');c.width=c.height=600;var g=c.getContext('2d');
+  var bg=g.createRadialGradient(300,300,20,300,300,440);bg.addColorStop(0,'#1B0509');bg.addColorStop(.45,'#5A1220');bg.addColorStop(1,'#8E2238');g.fillStyle=bg;g.fillRect(0,0,600,600);
+  // tungan: skuren, en halva i vardera nedre hörnet
+  [150,450].forEach(function(cx){
+    var tg=g.createRadialGradient(cx,545,10,cx,560,150);tg.addColorStop(0,'#F08AA0');tg.addColorStop(1,'#C24A68');
+    g.fillStyle=tg;g.beginPath();g.ellipse(cx,585,150,105,0,0,7);g.fill();
+    g.fillStyle='rgba(255,255,255,.2)';g.beginPath();g.ellipse(cx-30,525,34,13,-.3,0,7);g.fill();
+  });
+  // tandrader: två rader från varje sida som möts i mitten (brytpunkten), övre tänder pekar ner, undre upp
+  var PHI=17*Math.PI/180;
+  [-1,1].forEach(function(sx){[true,false].forEach(function(up){
+    var dx=sx*Math.cos(PHI),dy=(up?-1:1)*Math.sin(PHI),nx=-dy*sx*(up?-1:1)*0,ny=up?1:-1;
+    // e1 = riktning ut längs raden, e2 = mot tandspetsarna (vinkelrätt, mot mittlinjen)
+    var e2x=-dy*sx*0,e2y=ny; var len=Math.hypot(dx,dy);var e1x=dx/len,e1y=dy/len;
+    // gör e2 vinkelrät mot e1 och pekande mot axeln
+    var px=-e1y,py=e1x; if(py*ny<0){px=-px;py=-py}
+    e2x=px;e2y=py;
+    // ett sammanhängande, mjukt tandkött i stället för en ruta per tand
+    (function(){var r0=0,r1=400,g0=9*1.4,g1=(9+.17*r1)*1.4;
+      function P(r,v){return [300+e1x*r+e2x*v,300+e1y*r+e2y*v]}
+      var a=P(r0,3),b=P(r1,3),c2=P(r1,-g1),d=P(r0,-g0);
+      g.save();g.fillStyle='#E0607C';g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.lineTo(c2[0],c2[1]);g.lineTo(d[0],d[1]);g.closePath();g.fill();
+      g.strokeStyle='rgba(255,190,205,.55)';g.lineWidth=5;g.lineCap='round';g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke();
+      g.restore()})();
+    var r=36;
+    while(r<360){
+      var w=9+0.17*r,h=w*1.25,gum=w*1.4;
+      g.save();g.transform(e1x,e1y,e2x,e2y,300+e1x*r,300+e1y*r);
+      g.shadowColor='rgba(0,0,0,.45)';g.shadowBlur=8;
+      var tg2=g.createLinearGradient(0,0,0,h);tg2.addColorStop(0,'#E8DFCB');tg2.addColorStop(.5,'#FFFFFF');tg2.addColorStop(1,'#F2EAD8');
+      g.fillStyle=tg2;g.beginPath();g.moveTo(-w/2,-2);g.lineTo(w/2,-2);g.lineTo(w/2-w*.1,h*.78);g.quadraticCurveTo(0,h*1.12,-w/2+w*.1,h*.78);g.closePath();g.fill();
+      g.restore();
+      r+=w*1.02;
+    }
+  })});
+  presetCv=c;
+  // hjärnan (uppifrån, två halvor) överst i mitten
+  var hj=new Image();hj.onload=function(){var q=c.getContext('2d');q.save();q.shadowColor='rgba(0,0,0,.55)';q.shadowBlur=22;q.shadowOffsetY=8;var hh=290,ww=hh*hj.naturalWidth/hj.naturalHeight;[150,450].forEach(function(cx){q.drawImage(hj,cx-ww/2,-20,ww,hh)});q.restore();update()};hj.src='hjarna.png';
+  // en riktig bild (insida.jpg, kvadratisk) ersätter ritningen när den finns i mappen
+  var im=new Image();im.onload=function(){var q=c.getContext('2d'),m=Math.min(im.naturalWidth,im.naturalHeight);q.clearRect(0,0,600,600);q.drawImage(im,(im.naturalWidth-m)/2,(im.naturalHeight-m)/2,m,m,0,0,600,600);update()};im.src='insida.jpg';
+  return c;
+}
+function comboInt(n,L){
+  var c=document.createElement('canvas');c.width=c.height=n;var g=c.getContext('2d');
+  function egen(){var u=document.createElement('canvas');u.width=u.height=n;if(L&&L.img)renderInto(u.getContext('2d'),n,L);else{var q=u.getContext('2d');q.fillStyle='#fff';q.fillRect(0,0,n,n)}return u}
+  if(insMode==='pre'){g.drawImage(presetInt(),0,0,n,n);return c}
+  if(insMode==='own'){g.drawImage(egen(),0,0);return c}
+  g.drawImage(presetInt(),0,0,n,n);
+  var ks=n/200,set=swapInt?[0,1,2,3]:[4,5,6,7];
+  g.save();g.beginPath();
+  set.forEach(function(i){INT[i][2].forEach(function(p,j){var x=(p[0]+100)*ks,y=(100-p[1])*ks;if(j)g.lineTo(x,y);else g.moveTo(x,y)});g.closePath()});
+  g.clip();g.drawImage(egen(),0,0);g.restore();return c;
+}
+function composeUt(P,guides){
+  var n=Math.round(200*(P/400)),se=layers.ext,si=layers.int;
+  var be=bake(se,n);
+  if(mouth.on)drawMouth(be.img.getContext('2d'),n);
+  layers.ext=be;
+  layers.int={img:comboInt(n,si.img?bake(si,n):null),x:0,y:0,zoom:1,rot:0,flip:false};
+  try{return compose(P,guides)}finally{layers.ext=se;layers.int=si}
+}
+
+function overlay(c,n,type){
+  var lines=[[n/2,0,n/2,n],[0,n/2,n,n/2]];
+  if(type==='int'){lines.push([0,0,n,n],[n,0,0,n])}
+  c.save(); c.setLineDash([n/50,n/80]); c.lineCap='round';
+  [[n/90,'rgba(0,0,0,.45)'],[n/200,'rgba(255,255,255,.95)']].forEach(function(st){
+    c.lineWidth=st[0]; c.strokeStyle=st[1];
+    lines.forEach(function(l){c.beginPath();c.moveTo(l[0],l[1]);c.lineTo(l[2],l[3]);c.stroke()});
+  });
+  c.restore();
+}
+function drawEditor(){
+  var L=layers[cur], n=ed.width, c=ed.getContext('2d');
+  renderExt(c,n,L);
+  if(!L.img){c.fillStyle='#8a9692'; c.font='700 '+(n/22)+'px sans-serif'; c.textAlign='center'; c.fillText('Ingen bild. Arket lämnas tomt här.',n/2,n/2);}
+  if(cur==='ext'&&mouth.on)drawMouth(c,n);
+  overlay(c,n,cur);
+}
+function drawSheet(){sheet.getContext('2d').drawImage(composeUt(800,$('guides').checked),0,0)}
+var pending=false;
+function update(){if(pending)return;pending=true;requestAnimationFrame(function(){pending=false;drawEditor();drawSheet()})}
+
+function syncCtl(){
+  var L=layers[cur];
+  $('zoom').value=L.zoom; $('flip').checked=L.flip;
+  $('zoomv').textContent=L.zoom.toFixed(1).replace('.',',')+'×';
+  $('sampleBadge').hidden=!(L.sample&&L.img);
+  $('clear').textContent=L.img?'Ta bort bild':'Visa exempel';
+  $('edhint').textContent=cur==='ext'
+    ? 'Dra bilden för att flytta den. Nyp eller använd reglaget för att zooma. Munnen ska ligga där linjerna korsar varandra.'
+    : 'Loppan har två insidor. Den andra öppningen visar en färdig bild med tänder och hjärna, samma för alla. Här väljer du bilden för den första (valfritt): ta ett nära foto av bara en stor öppen mun (inga ögon, de sitter på utsidan). Mungiporna ska ligga på den vågräta linjen och munnens mitt där linjerna korsar varandra.';
+  var hs=cur==='ext'&&!!layers.ext.pts;$('hsizeBox').hidden=!hs;$('fishBox').hidden=!hs;$('fishv').textContent=fish>0?Math.round(fish*100)+' %':'Av';$('hsizeHint').hidden=!hs;
+  if(hs){$('hsize').value=layers.ext.abst;$('hsizev').textContent=layers.ext.abst<.2?'Hela':layers.ext.abst>.38?'Nära':'';}
+  $('swapBox').hidden=cur!=='int';
+  $('eFit').textContent=cur==='ext'?'🎯 Peka ut ögon och mun':'🎯 Peka ut munnen';
+  $('mouthbox').hidden=cur!=='ext';
+  ['ext','int'].forEach(function(k){$('tab-'+k).setAttribute('aria-selected',String(k===cur))});
+}
+$('tab-ext').onclick=function(){cur='ext';syncCtl();update()};
+$('tab-int').onclick=function(){cur='int';syncCtl();update()};
+$('zoom').oninput=function(){layers[cur].zoom=+this.value;syncCtl();update()};
+// passar om utifrån de tre punkterna; vid spegelvändning speglas punkterna så att munnen stannar i mitten och ögonen vågräta
+function refit(L,abst,flip){
+  var W=iw(L.img),pp=L.pts,use=flip?[[W-pp[1][0],pp[1][1]],[W-pp[0][0],pp[0][1]],[W-pp[2][0],pp[2][1]]]:pp;
+  var F=fitLayer(L.img,use,abst);if(!F)return null;F.pts=pp;F.flip=!!flip;F.abst=abst;return F;
+}
+$('flip').onchange=function(){
+  var L=layers[cur];
+  if(cur==='ext'&&L.pts){var F=refit(L,L.abst,this.checked);if(F)layers.ext=F;else L.flip=this.checked}
+  else L.flip=this.checked;
+  syncCtl();update();
+};
+// huvudets storlek: räknar om passningen från de tre punkterna (munnen stannar i mitten, ögonen vågräta)
+$('hsize').oninput=function(){
+  var L=layers.ext;if(!L.pts)return;var F=refit(L,+this.value,L.flip);if(!F)return;
+  layers.ext=F;syncCtl();update();
+};
+$('fish').oninput=function(){fish=+this.value;$('fishv').textContent=fish>0?Math.round(fish*100)+' %':'Av';update()};
+$('guides').onchange=update;
+$('swapInt').onchange=function(){swapInt=this.checked;update()};
+$('insMode').onchange=function(){insMode=this.value;$('swapLbl').style.display=insMode==='both'?'':'none';update()};
+$('clear').onclick=function(){var L=layers[cur];if(L.img){L.img=null;L.sample=false}else{layers[cur]=mk(cur)}syncCtl();update()};
+
+/* mun-val */
+$('msw').innerHTML=MCOL.map(function(c,i){return '<button type="button" data-c="'+c+'" style="background:'+c+'" aria-label="Färg '+(i+1)+'" class="'+(c===mouth.color?'on':'')+'"></button>'}).join('');
+$('msw').onclick=function(e){var b=e.target.closest('[data-c]');if(!b)return;mouth.color=b.dataset.c;[].forEach.call($('msw').children,function(x){x.classList.toggle('on',x===b)});update()};
+$('msize').oninput=function(){mouth.size=+this.value;$('msizev').textContent=Math.round(mouth.size*100)+'%';update()};
+$('msizev').textContent=Math.round(mouth.size*100)+'%';
+$('mToggle').onclick=function(){mouth.on=!mouth.on;this.setAttribute('aria-pressed',String(mouth.on));this.classList.toggle('on',mouth.on);this.textContent=mouth.on?'👄 Tecknad mun på':'👄 Lägg på en tecknad mun';$('mOpts').hidden=!mouth.on;update()};
+
+/* ---------- ladda bild ---------- */
+function toCanvas(im){
+  var w=iw(im),h=ih(im),s=Math.min(1,2400/Math.max(w,h)),c=document.createElement('canvas');
+  c.width=Math.max(1,Math.round(w*s));c.height=Math.max(1,Math.round(h*s));c.getContext('2d').drawImage(im,0,0,c.width,c.height);return c;
+}
+var target='ext';
+function taEmot(img){   // img är en canvas; ansiktet pekas ut när det gäller utsidan
+  if(target==='ext'){startPunkt(img,'ext')}
+  else{startPunkt(img,'int')}
+}
+$('file').onchange=function(){
+  var f=this.files&&this.files[0];if(!f)return;this.value='';
+  var url=URL.createObjectURL(f),im=new Image();
+  im.onload=function(){var c=toCanvas(im);URL.revokeObjectURL(url);pk.cam=false;taEmot(c)};
+  im.onerror=function(){URL.revokeObjectURL(url);alert('Bilden kunde inte läsas. Prova en JPG eller PNG.')};
+  im.src=url;
+};
+$('hPick').onclick=function(){target='ext'};
+document.querySelector('label[for="file"].pill').onclick=function(){target=cur};
+function openEditor(){show('edit');syncCtl();update()}
+$('hDemo').onclick=function(){layers={ext:mk('ext'),int:mk('int')};cur='ext';openEditor()};
+
+/* ---------- tre klick: ögon och mun ---------- */
+var pk={img:null,pts:[],s:1,ox:0,oy:0,mode:'ext'};
+var PKTEXT=[['Tryck på ditt vänstra öga','Mitt i ögat. Det är det som sitter till vänster i bilden.'],['Tryck på det högra ögat','Mitt i ögat.'],['Tryck på munnen','Mitt i, där läpparna möts.']];
+var PKINT=[['Tryck på ena mungipan','Ena hörnet av den öppna munnen.'],['Tryck på den andra mungipan','Det andra hörnet. Ögonen behövs inte här.']];
+function startPunkt(img,mode){pk.img=img;pk.pts=[];pk.mode=mode||'ext';show('punkt');drawPk()}
+function pkMax(){return pk.mode==='int'?2:3}
+function drawPk(){
+  var c=$('pk'),g=c.getContext('2d'),N=c.width,img=pk.img;
+  g.fillStyle='#fff';g.fillRect(0,0,N,N);
+  var s=Math.min(N/iw(img),N/ih(img)),w=iw(img)*s,h=ih(img)*s,ox=(N-w)/2,oy=(N-h)/2;pk.s=s;pk.ox=ox;pk.oy=oy;
+  g.drawImage(img,ox,oy,w,h);
+  pk.pts.forEach(function(p,i){
+    var x=ox+p[0]*s,y=oy+p[1]*s;
+    g.beginPath();g.arc(x,y,N/36,0,7);g.fillStyle='#E5484D';g.fill();g.lineWidth=N/180;g.strokeStyle='#fff';g.stroke();
+    g.fillStyle='#fff';g.font='800 '+(N/28)+'px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(String(i+1),x,y+1);
+  });
+  var d=pk.pts.length,T=pk.mode==='int'?PKINT:PKTEXT,t=T[Math.min(d,T.length-1)];
+  $('pkSay').innerHTML=d<pkMax()?(d+1)+'. '+t[0]+'<small>'+t[1]+'</small>':'Bra!';
+  var omFoto=!d&&pk.cam;$('pkUndo').disabled=!d&&!omFoto;$('pkUndo').textContent=omFoto?'📷 Ta om bilden':'↶ Ångra';
+}
+$('pk').addEventListener('pointerdown',function(e){
+  if(!pk.img||pk.pts.length>=pkMax())return;
+  var r=this.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*this.width,y=(e.clientY-r.top)/r.height*this.height;
+  var ix=(x-pk.ox)/pk.s,iy=(y-pk.oy)/pk.s;
+  if(ix<0||iy<0||ix>iw(pk.img)||iy>ih(pk.img))return;
+  pk.pts.push([ix,iy]);drawPk();e.preventDefault();
+  if(pk.pts.length===pkMax())setTimeout(klarPunkt,250);
+});
+$('pkUndo').onclick=function(){
+  if(!pk.pts.length&&pk.cam){target=pk.mode;facing=facing||'user';fran='home';oppnaKamera();return}   // inga punkter än: ångra = ta om fotot
+  pk.pts.pop();drawPk()};
+$('pkSkip').onclick=function(){applyFit(pk.img,null,pk.mode)};
+// räknar ut flytt, zoom och rotation så att ögonlinjen blir vågrät och munnen hamnar i mitten
+function fitLayer(img,pts,abst){
+  abst=abst||ABST;
+  var L=pts[0],R=pts[1],M=pts[2];
+  var ex=(L[0]+R[0])/2,ey=(L[1]+R[1])/2,dist=Math.hypot(M[0]-ex,M[1]-ey),eye=Math.hypot(R[0]-L[0],R[1]-L[1]);
+  if(eye<4||dist<4)return null;
+  var theta=Math.atan2(R[1]-L[1],R[0]-L[0]),rot=-theta*180/Math.PI;
+  var W=iw(img),H=ih(img),mn=Math.min(W,H);
+  var zoom=Math.min(8,Math.max(.4,abst*mn/dist)),base=zoom*1/mn;   // base i enheter av rutans storlek per bildpunkt
+  var a=rot*Math.PI/180,dx=(M[0]-W/2)*base,dy=(M[1]-H/2)*base;
+  var x=-(Math.cos(a)*dx-Math.sin(a)*dy),y=-(Math.sin(a)*dx+Math.cos(a)*dy);
+  return {img:img,sample:false,x:x,y:y,zoom:zoom,rot:rot,flip:false,kind:'ext',pts:pts,abst:abst};
+}
+// insidan: ena och andra mungipan; munnens mitt hamnar i rutans mitt och mungiporna ligger på den vågräta linjen
+var MUNBREDD=.8;   // munnens bredd som andel av rutans storlek (ändra här)
+function fitMouth(img,pts){
+  var A=pts[0],B=pts[1],dist=Math.hypot(B[0]-A[0],B[1]-A[1]);
+  if(dist<4)return null;
+  var theta=Math.atan2(B[1]-A[1],B[0]-A[0]),rot=-theta*180/Math.PI,W=iw(img),H=ih(img),mn=Math.min(W,H);
+  var zoom=Math.min(8,Math.max(.4,MUNBREDD*mn/dist)),base=zoom/mn,a=rot*Math.PI/180;
+  var Mx=(A[0]+B[0])/2,My=(A[1]+B[1])/2,dx=(Mx-W/2)*base,dy=(My-H/2)*base;
+  return {img:img,sample:false,x:-(Math.cos(a)*dx-Math.sin(a)*dy),y:-(Math.sin(a)*dx+Math.cos(a)*dy),zoom:zoom,rot:rot,flip:false,kind:'int'};
+}
+function klarPunkt(){
+  var L=pk.mode==='int'?fitMouth(pk.img,pk.pts):fitLayer(pk.img,pk.pts);
+  if(!L){pk.pts=[];drawPk();$('pkSay').innerHTML='Punkterna låg för nära varandra<small>Försök igen.</small>';return}
+  applyFit(pk.img,L,pk.mode);
+}
+function applyFit(img,L,mode){
+  mode=mode||'ext';
+  layers[mode]=L||{img:img,sample:false,x:0,y:0,zoom:1,rot:0,flip:false,kind:mode};
+  cur=mode;openEditor();
+}
+$('eFit').onclick=function(){var L=layers[cur];if(!L.img||L.sample){$('edhint').textContent='Välj en egen bild först.';return}target=cur;startPunkt(L.img,cur)};
+
+/* ---------- dra och nyp ---------- */
+var pts=new Map(),lastDist=0;
+ed.addEventListener('pointerdown',function(e){ed.setPointerCapture(e.pointerId);pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pts.size===2){var a=Array.from(pts.values());lastDist=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}ed.style.cursor='grabbing'});
+ed.addEventListener('pointermove',function(e){
+  if(!pts.has(e.pointerId))return;
+  var L=layers[cur],r=ed.getBoundingClientRect(),p=pts.get(e.pointerId);
+  if(pts.size===1){if(L.img){L.x+=(e.clientX-p.x)/r.width;L.y+=(e.clientY-p.y)/r.height}}
+  pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(pts.size===2){var a=Array.from(pts.values()),d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);if(lastDist&&L.img){L.zoom=Math.min(8,Math.max(.4,L.zoom*d/lastDist));syncCtl()}lastDist=d}
+  update();
+});
+function up(e){pts.delete(e.pointerId);lastDist=0;if(!pts.size)ed.style.cursor='grab'}
+ed.addEventListener('pointerup',up);ed.addEventListener('pointercancel',up);
+ed.addEventListener('wheel',function(e){e.preventDefault();var L=layers[cur];L.zoom=Math.min(8,Math.max(.4,L.zoom*Math.exp(-e.deltaY*.001)));syncCtl();update()},{passive:false});
+
+/* ---------- ta foto ---------- */
+var stream=null,facing='user';
+function stoppaKamera(){if(stream){stream.getTracks().forEach(function(t){t.stop()});stream=null}$('vid').srcObject=null}
+function kameraMsg(t){$('camMsg').textContent=t}
+function oppnaKamera(){
+  target=target||'ext';show('kamera');kameraMsg('');
+  var inne=target==='int';$('gExt').style.display=inne?'none':'';$('gInt').style.display=inne?'':'none';   // SVG-element har inget hidden-attribut som egenskap
+  $('camSay').innerHTML=inne?'Öppna munnen stort och ta bara munnen<small>Mungiporna på linjen. Inga ögon i bilden.</small>':'Ställ dig så att ansiktet fyller ovalen<small>Ögonen på linjen. Munnen i mitten av korset.</small>';
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){kameraMsg('Den här webbläsaren kan inte använda kameran. Välj en bild i stället.');return}
+  stoppaKamera();
+  navigator.mediaDevices.getUserMedia({video:{facingMode:facing,width:{ideal:1280},height:{ideal:1280}},audio:false}).then(function(s){
+    stream=s;var v=$('vid');v.style.transform=facing==='user'?'scaleX(-1)':'none';v.srcObject=s;v.play&&v.play().catch(function(){});
+  }).catch(function(err){
+    var n=err&&err.name;
+    kameraMsg(n==='NotAllowedError'||n==='SecurityError'?'Kameran är inte tillåten. Tillåt den i webbläsaren, eller välj en bild i stället.':n==='NotFoundError'||n==='OverconstrainedError'?'Hittar ingen kamera. Välj en bild i stället.':'Kameran kunde inte startas. Välj en bild i stället.');
+  });
+}
+var fran='home';
+$('hCam').onclick=function(){target='ext';facing='user';fran='home';oppnaKamera()};
+$('eCam').onclick=function(){target=cur;facing='user';fran='edit';oppnaKamera()};
+$('camFlip').onclick=function(){facing=facing==='user'?'environment':'user';oppnaKamera()};
+$('camCancel').onclick=function(){stoppaKamera();if(fran==='edit')openEditor();else show('home')};
+$('camShot').onclick=function(){
+  var v=$('vid');if(!stream||!v.videoWidth){kameraMsg('Kameran är inte klar än. Vänta en sekund.');return}
+  var s=Math.min(v.videoWidth,v.videoHeight),c=document.createElement('canvas');c.width=c.height=Math.min(s,1600);
+  c.getContext('2d').drawImage(v,(v.videoWidth-s)/2,(v.videoHeight-s)/2,s,s,0,0,c.width,c.height);   // fotot sparas i rätt riktning (inte spegelvänt)
+  stoppaKamera();pk.cam=true;taEmot(c);
+};
+document.addEventListener('visibilitychange',function(){if(document.hidden)stoppaKamera()});
+addEventListener('pagehide',stoppaKamera);
+function hem(){stoppaKamera();show('home')}
+
+/* ---------- ladda ner: A4 vid 300 dpi ---------- */
+function gorSida(){
+  var cm=+$('size').value,P=Math.round(cm/2.54*300),W=2480,H=3508;
+  var page=document.createElement('canvas');page.width=W;page.height=H;var g=page.getContext('2d');
+  g.fillStyle='#fff';g.fillRect(0,0,W,H);
+  var ox=Math.round((W-P)/2),oy=213;
+  g.drawImage(composeUt(P,$('guides').checked),ox,oy);
+  g.strokeStyle='#444';g.lineWidth=3;g.beginPath();
+  [[ox,oy],[ox+P,oy],[ox,oy+P],[ox+P,oy+P]].forEach(function(c,i){
+    var sx=i%2?1:-1,sy=i<2?-1:1;
+    g.moveTo(c[0]+sx*10,c[1]);g.lineTo(c[0]+sx*46,c[1]);
+    g.moveTo(c[0],c[1]+sy*10);g.lineTo(c[0],c[1]+sy*46);
+  });
+  g.stroke();
+  g.fillStyle='#666';g.font='34px sans-serif';g.textAlign='center';
+  g.fillText('Skriv ut i 100 %. Klipp ut kvadraten vid hörnmärkena. Lägg arket med bilden nedåt när du viker.',W/2,oy+P+120);
+  return page;
+}
+var fbUrl=null;
+$('dl').onclick=function(){
+  var msg=$('msg'),btn=this;msg.textContent='Skapar utskrift …';btn.disabled=true;
+  setTimeout(function(){
+    try{
+      var page=gorSida();
+      page.toBlob(function(blob){
+        btn.disabled=false;
+        if(!blob){msg.textContent='Något gick fel när arket skapades. Prova en mindre storlek.';return}
+        var url=URL.createObjectURL(blob),a=document.createElement('a');
+        a.href=url;a.download='ansiktsloppa.png';document.body.appendChild(a);a.click();a.remove();
+        setTimeout(function(){URL.revokeObjectURL(url)},4000);
+        if(fbUrl)URL.revokeObjectURL(fbUrl);
+        fbUrl=URL.createObjectURL(blob);$('fbimg').src=fbUrl;   // reserv om nedladdningen inte fungerar (t.ex. läsplatta)
+        msg.textContent='Klart! Skriv ut filen i 100 %.';
+      },'image/png');
+    }catch(e){btn.disabled=false;msg.textContent='Något gick fel när arket skapades. Prova en mindre storlek.'}
+  },30);
+};
+
+syncCtl();update();
+window.MPLopp={hem:hem,get layers(){return layers},get mouth(){return mouth},fitLayer:fitLayer,gorSida:gorSida,composeUt:composeUt,compose:compose,startPunkt:startPunkt,get pk(){return pk},toCanvas:toCanvas,sample:sample,renderInto:renderInto,EXT:EXT,INT:INT,ed:ed};
+})();
+</script>
+</body>
+</html>
