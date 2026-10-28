@@ -1,6 +1,6 @@
 (() => {
   const games=[
-    {id:'construction',title:'Byggarbetsplatsen 3D',tag:'DET DÄR BYGGDE JAG!',type:'3D · Byggspel',image:'byggarbetsplatsen/cover.webp',text:'Kör stora byggmaskiner, gräv, lyft och bygg fantastiska saker från grunden!',module:'FPConstruction'},
+    {id:'construction',title:'Byggarbetsplatsen',tag:'DET DÄR BYGGDE JAG!',type:'3D · Byggspel',image:'byggarbetsplatsen/cover.webp',text:'Kör stora byggmaskiner, gräv, lyft och bygg fantastiska saker från grunden!',module:'FPConstruction'},
     {id:'waterpark',title:'Vattenparken',tag:'ETT BLÖTT ÄVENTYR',type:'Äventyr',image:'vattenparken/cover.webp',text:'Åk enorma vattenrutschbanor, samla stjärnor och kasta dig genom vattenparkens galnaste äventyr!',module:'FPWaterpark'},
     {id:'frog',title:'Grodhoppet',tag:'ÖVER VÄGEN!',type:'3D · Äventyr',image:'grodhoppet/cover.webp',text:'Hoppa över vägar, floder och järnvägar och hjälp grodan hela vägen till målet!',module:'FPGrodhoppet'},
     {id:'clinic',title:'Djurkliniken',tag:'SMÅ TASSAR. STOR OMSORG.',type:'Djur & omsorg',image:'djurkliniken/cover.webp',text:'Ta emot åtta gulliga vänner. Undersök, plåstra om, bada och fyll din Djurbok.',module:'FPDjurkliniken'},
