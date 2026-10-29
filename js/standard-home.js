@@ -38,7 +38,7 @@
   const hero = document.createElement('section');
   hero.className = 'std-hero standard-only';
   hero.setAttribute('aria-labelledby','stdTitle');
-  hero.innerHTML = `<img class="std-hero-image" src="./assets/standard/nature-hero.jpg" alt="Barn och en hund vid en trädkoja med utsikt över en svensk sjö" width="1536" height="1024" fetchpriority="high"><div class="std-hero-copy"><h1 id="stdTitle">Fritidsparken.se</h1><p>Aktiviteter, pyssel, spel och inspiration<br>för en rolig fritid!</p><button type="button" class="std-seasonal-cta" hidden></button><form class="std-search" role="search"><label class="std-sr-only" for="standardSearch">Sök bland aktiviteter, spel och färgläggning</label><span class="std-search-leading">${searchIcon}</span><input type="search" id="standardSearch" placeholder="Sök aktivitet, pyssel, spel eller idé..." autocomplete="off"><button type="submit" aria-label="Sök">${searchIcon}</button></form></div>`;
+  hero.innerHTML = `<img class="std-hero-image" src="./assets/standard/nature-hero.jpg" alt="Barn och en hund vid en trädkoja med utsikt över en svensk sjö" width="1536" height="1024" fetchpriority="high"><div class="std-hero-copy"><h1 id="stdTitle">Fritidsparken.se</h1><p>Aktiviteter, pyssel, spel och inspiration<br>för en rolig fritid!</p><form class="std-search" role="search"><label class="std-sr-only" for="standardSearch">Sök bland aktiviteter, spel och färgläggning</label><span class="std-search-leading">${searchIcon}</span><input type="search" id="standardSearch" placeholder="Sök aktivitet, pyssel, spel eller idé..." autocomplete="off"><button type="submit" aria-label="Sök">${searchIcon}</button></form></div>`;
   document.querySelector('main').before(hero);
   const home = document.createElement('div');
   home.id = 'standardHome';home.className = 'standard-only';
@@ -52,6 +52,7 @@
     {id:'clinic',title:'Djurkliniken',image:'djurkliniken/cover.webp',tag:'Djur & omsorg · 8 små vänner'},
     {id:'construction',title:'Byggarbetsplatsen',image:'byggarbetsplatsen/cover.webp',tag:'3D · Bygg & maskiner'}
   ];
+  const shuffle = items => {const result=[...items];for(let i=result.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[result[i],result[j]]=[result[j],result[i]];}return result;};
   const photo = name => {const doc=new DOMParser().parseFromString(createPreview(name),'text/html');return doc.querySelector('img')?.getAttribute('src') || './assets/minifigurscen.jpg';};
   const activityCard = (title,label,src,action,kind='craft') => `<button type="button" class="std-activity-card" ${action}><img src="${esc(src)}" alt="${esc(title)}" loading="lazy" decoding="async"><span class="std-card-copy"><strong>${esc(title)}<span aria-hidden="true">›</span></strong><small class="std-label std-label-${kind}">${esc(label)}</small></span></button>`;
   const sectionHead = (title,cat,symbol) => `<div class="std-section-heading"><h2><span aria-hidden="true">${symbol}</span>${title}</h2><button type="button" data-standard-category="${cat}" ${cat==='Alla'?'data-standard-browse-all':''}>Visa alla <span aria-hidden="true">→</span></button></div>`;
@@ -69,11 +70,11 @@
       activityCard('Minifigurscen','Pyssel',photo('Minifigurscen'),'data-standard-activity="Minifigurscen"','build'),
       activityCard('Stuntcykel – Staden','Spel','./assets/stunt-bike-city-icon.svg','data-standard-game="bike"','game')
     ].join('');
-    // The catalogs have no publication timestamps. Use the last catalog entry
-    // in each requested category rather than inventing recency metadata.
     const season=currentSeason();
-    const newColors=season==='standard'?['Djur','Bilar','Bakverk','Squishy','Vår','Sommar','Höst','Vinter'].map(type=>mandalas.filter(m=>m.type===type).at(-1)).filter(Boolean):mandalas.filter(m=>m.type===(season==='halloween'?'Halloween':'Jul')||m.types?.includes(season==='halloween'?'Halloween':'Jul')).slice(-8);
-    return categoryPanel()+`<section class="std-panel std-popular">${sectionHead('Populära aktiviteter','Alla','★')}<div class="std-popular-grid">${popular}</div></section><div class="std-discover"><section class="std-panel std-games">${sectionHead('Spela direkt i webbläsaren','Spel','🎮')}<div class="std-game-grid">${gameItems.map(g=>`<button type="button" class="std-game-card" data-standard-game="${g.id}"><span class="std-game-art"><img src="./assets/${g.image}?v=game-covers-20261025-1" alt="" loading="lazy"><span class="std-play" aria-hidden="true">▶</span></span><span class="std-game-copy"><small>${g.tag}</small><strong>${g.title}</strong><span>Spela nu →</span></span></button>`).join('')}</div><div class="std-games-note">En liten spelpaus. Ett nytt äventyr. Välj ditt spel!</div></section><section class="std-panel std-coloring">${sectionHead('Nya färgläggningsbilder','Mandala','🖌️')}<div class="std-color-grid">${newColors.map(coloringCard).join('')}</div></section></div><section class="std-inspiration"><div>${icon('bulb')}</div><div><h2>Vad vill ni hitta på idag?</h2><p>En stund att skapa, en lek tillsammans eller något nytt att prova.</p></div><button type="button" data-standard-category="Roliga verktyg">Hitta en idé <span aria-hidden="true">→</span></button></section>`;
+    const colorPool=season==='standard'?mandalas.filter(m=>!['Halloween','Jul'].includes(m.type)&&!m.types?.some(t=>['Halloween','Jul'].includes(t))):mandalas.filter(m=>m.type===(season==='halloween'?'Halloween':'Jul')||m.types?.includes(season==='halloween'?'Halloween':'Jul'));
+    const uniqueColors=[...new Map(colorPool.map(m=>[m.img,m])).values()];
+    const newColors=shuffle(uniqueColors).slice(0,8);
+    return categoryPanel()+`<section class="std-panel std-popular">${sectionHead('Populära aktiviteter','Alla','★')}<div class="std-popular-grid">${popular}</div></section><div class="std-discover"><section class="std-panel std-games">${sectionHead('Spela direkt i webbläsaren','Spel','🎮')}<div class="std-game-grid">${shuffle(gameItems).map(g=>`<button type="button" class="std-game-card" data-standard-game="${g.id}"><span class="std-game-art"><img src="./assets/${g.image}?v=game-covers-20261025-1" alt="" loading="lazy"><span class="std-play" aria-hidden="true">▶</span></span><span class="std-game-copy"><small>${g.tag}</small><strong>${g.title}</strong><span>Spela nu →</span></span></button>`).join('')}</div><div class="std-games-note">En liten spelpaus. Ett nytt äventyr. Välj ditt spel!</div></section><section class="std-panel std-coloring">${sectionHead('Nya färgläggningsbilder','Mandala','🖌️')}<div class="std-color-grid">${newColors.map(coloringCard).join('')}</div></section></div><section class="std-inspiration"><div>${icon('bulb')}</div><div><h2>Vad vill ni hitta på idag?</h2><p>En stund att skapa, en lek tillsammans eller något nytt att prova.</p></div><button type="button" data-standard-category="Roliga verktyg">Hitta en idé <span aria-hidden="true">→</span></button></section>`;
   }
   let presentedSeason = null;
   const results = document.createElement('div');results.className='std-results-heading standard-only';results.setAttribute('aria-live','polite');
@@ -102,8 +103,7 @@
     if(presentedSeason!==season){
       presentedSeason=season;
       home.innerHTML=homeMarkup();
-      const shortcut=document.getElementById('advent-today-shortcut');if(shortcut)home.before(shortcut);
-      const cta=hero.querySelector('.std-seasonal-cta');cta.hidden=season==='standard';cta.textContent=season==='halloween'?'Halloweenpyssel':'Julpyssel';cta.dataset.standardCategory=season==='halloween'?'Halloweenpyssel':'Julpyssel';
+      const shortcut=document.getElementById('advent-today-shortcut');if(shortcut)hero.append(shortcut);
       const pic=hero.querySelector('.std-hero-image');
       pic.src=season==='halloween'?'./assets/embedded/halloween-hero.jpg':season==='christmas'?'./assets/embedded/christmas-hero.jpg':'./assets/standard/nature-hero.jpg';
       pic.alt=season==='halloween'?'Halloweenmiljö':season==='christmas'?'Julmiljö':'Barn och en hund vid en trädkoja med utsikt över en svensk sjö';
