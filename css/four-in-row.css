@@ -2,3 +2,9 @@
 
 /* Keep the full board within a normal laptop viewport. */
 .four-page{max-width:840px}.four-heading{margin-bottom:18px}.four-heading h2 span{display:inline-block;vertical-align:middle;margin:0 0 0 16px;font-size:13px;letter-spacing:3px}.four-arena{padding:18px 32px 16px}.four-match-bar{max-width:460px}.four-board-wrap{max-width:430px}.four-live{margin-top:12px}.four-heading p{font-size:12px}.four-player{padding:9px 13px}.four-bottom{margin-top:7px}@media(max-width:600px){.four-arena{padding:16px 12px}.four-heading h2 span{font-size:10px;margin-left:12px}.four-match-bar,.four-board-wrap{max-width:100%}.four-player{padding:9px 10px}.four-heading{margin-top:8px}.four-heading h2{font-size:37px}.four-modes{margin-top:14px}}
+
+.four-token-layer{overflow:visible;pointer-events:none}
+.four-board{background:radial-gradient(circle at 50% 0,#334f95,#172a5d 76%)}
+.four-arena{background:radial-gradient(circle at 15% 5%,#fff5d8 0,transparent 29%),radial-gradient(circle at 90% 12%,#dcefff 0,transparent 30%),linear-gradient(145deg,#f8fcff,#e6f1f5);box-shadow:0 16px 38px #17395b22}
+.four-drop span{box-shadow:0 3px 0 #ad4141,0 6px 10px #31548033}
+.four-drop[data-player="2"] span{box-shadow:0 3px 0 #bc881e,0 6px 10px #31548033}

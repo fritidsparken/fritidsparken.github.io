@@ -17,7 +17,7 @@
   section.innerHTML=`<div class="advent-snow" aria-hidden="true"></div><header class="advent-heading"><span class="advent-kicker">24 små stunder av julmagi</span><h2 id="advent-title">🎄 Fritidsparkens magiska julkalender</h2><p>En ny lucka varje dag fram till julafton!</p><div class="advent-meta"><span data-count>0 av 24 luckor öppnade</span><span data-countdown></span></div></header><p class="advent-clock" data-clock role="status">Kontrollerar dagens datum…</p><button class="advent-retry advent-preview" type="button">Lås upp alla luckor med kod</button><button class="advent-retry advent-motion-toggle" type="button" aria-pressed="true">Öppningsanimation: på</button><div class="advent-grid" aria-label="Luckor 1 till 24 december"></div><p class="advent-notice" aria-live="polite" aria-atomic="true"></p><button class="advent-retry" type="button" hidden>Kontrollera datum igen</button>`;
   document.querySelector('.hero')?.after(section);
   const todayShortcut=document.createElement('button');todayShortcut.id='advent-today-shortcut';todayShortcut.className='advent-today-shortcut';todayShortcut.type='button';todayShortcut.hidden=true;section.before(todayShortcut);
-  todayShortcut.addEventListener('click',()=>{const door=grid.querySelector('.advent-door[data-day="'+todayShortcut.dataset.day+'"]');if(door)openDoor(door);});
+  todayShortcut.addEventListener('click',()=>openDoor(Number(todayShortcut.dataset.day)));
   const grid=section.querySelector('.advent-grid'),notice=section.querySelector('.advent-notice');
   const ornaments=['❄','✧','🎄','✶','🎁','❄','✦','☃'];
   for(const entry of days){
@@ -93,7 +93,8 @@
   }
   async function openDoor(button){
     if(!isChristmas()||dialog.open)return;
-    const day=Number(button.dataset.day);
+    const day=typeof button==='number'?button:Number(button.dataset.day);
+    if(!Number.isInteger(day)||day<1||day>days.length)return;
     if(!isPreview()&&now()===null){todayShortcut.querySelector('.advent-banner-status').textContent='Kontrollerar datum…';await syncClock();}
     if(!isChristmas())return;
     const timestamp=now();
@@ -148,7 +149,7 @@
   grid.addEventListener('click',e=>{const button=e.target.closest('.advent-door');if(button)openDoor(button);});
   section.querySelector('.advent-retry:not(.advent-preview)').addEventListener('click',syncClock);
   section.querySelector('.advent-preview').addEventListener('click',()=>{
-    if(isPreview()){window.FPChristmasPreview=false;close();render();if(now()===null)syncClock();}
+    if(isPreview()){window.FPChristmasPreview=false;try{sessionStorage.removeItem('fpChristmasPreview');}catch{}close();render();if(now()===null)syncClock();}
     else window.dispatchEvent(new Event('fp:advent-preview-request'));
   });
   window.addEventListener('fp:christmas-preview',()=>{previewOpened=[];close();render();});

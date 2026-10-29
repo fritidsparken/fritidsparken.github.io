@@ -51,8 +51,8 @@
     token.style.left=`${(c+.5)/7*100}%`; token.style.top=`${(r+.5)/6*100}%`;token.dataset.row=r;token.dataset.col=c;
     root.querySelector('#fourTokens').append(token);
     const fall=(r+1)*root.querySelector('#fourBoard').clientHeight/6;
-    const duration=matchMedia('(prefers-reduced-motion: reduce)').matches?70:330+r*55;
-    animation=token.animate([{transform:`translate(-50%,calc(-50% - ${fall}px))`,offset:0},{transform:'translate(-50%,-50%)',offset:.78},{transform:'translate(-50%,calc(-50% - 9px))',offset:.9},{transform:'translate(-50%,-50%)',offset:1}],{duration,easing:'cubic-bezier(.4,0,.8,.5)'});
+    const duration=matchMedia('(prefers-reduced-motion: reduce)').matches?70:650+r*65;
+    animation=token.animate([{transform:`translate(-50%,calc(-50% - ${fall}px))`,offset:0},{transform:'translate(-50%,-50%)',offset:.68,easing:'ease-out'},{transform:'translate(-50%,calc(-50% - 13px))',offset:.82,easing:'ease-in'},{transform:'translate(-50%,-50%)',offset:1}],{duration,easing:'linear'});
     try { await animation.finished; } catch { return; }
     if(ticket!==generation || !root.isConnected)return;
     board[r][c]=p;moves.push({r,c,p});busy=false;
