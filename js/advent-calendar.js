@@ -16,6 +16,8 @@
   section.setAttribute('aria-labelledby','advent-title');
   section.innerHTML=`<div class="advent-snow" aria-hidden="true"></div><header class="advent-heading"><span class="advent-kicker">24 små stunder av julmagi</span><h2 id="advent-title">🎄 Fritidsparkens magiska julkalender</h2><p>En ny lucka varje dag fram till julafton!</p><div class="advent-meta"><span data-count>0 av 24 luckor öppnade</span><span data-countdown></span></div></header><p class="advent-clock" data-clock role="status">Kontrollerar dagens datum…</p><button class="advent-retry advent-preview" type="button">Lås upp alla luckor med kod</button><button class="advent-retry advent-motion-toggle" type="button" aria-pressed="true">Öppningsanimation: på</button><div class="advent-grid" aria-label="Luckor 1 till 24 december"></div><p class="advent-notice" aria-live="polite" aria-atomic="true"></p><button class="advent-retry" type="button" hidden>Kontrollera datum igen</button>`;
   document.querySelector('.hero')?.after(section);
+  const todayShortcut=document.createElement('button');todayShortcut.id='advent-today-shortcut';todayShortcut.className='advent-today-shortcut';todayShortcut.type='button';todayShortcut.hidden=true;section.before(todayShortcut);
+  todayShortcut.addEventListener('click',()=>{const door=grid.querySelector('.advent-door.is-today');if(door)openDoor(door);});
   const grid=section.querySelector('.advent-grid'),notice=section.querySelector('.advent-notice');
   const ornaments=['❄','✧','🎄','✶','🎁','❄','✦','☃'];
   for(const entry of days){
@@ -54,13 +56,16 @@
   }
   function render(){
     section.hidden=!isChristmas();
-    if(!isChristmas()){close();return;}
+    if(!isChristmas()){todayShortcut.hidden=true;close();return;}
     const timestamp=now(),verified=timestamp!==null;
     section.querySelector('.advent-retry:not(.advent-preview):not(.advent-motion-toggle)').hidden=verified||isPreview();
     section.querySelector('.advent-preview').textContent=isPreview()?'Avsluta förhandsvisning':'Lås upp alla luckor med kod';
     section.querySelector('[data-clock]').textContent=isPreview()?'Förhandsvisning · alla 24 luckor är upplåsta':verified?'Datum kontrollerat · svensk tid':'Vi behöver kontrollera dagens datum innan luckorna kan öppnas. Anslut till internet och försök igen.';
     if(verified)progress(timestamp);
     const available=availableDoors(timestamp),activeOpened=isPreview()?previewOpened:opened,p=verified?rules.dateParts(timestamp):null;
+    const hasToday=!!p&&p.month===12&&p.day>=1&&p.day<=24;
+    todayShortcut.hidden=!hasToday;
+    if(hasToday)todayShortcut.innerHTML=`<span aria-hidden="true">🎁</span><span><strong>Dagens lucka: ${p.day} december</strong><small>Öppna dagens överraskning i julkalendern</small></span><span aria-hidden="true">→</span>`;
     const date=p?`${p.year}-${p.month}-${p.day}`:'';
     if(lastDate&&lastDate!==date)close();lastDate=date;
     for(const button of grid.children){

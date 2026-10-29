@@ -149,3 +149,27 @@ body.std-design .std-categories>button>span{max-width:100%;overflow-wrap:anywher
  body.std-design:is(.halloween,.christmas) #stdNavigation{display:none;order:5;flex:0 0 100%;justify-content:flex-start;flex-wrap:wrap;border-top:1px solid #ffffff30;padding-top:10px}
  body.std-design:is(.halloween,.christmas) .menu-open #stdNavigation{display:flex}
 }
+
+/* One horizontal row at every screen size; smaller screens scroll the row. */
+body.std-design .std-categories{display:flex;flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin}
+body.std-design .std-categories>button{flex:1 0 0;min-width:0;flex-direction:column;padding:8px 3px;gap:3px}
+body.std-design .std-categories>button>span{max-width:100%;font-size:clamp(9px,.95vw,14px);line-height:1.1;overflow-wrap:anywhere;hyphens:auto}
+body.std-design .std-categories .std-icon{width:clamp(42px,5vw,72px);height:clamp(42px,5vw,72px)}
+@media(max-width:900px){body.std-design .std-categories>button{flex:0 0 76px;min-height:100px}body.std-design .std-categories>button>span{font-size:10px}}
+body.std-design:is(.halloween,.christmas) .std-hero:after{background:transparent}
+body.std-design.halloween .std-hero-image{filter:none;opacity:1}
+body.std-design.halloween .std-game-copy .std-play,body.std-design.halloween .std-play{background:#b65a13;color:#fff}
+body.std-design.halloween .std-section-heading button,body.std-design.halloween .std-game-copy>span:last-child{color:#f59c3d}
+body.std-design .std-seasonal-cta{border:1px solid #ffd28e;border-radius:999px;padding:9px 22px;margin:2px auto 0;background:#c75e11;color:white;font:800 16px FPStandardNunito,system-ui;box-shadow:0 3px 16px #0007;cursor:pointer;animation:fp-season-pulse 2s ease-in-out infinite}
+body.std-design.christmas .std-seasonal-cta{background:#aa272d;border-color:#f8db90}
+body.std-design .std-seasonal-cta[hidden]{display:none}
+@keyframes fp-season-pulse{50%{transform:scale(1.05);box-shadow:0 3px 22px #f7b24d99}}
+body.std-design .std-seasonal-cta+.std-search{margin-top:12px}
+body.std-design .advent-today-shortcut{width:100%;margin:0 0 14px;padding:12px 18px;border:1px solid #e4c884;border-radius:18px;background:linear-gradient(110deg,#174b37,#8d2933);color:#fff8e8;text-align:left;display:flex;align-items:center;gap:13px;cursor:pointer;box-shadow:0 5px 18px #172b1a30}
+body.std-design .advent-today-shortcut[hidden],body.std-design.std-browsing .advent-today-shortcut{display:none}
+body.std-design .advent-today-shortcut>span:first-child{font-size:30px}
+body.std-design .advent-today-shortcut>span:nth-child(2){flex:1}
+body.std-design .advent-today-shortcut strong,body.std-design .advent-today-shortcut small{display:block}
+body.std-design .advent-today-shortcut strong{font-size:16px}
+body.std-design .advent-today-shortcut small{font-size:12px}
+@media(prefers-reduced-motion:reduce){body.std-design .std-seasonal-cta{animation:none}}

@@ -38,7 +38,7 @@
   const hero = document.createElement('section');
   hero.className = 'std-hero standard-only';
   hero.setAttribute('aria-labelledby','stdTitle');
-  hero.innerHTML = `<img class="std-hero-image" src="./assets/standard/nature-hero.jpg" alt="Barn och en hund vid en trädkoja med utsikt över en svensk sjö" width="1536" height="1024" fetchpriority="high"><div class="std-hero-copy"><h1 id="stdTitle">Fritidsparken.se</h1><p>Aktiviteter, pyssel, spel och inspiration<br>för en rolig fritid!</p><form class="std-search" role="search"><label class="std-sr-only" for="standardSearch">Sök bland aktiviteter, spel och färgläggning</label><span class="std-search-leading">${searchIcon}</span><input type="search" id="standardSearch" placeholder="Sök aktivitet, pyssel, spel eller idé..." autocomplete="off"><button type="submit" aria-label="Sök">${searchIcon}</button></form></div>`;
+  hero.innerHTML = `<img class="std-hero-image" src="./assets/standard/nature-hero.jpg" alt="Barn och en hund vid en trädkoja med utsikt över en svensk sjö" width="1536" height="1024" fetchpriority="high"><div class="std-hero-copy"><h1 id="stdTitle">Fritidsparken.se</h1><p>Aktiviteter, pyssel, spel och inspiration<br>för en rolig fritid!</p><button type="button" class="std-seasonal-cta" hidden></button><form class="std-search" role="search"><label class="std-sr-only" for="standardSearch">Sök bland aktiviteter, spel och färgläggning</label><span class="std-search-leading">${searchIcon}</span><input type="search" id="standardSearch" placeholder="Sök aktivitet, pyssel, spel eller idé..." autocomplete="off"><button type="submit" aria-label="Sök">${searchIcon}</button></form></div>`;
   document.querySelector('main').before(hero);
   const home = document.createElement('div');
   home.id = 'standardHome';home.className = 'standard-only';
@@ -102,6 +102,8 @@
     if(presentedSeason!==season){
       presentedSeason=season;
       home.innerHTML=homeMarkup();
+      const shortcut=document.getElementById('advent-today-shortcut');if(shortcut)home.before(shortcut);
+      const cta=hero.querySelector('.std-seasonal-cta');cta.hidden=season==='standard';cta.textContent=season==='halloween'?'Halloweenpyssel':'Julpyssel';cta.dataset.standardCategory=season==='halloween'?'Halloweenpyssel':'Julpyssel';
       const pic=hero.querySelector('.std-hero-image');
       pic.src=season==='halloween'?'./assets/embedded/halloween-hero.jpg':season==='christmas'?'./assets/embedded/christmas-hero.jpg':'./assets/standard/nature-hero.jpg';
       pic.alt=season==='halloween'?'Halloweenmiljö':season==='christmas'?'Julmiljö':'Barn och en hund vid en trädkoja med utsikt över en svensk sjö';
