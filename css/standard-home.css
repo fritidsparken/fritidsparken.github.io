@@ -244,3 +244,11 @@ body.std-design .std-color-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media(max-width:520px){body.std-design .std-color-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){body.std-design .std-game-card:first-child{grid-column:auto;display:block}body.std-design .std-game-card:first-child .std-game-art{aspect-ratio:1}body.std-design .std-game-card:first-child .std-game-copy{padding:10px}body.std-design .std-game-card:first-child .std-game-copy strong{font-size:14px}}
 @media(min-width:1101px){body.std-design .std-discover{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Keep both site names and their icons matched in every theme. */
+body.std-design .std-plugg{font-size:23px;letter-spacing:-.7px}
+body.std-design .std-plugg img{width:38px;height:38px;border-radius:10px;object-fit:contain}
+@media(max-width:1300px){body.std-design .std-plugg{font-size:20px;gap:7px}body.std-design .std-plugg img{width:32px;height:32px}}
+@media(max-width:1100px){body.std-design .std-plugg{font-size:21px}}
+@media(max-width:760px){body.std-design .std-plugg{font-size:17px;letter-spacing:-.5px}body.std-design .std-plugg img{width:29px;height:29px}}
+@media(max-width:520px){body.std-design .std-plugg{font-size:16px}}
