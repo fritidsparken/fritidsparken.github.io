@@ -140,3 +140,12 @@ body.std-design.christmas .std-categories,body.std-design.christmas .std-panel,b
 body.std-design.christmas .std-categories>button{background:#d9edd9;color:#193b2a}
 body.std-design.christmas .std-categories>button:nth-child(3n){background:#f8ded7;color:#673328}
 @media(min-width:1101px){body.std-design:is(.halloween,.christmas) .std-categories{grid-template-columns:repeat(11,minmax(0,1fr))}}
+
+body.std-design .std-categories>button>span{max-width:100%;overflow-wrap:anywhere}
+@media (min-width:1101px) and (max-width:1550px){
+ body.std-design:is(.halloween,.christmas) .std-topbar{flex-wrap:wrap}
+ body.std-design:is(.halloween,.christmas) .std-menu-toggle{display:flex;margin-left:auto;flex-direction:column;gap:4px;justify-content:center;align-items:center;width:40px;height:40px;border:0;border-radius:12px;background:#ffffff19}
+ body.std-design:is(.halloween,.christmas) .std-menu-toggle span{width:18px;height:2px;background:white;border-radius:3px}
+ body.std-design:is(.halloween,.christmas) #stdNavigation{display:none;order:5;flex:0 0 100%;justify-content:flex-start;flex-wrap:wrap;border-top:1px solid #ffffff30;padding-top:10px}
+ body.std-design:is(.halloween,.christmas) .menu-open #stdNavigation{display:flex}
+}
