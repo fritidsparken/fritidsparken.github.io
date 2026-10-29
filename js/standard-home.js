@@ -46,7 +46,9 @@
     {id:'clinic',title:'Djurkliniken',image:'djurkliniken/cover.webp',tag:'Djur & omsorg · 8 små vänner'},
     {id:'bike',title:'Stuntcykel – Staden',image:'stunt-bike-city-icon.svg',tag:'3D · Fysik & balans'},
     {id:'plane',title:'Flygpilot',image:'plane-pilot-icon.svg',tag:'3D · Flygäventyr'},
-    {id:'four',title:'4 i rad',image:'four-in-row-icon.svg',tag:'Strategi · 1–2 spelare'}
+    {id:'four',title:'4 i rad',image:'four-in-row-icon.svg',tag:'Strategi · 1–2 spelare'},
+    {id:'frog',title:'Grodhoppet',image:'grodhoppet/cover.webp',tag:'Äventyr · Hopp & klurigheter'},
+    {id:'construction',title:'Byggarbetsplatsen',image:'byggarbetsplatsen/cover.webp',tag:'3D · Bygg & maskiner'}
   ];
   const photo = name => {const doc=new DOMParser().parseFromString(createPreview(name),'text/html');return doc.querySelector('img')?.getAttribute('src') || './assets/minifigurscen.jpg';};
   const activityCard = (title,label,src,action,kind='craft') => `<button type="button" class="std-activity-card" ${action}><img src="${esc(src)}" alt="${esc(title)}" loading="lazy" decoding="async"><span class="std-card-copy"><strong>${esc(title)}<span aria-hidden="true">›</span></strong><small class="std-label std-label-${kind}">${esc(label)}</small></span></button>`;
@@ -67,7 +69,7 @@
     ].join('');
     // The catalogs have no publication timestamps. Use the last catalog entry
     // in each requested category rather than inventing recency metadata.
-    const newColors=['Djur','Bilar','Bakverk','Vår','Sommar','Höst','Vinter'].map(type=>mandalas.filter(m=>m.type===type).at(-1)).filter(Boolean);
+    const newColors=['Djur','Bilar','Bakverk','Squishy','Vår','Sommar','Höst','Vinter'].map(type=>mandalas.filter(m=>m.type===type).at(-1)).filter(Boolean);
     return categoryPanel+`<section class="std-panel std-popular">${sectionHead('Populära aktiviteter','Alla','★')}<div class="std-popular-grid">${popular}</div></section><div class="std-discover"><section class="std-panel std-games">${sectionHead('Spela direkt i webbläsaren','Spel','🎮')}<div class="std-game-grid">${gameItems.map(g=>`<button type="button" class="std-game-card" data-standard-game="${g.id}"><span class="std-game-art"><img src="./assets/${g.image}?v=game-covers-20261025-1" alt="" loading="lazy"><span class="std-play" aria-hidden="true">▶</span></span><span class="std-game-copy"><small>${g.tag}</small><strong>${g.title}</strong><span>Spela nu →</span></span></button>`).join('')}</div><div class="std-games-note">En liten spelpaus. Ett nytt äventyr. Välj ditt spel!</div></section><section class="std-panel std-coloring">${sectionHead('Nya färgläggningsbilder','Mandala','🖌️')}<div class="std-color-grid">${newColors.map(coloringCard).join('')}</div></section></div><section class="std-inspiration"><div>${icon('bulb')}</div><div><h2>Vad vill ni hitta på idag?</h2><p>En stund att skapa, en lek tillsammans eller något nytt att prova.</p></div><button type="button" data-standard-category="Roliga verktyg">Hitta en idé <span aria-hidden="true">→</span></button></section>`;
   }
   home.innerHTML = homeMarkup();
