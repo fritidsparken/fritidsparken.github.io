@@ -236,3 +236,10 @@ body.std-design.christmas #stdNavigation button>span{font-size:16px}
 body.christmas .advent-status-dialog .advent-popup{padding:24px}
 body.christmas .advent-status-dialog .advent-status-message{color:#fff5da;font-size:17px;line-height:1.5}
 body.christmas .advent-status-dialog .advent-status-close{border:1px solid #ebcf91;border-radius:12px;background:#a73139;color:#fff;padding:10px 22px;font:700 15px system-ui;cursor:pointer}
+
+/* Matching two-row previews in the home-page panels. */
+body.std-design .std-discover{align-items:stretch}
+body.std-design .std-discover>.std-panel{min-width:0}
+body.std-design .std-color-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:520px){body.std-design .std-color-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){body.std-design .std-game-card:first-child{grid-column:auto;display:block}body.std-design .std-game-card:first-child .std-game-art{aspect-ratio:1}body.std-design .std-game-card:first-child .std-game-copy{padding:10px}body.std-design .std-game-card:first-child .std-game-copy strong{font-size:14px}}
