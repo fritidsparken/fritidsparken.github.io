@@ -120,3 +120,23 @@ body.std-design :is(button,a,input):focus-visible{outline:3px solid #52a960;outl
 @media(max-width:900px) and (orientation:landscape){body.std-design .std-categories>button{font-size:12px;gap:3px}body.std-design .std-categories .std-icon{width:42px;height:42px}}
 
 @media(min-width:1101px){body.std-design .std-categories{grid-template-columns:repeat(10,minmax(0,1fr))}}
+
+/* Seasonal variants share the standard structure while retaining their mood. */
+body.std-design.halloween,body.std-design.christmas{font-family:FPStandardNunito,ui-rounded,system-ui,sans-serif;font-size:16px;line-height:1.5}
+body.std-design.halloween .std-topbar{background:#281712ef;border-color:#bd6b24}
+body.std-design.halloween #stdNavigation button.active{background:#bd5b12}
+body.std-design.halloween .std-hero:after{background:linear-gradient(90deg,#1d100a24,#180b0ac9)}
+body.std-design.halloween .std-hero h1,body.std-design.halloween .std-hero p{color:#fff4e2;text-shadow:0 2px 8px #160906,0 0 22px #160906}
+body.std-design.halloween .std-search button{background:#c86413;border-color:#ef9b3a}
+body.std-design.halloween .std-categories,body.std-design.halloween .std-panel,body.std-design.halloween .std-inspiration{background:#261a18;border-color:#82451d}
+body.std-design.halloween .std-categories>button{background:#ffd8a9;color:#44250f}
+body.std-design.halloween .std-categories>button:nth-child(3n){background:#e8d0f4;color:#321b39}
+body.std-design.christmas .std-topbar{background:#173e30ef;border-color:#d4b86b}
+body.std-design.christmas #stdNavigation button.active{background:#a32929}
+body.std-design.christmas .std-hero:after{background:linear-gradient(90deg,#0a201321,#0b2516bf)}
+body.std-design.christmas .std-hero h1,body.std-design.christmas .std-hero p{color:#fff9e9;text-shadow:0 2px 8px #173827,0 0 22px #173827}
+body.std-design.christmas .std-search button{background:#a32929;border-color:#d94a42}
+body.std-design.christmas .std-categories,body.std-design.christmas .std-panel,body.std-design.christmas .std-inspiration{border-color:#d7bb80}
+body.std-design.christmas .std-categories>button{background:#d9edd9;color:#193b2a}
+body.std-design.christmas .std-categories>button:nth-child(3n){background:#f8ded7;color:#673328}
+@media(min-width:1101px){body.std-design:is(.halloween,.christmas) .std-categories{grid-template-columns:repeat(11,minmax(0,1fr))}}

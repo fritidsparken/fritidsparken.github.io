@@ -3,7 +3,8 @@
 (() => {
   'use strict';
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const isStandard = () => !document.body.matches('.halloween,.christmas');
+  const isStandard = () => true;
+  const currentSeason = () => document.body.classList.contains('halloween') ? 'halloween' : document.body.classList.contains('christmas') ? 'christmas' : 'standard';
   const originalDraw = draw, originalFilters = drawFilters;
   const legacyTop = document.querySelector('.topin');
   const controls = ['theme','seasonPicker','halloweenSound'].map(id => document.getElementById(id));
@@ -13,6 +14,7 @@
   function icon(kind) {
     const id = 'std-icon-' + (++iconId);
     const shapes = {
+      gift:'<rect x="16" y="40" width="68" height="43" rx="6" fill="#c93f3f"/><rect x="12" y="31" width="76" height="14" rx="5" fill="#e7514a"/><path d="M47 31v52h9V31Z" fill="#f6d363"/><path d="M50 30C17 29 31 8 41 15q9 5 9 15Zm0 0C83 29 69 8 59 15q-9 5-9 15Z" fill="none" stroke="#f6d363" stroke-width="6"/>',
       pumpkin:'<path d="M48 26c-4-10 0-17 7-20" fill="none" stroke="#528341" stroke-width="6" stroke-linecap="round"/><ellipse cx="50" cy="57" rx="35" ry="27" fill="#f19b32"/><path d="M50 30c-13 7-13 48 0 54m0-54c13 7 13 48 0 54" fill="none" stroke="#c96c22" stroke-width="3"/><path d="m31 52 7-8 6 8Zm25 0 7-8 6 8ZM32 63q18 17 36 0" fill="#58371f"/>',
       draw:'<rect x="17" y="14" width="60" height="72" rx="7" fill="#fff9e8"/><path d="M29 65q7-22 17-12t20-18" fill="none" stroke="#6db37a" stroke-width="5" stroke-linecap="round"/><path d="m35 65 32-39 8 7-32 39-12 4Z" fill="#edae3f"/><path d="m67 26 5-6 8 7-5 6" fill="#e87978"/>',
       scissors:'<path d="M35 51 70 18 52 61 75 79 68 85Z" fill="#e46656"/><path d="m60 50-37-31 19 43-17 19 8 7Z" fill="#bdccd2"/><circle cx="31" cy="72" r="13" fill="#58ad63"/><circle cx="31" cy="72" r="7" fill="#dff5d6"/><circle cx="65" cy="72" r="13" fill="#62bc72"/><circle cx="65" cy="72" r="7" fill="#dff5d6"/><circle cx="48" cy="54" r="4" fill="#f3f6ef"/>',
@@ -41,7 +43,7 @@
   const home = document.createElement('div');
   home.id = 'standardHome';home.className = 'standard-only';
   document.querySelector('.hero').after(home);
-  const categoryPanel = `<section class="std-categories" aria-label="Utforska kategorier">${categories.map(([label,cat,symbol],i)=>`<button type="button" data-standard-category="${cat}" ${cat==='Alla'?'data-standard-browse-all':''} style="--tile:${palettes[i % palettes.length]}">${icon(symbol)}<span>${label}</span></button>`).join('')}</section>`;
+  const categoryPanel = () => `<section class="std-categories" aria-label="Utforska kategorier">${(currentSeason()==='standard'?categories:[...categories.slice(0,4),currentSeason()==='halloween'?['Halloweenpyssel','Halloweenpyssel','pumpkin']:['Julpyssel','Julpyssel','gift'],...categories.slice(4)]).map(([label,cat,symbol],i)=>`<button type="button" data-standard-category="${cat}" ${cat==='Alla'?'data-standard-browse-all':''} style="--tile:${palettes[i % palettes.length]}">${icon(symbol)}<span>${label}</span></button>`).join('')}</section>`;
   const gameItems = [
     {id:'clinic',title:'Djurkliniken',image:'djurkliniken/cover.webp',tag:'Djur & omsorg · 8 små vänner'},
     {id:'bike',title:'Stuntcykel – Staden',image:'stunt-bike-city-icon.svg',tag:'3D · Fysik & balans'},
@@ -69,10 +71,11 @@
     ].join('');
     // The catalogs have no publication timestamps. Use the last catalog entry
     // in each requested category rather than inventing recency metadata.
-    const newColors=['Djur','Bilar','Bakverk','Squishy','Vår','Sommar','Höst','Vinter'].map(type=>mandalas.filter(m=>m.type===type).at(-1)).filter(Boolean);
-    return categoryPanel+`<section class="std-panel std-popular">${sectionHead('Populära aktiviteter','Alla','★')}<div class="std-popular-grid">${popular}</div></section><div class="std-discover"><section class="std-panel std-games">${sectionHead('Spela direkt i webbläsaren','Spel','🎮')}<div class="std-game-grid">${gameItems.map(g=>`<button type="button" class="std-game-card" data-standard-game="${g.id}"><span class="std-game-art"><img src="./assets/${g.image}?v=game-covers-20261025-1" alt="" loading="lazy"><span class="std-play" aria-hidden="true">▶</span></span><span class="std-game-copy"><small>${g.tag}</small><strong>${g.title}</strong><span>Spela nu →</span></span></button>`).join('')}</div><div class="std-games-note">En liten spelpaus. Ett nytt äventyr. Välj ditt spel!</div></section><section class="std-panel std-coloring">${sectionHead('Nya färgläggningsbilder','Mandala','🖌️')}<div class="std-color-grid">${newColors.map(coloringCard).join('')}</div></section></div><section class="std-inspiration"><div>${icon('bulb')}</div><div><h2>Vad vill ni hitta på idag?</h2><p>En stund att skapa, en lek tillsammans eller något nytt att prova.</p></div><button type="button" data-standard-category="Roliga verktyg">Hitta en idé <span aria-hidden="true">→</span></button></section>`;
+    const season=currentSeason();
+    const newColors=season==='standard'?['Djur','Bilar','Bakverk','Squishy','Vår','Sommar','Höst','Vinter'].map(type=>mandalas.filter(m=>m.type===type).at(-1)).filter(Boolean):mandalas.filter(m=>m.type===(season==='halloween'?'Halloween':'Jul')||m.types?.includes(season==='halloween'?'Halloween':'Jul')).slice(-8);
+    return categoryPanel()+`<section class="std-panel std-popular">${sectionHead('Populära aktiviteter','Alla','★')}<div class="std-popular-grid">${popular}</div></section><div class="std-discover"><section class="std-panel std-games">${sectionHead('Spela direkt i webbläsaren','Spel','🎮')}<div class="std-game-grid">${gameItems.map(g=>`<button type="button" class="std-game-card" data-standard-game="${g.id}"><span class="std-game-art"><img src="./assets/${g.image}?v=game-covers-20261025-1" alt="" loading="lazy"><span class="std-play" aria-hidden="true">▶</span></span><span class="std-game-copy"><small>${g.tag}</small><strong>${g.title}</strong><span>Spela nu →</span></span></button>`).join('')}</div><div class="std-games-note">En liten spelpaus. Ett nytt äventyr. Välj ditt spel!</div></section><section class="std-panel std-coloring">${sectionHead('Nya färgläggningsbilder','Mandala','🖌️')}<div class="std-color-grid">${newColors.map(coloringCard).join('')}</div></section></div><section class="std-inspiration"><div>${icon('bulb')}</div><div><h2>Vad vill ni hitta på idag?</h2><p>En stund att skapa, en lek tillsammans eller något nytt att prova.</p></div><button type="button" data-standard-category="Roliga verktyg">Hitta en idé <span aria-hidden="true">→</span></button></section>`;
   }
-  home.innerHTML = homeMarkup();
+  let presentedSeason = null;
   const results = document.createElement('div');results.className='std-results-heading standard-only';results.setAttribute('aria-live','polite');
   document.getElementById('catalog').before(results);
   function renderSearch(q) {
@@ -92,11 +95,23 @@
   }
   const matchesHoliday=value=>/halloween|mini-jul|jultomte|julgran/i.test(value);
   function syncPresentation() {
-    const standard=isStandard();document.body.classList.toggle('std-design',standard);
-    const target=standard?header.querySelector('.std-controls'):legacyTop;
+    const season=currentSeason();
+    document.body.classList.add('std-design');
+    const target=header.querySelector('.std-controls');
     for(const control of controls)if(control.parentNode!==target)target.append(control);
-    if(!standard){home.hidden=true;results.hidden=true;document.body.classList.remove('std-home','std-browsing');}
-    return standard;
+    if(presentedSeason!==season){
+      presentedSeason=season;
+      home.innerHTML=homeMarkup();
+      const pic=hero.querySelector('.std-hero-image');
+      pic.src=season==='halloween'?'./assets/embedded/halloween-hero.jpg':season==='christmas'?'./assets/embedded/christmas-hero.jpg':'./assets/standard/nature-hero.jpg';
+      pic.alt=season==='halloween'?'Halloweenmiljö':season==='christmas'?'Julmiljö':'Barn och en hund vid en trädkoja med utsikt över en svensk sjö';
+      hero.querySelector('.std-hero-copy p').innerHTML=season==='halloween'?'Kusligt roliga pyssel, spel och aktiviteter<br>för en spännande Halloween!':season==='christmas'?'Julpyssel, spel och aktiviteter<br>för en mysig jul!':'Aktiviteter, pyssel, spel och inspiration<br>för en rolig fritid!';
+      header.querySelector('[data-seasonal-nav]')?.remove();
+      if(season!=='standard'){
+        const b=document.createElement('button');b.type='button';b.dataset.seasonalNav='';b.dataset.standardCategory=season==='halloween'?'Halloweenpyssel':'Julpyssel';b.textContent=season==='halloween'?'🎃 Halloweenpyssel':'🎄 Julpyssel';header.querySelector('#stdNavigation').append(b);
+      }
+    }
+    return true;
   }
   draw=function(){
     if(!syncPresentation()){originalDraw();return;}
@@ -108,7 +123,7 @@
     document.getElementById('standardSearch').value=document.getElementById('search').value;
     if(atHome){window.FPGameHub?.stop();document.getElementById('catalog').innerHTML='';return;}
     results.innerHTML=`<h2>${esc(pearlPage?'Pärlmönster':category==='Mandala'?'Färglägga':category==='Fritidsgympa'?'Rörelse & Fritidsgympa':category==='Alla'?'Alla aktiviteter':category)}</h2><button type="button" data-standard-category="Alla">← Till startsidan</button>`;
-    if(category==='Alla'&&q&&!pearlPage){window.FPGameHub?.stop();renderSearch(q);return;}
+    if(category==='Alla'&&q&&!pearlPage&&currentSeason()==='standard'){window.FPGameHub?.stop();renderSearch(q);return;}
     originalDraw();
   };
   function navigate(cat,scroll=true){
@@ -138,7 +153,7 @@
   });
   // Theme changes run through the existing draw() call. Attribute observation
   // also covers theme changes from extensions without watching catalog churn.
-  new MutationObserver(()=>{if(document.body.classList.contains('std-design')!==isStandard()){drawFilters();draw();}}).observe(document.body,{attributes:true,attributeFilter:['class']});
+  new MutationObserver(()=>{if(!document.body.classList.contains('std-design')||presentedSeason!==currentSeason()){drawFilters();draw();}}).observe(document.body,{attributes:true,attributeFilter:['class']});
   drawFilters();draw();
 })();
 
