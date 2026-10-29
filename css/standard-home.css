@@ -187,3 +187,33 @@ body.std-design .advent-today-shortcut:hover .advent-banner-door{transform:trans
 body.std-design .advent-preview,body.std-design .advent-motion-toggle{display:none}
 @media(max-width:760px){body.std-design .std-hero #advent-today-shortcut{left:4%;top:32%;width:90px;gap:3px}body.std-design .advent-banner-caption{font-size:12px}body.std-design .advent-banner-door strong{font-size:43px}body.std-design .advent-banner-door small,body.std-design .advent-banner-status{font-size:9px}}
 @media(prefers-reduced-motion:reduce){body.std-design .advent-banner-door{transition:none}}
+
+/* Keep the full Halloween illustration visible without enlarging and cropping it. */
+body.std-design.halloween .std-hero{height:clamp(350px,31.5vw,480px);background:#1d0c09}
+body.std-design.halloween .std-hero-image{object-fit:contain;object-position:center top}
+body.std-design.halloween .std-hero-copy{top:clamp(98px,9vw,140px);right:22%;width:48%}
+body.std-design.halloween .std-hero h1{font-size:clamp(37px,5vw,68px)}
+body.std-design.halloween .std-hero p{font-size:clamp(16px,1.5vw,22px)}
+body.std-design.halloween .std-search{margin-top:14px;min-height:52px}
+body.std-design.halloween .std-search button{width:40px;height:40px}
+/* Keep Halloween navigation visible; it can scroll horizontally on a small screen. */
+body.std-design.halloween .std-menu-toggle{display:none}
+body.std-design.halloween #stdNavigation{display:flex;align-items:center;flex-wrap:nowrap;gap:2px}
+body.std-design.halloween #stdNavigation button{font-size:clamp(10px,.85vw,14px);padding:9px 6px;gap:3px}
+body.std-design.halloween #stdNavigation button>span{font-size:16px}
+@media(min-width:1101px){
+ body.std-design.halloween .std-topbar{flex-wrap:nowrap;gap:10px}
+ body.std-design.halloween #stdNavigation{order:0;flex:1;min-width:0;border:0;padding:0;justify-content:flex-end}
+}
+@media(max-width:1100px){
+ body.std-design.halloween .std-topbar{flex-wrap:wrap}
+ body.std-design.halloween #stdNavigation{order:5;flex:0 0 100%;min-width:0;overflow-x:auto;justify-content:flex-start;border-top:1px solid #ffffff30;padding:5px 0 0;scrollbar-width:thin}
+ body.std-design.halloween #stdNavigation button{flex:0 0 auto;font-size:12px;padding:8px}
+}
+@media(max-width:760px){
+ body.std-design.halloween .std-hero{height:400px}
+ body.std-design.halloween .std-hero-image{object-fit:contain;object-position:center top}
+ body.std-design.halloween .std-hero-copy{top:145px;left:5%;right:5%;width:90%}
+ body.std-design.halloween .std-hero h1{font-size:38px;letter-spacing:-1.4px}
+ body.std-design.halloween .std-hero p{font-size:16px}
+}
