@@ -6,7 +6,7 @@
   if(!rules||days?.length!==24)return;
   const key='fpAdventProgress', maxClockAge=10*60*1000;
   let openingId=0,previewOpened=[];
-  let openingMotion=true;try{openingMotion=localStorage.getItem('fpAdventOpeningMotion')!=='off';}catch{}
+  let openingMotion=true;
   const isPreview=()=>window.FPChristmasPreview===true;
   const availableDoors=timestamp=>isPreview()?24:timestamp===null?0:rules.available(timestamp);
   let clock=null, syncing=null, opened=[],year=null,lastDate='',returnFocus=null,revealTimer=null,storageWarning=false;
@@ -17,7 +17,7 @@
   section.innerHTML=`<div class="advent-snow" aria-hidden="true"></div><header class="advent-heading"><span class="advent-kicker">24 små stunder av julmagi</span><h2 id="advent-title">🎄 Fritidsparkens magiska julkalender</h2><p>En ny lucka varje dag fram till julafton!</p><div class="advent-meta"><span data-count>0 av 24 luckor öppnade</span><span data-countdown></span></div></header><p class="advent-clock" data-clock role="status">Kontrollerar dagens datum…</p><button class="advent-retry advent-preview" type="button">Lås upp alla luckor med kod</button><button class="advent-retry advent-motion-toggle" type="button" aria-pressed="true">Öppningsanimation: på</button><div class="advent-grid" aria-label="Luckor 1 till 24 december"></div><p class="advent-notice" aria-live="polite" aria-atomic="true"></p><button class="advent-retry" type="button" hidden>Kontrollera datum igen</button>`;
   document.querySelector('.hero')?.after(section);
   const todayShortcut=document.createElement('button');todayShortcut.id='advent-today-shortcut';todayShortcut.className='advent-today-shortcut';todayShortcut.type='button';todayShortcut.hidden=true;section.before(todayShortcut);
-  todayShortcut.addEventListener('click',()=>{const door=grid.querySelector('.advent-door[data-day="1"]');if(door)openDoor(door);});
+  todayShortcut.addEventListener('click',()=>{const door=grid.querySelector('.advent-door[data-day="'+todayShortcut.dataset.day+'"]');if(door)openDoor(door);});
   const grid=section.querySelector('.advent-grid'),notice=section.querySelector('.advent-notice');
   const ornaments=['❄','✧','🎄','✶','🎁','❄','✦','☃'];
   for(const entry of days){
@@ -64,10 +64,12 @@
     if(verified)progress(timestamp);
     const available=availableDoors(timestamp),activeOpened=isPreview()?previewOpened:opened,p=verified?rules.dateParts(timestamp):null;
     todayShortcut.hidden=false;
-    const firstAvailable=available>=1;
-    todayShortcut.setAttribute('aria-label',`Julkalendern, lucka 1 december, ${firstAvailable?'öppna':'låst'}`);
-    todayShortcut.setAttribute('aria-disabled',String(!firstAvailable));
-    todayShortcut.innerHTML=`<span class="advent-banner-caption">Julkalendern</span><span class="advent-banner-door"><span aria-hidden="true">✦</span><strong>1</strong><small>december</small></span><span class="advent-banner-status">${firstAvailable?'Öppna luckan':'Öppnas 1 december'}</span>`;
+    const bannerDay=p?.month===12?Math.min(24,Math.max(1,p.day)):1;
+    const bannerAvailable=available>=bannerDay;
+    todayShortcut.dataset.day=String(bannerDay);
+    todayShortcut.setAttribute('aria-label',`Julkalendern, lucka ${bannerDay} december, ${bannerAvailable?'öppna':'låst'}`);
+    todayShortcut.setAttribute('aria-disabled',String(!bannerAvailable));
+    todayShortcut.innerHTML=`<span class="advent-banner-caption">Julkalendern</span><span class="advent-banner-door"><span aria-hidden="true">✦</span><strong>${bannerDay}</strong><small>december</small></span><span class="advent-banner-status">${bannerAvailable?'Öppna luckan':verified?'Öppnas 1 december':'Kontrollerar datum…'}</span>`;
     const date=p?`${p.year}-${p.month}-${p.day}`:'';
     if(lastDate&&lastDate!==date)close();lastDate=date;
     for(const button of grid.children){
@@ -96,7 +98,7 @@
     if(timestamp!==null)progress(timestamp);
     if(day>availableDoors(timestamp)){notice.textContent=`Ho ho ho! Den här luckan öppnas först den ${day} december! 🎅`;return;}
     const requestId=++openingId;
-    notice.textContent='';returnFocus=button;
+    notice.textContent='';returnFocus=todayShortcut;
     const entry=days[day-1];image.src=entry.image;image.alt=entry.animal;
     dialog.querySelector('#advent-date').textContent=`${day} december`;
     const separator=entry.message.indexOf(' – ');

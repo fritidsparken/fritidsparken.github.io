@@ -217,3 +217,9 @@ body.std-design.halloween #stdNavigation button>span{font-size:16px}
  body.std-design.halloween .std-hero h1{font-size:38px;letter-spacing:-1.4px}
  body.std-design.halloween .std-hero p{font-size:16px}
 }
+
+/* The calendar remains behind the banner door; only its dialog is shown. */
+body.std-design.christmas #julkalender{display:none}
+body.std-design.christmas .std-hero #advent-today-shortcut{left:19%;top:20%;transform:translateX(-50%);padding-top:9px}
+body.std-design.christmas .advent-banner-caption{position:absolute;z-index:3;top:0;left:50%;transform:translateX(-50%) rotate(-14deg);white-space:nowrap;padding:4px 10px;border:1px solid #fff0bd;border-radius:4px;background:#f0d284;color:#492d1d;font:900 clamp(10px,1vw,13px)/1 FPStandardNunito,system-ui;letter-spacing:.04em;text-shadow:none;box-shadow:0 2px 5px #0008}
+@media(max-width:760px){body.std-design.christmas .std-hero #advent-today-shortcut{left:16%;top:23%;width:90px}body.std-design.christmas .advent-banner-caption{font-size:9px;padding:3px 6px}}
