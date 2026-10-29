@@ -35,7 +35,7 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
   );
   replaceOnce(
     ' if(isSpringTarget)dialog.classList.add("fp-paint-ghost");',
-    ' if(isSpringTarget||isSummerTarget||isAutumnTarget||isWinterTarget||isBakeryTarget)dialog.classList.add("fp-paint-ghost");',
+    ' if(isSpringTarget||isSummerTarget||isAutumnTarget||isWinterTarget||isBakeryTarget)dialog.classList.add("fp-paint-ghost");\n if(["Fotbollsproffs","Fotbollslag","Pokémon","Superhjältar"].includes(mandalas.find(m=>m.title===TARGET&&new URL(m.preview||m.img,location.href).href===new URL(IMAGE,location.href).href)?.type))dialog.classList.add("fp-paint-unified");',
     "summer layout"
   );
   replaceOnce(' let carReferenceImage=null;',
@@ -120,5 +120,6 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
     'status.textContent=(isSummerTarget||isAutumnTarget||isWinterTarget||isBakeryTarget)?"Klart! "+TARGET+" är färglagd enligt färgreferensen. Du kan fortsätta måla eller spara bilden.":isCarTarget?"Klart! "',
     "summer finished status"
   );
+  source=source.replaceAll(".fp-paint-dialog.fp-paint-ghost", ".fp-paint-dialog:is(.fp-paint-ghost,.fp-paint-unified)");
   return source;
 };
