@@ -26,6 +26,9 @@
     button.innerHTML=`<span class="advent-door-inner"><span class="advent-ornament" aria-hidden="true">${ornaments[(entry.day-1)%ornaments.length]}</span><span class="advent-number">${entry.day}</span><span class="advent-door-status">Låst</span><span class="advent-today-star" aria-hidden="true">✦</span></span>`;
     grid.append(button);
   }
+  const noticeDialog=document.createElement('dialog');noticeDialog.className='advent-dialog advent-status-dialog';noticeDialog.innerHTML='<article class="advent-popup"><button type="button" class="advent-close" aria-label="Stäng">×</button><h2>Julkalendern</h2><p class="advent-status-message" role="status"></p><button type="button" class="advent-status-close">Stäng</button></article>';document.body.append(noticeDialog);
+  const showNotice=message=>{if(!isChristmas())return;noticeDialog.querySelector('.advent-status-message').textContent=message;if(!noticeDialog.open)noticeDialog.showModal();noticeDialog.querySelector('.advent-status-close').focus();};
+  noticeDialog.querySelectorAll('.advent-close,.advent-status-close').forEach(b=>b.addEventListener('click',()=>{noticeDialog.close();todayShortcut.focus();}));
   const dialog=document.createElement('dialog');dialog.className='advent-dialog';dialog.classList.toggle('advent-motion-enabled',openingMotion);dialog.setAttribute('aria-labelledby','advent-date');
   dialog.innerHTML=`<article class="advent-popup"><div class="advent-snow" aria-hidden="true"></div><button type="button" class="advent-close" aria-label="Stäng luckan">×</button><h2 id="advent-date"></h2><div class="advent-stage-space"><div class="advent-stage"><div class="advent-light" aria-hidden="true"></div><div class="advent-picture-frame"><div class="advent-animal"><img width="800" height="800" alt="" decoding="async"></div></div><div class="advent-hinge" aria-hidden="true"><span>✦</span><b></b><small>Lite julmagi väntar…</small></div><div class="advent-particles" aria-hidden="true"></div></div></div><div class="advent-copy"><p class="advent-message"></p><p class="advent-answer" id="advent-answer" hidden aria-live="polite"></p><p class="advent-finale" hidden>En riktigt god jul från oss på Fritidsparken! ✨</p><div class="advent-popup-actions"><button type="button" class="advent-show-answer" aria-controls="advent-answer" aria-expanded="false" disabled>Visa svaret</button><button type="button" class="advent-shut">Stäng luckan</button></div></div></article>`;
   document.body.append(dialog);
@@ -56,7 +59,7 @@
   }
   function render(){
     section.hidden=!isChristmas();
-    if(!isChristmas()){todayShortcut.hidden=true;close();return;}
+    if(!isChristmas()){todayShortcut.hidden=true;if(noticeDialog.open)noticeDialog.close();close();return;}
     const timestamp=now(),verified=timestamp!==null;
     section.querySelector('.advent-retry:not(.advent-preview):not(.advent-motion-toggle)').hidden=verified||isPreview();
     section.querySelector('.advent-preview').textContent=isPreview()?'Avsluta förhandsvisning':'Lås upp alla luckor med kod';
@@ -91,12 +94,12 @@
   async function openDoor(button){
     if(!isChristmas()||dialog.open)return;
     const day=Number(button.dataset.day);
-    if(!isPreview()&&now()===null)await syncClock();
+    if(!isPreview()&&now()===null){todayShortcut.querySelector('.advent-banner-status').textContent='Kontrollerar datum…';await syncClock();}
     if(!isChristmas())return;
     const timestamp=now();
-    if(!isPreview()&&timestamp===null){notice.textContent='Vi kunde inte kontrollera datumet. Försök igen när du är ansluten till internet.';return;}
+    if(!isPreview()&&timestamp===null){notice.textContent='Vi kunde inte kontrollera datumet. Försök igen när du är ansluten till internet.';showNotice(notice.textContent);return;}
     if(timestamp!==null)progress(timestamp);
-    if(day>availableDoors(timestamp)){notice.textContent=`Ho ho ho! Den här luckan öppnas först den ${day} december! 🎅`;return;}
+    if(day>availableDoors(timestamp)){notice.textContent=`Ho ho ho! Den här luckan öppnas först den ${day} december! 🎅`;showNotice(notice.textContent);return;}
     const requestId=++openingId;
     notice.textContent='';returnFocus=todayShortcut;
     const entry=days[day-1];image.src=entry.image;image.alt=entry.animal;

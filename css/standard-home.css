@@ -223,3 +223,16 @@ body.std-design.christmas #julkalender{display:none}
 body.std-design.christmas .std-hero #advent-today-shortcut{left:19%;top:20%;transform:translateX(-50%);padding-top:9px}
 body.std-design.christmas .advent-banner-caption{position:absolute;z-index:3;top:0;left:50%;transform:translateX(-50%) rotate(-14deg);white-space:nowrap;padding:4px 10px;border:1px solid #fff0bd;border-radius:4px;background:#f0d284;color:#492d1d;font:900 clamp(10px,1vw,13px)/1 FPStandardNunito,system-ui;letter-spacing:.04em;text-shadow:none;box-shadow:0 2px 5px #0008}
 @media(max-width:760px){body.std-design.christmas .std-hero #advent-today-shortcut{left:16%;top:23%;width:90px}body.std-design.christmas .advent-banner-caption{font-size:9px;padding:3px 6px}}
+
+/* The Christmas door is centered vertically in its side of the banner. */
+body.std-design.christmas .std-hero #advent-today-shortcut{top:50%;left:19%;transform:translate(-50%,-50%)}
+@media(max-width:760px){body.std-design.christmas .std-hero #advent-today-shortcut{top:50%;left:16%;transform:translate(-50%,-50%)}}
+body.std-design.christmas .std-menu-toggle{display:none}
+body.std-design.christmas #stdNavigation{display:flex;align-items:center;flex-wrap:nowrap;gap:2px}
+body.std-design.christmas #stdNavigation button{font-size:clamp(10px,.85vw,14px);padding:9px 6px;gap:3px}
+body.std-design.christmas #stdNavigation button>span{font-size:16px}
+@media(min-width:1101px){body.std-design.christmas .std-topbar{flex-wrap:nowrap;gap:10px}body.std-design.christmas #stdNavigation{order:0;flex:1;min-width:0;border:0;padding:0;justify-content:flex-end}}
+@media(max-width:1100px){body.std-design.christmas .std-topbar{flex-wrap:wrap}body.std-design.christmas #stdNavigation{order:5;flex:0 0 100%;min-width:0;overflow-x:auto;justify-content:flex-start;border-top:1px solid #ffffff30;padding:5px 0 0;scrollbar-width:thin}body.std-design.christmas #stdNavigation button{flex:0 0 auto;font-size:12px;padding:8px}}
+body.christmas .advent-status-dialog .advent-popup{padding:24px}
+body.christmas .advent-status-dialog .advent-status-message{color:#fff5da;font-size:17px;line-height:1.5}
+body.christmas .advent-status-dialog .advent-status-close{border:1px solid #ebcf91;border-radius:12px;background:#a73139;color:#fff;padding:10px 22px;font:700 15px system-ui;cursor:pointer}
