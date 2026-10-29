@@ -45,6 +45,7 @@
   document.querySelector('.hero').after(home);
   const categoryPanel = () => `<section class="std-categories" aria-label="Utforska kategorier">${(currentSeason()==='standard'?categories:[...categories.slice(0,4),currentSeason()==='halloween'?['Halloweenpyssel','Halloweenpyssel','pumpkin']:['Julpyssel','Julpyssel','gift'],...categories.slice(4)]).map(([label,cat,symbol],i)=>`<button type="button" data-standard-category="${cat}" ${cat==='Alla'?'data-standard-browse-all':''} style="--tile:${palettes[i % palettes.length]}">${icon(symbol)}<span>${label}</span></button>`).join('')}</section>`;
   const gameItems = [
+    {id:'bowling',title:'Crazy Bowling',image:'crazy-bowling/cover.svg',tag:'3D · Bowling & galna banor'},
     {id:'frog',title:'Grodhoppet',image:'grodhoppet/cover.webp',tag:'Äventyr · Hopp & klurigheter'},
     {id:'bike',title:'Stuntcykel – Staden',image:'stunt-bike-city-icon.svg',tag:'3D · Fysik & balans'},
     {id:'plane',title:'Flygpilot',image:'plane-pilot-icon.svg',tag:'3D · Flygäventyr'},
