@@ -45,11 +45,11 @@
   document.querySelector('.hero').after(home);
   const categoryPanel = () => `<section class="std-categories" aria-label="Utforska kategorier">${(currentSeason()==='standard'?categories:[...categories.slice(0,4),currentSeason()==='halloween'?['Halloweenpyssel','Halloweenpyssel','pumpkin']:['Julpyssel','Julpyssel','gift'],...categories.slice(4)]).map(([label,cat,symbol],i)=>`<button type="button" data-standard-category="${cat}" ${cat==='Alla'?'data-standard-browse-all':''} style="--tile:${palettes[i % palettes.length]}">${icon(symbol)}<span>${label}</span></button>`).join('')}</section>`;
   const gameItems = [
-    {id:'clinic',title:'Djurkliniken',image:'djurkliniken/cover.webp',tag:'Djur & omsorg · 8 små vänner'},
+    {id:'frog',title:'Grodhoppet',image:'grodhoppet/cover.webp',tag:'Äventyr · Hopp & klurigheter'},
     {id:'bike',title:'Stuntcykel – Staden',image:'stunt-bike-city-icon.svg',tag:'3D · Fysik & balans'},
     {id:'plane',title:'Flygpilot',image:'plane-pilot-icon.svg',tag:'3D · Flygäventyr'},
     {id:'four',title:'4 i rad',image:'four-in-row-icon.svg',tag:'Strategi · 1–2 spelare'},
-    {id:'frog',title:'Grodhoppet',image:'grodhoppet/cover.webp',tag:'Äventyr · Hopp & klurigheter'},
+    {id:'clinic',title:'Djurkliniken',image:'djurkliniken/cover.webp',tag:'Djur & omsorg · 8 små vänner'},
     {id:'construction',title:'Byggarbetsplatsen',image:'byggarbetsplatsen/cover.webp',tag:'3D · Bygg & maskiner'}
   ];
   const photo = name => {const doc=new DOMParser().parseFromString(createPreview(name),'text/html');return doc.querySelector('img')?.getAttribute('src') || './assets/minifigurscen.jpg';};
