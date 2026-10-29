@@ -8,7 +8,7 @@
   const legacyTop = document.querySelector('.topin');
   const controls = ['theme','seasonPicker','halloweenSound'].map(id => document.getElementById(id));
   const palettes = ['#dcf2d6','#ffe5c6','#fff0b6','#ffdeea','#d4efff','#d7f2df','#e9dfff','#e1e4ff','#ffdeeb','#d2f4ee'];
-  const categories = [['Alla','Alla','bulb'],['Skapa','Skapa','scissors'],['Pyssel','Pyssel','palette'],['Färglägga','Mandala','pencils'],['Halloweenpyssel','Halloweenpyssel','pumpkin'],['Klippdockor','Klippdockor','dolls'],['Rita steg-för-steg','Rita steg-för-steg','draw'],['Rast','Rast','ball'],['Fritidsgympa','Fritidsgympa','ball'],['Spel','Spel','game'],['Roliga verktyg','Roliga verktyg','tools']];
+  const categories = [['Alla','Alla','bulb'],['Skapa','Skapa','scissors'],['Pyssel','Pyssel','palette'],['Färglägga','Mandala','pencils'],['Klippdockor','Klippdockor','dolls'],['Rita steg-för-steg','Rita steg-för-steg','draw'],['Rast','Rast','ball'],['Fritidsgympa','Fritidsgympa','ball'],['Spel','Spel','game'],['Roliga verktyg','Roliga verktyg','tools']];
   let iconId = 0, browseAll = false;
   function icon(kind) {
     const id = 'std-icon-' + (++iconId);
