@@ -118,3 +118,5 @@ body.std-design :is(button,a,input):focus-visible{outline:3px solid #52a960;outl
 
 @media(min-width:761px) and (max-width:900px) and (orientation:portrait){body.std-design .std-categories>button{flex-direction:column;min-height:110px}body.std-design .std-categories .std-icon{width:58px;height:58px}}
 @media(max-width:900px) and (orientation:landscape){body.std-design .std-categories>button{font-size:12px;gap:3px}body.std-design .std-categories .std-icon{width:42px;height:42px}}
+
+@media(min-width:1101px){body.std-design .std-categories{grid-template-columns:repeat(11,minmax(0,1fr))}}

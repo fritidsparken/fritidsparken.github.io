@@ -8,11 +8,13 @@
   const legacyTop = document.querySelector('.topin');
   const controls = ['theme','seasonPicker','halloweenSound'].map(id => document.getElementById(id));
   const palettes = ['#dcf2d6','#ffe5c6','#fff0b6','#ffdeea','#d4efff','#d7f2df','#e9dfff','#e1e4ff','#ffdeeb','#d2f4ee'];
-  const categories = [['Skapa','Skapa','scissors'],['Pyssel','Pyssel','palette'],['Färglägga','Mandala','pencils'],['Klippdockor','Klippdockor','dolls'],['Rörelse','Fritidsgympa','ball'],['Spel','Spel','game'],['Roliga verktyg','Roliga verktyg','tools']];
+  const categories = [['Alla','Alla','bulb'],['Skapa','Skapa','scissors'],['Pyssel','Pyssel','palette'],['Färglägga','Mandala','pencils'],['Halloweenpyssel','Halloweenpyssel','pumpkin'],['Klippdockor','Klippdockor','dolls'],['Rita steg-för-steg','Rita steg-för-steg','draw'],['Rast','Rast','ball'],['Fritidsgympa','Fritidsgympa','ball'],['Spel','Spel','game'],['Roliga verktyg','Roliga verktyg','tools']];
   let iconId = 0, browseAll = false;
   function icon(kind) {
     const id = 'std-icon-' + (++iconId);
     const shapes = {
+      pumpkin:'<path d="M48 26c-4-10 0-17 7-20" fill="none" stroke="#528341" stroke-width="6" stroke-linecap="round"/><ellipse cx="50" cy="57" rx="35" ry="27" fill="#f19b32"/><path d="M50 30c-13 7-13 48 0 54m0-54c13 7 13 48 0 54" fill="none" stroke="#c96c22" stroke-width="3"/><path d="m31 52 7-8 6 8Zm25 0 7-8 6 8ZM32 63q18 17 36 0" fill="#58371f"/>',
+      draw:'<rect x="17" y="14" width="60" height="72" rx="7" fill="#fff9e8"/><path d="M29 65q7-22 17-12t20-18" fill="none" stroke="#6db37a" stroke-width="5" stroke-linecap="round"/><path d="m35 65 32-39 8 7-32 39-12 4Z" fill="#edae3f"/><path d="m67 26 5-6 8 7-5 6" fill="#e87978"/>',
       scissors:'<path d="M35 51 70 18 52 61 75 79 68 85Z" fill="#e46656"/><path d="m60 50-37-31 19 43-17 19 8 7Z" fill="#bdccd2"/><circle cx="31" cy="72" r="13" fill="#58ad63"/><circle cx="31" cy="72" r="7" fill="#dff5d6"/><circle cx="65" cy="72" r="13" fill="#62bc72"/><circle cx="65" cy="72" r="7" fill="#dff5d6"/><circle cx="48" cy="54" r="4" fill="#f3f6ef"/>',
       palette:'<path d="M76 62c-5 3-17-9-21 0-4 10 7 14 1 21C44 94 13 79 13 54 13 26 44 12 67 23c25 11 26 30 9 39Z" fill="#f3bb50"/><circle cx="31" cy="42" r="7" fill="#ea6d68"/><circle cx="47" cy="32" r="7" fill="#9d70cf"/><circle cx="66" cy="37" r="7" fill="#6baed9"/><circle cx="28" cy="62" r="7" fill="#66b67b"/><path d="m45 83 31-53 9 5-32 53Z" fill="#b97842"/><path d="M75 33c-4-9 3-18 13-22 0 12-1 22-9 25Z" fill="#3998d1"/>',
       pencils:'<g transform="rotate(17 50 50)"><path d="M16 26h13v57H16Z" fill="#a17ce1"/><path d="m16 26 6-16 7 16Z" fill="#e4bf8a"/><path d="m20 17 2-7 3 7Z" fill="#58456a"/><path d="M33 22h13v61H33Z" fill="#518dcc"/><path d="m33 22 6-16 7 16Z" fill="#e4bf8a"/><path d="M50 26h13v57H50Z" fill="#50ad69"/><path d="m50 26 6-16 7 16Z" fill="#e4bf8a"/><path d="M67 31h13v52H67Z" fill="#efb03b"/><path d="m67 31 6-16 7 16Z" fill="#e4bf8a"/><path d="M20 31v46m17-51v51m17-46v46m17-41v41" stroke="#fff" stroke-opacity=".35" stroke-width="3"/></g>',
@@ -39,7 +41,7 @@
   const home = document.createElement('div');
   home.id = 'standardHome';home.className = 'standard-only';
   document.querySelector('.hero').after(home);
-  const categoryPanel = `<section class="std-categories" aria-label="Utforska kategorier">${categories.map(([label,cat,symbol],i)=>`<button type="button" data-standard-category="${cat}" style="--tile:${palettes[i]}">${icon(symbol)}<span>${label}</span></button>`).join('')}</section>`;
+  const categoryPanel = `<section class="std-categories" aria-label="Utforska kategorier">${categories.map(([label,cat,symbol],i)=>`<button type="button" data-standard-category="${cat}" ${cat==='Alla'?'data-standard-browse-all':''} style="--tile:${palettes[i % palettes.length]}">${icon(symbol)}<span>${label}</span></button>`).join('')}</section>`;
   const gameItems = [
     {id:'clinic',title:'Djurkliniken',image:'djurkliniken/cover.webp',tag:'Djur & omsorg · 8 små vänner'},
     {id:'bike',title:'Stuntcykel – Staden',image:'stunt-bike-city-icon.svg',tag:'3D · Fysik & balans'},
