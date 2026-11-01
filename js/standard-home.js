@@ -8,7 +8,7 @@
   const legacyTop = document.querySelector('.topin');
   const controls = ['theme','seasonPicker','halloweenSound'].map(id => document.getElementById(id));
   const palettes = ['#dcf2d6','#ffe5c6','#fff0b6','#ffdeea','#d4efff','#d7f2df','#e9dfff','#e1e4ff','#ffdeeb','#d2f4ee'];
-  const categories = [['Alla','Alla','bulb'],['Skapa','Skapa','scissors'],['Pyssel','Pyssel','palette'],['Färglägga','Mandala','pencils'],['Klippdockor','Klippdockor','dolls'],['Rita steg-för-steg','Rita steg-för-steg','draw'],['Rastlekar','Rast','ball'],['Rörelse','Fritidsgympa','ball'],['Spel','Spel','game'],['Roliga verktyg','Roliga verktyg','tools']];
+  const categories = [['Alla','Alla','bulb'],['Skapa','Skapa','scissors'],['Pyssel','Pyssel','palette'],['Färglägga','Mandala','pencils'],['Klippdockor','Klippdockor','dolls'],['Rita steg-för-steg','Rita steg-för-steg','draw'],['Rastlekar','Rast','ball'],['Fritidsgympa','Fritidsgympa','gym'],['Spel','Spel','game'],['Roliga verktyg','Roliga verktyg','tools']];
   let iconId = 0, browseAll = false;
   function icon(kind) {
     const id = 'std-icon-' + (++iconId);
@@ -20,6 +20,7 @@
       palette:'<path d="M76 62c-5 3-17-9-21 0-4 10 7 14 1 21C44 94 13 79 13 54 13 26 44 12 67 23c25 11 26 30 9 39Z" fill="#f3bb50"/><circle cx="31" cy="42" r="7" fill="#ea6d68"/><circle cx="47" cy="32" r="7" fill="#9d70cf"/><circle cx="66" cy="37" r="7" fill="#6baed9"/><circle cx="28" cy="62" r="7" fill="#66b67b"/><path d="m45 83 31-53 9 5-32 53Z" fill="#b97842"/><path d="M75 33c-4-9 3-18 13-22 0 12-1 22-9 25Z" fill="#3998d1"/>',
       pencils:'<g transform="rotate(17 50 50)"><path d="M16 26h13v57H16Z" fill="#a17ce1"/><path d="m16 26 6-16 7 16Z" fill="#e4bf8a"/><path d="m20 17 2-7 3 7Z" fill="#58456a"/><path d="M33 22h13v61H33Z" fill="#518dcc"/><path d="m33 22 6-16 7 16Z" fill="#e4bf8a"/><path d="M50 26h13v57H50Z" fill="#50ad69"/><path d="m50 26 6-16 7 16Z" fill="#e4bf8a"/><path d="M67 31h13v52H67Z" fill="#efb03b"/><path d="m67 31 6-16 7 16Z" fill="#e4bf8a"/><path d="M20 31v46m17-51v51m17-46v46m17-41v41" stroke="#fff" stroke-opacity=".35" stroke-width="3"/></g>',
       dolls:'<g fill="#d49654"><circle cx="31" cy="26" r="13"/><circle cx="70" cy="26" r="13"/></g><g fill="#ffdab0"><circle cx="31" cy="30" r="10"/><circle cx="70" cy="30" r="10"/><path d="m19 49-12 15 5 4 16-15m16-4 11 15-5 4-15-15m24-4-10 15 5 4 14-15m14-4 12 15-5 4-16-15M24 72v14h6V72m6 0v14h6V72m22 0v14h6V72m6 0v14h6V72"/></g><path d="m24 42-8 33h29l-8-33Z" fill="#e377a5"/><path d="m64 42-8 33h29l-8-33Z" fill="#f8f1cc"/>',
+      gym:'<circle cx="50" cy="18" r="10" fill="#edaa78"/><path d="M50 31v25M50 38 27 27M50 38 73 27M50 56 30 79M50 56 70 79" fill="none" stroke="#446dad" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 82h66" stroke="#efad47" stroke-width="6" stroke-linecap="round"/><path d="m20 17 3-5m55 5 3-5" stroke="#e98b53" stroke-width="4" stroke-linecap="round"/>',
       ball:'<circle cx="50" cy="49" r="35" fill="#f8faf8"/><path d="m43 34 17 1 7 15-12 13-18-8Z" fill="#34475b"/><path d="m26 22 9 4-7 17-12 1m56-22-7 10 11 15 9-3M21 65l15-2 7 20-10-2m42-15-14 3-1 15 15-10" fill="#34475b"/><path d="m35 26 8 8m24 16 9-3m-39 8-9-12m27 20 6 6" stroke="#c0c9cc" stroke-width="2"/>',
       brick:'<path d="m13 42 37-19 38 20v30L50 91 13 72Z" fill="#58b864"/><path d="m13 42 37 19 38-18-38-20Z" fill="#8cce76"/><path d="M50 61v30l38-18V43Z" fill="#359652"/><g fill="#64b75f"><ellipse cx="37" cy="39" rx="10" ry="5"/><ellipse cx="61" cy="39" rx="10" ry="5"/><path d="M27 31h20v8H27m24-8h20v8H51"/></g><g fill="#a2dc87"><ellipse cx="37" cy="31" rx="10" ry="5"/><ellipse cx="61" cy="31" rx="10" ry="5"/></g>',
       bulb:'<path d="M36 67c0-13-16-17-12-36 5-25 44-25 50 0 5 19-13 25-13 36Z" fill="#f5c43c"/><path d="M36 65h25v15H36Z" fill="#70818b"/><path d="M40 81h17l-3 7h-11Z" fill="#3e5263"/><path d="m43 64-6-22 12 8 12-8-6 22" fill="none" stroke="#fff1a1" stroke-width="3"/><path d="M49 2v8M15 14l6 7M4 42h10m72 0h10M77 17l7-7" stroke="#e9b12e" stroke-width="4" stroke-linecap="round"/>',
@@ -32,7 +33,7 @@
   const searchIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg>';
   const header = document.createElement('header');
   header.className = 'std-header standard-only';
-  header.innerHTML = `<div class="std-topbar"><a class="std-brand" href="#" data-standard-category="Alla"><img src="./assets/fritidsparken-logo.jpg" alt="" width="38" height="38">Fritidsparken.se</a><a class="std-plugg" href="https://pluggparken.se/"><img src="./assets/pluggparken-icon.svg" alt="" width="38" height="38"> Pluggparken.se</a><button class="std-menu-toggle" aria-expanded="false" aria-controls="stdNavigation" aria-label="Öppna huvudmenyn"><span></span><span></span><span></span></button><nav id="stdNavigation" aria-label="Huvudmeny">${[['Hem','Alla','⌂'],['Skapa','Skapa','✂'],['Pyssel','Pyssel','◉'],['Färglägga','Mandala','✎'],['Rörelse','Fritidsgympa','↗'],['Spel','Spel','⊞'],['Roliga verktyg','Roliga verktyg','⚒']].map(([label,cat,symbol])=>`<button type="button" data-standard-category="${cat}"><span aria-hidden="true">${symbol}</span>${label}</button>`).join('')}</nav><button type="button" class="std-header-search" aria-label="Sök aktiviteter">${searchIcon}</button><div class="std-controls"></div></div>`;
+  header.innerHTML = `<div class="std-topbar"><a class="std-brand" href="#" data-standard-category="Alla"><img src="./assets/fritidsparken-logo.jpg" alt="" width="38" height="38">Fritidsparken.se</a><a class="std-plugg" href="https://pluggparken.se/"><img src="./assets/pluggparken-icon.svg" alt="" width="38" height="38"> Pluggparken.se</a><button class="std-menu-toggle" aria-expanded="false" aria-controls="stdNavigation" aria-label="Öppna huvudmenyn"><span></span><span></span><span></span></button><nav id="stdNavigation" aria-label="Huvudmeny">${[['Hem','Alla','⌂'],['Skapa','Skapa','✂'],['Pyssel','Pyssel','◉'],['Färglägga','Mandala','✎'],['Fritidsgympa','Fritidsgympa','↗'],['Spel','Spel','⊞'],['Roliga verktyg','Roliga verktyg','⚒']].map(([label,cat,symbol])=>`<button type="button" data-standard-category="${cat}"><span aria-hidden="true">${symbol}</span>${label}</button>`).join('')}</nav><button type="button" class="std-header-search" aria-label="Sök aktiviteter">${searchIcon}</button><div class="std-controls"></div></div>`;
   document.body.prepend(header);
   const hero = document.createElement('section');
   hero.className = 'std-hero standard-only';
@@ -58,7 +59,7 @@
       activityCard('Toarullefigurer','Pyssel',photo('Toarullefigurer'),'data-standard-activity="Toarullefigurer"'),
       activityCard('Pärlmönster','Pyssel',photo('Pärlmönster'),'data-standard-pearl'),
       activityCard('Rita steg för steg','Färglägga','./assets/standard/drawing-step-cover.jpg','data-standard-category="Rita steg-för-steg"','color'),
-      activityCard('Hinderbana','Rörelse','./assets/'+obstacle.image,'data-standard-gym="'+esc(obstacle.name)+'"','move'),
+      activityCard('Hinderbana','Fritidsgympa','./assets/'+obstacle.image,'data-standard-gym="'+esc(obstacle.name)+'"','move'),
       activityCard('Minifigurscen','Pyssel',photo('Minifigurscen'),'data-standard-activity="Minifigurscen"','build')
     ].join('');
     const season=currentSeason();
@@ -82,7 +83,7 @@
     const count=act.filter(a=>a[1]!=='Spel').length+games.length+gym.length+colors.length+drawings.length+dolls.length+tools.length;
     results.innerHTML=`<h2>${count} ${count===1?'träff':'träffar'} för ”${esc(document.getElementById('search').value)}”</h2><button type="button" data-standard-category="Alla">Rensa sökning ×</button>`;
     const activityHtml=act.filter(a=>a[1]!=='Spel').map(a=>activityCard(a[2],a[1],photo(a[2]),a[1]==='Spel'?`data-standard-game="${a[2]==='4 i rad'?'four':a[2].startsWith('Flygpilot')?'plane':'bike'}"`:a[2]==='Pärlmönster'?'data-standard-pearl':`data-standard-activity="${esc(a[2])}"`)).join('');
-    const gymHtml=gym.map(g=>activityCard(g.name,'Rörelse','./assets/'+g.image,`data-standard-gym="${esc(g.name)}"`)).join('');
+    const gymHtml=gym.map(g=>activityCard(g.name,'Fritidsgympa','./assets/'+g.image,`data-standard-gym="${esc(g.name)}"`)).join('');
     const drawingHtml=drawings.map(a=>activityCard('Rita '+a.name,'Rita steg för steg','./assets/drawing-guides/'+(drawingGuideAsset[a.id]||a.id+'.png'),`data-standard-drawing="${esc(a.id)}"`)).join('');
     document.getElementById('catalog').innerHTML=count?`<div class="std-collection-grid">${games.map(g=>activityCard(g.title,'Spel','./assets/'+g.image,`data-standard-game="${g.id}"`,'game')).join('')}${activityHtml}${gymHtml}${drawingHtml}${dolls.map(m=>activityCard(m.title,'Klippdockor',m.img,'data-standard-category="Klippdockor"')).join('')}${tools.map(t=>activityCard(t.name,'Roliga verktyg','./assets/'+t.image,`data-standard-tool="${esc(t.key)}"`)).join('')}</div>${colors.length?'<h3 class="std-search-subtitle">Färgläggningsbilder</h3><div class="std-search-color-grid">'+colors.map(coloringCard).join('')+'</div>':''}`:'<p class="empty">Inga träffar ännu. Prova exempelvis katt, pärlor eller flygpilot.</p>';
   }
@@ -120,7 +121,7 @@
     header.querySelectorAll('[data-standard-category]').forEach(b=>{const active=b.dataset.standardCategory===category;b.classList.toggle('active',active);if(b.tagName==='BUTTON')b.setAttribute('aria-current',active?'page':'false');});
     document.getElementById('standardSearch').value=document.getElementById('search').value;
     if(atHome){window.FPGameHub?.stop();document.getElementById('catalog').innerHTML='';return;}
-    results.innerHTML=`<h2>${esc(pearlPage?'Pärlmönster':category==='Mandala'?'Färglägga':category==='Fritidsgympa'?'Rörelse & Fritidsgympa':category==='Alla'?'Alla aktiviteter':category)}</h2><button type="button" data-standard-category="Alla">← Till startsidan</button>`;
+    results.innerHTML=`<h2>${esc(pearlPage?'Pärlmönster':category==='Mandala'?'Färglägga':category==='Fritidsgympa'?'Fritidsgympa':category==='Alla'?'Alla aktiviteter':category)}</h2><button type="button" data-standard-category="Alla">← Till startsidan</button>`;
     if(category==='Alla'&&q&&!pearlPage){window.FPGameHub?.stop();renderSearch(q);return;}
     originalDraw();
   };
