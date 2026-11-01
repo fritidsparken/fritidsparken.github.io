@@ -74,7 +74,7 @@
     ].join('');
     const season=currentSeason();
     const colorPool=season==='standard'?mandalas.filter(m=>!['Halloween','Jul'].includes(m.type)&&!m.types?.some(t=>['Halloween','Jul'].includes(t))):mandalas.filter(m=>m.type===(season==='halloween'?'Halloween':'Jul')||m.types?.includes(season==='halloween'?'Halloween':'Jul'));
-    const uniqueColors=[...new Map(colorPool.map(m=>[m.img,m])).values()];
+    const uniqueColors=[...new Map(colorPool.filter(m=>m.preview||m.img).map(m=>[m.preview||m.img,m])).values()];
     const newColors=shuffle(uniqueColors).slice(0,6);
     return categoryPanel()+`<section class="std-panel std-popular">${sectionHead('Populära aktiviteter','Alla','★')}<div class="std-popular-grid">${popular}</div></section><div class="std-discover"><section class="std-panel std-games">${sectionHead('Spela direkt i webbläsaren','Spel','🎮')}<div class="std-game-grid">${shuffle(gameItems).slice(0,6).map(g=>`<button type="button" class="std-game-card" data-standard-game="${g.id}"><span class="std-game-art"><img src="./assets/${g.image}?v=game-covers-20261025-1" alt="" loading="lazy"><span class="std-play" aria-hidden="true">▶</span></span><span class="std-game-copy"><small>${g.tag}</small><strong>${g.title}</strong><span>Spela nu →</span></span></button>`).join('')}</div><div class="std-games-note">En liten spelpaus. Ett nytt äventyr. Välj ditt spel!</div></section><section class="std-panel std-coloring">${sectionHead('Nya färgläggningsbilder','Mandala','🖌️')}<div class="std-color-grid">${newColors.map(coloringCard).join('')}</div></section></div><section class="std-inspiration"><div>${icon('bulb')}</div><div><h2>Vad vill ni hitta på idag?</h2><p>En stund att skapa, en lek tillsammans eller något nytt att prova.</p></div><button type="button" data-standard-category="Roliga verktyg">Hitta en idé <span aria-hidden="true">→</span></button></section>`;
   }
@@ -105,6 +105,10 @@
     if(presentedSeason!==season){
       presentedSeason=season;
       home.innerHTML=homeMarkup();
+      const grid=home.querySelector('.std-color-grid');
+      const fallback=shuffle(mandalas.filter(m=>(m.preview||m.img) && (season==='standard'?!['Halloween','Jul','Blommor & blad'].includes(m.type):m.type===(season==='halloween'?'Halloween':'Jul'))));
+      const used=new Set([...grid.querySelectorAll('img')].map(img=>new URL(img.getAttribute('src'),location.href).href));
+      grid.addEventListener('error',e=>{const img=e.target;if(img.tagName!=='IMG')return;const card=img.closest('.std-color-card');if(!card)return;let next;while((next=fallback.pop())&&used.has(new URL(next.preview||next.img,location.href).href)){}if(next){used.add(new URL(next.preview||next.img,location.href).href);card.outerHTML=coloringCard(next);}else card.remove();},true);
       const shortcut=document.getElementById('advent-today-shortcut');if(shortcut)hero.append(shortcut);
       const pic=hero.querySelector('.std-hero-image');
       pic.src=season==='halloween'?'./assets/embedded/halloween-hero.jpg':season==='christmas'?'./assets/embedded/christmas-hero.jpg':'./assets/standard/nature-hero.jpg';
