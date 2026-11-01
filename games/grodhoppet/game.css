@@ -11,3 +11,8 @@
 .panel,#levels{touch-action:pan-y;overscroll-behavior:contain}
 
 @media (max-width: 800px), (pointer: coarse){#controls{left:50%;right:auto;transform:translateX(-50%);bottom:max(16px,env(safe-area-inset-bottom))}}
+
+/* Centre the complete pad within the game viewport, in both orientations. */
+#controls{position:fixed;left:0;right:0;width:100%;transform:none;justify-content:center;bottom:max(20px,env(safe-area-inset-bottom));padding:0 12px;grid-template-columns:repeat(3,58px);gap:8px;pointer-events:none;z-index:3}
+#controls button{pointer-events:auto;height:58px;user-select:none;-webkit-user-select:none}
+@media(max-height:500px){#controls{grid-template-columns:repeat(3,48px);gap:6px;bottom:max(12px,env(safe-area-inset-bottom))}#controls button{height:48px}}
