@@ -242,7 +242,7 @@ document.documentElement.style.setProperty("--halloween-hero","url('"+halloweenP
 document.documentElement.style.setProperty("--halloween-web","url('"+halloweenPictures.web+"')");
 document.documentElement.style.setProperty("--halloween-mark","url('"+halloweenPictures.mark+"')");
 function stockholmDateCode(){const parts=new Intl.DateTimeFormat("en-US",{timeZone:"Europe/Stockholm",month:"numeric",day:"numeric"}).formatToParts(new Date());return Number(parts.find(p=>p.type==="month").value)*100+Number(parts.find(p=>p.type==="day").value)}
-const todayCode=stockholmDateCode(),autoHalloween=todayCode>=1001&&todayCode<=1110,autoChristmas=todayCode>=1201||todayCode<=110;
+const todayCode=stockholmDateCode(),autoHalloween=todayCode>=1001&&todayCode<=1031,autoChristmas=todayCode>=1201||todayCode<=110;
 const savedTheme=localStorage.fpSeasonTheme||"",codeUnlocked=localStorage.fpThemeCodeUnlocked==="1",themeSelectionSaved=localStorage.fpThemeSelectionSaved==="1";
 const manualTheme=codeUnlocked||themeSelectionSaved;
 let christmasPreviewSession=false;try{christmasPreviewSession=sessionStorage.getItem("fpChristmasPreview")==="1"}catch{}
