@@ -80,7 +80,7 @@
     const tools=funTools.filter(t=>matches('Roliga verktyg '+t.name+' '+t.desc));
     const games=gameItems.filter(g=>matches(g.title+' '+g.tag));
     const count=act.filter(a=>a[1]!=='Spel').length+games.length+gym.length+colors.length+drawings.length+dolls.length+tools.length;
-    results.innerHTML=`<h2>${count} träffar för ”${esc(document.getElementById('search').value)}”</h2><button type="button" data-standard-category="Alla">Rensa sökning ×</button>`;
+    results.innerHTML=`<h2>${count} ${count===1?'träff':'träffar'} för ”${esc(document.getElementById('search').value)}”</h2><button type="button" data-standard-category="Alla">Rensa sökning ×</button>`;
     const activityHtml=act.filter(a=>a[1]!=='Spel').map(a=>activityCard(a[2],a[1],photo(a[2]),a[1]==='Spel'?`data-standard-game="${a[2]==='4 i rad'?'four':a[2].startsWith('Flygpilot')?'plane':'bike'}"`:a[2]==='Pärlmönster'?'data-standard-pearl':`data-standard-activity="${esc(a[2])}"`)).join('');
     const gymHtml=gym.map(g=>activityCard(g.name,'Rörelse','./assets/'+g.image,`data-standard-gym="${esc(g.name)}"`)).join('');
     const drawingHtml=drawings.map(a=>activityCard('Rita '+a.name,'Rita steg för steg','./assets/drawing-guides/'+(drawingGuideAsset[a.id]||a.id+'.png'),`data-standard-drawing="${esc(a.id)}"`)).join('');
