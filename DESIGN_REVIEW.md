@@ -1,40 +1,29 @@
-# Gemensam Fritidsparken-design – arbetsversion
+# Gemensamt designsystem för Fritidsparken
 
-Den här versionen ersätter `css/standard-home.css` och använder samma header,
-hero, kategorier, kort och brytpunkter i Standard, Halloween och Jul. Färger och
-befintlig hero-bild väljs efter tema. Mobilkategorier visas i ett rutnät, navigationen
-har en öppningsbar meny och spel visas i en mörk sektion över färgläggningen.
-Kataloger och aktivitetsdialoger får samma ytor. Startsidan behåller sex
-färgläggningsbilder. Pluggparkens befintliga ikon används.
+`css/standard-home.css` äger webbplatsens gemensamma presentation: header,
+hero, navigation, kategorier, kort, kataloger och aktivitetsdialoger. Standard,
+Halloween och Jul använder samma komponenter och brytpunkter. Temaidentiteten
+styrs av CSS-variabler och de befintliga hero-bilderna.
 
-Spelregistret i `js/game-hub.js` delas med startsidan och sökningen; alla nio
-befintliga spel kan därför hittas utan en separat, ofullständig spelista.
-Färgläggningseditorn, kalenderns datum-/öppningslogik och spelmotorerna är oförändrade.
-Den gamla mobila headerstilmallen laddas inte längre.
+Startsidan visar fem riktiga aktiviteter, sex spel och sex färgläggningsbilder.
+Spelregistret i `js/game-hub.js` delas med sökningen; alla nio befintliga spel
+är sökbara. Katalogernas innehåll, färgläggningsmotor, kalenderlogik och spelmotorer
+är bevarade. Pluggparkens riktiga ikon används. Den tidigare mobila
+headerstilmallen laddas inte längre. 225 obsoleta header-/hero-regler har tagits
+bort ur `site.css`.
 
-## Verifierat
+## Verifiering
 
-- Syntaxkontroll av båda ändrade JavaScript-filerna.
-- Alla nio spelomslag och alla lokala resurssökvägar i index finns i repot.
-- Balanserade CSS-block och gemensam hero-geometri.
-- 26 godkända befintliga tester: julkalenderns datum/progress, Straffläggarens
-  fysik, Flygpilotens fysik och Stuntcykelns banor/kontroller.
-- Ett bredare testförsök blockerades av saknade lokala Three.js- och bildfiler.
-  Dessa finns kvar i fjärrrepot; den lokala arbetskopian hämtades selektivt.
+- 26 befintliga tester godkända: julkalender, Straffläggaren, Flygpilot och Stuntcykel.
+- Syntaxkontroll av ändrade JavaScript-filer.
+- Lokala länkar i index och samtliga nio spelomslag kontrollerade mot repots filer.
+- Webbläsarkontroll vid 1920×1080, 1366×768, 1024×768, 768×1024,
+  390×844, 320×640 och 844×390 i samtliga tre teman: ingen horisontell sidskroll.
+- Mobilmeny, sökning, kategoribyte, aktiviteternas dialoger och kalenderlucka
+  öppnade i webbläsaren. Kalenderns kodförhandsvisning testad före december.
+- Måla online öppnar editorn med auto-färgläggning, färgförslag och färgpalett.
+  Canvas-baserade funktioner kräver samma domän för bilderna och kontrolleras
+  därför även på den publicerade sidan; en extern HTML-förhandsvisning kan inte
+  verifiera dem fullt ut.
 
-## Återstår före main
-
-Detta är en arbetsversion, inte en färdigtestad leverans. Lokal HTTP-server
-blockerades av körmiljön (bind: Operation not permitted). Webbläsarens URL-policy
-blockerade file:-förhandsvisning. Den ändrade designen har därför inte körts
-eller granskats visuellt i en webbläsare.
-
-- Granska mot referensbilden och justera typografi, bildplacering och kort.
-- Testa 1920, 1366, 1024, 768, 390, 320 samt 844×390 px i alla teman.
-- Kontrollera överlapp, horisontell scroll, fokus och mobilmeny.
-- Testa samtliga kataloger, modalvyer och fristående spel/verktyg.
-- Prova Måla online, Skriv ut, automatisk färgläggning och färgförslag.
-- Prova julkalenderns kodförhandsvisning och lucköppning i nya placeringen.
-- Kontrollera konsol och nätverksfel, och rensa kvarvarande obsoleta regler i
-  `site.css` efter visuell verifiering av vilka komponenter som använder dem.
-- Slå ihop till main först när dessa kontroller är klara.
+Storlekarna testas i webbläsaren, inte på fysiska Chromebook-/iPad-enheter.
