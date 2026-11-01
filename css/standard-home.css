@@ -1,56 +1,56 @@
-/* Every presentation override is scoped to Standard. Seasonal CSS is untouched. */
+/* Shared presentation: one layout; theme tokens change only colour and artwork. */
 @font-face{font-family:FPStandardNunito;font-style:normal;font-weight:400 900;font-display:swap;src:url('../assets/standard/nunito-latin.woff2') format('woff2')}
 .standard-only{display:none}
-body.std-design:not(.halloween):not(.christmas){--bg:#f5f3ec;--paper:#fff;--ink:#182d30;--muted:#64716b;--green:#298344;--mint:#e9f3e5;--line:#e4e9df;background:var(--bg);font-family:FPStandardNunito,ui-rounded,system-ui,sans-serif;font-size:16px;line-height:1.5}
+body.std-design{--bg:#f2f9ff;--paper:#fff;--ink:#09213d;--muted:#53687b;--green:#168836;--mint:#e3f5ed;--line:#dbe7ef;--header:#071e35;--hero-wash:#e7f6ff;--hero-ink:#09213d;--tile-tint:transparent;--tile-mix:22%;--radius:24px;--shadow:0 8px 28px #15365312;background:var(--bg);font-family:FPStandardNunito,ui-rounded,system-ui,sans-serif;font-size:16px;line-height:1.5}
 body.std-design.dark:not(.halloween):not(.christmas){--bg:#15251e;--paper:#20372b;--ink:#f1f6ee;--muted:#c1cfc2;--line:#395541;--mint:#304e3c;--green:#8dd197}
 body.std-design .standard-only{display:block}
 body.std-design .standard-only[hidden]{display:none!important}
 body.std-design>.top,body.std-design main>.hero,body.std-design #Aktiviteter>div:first-child,body.std-design [id="Om Fritidsparken"]{display:none}
 body.std-design.std-home #Aktiviteter,body.std-design.std-home #filters,body.std-design.std-home #catalog{display:none}
-body.std-design .wrap{position:relative;width:100%;max-width:1536px;margin:0 auto;padding:0 30px 30px}
-body.std-design.std-home .wrap{margin-top:-82px}
-body.std-design .std-header{position:absolute;z-index:12;top:18px;left:30px;right:30px;max-width:1476px;margin:auto}
-body.std-design .std-topbar{min-height:68px;display:flex;align-items:center;gap:20px;padding:9px 17px;border:1px solid #ffffff8c;border-radius:24px;background:#17362cec;box-shadow:0 7px 24px #12341d24;backdrop-filter:blur(18px);color:#fff}
+body.std-design .wrap{position:relative;width:100%;max-width:1440px;margin:0 auto;padding:0 30px 30px}
+body.std-design.std-home .wrap{margin-top:-36px}
+body.std-design .std-header{position:relative;z-index:12;margin:0;background:var(--header)}
+body.std-design .std-topbar{min-height:68px;display:flex;align-items:center;gap:16px;padding:14px 24px;border:0;border-radius:0;background:var(--header);flex-wrap:wrap;max-width:1440px;margin:auto;box-shadow:0 7px 24px #12341d24;backdrop-filter:blur(18px);color:#fff}
 body.std-design .std-brand,body.std-design .std-plugg{display:flex;align-items:center;gap:10px;white-space:nowrap;flex-shrink:0;font-weight:850;letter-spacing:-.7px}
 body.std-design .std-brand{font-size:23px}
 body.std-design .std-brand img{border-radius:13px;object-fit:cover}
-body.std-design .std-plugg{font-size:16px;letter-spacing:-.4px}
+body.std-design .std-plugg{font-size:23px;letter-spacing:-.7px}
 body.std-design .std-plugg>span{font-size:25px}
-body.std-design #stdNavigation{display:flex;align-items:center;justify-content:flex-end;gap:3px;flex:1}
+body.std-design #stdNavigation{display:flex;align-items:center;justify-content:center;gap:8px;flex:1 0 100%;order:4}
 body.std-design #stdNavigation button{border:0;background:transparent;color:#fff;display:flex;align-items:center;justify-content:center;gap:7px;padding:11px 10px;border-radius:16px;font-size:14px;font-weight:750;white-space:nowrap;min-height:44px;transition:background .18s}
 body.std-design #stdNavigation button>span{font-size:23px;line-height:1;color:#c5e5be}
-body.std-design #stdNavigation button.active{background:#3ca044;box-shadow:inset 0 1px 0 #ffffff4a}
+body.std-design #stdNavigation button.active{background:var(--green);box-shadow:inset 0 1px 0 #ffffff4a}
 body.std-design #stdNavigation button:hover{background:#ffffff24}
 body.std-design .std-controls{display:flex;gap:5px;align-items:center}
 body.std-design .std-controls .iconbtn{display:grid;place-items:center;position:static!important;transform:none!important;flex:0 0 34px;width:34px;height:38px;min-width:34px;padding:4px;border:0;background:#ffffff19;border-radius:12px;line-height:1;font-size:19px;color:white}
 body.std-design .std-controls #seasonPicker img{width:27px;height:27px;border-radius:9px;object-fit:cover}
-body.std-design #seasonMenu{position:absolute;z-index:25;top:94px;right:32px;left:auto;max-width:240px;background:var(--paper);color:var(--ink)}
+body.std-design #seasonMenu{position:absolute;z-index:25;top:126px;right:32px;left:auto;max-width:240px;background:var(--paper);color:var(--ink)}
 body.std-design .std-menu-toggle{display:none}
-body.std-design .std-hero{height:510px;position:relative;isolation:isolate;overflow:hidden;background:#c6d9cb}
-body.std-design .std-hero-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 28%;z-index:-2}
-body.std-design .std-hero:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,transparent 32%,#e5f2f029 62%,#fff7df3d),linear-gradient(0deg,#173a1d22,transparent 35%)}
-body.std-design .std-hero-copy{position:absolute;top:151px;right:7%;width:51%;text-align:center;color:#173e26}
-body.std-design .std-hero h1{font-size:clamp(40px,5.5vw,80px);line-height:1.12;letter-spacing:-3.3px;font-weight:950;margin:0 0 13px;text-shadow:0 2px 0 #fff,2px 0 0 #fff,-2px 0 0 #fff,0 -2px 0 #fff,0 4px 18px #ffffffbd}
-body.std-design .std-hero p{margin:0;color:#122d33;font-weight:750;font-size:clamp(18px,1.65vw,25px);line-height:1.35;text-shadow:0 1px 8px white}
+body.std-design .std-hero{height:540px;position:relative;isolation:isolate;overflow:hidden;background:#c6d9cb}
+body.std-design .std-hero-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%;z-index:-2}
+body.std-design .std-hero:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,transparent 25%,color-mix(in srgb,var(--hero-wash) 70%,transparent) 58%,var(--hero-wash)),linear-gradient(0deg,#173a1d22,transparent 35%)}
+body.std-design .std-hero-copy{position:absolute;top:90px;right:max(4%,calc((100vw - 1360px)/2));width:53%;max-width:720px;text-align:center;color:var(--hero-ink)}
+body.std-design .std-hero h1{font-size:clamp(40px,5vw,76px);line-height:1.12;letter-spacing:-3.3px;font-weight:950;margin:0 0 13px;text-shadow:0 2px 0 #fff,2px 0 0 #fff,-2px 0 0 #fff,0 -2px 0 #fff,0 4px 18px #ffffffbd}
+body.std-design .std-hero p{margin:0;color:var(--hero-ink);font-weight:750;font-size:clamp(18px,1.65vw,25px);line-height:1.35;text-shadow:0 1px 8px white}
 body.std-design .std-search{display:flex;align-items:center;gap:13px;max-width:590px;width:100%;margin:24px auto 0;background:#fffffff7;border:1px solid #ced8d0;border-radius:999px;min-height:62px;padding:5px 6px 5px 21px;box-shadow:0 7px 22px #1e3a3020;color:#66736b}
 body.std-design .std-search-leading{display:flex;width:23px;flex:none}
 body.std-design .std-search svg{width:23px;height:23px}
 body.std-design .std-search input{min-width:0;flex:1;width:0;padding:8px 0;border:0;background:transparent;color:#283b31;font-size:16px;outline:none}
-body.std-design .std-search:focus-within{outline:3px solid #42a451;outline-offset:3px}
-body.std-design .std-search button{display:grid;place-items:center;flex:none;width:49px;height:49px;border:1px solid #4fbb59;border-radius:50%;background:linear-gradient(#46b84d,#249238);color:white;box-shadow:0 2px 5px #21653329}
+body.std-design .std-search:focus-within{outline:3px solid var(--green);outline-offset:3px}
+body.std-design .std-search button{display:grid;place-items:center;flex:none;width:49px;height:49px;border:1px solid var(--green);border-radius:50%;background:var(--green);color:white;box-shadow:0 2px 5px #21653329}
 body.std-design .std-categories{position:relative;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:12px;padding:14px;background:var(--paper);border:1px solid #ffffff8c;border-radius:29px;box-shadow:0 9px 32px #25462913;margin:0 0 16px}
-body.std-design .std-categories>button{border:0;background:var(--tile);color:#1a3033;min-width:0;display:flex;align-items:center;justify-content:center;flex-direction:column;border-radius:21px;padding:11px 4px 13px;font-size:16px;font-weight:850;line-height:1.1;gap:5px;box-shadow:inset 0 2px 5px #ffffff50;transition:transform .18s,box-shadow .18s}
+body.std-design .std-categories>button{border:0;background:color-mix(in srgb,var(--tile),var(--tile-tint) var(--tile-mix));color:#1a3033;min-width:0;display:flex;align-items:center;justify-content:center;flex-direction:column;border-radius:21px;padding:11px 4px 13px;font-size:16px;font-weight:850;line-height:1.1;gap:5px;box-shadow:inset 0 2px 5px #ffffff50;transition:transform .18s,box-shadow .18s}
 body.std-design .std-icon{width:86px;height:86px;display:block;flex:none}
 body.std-design .std-categories>button>span{min-height:36px;display:flex;align-items:center;justify-content:center;text-align:center}
 body.std-design .std-categories>button:hover{transform:translateY(-5px);box-shadow:0 6px 14px #244e2522}
 body.std-design .std-panel{background:var(--paper);border:1px solid #ffffff38;border-radius:27px;padding:20px;box-shadow:0 6px 22px #29402c06}
 body.std-design .std-section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
 body.std-design .std-section-heading h2{display:flex;align-items:center;gap:10px;font-size:clamp(20px,1.8vw,27px);letter-spacing:-.8px;line-height:1.2;margin:0;font-weight:850}
-body.std-design .std-section-heading h2>span{color:#efb637;font-size:29px;line-height:1}
+body.std-design .std-section-heading h2>span{flex:none;color:#efb637;font-size:29px;line-height:1}
 body.std-design .std-section-heading>button{border:0;background:transparent;color:var(--green);font-weight:750;font-size:14px;white-space:nowrap;padding:9px 0 9px 8px;min-height:44px}
-body.std-design .std-popular-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:13px}
+body.std-design .std-popular-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px}
 body.std-design .std-activity-card{display:block;overflow:hidden;text-align:left;width:100%;min-width:0;padding:0;background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:17px;box-shadow:0 5px 12px #243c2910;transition:transform .18s,box-shadow .18s}
-body.std-design .std-activity-card>img{width:100%;height:145px;object-fit:cover;display:block;background:var(--mint)}
+body.std-design .std-activity-card>img{width:100%;height:180px;object-fit:cover;display:block;background:var(--mint)}
 body.std-design .std-activity-card[data-standard-category="Rita steg-för-steg"]>img{object-fit:cover;background:#243a35}
 body.std-design .std-card-copy{display:block;padding:10px 12px 12px}
 body.std-design .std-card-copy strong{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:15px;line-height:1.25;min-height:37px;font-weight:800}
@@ -61,11 +61,11 @@ body.std-design .std-label-move{background:#d3eefe;color:#1c5677}
 body.std-design .std-label-build{background:#d2efdd;color:#24654a}
 body.std-design .std-label-game{background:#fbd7e4;color:#8b3250}
 body.std-design .std-activity-card:hover,body.std-design .std-game-card:hover{transform:translateY(-4px);box-shadow:0 10px 23px #254c2522}
-body.std-design .std-discover{display:grid;grid-template-columns:1.15fr 1fr;gap:18px;margin-top:18px;align-items:start}
+body.std-design .std-discover{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;margin-top:18px;align-items:stretch}
 body.std-design .std-discover .std-section-heading h2{font-size:clamp(18px,1.65vw,25px)}
-body.std-design .std-game-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+body.std-design .std-game-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
 body.std-design .std-game-card{padding:0;min-width:0;overflow:hidden;background:var(--paper);border:1px solid var(--line);border-radius:17px;text-align:left;transition:transform .18s,box-shadow .18s}
-body.std-design .std-game-art{display:block;position:relative;overflow:hidden;background:#dce9ec;aspect-ratio:1.1}
+body.std-design .std-game-art{display:block;position:relative;overflow:hidden;background:#dce9ec;aspect-ratio:1.4}
 body.std-design .std-game-art>img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
 body.std-design .std-game-card:hover img{transform:scale(1.035)}
 body.std-design .std-play{position:absolute;right:10px;bottom:10px;width:36px;height:36px;display:grid;place-items:center;border-radius:50%;color:white;background:#173b2ad9;backdrop-filter:blur(6px);font-size:13px;border:1px solid #ffffff8f}
@@ -74,7 +74,7 @@ body.std-design .std-game-copy small{font-size:10px;color:var(--muted);font-weig
 body.std-design .std-game-copy strong{font-size:16px;font-weight:850;line-height:1.2;min-height:38px}
 body.std-design .std-game-copy>span{font-size:13px;color:var(--green);font-weight:800;margin-top:5px}
 body.std-design .std-games-note{color:var(--muted);padding:18px 0 2px;font-size:14px;text-align:center}
-body.std-design .std-color-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+body.std-design .std-color-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
 body.std-design .std-color-card.mandala-card{display:block;min-width:0;max-width:none;margin:0;background:var(--paper);border:1px solid var(--line);border-radius:15px;overflow:hidden;box-shadow:0 3px 10px #29452b08;padding:0}
 body.std-design .std-color-open{display:block;width:100%;padding:9px;border:0;border-bottom:1px solid var(--line);background:white;cursor:pointer}
 body.std-design .std-color-open>img{display:block;width:100%!important;height:154px!important;max-height:none!important;aspect-ratio:auto!important;object-fit:contain!important;margin:0!important;border-radius:0!important;background:white!important}
@@ -82,7 +82,7 @@ body.std-design .std-color-card .mandala-info{padding:8px!important;display:bloc
 body.std-design .std-color-card .mandala-label{font-size:10px;color:var(--green);text-transform:uppercase;font-weight:800;display:block;line-height:1.4}
 body.std-design .std-color-card h3{font-size:12px!important;line-height:1.25;margin:3px 0 7px!important;min-height:30px}
 body.std-design .std-color-card .fp-online-actions{display:flex!important;flex-direction:column;gap:5px;margin:0!important;padding:0!important}
-body.std-design .std-color-card .fp-online-actions button,body.std-design .std-color-card .fp-online-actions a{display:block;width:100%;border:0!important;padding:7px 2px!important;border-radius:8px!important;font-size:10px!important;line-height:1.3!important;text-align:center;min-height:30px;margin:0!important}
+body.std-design .std-color-card .fp-online-actions button,body.std-design .std-color-card .fp-online-actions a{display:block;width:100%;border:0!important;padding:7px 2px!important;border-radius:8px!important;font-size:12px!important;line-height:1.3!important;text-align:center;min-height:44px;margin:0!important}
 body.std-design .std-color-card .fp-online-actions button{background:var(--mint)!important;color:var(--green)!important}
 body.std-design .std-color-card .fp-online-actions a{color:var(--muted)!important;background:transparent!important}
 body.std-design .std-inspiration{display:flex;align-items:center;gap:18px;margin:22px 0;padding:23px 30px;border:1px solid var(--line);border-radius:25px;background:var(--mint)}
@@ -94,200 +94,158 @@ body.std-design .footer{margin-top:24px;font-size:13px;border-color:var(--line)}
 body.std-design .std-results-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:25px;scroll-margin-top:20px}
 body.std-design .std-results-heading h2{font-size:28px;margin:0}
 body.std-design .std-results-heading>button,body.std-design .std-tool-shortcut{border:1px solid var(--line);background:var(--paper);color:var(--green);font-weight:750;padding:10px 16px;border-radius:12px}
-body.std-design.std-browsing .std-hero{height:380px}
-body.std-design.std-browsing .std-hero-copy{top:122px}
+body.std-design.std-browsing .std-hero{height:300px}
+body.std-design.std-browsing .std-hero-copy{top:40px}
 body.std-design.std-browsing .std-hero h1{font-size:48px}
 body.std-design #Aktiviteter{margin:16px 0 0;display:flex;justify-content:flex-end;align-items:center}
 body.std-design #Aktiviteter .tools{width:100%;max-width:500px}
 body.std-design #search{width:100%;min-height:46px}
 body.std-design #filters{margin-top:14px}
-body.std-design #filters [data-cat="Halloweenpyssel"],body.std-design #filters [data-cat="Julpyssel"]{display:none}
+
 body.std-design .std-collection-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:18px;margin:22px 0}
 body.std-design .std-collection-grid .std-activity-card>img{height:175px}
 body.std-design .std-search-color-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:15px}
 body.std-design .std-search-color-grid .std-color-open>img{height:200px!important}
 body.std-design .std-sr-only{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 body.std-design :is(button,a,input):focus-visible{outline:3px solid #52a960;outline-offset:3px}
-@media(min-width:1600px){body.std-design .std-hero-copy{right:calc((100vw - 1536px)/2 + 90px);width:720px}}
-@media(max-width:1300px){body.std-design .std-topbar{gap:13px;padding:9px 13px}body.std-design .std-brand{font-size:20px;gap:7px}body.std-design .std-brand img{width:32px;height:32px}body.std-design .std-plugg{font-size:14px}body.std-design #stdNavigation button{font-size:12px;gap:4px;padding:10px 7px}body.std-design #stdNavigation button>span{font-size:20px}body.std-design .std-categories{gap:9px}body.std-design .std-categories>button{font-size:14px}body.std-design .std-icon{width:73px;height:73px}body.std-design .std-popular-grid{gap:10px}body.std-design .std-activity-card>img{height:120px}body.std-design .std-card-copy{padding:9px}body.std-design .std-card-copy strong{font-size:13px}body.std-design .std-discover{grid-template-columns:1fr 1fr}body.std-design .std-panel{padding:17px}body.std-design .std-color-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:1100px){body.std-design .std-header{left:20px;right:20px;top:14px}body.std-design .std-topbar{gap:15px;min-height:60px;border-radius:20px;flex-wrap:wrap}body.std-design .std-brand{font-size:21px}body.std-design .std-plugg{font-size:15px}body.std-design .std-menu-toggle{display:flex;margin-left:auto;flex-direction:column;gap:4px;justify-content:center;align-items:center;width:40px;height:40px;background:#ffffff1f;border:0;border-radius:11px}body.std-design .std-menu-toggle span{width:18px;height:2px;background:white;border-radius:3px}body.std-design #stdNavigation{display:none;order:5;flex:0 0 100%;justify-content:flex-start;flex-wrap:wrap;border-top:1px solid #ffffff30;padding-top:10px}body.std-design .menu-open #stdNavigation{display:flex}body.std-design #stdNavigation button{font-size:14px;padding:9px 13px}body.std-design .std-hero{height:480px}body.std-design .std-hero-copy{right:4%;width:56%;top:153px}body.std-design .std-hero h1{font-size:54px;letter-spacing:-2.5px}body.std-design .wrap{padding:0 20px 24px}body.std-design.std-home .wrap{margin-top:-62px}body.std-design .std-categories{grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;padding:12px}body.std-design .std-categories>button{flex-direction:row;min-height:83px;gap:5px;border-radius:16px;font-size:14px;padding:8px}body.std-design .std-categories .std-icon{width:52px;height:52px}body.std-design .std-categories>button>span{min-height:0}body.std-design .std-popular-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}body.std-design .std-activity-card>img{height:160px}body.std-design .std-card-copy strong{font-size:15px;min-height:22px}body.std-design .std-discover{grid-template-columns:1fr}body.std-design .std-game-art{aspect-ratio:1.7}body.std-design .std-color-grid{grid-template-columns:repeat(4,minmax(0,1fr))}body.std-design .std-color-open>img{height:150px!important}body.std-design .std-collection-grid{grid-template-columns:repeat(3,minmax(0,1fr))}body.std-design .std-search-color-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media(max-width:760px){body.std-design .std-header{top:10px;left:12px;right:12px}body.std-design .std-topbar{gap:9px;padding:8px 11px;min-height:58px}body.std-design .std-brand{font-size:17px;letter-spacing:-.5px}body.std-design .std-brand img{width:29px;height:29px;border-radius:10px}body.std-design .std-plugg{font-size:13px;gap:5px}body.std-design .std-plugg>span{font-size:20px}body.std-design .std-controls{gap:3px}body.std-design .std-controls .iconbtn{width:30px;min-width:30px;flex-basis:30px;height:34px;font-size:17px}body.std-design .std-controls #seasonPicker img{width:24px;height:24px}body.std-design .std-hero{height:475px}body.std-design .std-hero-image{object-position:37% center}body.std-design .std-hero:after{background:linear-gradient(0deg,#e8f1e7e8 0%,#e5f2e9aa 39%,transparent 83%)}body.std-design .std-hero-copy{top:auto;bottom:76px;left:5%;right:5%;width:auto}body.std-design .std-hero h1{font-size:clamp(34px,7.5vw,53px);letter-spacing:-1.8px;margin-bottom:8px}body.std-design .std-hero p{font-size:18px}body.std-design .std-search{margin-top:17px;min-height:55px;padding:4px 5px 4px 16px;max-width:500px;gap:9px}body.std-design .std-search input{font-size:14px}body.std-design .std-search button{width:43px;height:43px}body.std-design .std-search-leading{display:none}body.std-design .wrap{padding:0 12px 24px}body.std-design.std-home .wrap{margin-top:-47px}body.std-design .std-categories{gap:8px;border-radius:22px;padding:10px;margin-bottom:13px}body.std-design .std-categories>button{flex-direction:column;padding:8px 2px;gap:1px;min-height:95px;font-size:12px;border-radius:14px}body.std-design .std-categories .std-icon{width:50px;height:50px}body.std-design .std-categories>button>span{min-height:28px}body.std-design .std-panel{padding:15px;border-radius:22px}body.std-design .std-section-heading{gap:8px;margin-bottom:12px}body.std-design .std-section-heading h2,body.std-design .std-discover .std-section-heading h2{font-size:20px;gap:7px;letter-spacing:-.6px}body.std-design .std-section-heading h2>span{font-size:24px}body.std-design .std-section-heading>button{font-size:12px}body.std-design .std-popular-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}body.std-design .std-activity-card>img{height:145px}body.std-design .std-card-copy strong{font-size:14px;min-height:34px}body.std-design .std-label{font-size:9px;padding:4px 8px}body.std-design .std-discover{gap:13px;margin-top:13px}body.std-design .std-game-grid{gap:10px}body.std-design .std-game-art{aspect-ratio:1}body.std-design .std-game-copy{padding:10px}body.std-design .std-game-copy strong{font-size:14px;min-height:36px}body.std-design .std-game-copy small{font-size:9px}body.std-design .std-play{width:30px;height:30px;right:7px;bottom:7px}body.std-design .std-game-copy>span{font-size:12px}body.std-design .std-color-grid{grid-template-columns:repeat(4,minmax(0,1fr))}body.std-design .std-color-open>img{height:150px!important}body.std-design .std-color-card h3{font-size:11px!important}body.std-design .std-inspiration{padding:18px;gap:10px;flex-wrap:wrap}body.std-design .std-inspiration>div:first-child{display:none}body.std-design .std-inspiration h2{font-size:20px}body.std-design .std-inspiration>button{margin:5px 0 0;padding:11px 15px}body.std-design .std-results-heading{padding-top:18px;align-items:flex-start}body.std-design .std-results-heading h2{font-size:23px}body.std-design .std-results-heading>button{font-size:12px;padding:9px 10px}body.std-design.std-browsing .std-hero{height:350px}body.std-design.std-browsing .std-hero-copy{top:auto;bottom:30px}body.std-design.std-browsing .std-hero h1{font-size:36px}body.std-design .std-collection-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}body.std-design .std-search-color-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}body.std-design #seasonMenu{top:78px;right:14px}}
-@media(max-width:520px){body.std-design .std-topbar{gap:7px}body.std-design .std-brand{font-size:16px;flex:1}body.std-design .std-plugg{position:absolute;top:67px;left:9px;padding:6px 10px;background:#17362cde;backdrop-filter:blur(10px);border:1px solid #ffffff52;border-radius:12px;font-size:12px}body.std-design .std-plugg>span{font-size:16px}body.std-design .std-menu-toggle{margin-left:0;width:34px;height:34px}body.std-design #stdNavigation{padding-top:6px;gap:3px}body.std-design #stdNavigation button{font-size:13px;min-height:43px;padding:8px 10px}body.std-design .menu-open .std-plugg{display:none}body.std-design .std-hero{height:470px}body.std-design .std-hero-copy{bottom:71px}body.std-design .std-hero-image{object-position:27% center}body.std-design .std-categories{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;padding:8px}body.std-design .std-categories>button{font-size:10px;min-height:87px;padding:6px 1px}body.std-design .std-categories .std-icon{width:44px;height:44px}body.std-design .std-panel{padding:12px}body.std-design .std-section-heading h2,body.std-design .std-discover .std-section-heading h2{font-size:18px;line-height:1.25}body.std-design .std-section-heading>button{font-size:11px}body.std-design .std-activity-card>img{height:126px}body.std-design .std-card-copy{padding:8px 9px 10px}body.std-design .std-card-copy strong{font-size:13px}body.std-design .std-game-grid{grid-template-columns:repeat(2,minmax(0,1fr))}body.std-design .std-game-card:first-child{grid-column:1/-1;display:grid;grid-template-columns:1.1fr 1fr;align-items:center}body.std-design .std-game-card:first-child .std-game-art{aspect-ratio:1.1}body.std-design .std-game-card:first-child .std-game-copy{padding:14px}body.std-design .std-game-card:first-child .std-game-copy strong{font-size:18px}body.std-design .std-color-grid{grid-template-columns:repeat(2,minmax(0,1fr))}body.std-design .std-color-open>img{height:205px!important}body.std-design .std-color-card h3{font-size:13px!important;min-height:20px}body.std-design .std-color-card .fp-online-actions button,body.std-design .std-color-card .fp-online-actions a{font-size:12px!important;min-height:38px}body.std-design .std-search-color-grid{grid-template-columns:repeat(2,minmax(0,1fr))}body.std-design .std-collection-grid .std-activity-card>img{height:130px}}
-@media(max-width:900px) and (orientation:landscape){body.std-design .std-hero{height:420px}body.std-design .std-hero-copy{top:130px;bottom:auto;left:auto;right:4%;width:56%}body.std-design .std-hero h1{font-size:43px}body.std-design .std-hero p{font-size:18px}body.std-design .std-hero:after{background:linear-gradient(90deg,transparent 20%,#eff6ec7a 80%)}body.std-design .std-categories{grid-template-columns:repeat(5,minmax(0,1fr))}body.std-design .std-categories>button{flex-direction:row;min-height:70px}body.std-design .std-popular-grid{grid-template-columns:repeat(3,minmax(0,1fr))}body.std-design .std-game-art{aspect-ratio:1.4}body.std-design .std-color-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media(prefers-reduced-motion:reduce){body.std-design *,body.std-design *:before,body.std-design *:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 
-@media(min-width:761px) and (max-width:900px) and (orientation:portrait){body.std-design .std-categories>button{flex-direction:column;min-height:110px}body.std-design .std-categories .std-icon{width:58px;height:58px}}
-@media(max-width:900px) and (orientation:landscape){body.std-design .std-categories>button{font-size:12px;gap:3px}body.std-design .std-categories .std-icon{width:42px;height:42px}}
 
-@media(min-width:1101px){body.std-design .std-categories{grid-template-columns:repeat(10,minmax(0,1fr))}}
-
-/* Seasonal variants share the standard structure while retaining their mood. */
-body.std-design.halloween,body.std-design.christmas{font-family:FPStandardNunito,ui-rounded,system-ui,sans-serif;font-size:16px;line-height:1.5}
-body.std-design.halloween .std-topbar{background:#281712ef;border-color:#bd6b24}
-body.std-design.halloween #stdNavigation button.active{background:#bd5b12}
-body.std-design.halloween .std-hero:after{background:linear-gradient(90deg,#1d100a24,#180b0ac9)}
-body.std-design.halloween .std-hero h1,body.std-design.halloween .std-hero p{color:#fff4e2;text-shadow:0 2px 8px #160906,0 0 22px #160906}
-body.std-design.halloween .std-search button{background:#c86413;border-color:#ef9b3a}
-body.std-design.halloween .std-categories,body.std-design.halloween .std-panel,body.std-design.halloween .std-inspiration{background:#261a18;border-color:#82451d}
-body.std-design.halloween .std-categories>button{background:#ffd8a9;color:#44250f}
-body.std-design.halloween .std-categories>button:nth-child(3n){background:#e8d0f4;color:#321b39}
-body.std-design.christmas .std-topbar{background:#173e30ef;border-color:#d4b86b}
-body.std-design.christmas #stdNavigation button.active{background:#a32929}
-body.std-design.christmas .std-hero:after{background:linear-gradient(90deg,#0a201321,#0b2516bf)}
-body.std-design.christmas .std-hero h1,body.std-design.christmas .std-hero p{color:#fff9e9;text-shadow:0 2px 8px #173827,0 0 22px #173827}
-body.std-design.christmas .std-search button{background:#a32929;border-color:#d94a42}
-body.std-design.christmas .std-categories,body.std-design.christmas .std-panel,body.std-design.christmas .std-inspiration{border-color:#d7bb80}
-body.std-design.christmas .std-categories>button{background:#d9edd9;color:#193b2a}
-body.std-design.christmas .std-categories>button:nth-child(3n){background:#f8ded7;color:#673328}
-@media(min-width:1101px){body.std-design:is(.halloween,.christmas) .std-categories{grid-template-columns:repeat(11,minmax(0,1fr))}}
-
-body.std-design .std-categories>button>span{max-width:100%;overflow-wrap:anywhere}
-@media (min-width:1101px) and (max-width:1550px){
- body.std-design:is(.halloween,.christmas) .std-topbar{flex-wrap:wrap}
- body.std-design:is(.halloween,.christmas) .std-menu-toggle{display:flex;margin-left:auto;flex-direction:column;gap:4px;justify-content:center;align-items:center;width:40px;height:40px;border:0;border-radius:12px;background:#ffffff19}
- body.std-design:is(.halloween,.christmas) .std-menu-toggle span{width:18px;height:2px;background:white;border-radius:3px}
- body.std-design:is(.halloween,.christmas) #stdNavigation{display:none;order:5;flex:0 0 100%;justify-content:flex-start;flex-wrap:wrap;border-top:1px solid #ffffff30;padding-top:10px}
- body.std-design:is(.halloween,.christmas) .menu-open #stdNavigation{display:flex}
-}
-
-/* One horizontal row at every screen size; smaller screens scroll the row. */
-body.std-design .std-categories{display:flex;flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin}
-body.std-design .std-categories>button{flex:1 0 0;min-width:0;flex-direction:column;padding:8px 3px;gap:3px}
-body.std-design .std-categories>button>span{max-width:100%;font-size:clamp(9px,.95vw,14px);line-height:1.1;overflow-wrap:anywhere;hyphens:auto}
-body.std-design .std-categories .std-icon{width:clamp(42px,5vw,72px);height:clamp(42px,5vw,72px)}
-@media(max-width:900px){body.std-design .std-categories>button{flex:0 0 76px;min-height:100px}body.std-design .std-categories>button>span{font-size:10px}}
-body.std-design:is(.halloween,.christmas) .std-hero:after{background:transparent}
-body.std-design.halloween .std-hero-image{filter:none;opacity:1}
-body.std-design.halloween .std-game-copy .std-play,body.std-design.halloween .std-play{background:#b65a13;color:#fff}
-body.std-design.halloween .std-section-heading button,body.std-design.halloween .std-game-copy>span:last-child{color:#f59c3d}
-body.std-design .std-seasonal-cta{border:1px solid #ffd28e;border-radius:999px;padding:9px 22px;margin:2px auto 0;background:#c75e11;color:white;font:800 16px FPStandardNunito,system-ui;box-shadow:0 3px 16px #0007;cursor:pointer;animation:fp-season-pulse 2s ease-in-out infinite}
-body.std-design.christmas .std-seasonal-cta{background:#aa272d;border-color:#f8db90}
-body.std-design .std-seasonal-cta[hidden]{display:none}
-@keyframes fp-season-pulse{50%{transform:scale(1.05);box-shadow:0 3px 22px #f7b24d99}}
-body.std-design .std-seasonal-cta+.std-search{margin-top:12px}
-body.std-design .advent-today-shortcut{width:100%;margin:0 0 14px;padding:12px 18px;border:1px solid #e4c884;border-radius:18px;background:linear-gradient(110deg,#174b37,#8d2933);color:#fff8e8;text-align:left;display:flex;align-items:center;gap:13px;cursor:pointer;box-shadow:0 5px 18px #172b1a30}
-body.std-design .advent-today-shortcut[hidden],body.std-design.std-browsing .advent-today-shortcut{display:none}
-body.std-design .advent-today-shortcut>span:first-child{font-size:30px}
-body.std-design .advent-today-shortcut>span:nth-child(2){flex:1}
-body.std-design .advent-today-shortcut strong,body.std-design .advent-today-shortcut small{display:block}
-body.std-design .advent-today-shortcut strong{font-size:16px}
-body.std-design .advent-today-shortcut small{font-size:12px}
-@media(prefers-reduced-motion:reduce){body.std-design .std-seasonal-cta{animation:none}}
-
-/* A single calendar door sits naturally within the Christmas scene. */
-body.std-design .std-hero #advent-today-shortcut{position:absolute;z-index:1;left:10%;top:28%;width:clamp(105px,13vw,190px);margin:0;padding:0;border:0;background:none;box-shadow:none;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center;color:#fff6d9;font-family:FPStandardNunito,system-ui}
-body.std-design .std-hero #advent-today-shortcut[hidden],body.std-design.std-browsing .std-hero #advent-today-shortcut{display:none}
-body.std-design .advent-banner-caption{font-weight:900;font-size:clamp(14px,1.5vw,21px);text-shadow:0 2px 7px #102a18}
-body.std-design .advent-banner-door{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;aspect-ratio:4/5;border:2px solid #e1c184;border-radius:46% 46% 10px 10px;background:linear-gradient(115deg,#6c1b24,#a33839 48%,#531a23);box-shadow:0 12px 20px #14291980,inset 0 0 0 6px #6e241f,inset 0 0 0 8px #dcb46b;text-shadow:0 2px 6px #421212;transition:transform .2s}
+/* Theme identity. Geometry is intentionally shared. */
+body.std-design.halloween{--bg:#1b1327;--paper:#2b2037;--ink:#fff5e6;--muted:#e1cdbb;--green:#ffb34e;--mint:#473047;--line:#634554;--header:#170f21;--hero-wash:#241332;--hero-ink:#fff3df;--tile-tint:#ffab63;--tile-mix:65%;background:var(--bg)}
+body.std-design.christmas{--bg:#eef7f6;--paper:#fffefa;--ink:#163c35;--muted:#526c66;--green:#b32636;--mint:#e1efe6;--line:#d5e3dc;--header:#103b31;--hero-wash:#e9f4ee;--hero-ink:#153f32;--tile-tint:#d8e9df;--tile-mix:60%;background:var(--bg)}
+body.std-design.dark:not(.halloween):not(.christmas){--header:#10261f;--hero-wash:#d4e9e0;--hero-ink:#153627}
+body.std-design .std-hero h1 span{color:#149939}
+body.std-design.halloween .std-hero h1{ text-shadow:0 3px 14px #130b1c }
+body.std-design.halloween .std-hero h1 span{color:#ffb34e}
+body.std-design.christmas .std-hero h1 span{color:#b32636}
+body.std-design .std-brand img,body.std-design .std-plugg img{width:38px;height:38px;object-fit:contain;border-radius:12px}
+body.std-design .std-header-search{margin-left:auto;width:44px;height:44px;display:grid;place-items:center;border:0;border-radius:14px;background:#ffffff1c;color:white}
+body.std-design .std-header-search svg{width:24px;height:24px}
+body.std-design .std-controls .iconbtn{width:44px;min-width:44px;flex-basis:44px;height:44px}
+body.std-design .std-hero-benefits{display:flex;justify-content:center;gap:16px;margin-top:22px;flex-wrap:wrap}
+body.std-design .std-hero-benefits span{padding:10px 14px;background:#ffffffe6;color:#183547;border-radius:16px;font-size:14px;font-weight:850;box-shadow:var(--shadow)}
+body.std-design .std-games{background:linear-gradient(125deg,var(--header),#12354f);color:#fff;box-shadow:0 10px 30px #15365322}
+body.std-design .std-games .std-section-heading>button{color:#c8e7ff}
+body.std-design .std-game-card{background:#ffffff0d;border-color:#ffffff25}
+body.std-design .std-game-copy{color:#fff;padding:12px}
+body.std-design .std-game-copy small,body.std-design .std-games-note{color:#c6dce8}
+body.std-design .std-game-copy>span{color:#9fe5ae}
+body.std-design .std-game-copy strong{min-height:40px}
+body.std-design .std-card-copy strong>span{width:28px;height:28px;border-radius:50%;background:var(--mint);text-align:center;flex:none}
+body.std-design .std-color-card h3{font-size:14px!important;min-height:36px}
+body.std-design .std-color-card .mandala-label{color:var(--ink);background:var(--mint);display:inline-block;padding:4px 9px;border-radius:99px}
+body.std-design .std-color-open>img{height:180px!important}
+body.std-design :is(.std-categories>button,.std-activity-card,.std-game-card):active{transform:scale(.97)}
+/* Catalogs and activity dialogs use the same surfaces as the home page. */
+body.std-design :is(.card,.mandala-card,.pearl-card,.gym-card,.fun-card,.halloween-craft-card,.modal,.draw-modal,.gym-planner){background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+body.std-design :is(.group h3,.sectionhead h2,.mandala-info h3){color:var(--ink)}
+body.std-design :is(.sectionhead p,.ctext small,.modal p,.footer){color:var(--muted)}
+body.std-design :is(.filter,.mandala-type,.search,.season-menu){background:var(--paper);color:var(--ink);border-color:var(--line)}
+body.std-design :is(.filter.active,.mandala-type.active,.primary){background:var(--green);color:#fff}
+body.std-design.halloween :is(.filter.active,.mandala-type.active,.primary){color:#281521}
+body.std-design :is(.secondary,.steps,.empty,.mandala-intro){background:var(--mint);color:var(--ink)}
+body.std-design .filters{flex-wrap:wrap;overflow:visible;gap:8px}
+body.std-design :is(.filter,.mandala-type,.mandala-links a){min-height:44px}
+body.std-design #catalog .grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:20px}
+body.std-design #catalog .card{display:flex;flex-direction:column;align-items:stretch;position:relative;padding:0;overflow:hidden;min-width:0}
+body.std-design #catalog .card .create-preview{display:block;width:100%;height:190px;flex:none;max-width:none;border-radius:0;background:var(--mint)}
+body.std-design #catalog .create-preview img{width:100%;height:100%;object-fit:cover}
+body.std-design #catalog .card>.emoji{width:100%;height:160px;font-size:64px;border-radius:0;background:var(--mint)}
+body.std-design #catalog .card>.ctext{padding:18px;flex:1}
+body.std-design #catalog .card>.arrow{position:absolute;bottom:12px;right:14px}
+body.std-design #catalog .ctext strong{font-size:19px;padding-right:18px}
+body.std-design #catalog .ctext small{font-size:15px;line-height:1.5}
+body.std-design .mandala-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:20px}
+body.std-design .mandala-card img{max-width:100%;height:290px;object-fit:contain;background:#fff}
+body.std-design .modal{max-height:calc(100dvh - 32px);overflow:auto;width:min(780px,100%);padding:32px}
+body.std-design .modal .close{position:absolute;right:14px;top:14px;float:none;z-index:2}
+body.std-design .std-results-heading{gap:20px;scroll-margin-top:16px}
+body.std-design .std-results-heading h2{overflow-wrap:anywhere}
+body.std-design .std-results-heading>button{flex:none;min-height:44px}
+body.std-design .std-inspiration>button{color:#fff}
+body.std-design.halloween .std-inspiration>button{color:#281521}
+/* Existing calendar door and popup events remain owned by advent-calendar.js. */
+body.std-design #julkalender,body.std-design .advent-preview,body.std-design .advent-motion-toggle{display:none}
+body.std-design .std-hero #advent-today-shortcut{position:absolute;z-index:2;left:14%;top:50%;transform:translate(-50%,-50%);width:140px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:none;color:#fff6d9;text-align:center;cursor:pointer}
+body.std-design .std-hero #advent-today-shortcut[hidden],body.std-design.std-browsing #advent-today-shortcut{display:none}
+body.std-design .advent-banner-caption,body.std-design .advent-banner-status{font-size:14px;font-weight:900;text-shadow:0 2px 6px #102a18}
+body.std-design .advent-banner-door{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;aspect-ratio:4/5;border:2px solid #e1c184;border-radius:46% 46% 10px 10px;background:linear-gradient(115deg,#6c1b24,#a33839 48%,#531a23);box-shadow:0 12px 20px #14291980,inset 0 0 0 6px #6e241f,inset 0 0 0 8px #dcb46b;transition:transform .2s}
+body.std-design .advent-banner-door strong{font:700 64px/1 Georgia,serif}
 body.std-design .advent-banner-door>span{font-size:23px;color:#ffe5a1}
-body.std-design .advent-banner-door strong{font:700 clamp(48px,6vw,82px)/1 Georgia,serif}
-body.std-design .advent-banner-door small{font-size:13px;letter-spacing:.06em}
-body.std-design .advent-banner-status{font-size:12px;font-weight:800;text-shadow:0 2px 6px #102a18}
-body.std-design .advent-today-shortcut:hover .advent-banner-door{transform:translateY(-3px)}
-body.std-design .advent-preview,body.std-design .advent-motion-toggle{display:none}
-@media(max-width:760px){body.std-design .std-hero #advent-today-shortcut{left:4%;top:32%;width:90px;gap:3px}body.std-design .advent-banner-caption{font-size:12px}body.std-design .advent-banner-door strong{font-size:43px}body.std-design .advent-banner-door small,body.std-design .advent-banner-status{font-size:9px}}
-@media(prefers-reduced-motion:reduce){body.std-design .advent-banner-door{transition:none}}
+body.std-design .advent-banner-door small{font-size:13px}
+body.std-design #advent-today-shortcut:hover .advent-banner-door{transform:rotate(-3deg)}
+body.std-design .advent-status-dialog .advent-popup{padding:24px}
+body.std-design .advent-status-message{color:#fff5da;font-size:17px}
+body.std-design .advent-status-close{border:1px solid #ebcf91;border-radius:12px;background:#a73139;color:#fff;padding:12px 22px}
 
-/* Keep the full Halloween illustration visible without enlarging and cropping it. */
-body.std-design.halloween .std-hero{height:clamp(350px,31.5vw,480px);background:#1d0c09}
-body.std-design.halloween .std-hero-image{object-fit:contain;object-position:center top}
-body.std-design.halloween .std-hero-copy{top:clamp(98px,9vw,140px);right:22%;width:48%}
-body.std-design.halloween .std-hero h1{font-size:clamp(37px,5vw,68px)}
-body.std-design.halloween .std-hero p{font-size:clamp(16px,1.5vw,22px)}
-body.std-design.halloween .std-search{margin-top:14px;min-height:52px}
-body.std-design.halloween .std-search button{width:40px;height:40px}
-/* Keep Halloween navigation visible; it can scroll horizontally on a small screen. */
-body.std-design.halloween .std-menu-toggle{display:none}
-body.std-design.halloween #stdNavigation{display:flex;align-items:center;flex-wrap:nowrap;gap:2px}
-body.std-design.halloween #stdNavigation button{font-size:clamp(10px,.85vw,14px);padding:9px 6px;gap:3px}
-body.std-design.halloween #stdNavigation button>span{font-size:16px}
-@media(min-width:1101px){
- body.std-design.halloween .std-topbar{flex-wrap:nowrap;gap:10px}
- body.std-design.halloween #stdNavigation{order:0;flex:1;min-width:0;border:0;padding:0;justify-content:flex-end}
-}
 @media(max-width:1100px){
- body.std-design.halloween .std-topbar{flex-wrap:wrap}
- body.std-design.halloween #stdNavigation{order:5;flex:0 0 100%;min-width:0;overflow-x:auto;justify-content:flex-start;border-top:1px solid #ffffff30;padding:5px 0 0;scrollbar-width:thin}
- body.std-design.halloween #stdNavigation button{flex:0 0 auto;font-size:12px;padding:8px}
+ body.std-design .std-categories{grid-template-columns:repeat(5,minmax(0,1fr))}
+ body.std-design .std-categories>button{flex-direction:row;min-height:90px;font-size:14px}
+ body.std-design .std-categories .std-icon{width:56px;height:56px}
+ body.std-design .std-popular-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+ body.std-design .std-game-grid,body.std-design .std-color-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+ body.std-design .std-collection-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+ body.std-design .std-search-color-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+ body.std-design .std-hero-copy{width:58%;right:3%}
+ body.std-design .std-hero h1{font-size:clamp(38px,5.7vw,62px);letter-spacing:-2px}
+ body.std-design .std-hero-benefits{gap:8px}
+ body.std-design .std-hero-benefits span{font-size:12px;padding:9px}
+ body.std-design .wrap{padding:0 18px 28px}
 }
-@media(max-width:760px){
- body.std-design.halloween .std-hero{height:400px}
- body.std-design.halloween .std-hero-image{object-fit:contain;object-position:center top}
- body.std-design.halloween .std-hero-copy{top:145px;left:5%;right:5%;width:90%}
- body.std-design.halloween .std-hero h1{font-size:38px;letter-spacing:-1.4px}
- body.std-design.halloween .std-hero p{font-size:16px}
+@media(max-width:700px){
+ body.std-design .std-topbar{padding:12px;gap:10px}
+ body.std-design .std-brand,body.std-design .std-plugg{font-size:clamp(13px,3.8vw,21px);gap:6px;letter-spacing:-.5px;flex:1 1 auto}
+ body.std-design .std-plugg{justify-content:flex-end}
+ body.std-design .std-brand img,body.std-design .std-plugg img{width:28px;height:28px}
+ body.std-design .std-controls{order:2;margin-right:auto}
+ body.std-design .std-topbar:before{content:"";order:1;flex-basis:100%}
+ body.std-design .std-header-search{order:2;margin-left:0}
+ body.std-design .std-menu-toggle{display:flex;order:3;width:44px;height:44px;align-items:center;justify-content:center;flex-direction:column;gap:5px;border:0;border-radius:12px;background:#ffffff22}
+ body.std-design .std-menu-toggle span{width:21px;height:2px;background:#fff}
+ body.std-design #stdNavigation{display:none;order:4;flex:1 0 100%;justify-content:flex-start;flex-wrap:wrap;gap:6px;border-top:1px solid #ffffff30;padding-top:10px}
+ body.std-design .menu-open #stdNavigation{display:flex}
+ body.std-design #stdNavigation button{font-size:14px;padding:10px 12px;flex:1 0 auto}
+ body.std-design #seasonMenu{top:118px;right:12px}
+ body.std-design .std-hero{height:570px}
+ body.std-design .std-hero-image{object-position:25% top;height:300px}
+ body.std-design .std-hero:after{background:linear-gradient(0deg,var(--hero-wash) 0%,var(--hero-wash) 43%,transparent 85%)}
+ body.std-design .std-hero-copy{left:20px;right:20px;top:auto;bottom:60px;width:auto;max-width:none}
+ body.std-design .std-hero h1{font-size:clamp(32px,8vw,52px);letter-spacing:-1.5px}
+ body.std-design .std-hero p{font-size:18px}
+ body.std-design .std-search{margin-top:18px;min-height:58px;gap:8px;padding-left:14px}
+ body.std-design .std-search input{font-size:14px}
+ body.std-design .std-search-leading{display:none}
+ body.std-design .std-hero-benefits{gap:6px;margin-top:16px}
+ body.std-design .std-hero-benefits span{font-size:11px;padding:8px}
+ body.std-design .wrap{padding:0 12px 24px}
+ body.std-design .std-categories{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;padding:11px;border-radius:24px}
+ body.std-design .std-categories>button{flex-direction:column;min-height:106px;font-size:14px;padding:8px 5px}
+ body.std-design .std-categories>button>span{min-height:26px;overflow-wrap:anywhere}
+ body.std-design .std-categories .std-icon{width:58px;height:58px}
+ body.std-design .std-panel{padding:14px;border-radius:24px}
+ body.std-design .std-section-heading{gap:10px;align-items:flex-start}
+ body.std-design .std-section-heading h2,body.std-design .std-discover .std-section-heading h2{font-size:21px;line-height:1.25}
+ body.std-design .std-section-heading>button{font-size:12px;flex:none}
+ body.std-design .std-section-heading h2>span{font-size:24px}
+ body.std-design .std-popular-grid,body.std-design .std-game-grid,body.std-design .std-color-grid,body.std-design .std-collection-grid,body.std-design .std-search-color-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ body.std-design .std-activity-card>img{height:140px}
+ body.std-design .std-card-copy{padding:10px}
+ body.std-design .std-card-copy strong,body.std-design .std-game-copy strong{font-size:15px}
+ body.std-design .std-game-copy small{font-size:10px}
+ body.std-design .std-color-open>img{height:170px!important}
+ body.std-design .std-inspiration{padding:20px;flex-wrap:wrap;gap:12px}
+ body.std-design .std-inspiration>div:first-child{display:none}
+ body.std-design .std-inspiration>button{margin:0}
+ body.std-design .std-inspiration h2{font-size:22px}
+ body.std-design.std-browsing .std-hero{height:290px}
+ body.std-design.std-browsing .std-hero-copy{top:25px;bottom:auto}
+ body.std-design.std-browsing .std-hero h1{font-size:34px}
+ body.std-design.std-browsing .std-hero-benefits{display:none}
+ body.std-design .std-results-heading{flex-wrap:wrap}
+ body.std-design .std-results-heading h2{font-size:25px}
+ body.std-design .modal{padding:22px}
+ body.std-design .std-hero #advent-today-shortcut{top:18px;left:50%;transform:translateX(-50%);width:92px;gap:3px}
+ body.std-design .advent-banner-caption,body.std-design .advent-banner-status{font-size:12px}
+ body.std-design .advent-banner-door strong{font-size:42px}
 }
-
-/* The calendar remains behind the banner door; only its dialog is shown. */
-body.std-design.christmas #julkalender{display:none}
-body.std-design.christmas .std-hero #advent-today-shortcut{left:19%;top:20%;transform:translateX(-50%);padding-top:9px}
-body.std-design.christmas .advent-banner-caption{position:absolute;z-index:3;top:0;left:50%;transform:translateX(-50%) rotate(-14deg);white-space:nowrap;padding:4px 10px;border:1px solid #fff0bd;border-radius:4px;background:#f0d284;color:#492d1d;font:900 clamp(10px,1vw,13px)/1 FPStandardNunito,system-ui;letter-spacing:.04em;text-shadow:none;box-shadow:0 2px 5px #0008}
-@media(max-width:760px){body.std-design.christmas .std-hero #advent-today-shortcut{left:16%;top:23%;width:90px}body.std-design.christmas .advent-banner-caption{font-size:9px;padding:3px 6px}}
-
-/* The Christmas door is centered vertically in its side of the banner. */
-body.std-design.christmas .std-hero #advent-today-shortcut{top:50%;left:19%;transform:translate(-50%,-50%)}
-@media(max-width:760px){body.std-design.christmas .std-hero #advent-today-shortcut{top:50%;left:16%;transform:translate(-50%,-50%)}}
-body.std-design.christmas .std-menu-toggle{display:none}
-body.std-design.christmas #stdNavigation{display:flex;align-items:center;flex-wrap:nowrap;gap:2px}
-body.std-design.christmas #stdNavigation button{font-size:clamp(10px,.85vw,14px);padding:9px 6px;gap:3px}
-body.std-design.christmas #stdNavigation button>span{font-size:16px}
-@media(min-width:1101px){body.std-design.christmas .std-topbar{flex-wrap:nowrap;gap:10px}body.std-design.christmas #stdNavigation{order:0;flex:1;min-width:0;border:0;padding:0;justify-content:flex-end}}
-@media(max-width:1100px){body.std-design.christmas .std-topbar{flex-wrap:wrap}body.std-design.christmas #stdNavigation{order:5;flex:0 0 100%;min-width:0;overflow-x:auto;justify-content:flex-start;border-top:1px solid #ffffff30;padding:5px 0 0;scrollbar-width:thin}body.std-design.christmas #stdNavigation button{flex:0 0 auto;font-size:12px;padding:8px}}
-body.christmas .advent-status-dialog .advent-popup{padding:24px}
-body.christmas .advent-status-dialog .advent-status-message{color:#fff5da;font-size:17px;line-height:1.5}
-body.christmas .advent-status-dialog .advent-status-close{border:1px solid #ebcf91;border-radius:12px;background:#a73139;color:#fff;padding:10px 22px;font:700 15px system-ui;cursor:pointer}
-
-/* Matching two-row previews in the home-page panels. */
-body.std-design .std-discover{align-items:stretch}
-body.std-design .std-discover>.std-panel{min-width:0}
-body.std-design .std-color-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-@media(max-width:520px){body.std-design .std-color-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:520px){body.std-design .std-game-card:first-child{grid-column:auto;display:block}body.std-design .std-game-card:first-child .std-game-art{aspect-ratio:1}body.std-design .std-game-card:first-child .std-game-copy{padding:10px}body.std-design .std-game-card:first-child .std-game-copy strong{font-size:14px}}
-@media(min-width:1101px){body.std-design .std-discover{grid-template-columns:repeat(2,minmax(0,1fr))}}
-
-/* Keep both site names and their icons matched in every theme. */
-body.std-design .std-plugg{font-size:23px;letter-spacing:-.7px}
-body.std-design .std-plugg img{width:38px;height:38px;border-radius:10px;object-fit:contain}
-@media(max-width:1300px){body.std-design .std-plugg{font-size:20px;gap:7px}body.std-design .std-plugg img{width:32px;height:32px}}
-@media(max-width:1100px){body.std-design .std-plugg{font-size:21px}}
-@media(max-width:760px){body.std-design .std-plugg{font-size:17px;letter-spacing:-.5px}body.std-design .std-plugg img{width:29px;height:29px}}
-@media(max-width:520px){body.std-design .std-plugg{font-size:16px}}
-
-/* On a phone the two site links and the menu need separate rows. */
-@media (max-width: 520px) {
-  body.std-design .std-header {
-    position: relative;
-    inset: auto;
-    margin: 8px max(8px, env(safe-area-inset-right)) 0 max(8px, env(safe-area-inset-left));
-  }
-  body.std-design .std-topbar {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 5px 8px;
-  }
-  body.std-design .std-brand, body.std-design .std-plugg {
-    position: static;
-    min-width: 0;
-    padding: 0;
-    background: none;
-    border: 0;
-    font-size: clamp(13px, 3.8vw, 17px);
-    white-space: nowrap;
-  }
-  body.std-design .std-plugg { justify-self: end; }
-  body.std-design .std-menu-toggle { display: none; }
-  body.std-design .std-controls { grid-row: 2; grid-column: 1; }
-  body.std-design #stdNavigation {
-    position: static;
-    display: flex;
-    grid-row: 2;
-    grid-column: 2;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    min-width: 0;
-    justify-content: flex-start;
-    padding: 2px 0;
-    border: 0;
-  }
-  body.std-design #stdNavigation button { flex: 0 0 auto; }
-}
+@media(prefers-reduced-motion:reduce){body.std-design *,body.std-design *:before,body.std-design *:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}

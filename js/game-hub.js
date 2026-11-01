@@ -16,8 +16,9 @@
   function render(){stop();const root=document.querySelector('#catalog');if(!root)return;root.innerHTML=gallery();mount();}
   function mount(){const root=document.querySelector('#catalog');if(!root||root.dataset.gameHubBound)return;root.dataset.gameHubBound='true';root.addEventListener('click',e=>{const game=e.target.closest('[data-game-launch]');if(game){open(game.dataset.gameLaunch);return;}if(e.target.closest('[data-game-back]')){render();document.querySelector('.games-heading')?.scrollIntoView({behavior:'smooth',block:'start'});}});}
   function open(id){const game=games.find(g=>g.id===id);if(!game)return;const api=window[game.module];if(!api)return;stop();const root=document.querySelector('#catalog'),stage=root?.querySelector('#gameStage');if(!stage)return;current=id;root.querySelector('.games-heading').hidden=true;root.querySelector('.games-grid').hidden=true;stage.innerHTML=`<div class="game-running"><button class="game-back" data-game-back>← Tillbaka till spelmenyn</button>${api.gallery()}</div>`;api.start();if(!['bowling','penalty'].includes(id))window.FPGameNavigation?.mount();stage.scrollIntoView({behavior:'smooth',block:'start'});}
-  window.FPGameHub={gallery,mount,render,open,stop};
+  window.FPGameHub={games,gallery,mount,render,open,stop};
   if(document.querySelector('#filters .active')?.dataset.cat==='Spel'){render();if(window.FPPendingGame){open(window.FPPendingGame);delete window.FPPendingGame;}}
 })();
+
 
 

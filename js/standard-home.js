@@ -1,5 +1,4 @@
-/* Standard's presentation layer. Existing seasonal views, games and painter own
-   their original DOM and lifecycle. No copies of their implementation live here. */
+/* Shared Fritidsparken presentation. Games, painter and calendar retain their lifecycles. */
 (() => {
   'use strict';
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -9,7 +8,7 @@
   const legacyTop = document.querySelector('.topin');
   const controls = ['theme','seasonPicker','halloweenSound'].map(id => document.getElementById(id));
   const palettes = ['#dcf2d6','#ffe5c6','#fff0b6','#ffdeea','#d4efff','#d7f2df','#e9dfff','#e1e4ff','#ffdeeb','#d2f4ee'];
-  const categories = [['Alla','Alla','bulb'],['Skapa','Skapa','scissors'],['Pyssel','Pyssel','palette'],['Färglägga','Mandala','pencils'],['Klippdockor','Klippdockor','dolls'],['Rita steg-för-steg','Rita steg-för-steg','draw'],['Rast','Rast','ball'],['Fritidsgympa','Fritidsgympa','ball'],['Spel','Spel','game'],['Roliga verktyg','Roliga verktyg','tools']];
+  const categories = [['Alla','Alla','bulb'],['Skapa','Skapa','scissors'],['Pyssel','Pyssel','palette'],['Färglägga','Mandala','pencils'],['Klippdockor','Klippdockor','dolls'],['Rita steg-för-steg','Rita steg-för-steg','draw'],['Rastlekar','Rast','ball'],['Rörelse','Fritidsgympa','ball'],['Spel','Spel','game'],['Roliga verktyg','Roliga verktyg','tools']];
   let iconId = 0, browseAll = false;
   function icon(kind) {
     const id = 'std-icon-' + (++iconId);
@@ -33,27 +32,18 @@
   const searchIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg>';
   const header = document.createElement('header');
   header.className = 'std-header standard-only';
-  header.innerHTML = `<div class="std-topbar"><a class="std-brand" href="#" data-standard-category="Alla"><img src="./assets/fritidsparken-logo.jpg" alt="" width="38" height="38">Fritidsparken.se</a><a class="std-plugg" href="https://pluggparken.se/"><img src="./assets/pluggparken-icon.svg" alt="" width="38" height="38"> Pluggparken.se</a><button class="std-menu-toggle" aria-expanded="false" aria-controls="stdNavigation" aria-label="Öppna huvudmenyn"><span></span><span></span><span></span></button><nav id="stdNavigation" aria-label="Huvudmeny">${[['Hem','Alla','⌂'],['Skapa','Skapa','✂'],['Pyssel','Pyssel','◉'],['Färglägga','Mandala','✎'],['Rörelse','Fritidsgympa','↗'],['Spel','Spel','⊞'],['Roliga verktyg','Roliga verktyg','⚒']].map(([label,cat,symbol])=>`<button type="button" data-standard-category="${cat}"><span aria-hidden="true">${symbol}</span>${label}</button>`).join('')}</nav><div class="std-controls"></div></div>`;
+  header.innerHTML = `<div class="std-topbar"><a class="std-brand" href="#" data-standard-category="Alla"><img src="./assets/fritidsparken-logo.jpg" alt="" width="38" height="38">Fritidsparken.se</a><a class="std-plugg" href="https://pluggparken.se/"><img src="./assets/pluggparken-icon.svg" alt="" width="38" height="38"> Pluggparken.se</a><button class="std-menu-toggle" aria-expanded="false" aria-controls="stdNavigation" aria-label="Öppna huvudmenyn"><span></span><span></span><span></span></button><nav id="stdNavigation" aria-label="Huvudmeny">${[['Hem','Alla','⌂'],['Skapa','Skapa','✂'],['Pyssel','Pyssel','◉'],['Färglägga','Mandala','✎'],['Rörelse','Fritidsgympa','↗'],['Spel','Spel','⊞'],['Roliga verktyg','Roliga verktyg','⚒']].map(([label,cat,symbol])=>`<button type="button" data-standard-category="${cat}"><span aria-hidden="true">${symbol}</span>${label}</button>`).join('')}</nav><button type="button" class="std-header-search" aria-label="Sök aktiviteter">${searchIcon}</button><div class="std-controls"></div></div>`;
   document.body.prepend(header);
   const hero = document.createElement('section');
   hero.className = 'std-hero standard-only';
   hero.setAttribute('aria-labelledby','stdTitle');
-  hero.innerHTML = `<img class="std-hero-image" src="./assets/standard/nature-hero.jpg" alt="Barn och en hund vid en trädkoja med utsikt över en svensk sjö" width="1536" height="1024" fetchpriority="high"><div class="std-hero-copy"><h1 id="stdTitle">Fritidsparken.se</h1><p>Aktiviteter, pyssel, spel och inspiration<br>för en rolig fritid!</p><form class="std-search" role="search"><label class="std-sr-only" for="standardSearch">Sök bland aktiviteter, spel och färgläggning</label><span class="std-search-leading">${searchIcon}</span><input type="search" id="standardSearch" placeholder="Sök aktivitet, pyssel, spel eller idé..." autocomplete="off"><button type="submit" aria-label="Sök">${searchIcon}</button></form></div>`;
+  hero.innerHTML = `<img class="std-hero-image" src="./assets/standard/nature-hero.jpg" alt="Barn och en hund vid en trädkoja med utsikt över en svensk sjö" width="1536" height="1024" fetchpriority="high"><div class="std-hero-copy"><h1 id="stdTitle">Fritidsparken<span>.se</span></h1><p>Aktiviteter, pyssel, spel och inspiration<br>för en rolig fritid!</p><form class="std-search" role="search"><label class="std-sr-only" for="standardSearch">Sök bland aktiviteter, spel och färgläggning</label><span class="std-search-leading">${searchIcon}</span><input type="search" id="standardSearch" placeholder="Sök aktivitet, pyssel, spel eller idé..." autocomplete="off"><button type="submit" aria-label="Sök">${searchIcon}</button></form><div class="std-hero-benefits"><span>💡 Massor av idéer</span><span>💚 En roligare fritid</span><span>👋 För 6–12 år</span></div></div>`;
   document.querySelector('main').before(hero);
   const home = document.createElement('div');
   home.id = 'standardHome';home.className = 'standard-only';
   document.querySelector('.hero').after(home);
-  const categoryPanel = () => `<section class="std-categories" aria-label="Utforska kategorier">${(currentSeason()==='standard'?categories:[...categories.slice(0,4),currentSeason()==='halloween'?['Halloweenpyssel','Halloweenpyssel','pumpkin']:['Julpyssel','Julpyssel','gift'],...categories.slice(4)]).map(([label,cat,symbol],i)=>`<button type="button" data-standard-category="${cat}" ${cat==='Alla'?'data-standard-browse-all':''} style="--tile:${palettes[i % palettes.length]}">${icon(symbol)}<span>${label}</span></button>`).join('')}</section>`;
-  const gameItems = [
-    {id:'penalty',title:'Straffläggaren',image:'strafflaggaren/cover.svg',tag:'3D · Skjut & rädda straffar'},
-    {id:'bowling',title:'Crazy Bowling',image:'crazy-bowling/cover.svg',tag:'3D · Bowling & galna banor'},
-    {id:'frog',title:'Grodhoppet',image:'grodhoppet/cover.webp',tag:'Äventyr · Hopp & klurigheter'},
-    {id:'bike',title:'Stuntcykel – Staden',image:'stunt-bike-city-icon.svg',tag:'3D · Fysik & balans'},
-    {id:'plane',title:'Flygpilot',image:'plane-pilot-icon.svg',tag:'3D · Flygäventyr'},
-    {id:'four',title:'4 i rad',image:'four-in-row-icon.svg',tag:'Strategi · 1–2 spelare'},
-    {id:'clinic',title:'Djurkliniken',image:'djurkliniken/cover.webp',tag:'Djur & omsorg · 8 små vänner'},
-    {id:'construction',title:'Byggarbetsplatsen',image:'byggarbetsplatsen/cover.webp',tag:'3D · Bygg & maskiner'}
-  ];
+  const categoryPanel = () => `<section class="std-categories" aria-label="Utforska kategorier">${categories.map(([label,cat,symbol],i)=>`<button type="button" data-standard-category="${cat}" ${cat==='Alla'?'data-standard-browse-all':''} style="--tile:${palettes[i]}">${icon(symbol)}<span>${label}</span></button>`).join('')}</section>`;
+  const gameItems = window.FPGameHub.games.map(g=>({...g,tag:g.type}));
   const shuffle = items => {const result=[...items];for(let i=result.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[result[i],result[j]]=[result[j],result[i]];}return result;};
   const photo = name => {const doc=new DOMParser().parseFromString(createPreview(name),'text/html');return doc.querySelector('img')?.getAttribute('src') || './assets/minifigurscen.jpg';};
   const activityCard = (title,label,src,action,kind='craft') => `<button type="button" class="std-activity-card" ${action}><img src="${esc(src)}" alt="${esc(title)}" loading="lazy" decoding="async"><span class="std-card-copy"><strong>${esc(title)}<span aria-hidden="true">›</span></strong><small class="std-label std-label-${kind}">${esc(label)}</small></span></button>`;
@@ -69,8 +59,7 @@
       activityCard('Pärlmönster','Pyssel',photo('Pärlmönster'),'data-standard-pearl'),
       activityCard('Rita steg för steg','Färglägga','./assets/standard/drawing-step-cover.jpg','data-standard-category="Rita steg-för-steg"','color'),
       activityCard('Hinderbana','Rörelse','./assets/'+obstacle.image,'data-standard-gym="'+esc(obstacle.name)+'"','move'),
-      activityCard('Minifigurscen','Pyssel',photo('Minifigurscen'),'data-standard-activity="Minifigurscen"','build'),
-      activityCard('Stuntcykel – Staden','Spel','./assets/stunt-bike-city-icon.svg','data-standard-game="bike"','game')
+      activityCard('Minifigurscen','Pyssel',photo('Minifigurscen'),'data-standard-activity="Minifigurscen"','build')
     ].join('');
     const season=currentSeason();
     const colorPool=season==='standard'?mandalas.filter(m=>!['Halloween','Jul'].includes(m.type)&&!m.types?.some(t=>['Halloween','Jul'].includes(t))):mandalas.filter(m=>m.type===(season==='halloween'?'Halloween':'Jul')||m.types?.includes(season==='halloween'?'Halloween':'Jul'));
@@ -85,16 +74,17 @@
     const matches=value=>String(value).toLocaleLowerCase('sv').includes(q);
     const act=activities.filter(a=>matches(a.join(' ')));
     const gym=gymGames.filter(g=>matches(g.name+' '+g.description));
-    const colors=mandalas.filter(m=>!['Halloween','Jul'].includes(m.type)&&!m.types?.some(t=>['Halloween','Jul'].includes(t))&&matches(m.title+' '+m.type));
+    const colors=mandalas.filter(m=>(currentSeason()!=='standard'||(!['Halloween','Jul'].includes(m.type)&&!m.types?.some(t=>['Halloween','Jul'].includes(t))))&&matches(m.title+' '+m.type));
     const drawings=drawingAnimals.filter(a=>!['spoke','pumpa','fladdermus'].includes(a.id)&&matches('Rita steg för steg '+a.name));
     const dolls=paperDolls.filter(m=>!matchesHoliday(m.title+' '+m.img)&&matches('Klippdockor '+m.title));
     const tools=funTools.filter(t=>matches('Roliga verktyg '+t.name+' '+t.desc));
-    const count=act.length+gym.length+colors.length+drawings.length+dolls.length+tools.length;
-    results.innerHTML=`<h2>${count} träffar för ”${esc(document.getElementById('search').value)}”</h2><button type="button" data-standard-category="Alla">Rensa sökning ×</button>`;
-    const activityHtml=act.map(a=>activityCard(a[2],a[1],photo(a[2]),a[1]==='Spel'?`data-standard-game="${a[2]==='4 i rad'?'four':a[2].startsWith('Flygpilot')?'plane':'bike'}"`:a[2]==='Pärlmönster'?'data-standard-pearl':`data-standard-activity="${esc(a[2])}"`)).join('');
+    const games=gameItems.filter(g=>matches(g.title+' '+g.tag));
+    const count=act.filter(a=>a[1]!=='Spel').length+games.length+gym.length+colors.length+drawings.length+dolls.length+tools.length;
+    results.innerHTML=`<h2>${count} ${count===1?'träff':'träffar'} för ”${esc(document.getElementById('search').value)}”</h2><button type="button" data-standard-category="Alla">Rensa sökning ×</button>`;
+    const activityHtml=act.filter(a=>a[1]!=='Spel').map(a=>activityCard(a[2],a[1],photo(a[2]),a[1]==='Spel'?`data-standard-game="${a[2]==='4 i rad'?'four':a[2].startsWith('Flygpilot')?'plane':'bike'}"`:a[2]==='Pärlmönster'?'data-standard-pearl':`data-standard-activity="${esc(a[2])}"`)).join('');
     const gymHtml=gym.map(g=>activityCard(g.name,'Rörelse','./assets/'+g.image,`data-standard-gym="${esc(g.name)}"`)).join('');
     const drawingHtml=drawings.map(a=>activityCard('Rita '+a.name,'Rita steg för steg','./assets/drawing-guides/'+(drawingGuideAsset[a.id]||a.id+'.png'),`data-standard-drawing="${esc(a.id)}"`)).join('');
-    document.getElementById('catalog').innerHTML=count?`<div class="std-collection-grid">${activityHtml}${gymHtml}${drawingHtml}${dolls.map(m=>activityCard(m.title,'Klippdockor',m.img,'data-standard-category="Klippdockor"')).join('')}${tools.map(t=>activityCard(t.name,'Roliga verktyg','./assets/'+t.image,`data-standard-tool="${esc(t.key)}"`)).join('')}</div>${colors.length?'<h3 class="std-search-subtitle">Färgläggningsbilder</h3><div class="std-search-color-grid">'+colors.map(coloringCard).join('')+'</div>':''}`:'<p class="empty">Inga träffar ännu. Prova exempelvis katt, pärlor eller flygpilot.</p>';
+    document.getElementById('catalog').innerHTML=count?`<div class="std-collection-grid">${games.map(g=>activityCard(g.title,'Spel','./assets/'+g.image,`data-standard-game="${g.id}"`,'game')).join('')}${activityHtml}${gymHtml}${drawingHtml}${dolls.map(m=>activityCard(m.title,'Klippdockor',m.img,'data-standard-category="Klippdockor"')).join('')}${tools.map(t=>activityCard(t.name,'Roliga verktyg','./assets/'+t.image,`data-standard-tool="${esc(t.key)}"`)).join('')}</div>${colors.length?'<h3 class="std-search-subtitle">Färgläggningsbilder</h3><div class="std-search-color-grid">'+colors.map(coloringCard).join('')+'</div>':''}`:'<p class="empty">Inga träffar ännu. Prova exempelvis katt, pärlor eller flygpilot.</p>';
   }
   const matchesHoliday=value=>/halloween|mini-jul|jultomte|julgran/i.test(value);
   function syncPresentation() {
@@ -131,7 +121,7 @@
     document.getElementById('standardSearch').value=document.getElementById('search').value;
     if(atHome){window.FPGameHub?.stop();document.getElementById('catalog').innerHTML='';return;}
     results.innerHTML=`<h2>${esc(pearlPage?'Pärlmönster':category==='Mandala'?'Färglägga':category==='Fritidsgympa'?'Rörelse & Fritidsgympa':category==='Alla'?'Alla aktiviteter':category)}</h2><button type="button" data-standard-category="Alla">← Till startsidan</button>`;
-    if(category==='Alla'&&q&&!pearlPage&&currentSeason()==='standard'){window.FPGameHub?.stop();renderSearch(q);return;}
+    if(category==='Alla'&&q&&!pearlPage){window.FPGameHub?.stop();renderSearch(q);return;}
     originalDraw();
   };
   function navigate(cat,scroll=true){
@@ -144,6 +134,7 @@
   header.querySelector('.std-menu-toggle').addEventListener('click',e=>{const expanded=header.classList.toggle('menu-open');e.currentTarget.setAttribute('aria-expanded',String(expanded));});
   header.addEventListener('keydown',e=>{if(e.key==='Escape'){header.classList.remove('menu-open');header.querySelector('.std-menu-toggle').setAttribute('aria-expanded','false');header.querySelector('.std-menu-toggle').focus();}});
   const searchInput=document.getElementById('standardSearch');
+  header.querySelector('.std-header-search').addEventListener('click',()=>{hero.scrollIntoView({block:'start'});searchInput.focus({preventScroll:true});});
   function search(){category='Alla';pearlPage=false;funTool=null;selectedPearl=null;browseAll=false;document.getElementById('search').value=searchInput.value;drawFilters();draw();}
   searchInput.addEventListener('input',search);
   hero.querySelector('form').addEventListener('submit',e=>{e.preventDefault();search();results.scrollIntoView({behavior:'smooth',block:'start'});});
@@ -157,11 +148,12 @@
     if(e.target.closest('[data-standard-pearl]')){navigate('Pyssel',false);pearlPage=true;pearlLevel='Alla';draw();results.scrollIntoView({behavior:'smooth'});return;}
     const drawing=e.target.closest('[data-standard-drawing]');if(drawing){navigate('Rita steg-för-steg',false);activeDrawing=drawing.dataset.standardDrawing;drawingStep=1;drawNow();return;}
     const tool=e.target.closest('[data-standard-tool]');if(tool){navigate('Roliga verktyg',false);funTool=tool.dataset.standardTool;draw();return;}
-    const color=e.target.closest('.std-color-open');if(color){const paint=color.closest('.mandala-card').querySelector('.fp-online-actions button');if(paint)paint.click();}
+    const color=e.target.closest('.std-color-open');if(color){const paint=color.closest('.mandala-card').querySelector('.fp-online-actions button');if(paint)paint.click();else navigate('Mandala');}
   });
   // Theme changes run through the existing draw() call. Attribute observation
   // also covers theme changes from extensions without watching catalog churn.
   new MutationObserver(()=>{if(!document.body.classList.contains('std-design')||presentedSeason!==currentSeason()){drawFilters();draw();}}).observe(document.body,{attributes:true,attributeFilter:['class']});
   drawFilters();draw();
 })();
+
 
