@@ -1,5 +1,5 @@
 import {clamp,winner,launch,step,swipe,keeperPose} from './physics.mjs';
-import {createWorld} from './scene.mjs';
+import {createWorld} from './scene.mjs?v=keeper-view-20261101';
 const $=s=>document.querySelector(s), overlay=$('#overlay'),KEY='fp-strafflaggaren-v1';
 let data={wins:0,xp:0,ball:0,kit:0,gloves:0,net:0,arena:0,record:0,completed:[],tutorial:false,sound:true};
 try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&typeof d==='object'){for(const k of ['wins','xp','ball','kit','gloves','net','arena','record'])if(Number.isFinite(d[k])&&d[k]>=0)data[k]=Math.floor(d[k]);if(Array.isArray(d.completed))data.completed=d.completed.filter(n=>Number.isInteger(n)&&n>=0&&n<5);data.tutorial=!!d.tutorial;data.sound=d.sound!==false;}}catch{}

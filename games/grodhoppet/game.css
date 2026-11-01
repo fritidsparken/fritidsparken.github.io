@@ -9,3 +9,5 @@
 .difficulty-select{margin:8px 0}.difficulty-select strong{display:block;font-size:.8rem;color:#44775a}.difficulty-select #difficulties{display:flex;justify-content:center;flex-wrap:wrap}.difficulty-select button{font-size:.8rem;padding:7px 14px;margin:3px;border:2px solid transparent}.difficulty-select button.selected{border-color:#32985d;background:#d5edc9}.difficulty-select small{display:block;color:#587663;font-weight:700;font-size:.72rem}#levels{max-height:112px;overflow-y:auto}@media(max-height:600px){.difficulty-select{margin:3px 0}#levels{max-height:74px}}
 
 .panel,#levels{touch-action:pan-y;overscroll-behavior:contain}
+
+@media (max-width: 800px), (pointer: coarse){#controls{left:50%;right:auto;transform:translateX(-50%);bottom:max(16px,env(safe-area-inset-bottom))}}
