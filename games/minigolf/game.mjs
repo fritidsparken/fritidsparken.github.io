@@ -1,6 +1,6 @@
 import {courses,worlds,totalPar} from './courses.mjs';
 import {Physics} from './physics.mjs';
-import {View} from './view.mjs';
+import {View} from './view.mjs?v=canvas-start-2';
 import {fresh,clean,key,balls,unlocked,result} from './state.mjs';
 import {Audio} from './audio.mjs';
 const $=id=>document.getElementById(id);let s;try{s=clean(JSON.parse(localStorage.getItem(key)));}catch{s=fresh();}
@@ -27,7 +27,7 @@ $('overlay').addEventListener('click',e=>{const b=e.target.closest('[data-action
 });
 $('overlay').addEventListener('change',e=>{if(e.target.id==='quality'){s.quality=e.target.value;view.quality(s.quality);save();}});
 $('menu').onclick=()=>{if(active){s.position=p.rest?[p.x,p.y,p.z]:p.safe.slice();save();}home();};$('score').onclick=scoreboard;$('overview').onclick=()=>{intro=0;overview=!overview;msg(overview?'Studera banan':'Dra bakåt och släpp');};$('rescue').onclick=()=>{if(!active||completed||paused)return;p.reset();s.position=p.safe.slice();save();hud();};
-try{view=new View($('world'));view.quality(s.quality);p=new Physics(courses[s.hole]);view.build(courses[s.hole],balls[s.selected][1]);home();}catch(e){console.error(e);panel('<h2>3D-grafiken kunde inte starta</h2><p>Prova att slå på hårdvaruacceleration eller öppna spelet i en annan webbläsare.</p><a href="../../?view=games" target="_top">Till spelmenyn</a>');throw e;}
+try{view=new View($('world'));view.quality(s.quality);p=new Physics(courses[s.hole]);view.build(courses[s.hole],balls[s.selected][1]);home();}catch(e){console.error(e);panel('<h2>3D-grafiken kunde inte starta</h2><p>Spelets grafik kunde inte laddas. Ladda om sidan för att försöka igen.</p><a href="../../?view=games" target="_top">Till spelmenyn</a>');throw e;}
 const canvas=view.renderer.domElement;
 canvas.addEventListener('pointerdown',e=>{if(!active||paused||!p.rest||completed)return;audio.unlock();if(intro>0){intro=0;return;}if(overview)return;const point=view.point(e.clientX,e.clientY,p.y);if(!point)return;drag={id:e.pointerId,start:point};canvas.setPointerCapture(e.pointerId);power=0;e.preventDefault();});
 canvas.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;const q=view.point(e.clientX,e.clientY,p.y);if(!q)return;const dx=drag.start.x-q.x,dz=drag.start.z-q.z,l=Math.hypot(dx,dz);if(l>.05)aim=[dx/l,dz/l];power=Math.min(1,l/5);});
