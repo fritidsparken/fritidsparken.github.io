@@ -2,7 +2,7 @@
 @font-face{font-family:FPStandardNunito;font-style:normal;font-weight:400 900;font-display:swap;src:url('../assets/standard/nunito-latin.woff2') format('woff2')}
 .standard-only{display:none}
 body.std-design{--bg:#f2f9ff;--paper:#fff;--ink:#09213d;--muted:#53687b;--green:#168836;--mint:#e3f5ed;--line:#dbe7ef;--header:#071e35;--hero-wash:#e7f6ff;--hero-ink:#09213d;--tile-tint:transparent;--tile-mix:22%;--radius:24px;--shadow:0 8px 28px #15365312;background:var(--bg);font-family:FPStandardNunito,ui-rounded,system-ui,sans-serif;font-size:16px;line-height:1.5}
-body.std-design.dark:not(.halloween):not(.christmas){--bg:#15251e;--paper:#20372b;--ink:#f1f6ee;--muted:#c1cfc2;--line:#395541;--mint:#304e3c;--green:#8dd197}
+body.std-design.dark:not(.halloween):not(.christmas){--bg:#181a1e;--paper:#24272d;--ink:#f3f4f6;--muted:#bfc3cb;--line:#3b3f47;--mint:#32363e;--green:#b9c1cd;--tile-tint:#2d3138;--tile-mix:92%}
 body.std-design .standard-only{display:block}
 body.std-design .standard-only[hidden]{display:none!important}
 body.std-design>.top,body.std-design main>.hero,body.std-design #Aktiviteter>div:first-child,body.std-design [id="Om Fritidsparken"]{display:none}
@@ -10,13 +10,13 @@ body.std-design.std-home #Aktiviteter,body.std-design.std-home #filters,body.std
 body.std-design .wrap{position:relative;width:100%;max-width:1440px;margin:0 auto;padding:0 30px 30px}
 body.std-design.std-home .wrap{margin-top:-36px}
 body.std-design .std-header{position:relative;z-index:12;margin:0;background:var(--header)}
-body.std-design .std-topbar{min-height:68px;display:flex;align-items:center;gap:16px;padding:14px 24px;border:0;border-radius:0;background:var(--header);flex-wrap:wrap;max-width:1440px;margin:auto;box-shadow:0 7px 24px #12341d24;backdrop-filter:blur(18px);color:#fff}
+body.std-design .std-topbar{min-height:68px;display:flex;align-items:center;gap:16px;padding:14px 24px;border:0;border-radius:0;background:var(--header);flex-wrap:nowrap;max-width:1600px;margin:auto;box-shadow:0 7px 24px #12341d24;backdrop-filter:blur(18px);color:#fff}
 body.std-design .std-brand,body.std-design .std-plugg{display:flex;align-items:center;gap:10px;white-space:nowrap;flex-shrink:0;font-weight:850;letter-spacing:-.7px}
 body.std-design .std-brand{font-size:23px}
 body.std-design .std-brand img{border-radius:13px;object-fit:cover}
 body.std-design .std-plugg{font-size:23px;letter-spacing:-.7px}
 body.std-design .std-plugg>span{font-size:25px}
-body.std-design #stdNavigation{display:flex;align-items:center;justify-content:center;gap:8px;flex:1 0 100%;order:4}
+body.std-design #stdNavigation{display:flex;align-items:center;justify-content:center;gap:3px;flex:1 1 auto;order:0;min-width:0}
 body.std-design #stdNavigation button{border:0;background:transparent;color:#fff;display:flex;align-items:center;justify-content:center;gap:7px;padding:11px 10px;border-radius:16px;font-size:14px;font-weight:750;white-space:nowrap;min-height:44px;transition:background .18s}
 body.std-design #stdNavigation button>span{font-size:23px;line-height:1;color:#c5e5be}
 body.std-design #stdNavigation button.active{background:var(--green);box-shadow:inset 0 1px 0 #ffffff4a}
@@ -24,7 +24,7 @@ body.std-design #stdNavigation button:hover{background:#ffffff24}
 body.std-design .std-controls{display:flex;gap:5px;align-items:center}
 body.std-design .std-controls .iconbtn{display:grid;place-items:center;position:static!important;transform:none!important;flex:0 0 34px;width:34px;height:38px;min-width:34px;padding:4px;border:0;background:#ffffff19;border-radius:12px;line-height:1;font-size:19px;color:white}
 body.std-design .std-controls #seasonPicker img{width:27px;height:27px;border-radius:9px;object-fit:cover}
-body.std-design #seasonMenu{position:absolute;z-index:25;top:126px;right:32px;left:auto;max-width:240px;background:var(--paper);color:var(--ink)}
+body.std-design #seasonMenu{position:absolute;z-index:25;top:72px;right:24px;left:auto;max-width:240px;background:var(--paper);color:var(--ink)}
 body.std-design .std-menu-toggle{display:none}
 body.std-design .std-hero{height:540px;position:relative;isolation:isolate;overflow:hidden;background:#c6d9cb}
 body.std-design .std-hero-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%;z-index:-2}
@@ -113,7 +113,7 @@ body.std-design :is(button,a,input):focus-visible{outline:3px solid #52a960;outl
 /* Theme identity. Geometry is intentionally shared. */
 body.std-design.halloween{--bg:#1b1327;--paper:#2b2037;--ink:#fff5e6;--muted:#e1cdbb;--green:#ffb34e;--mint:#473047;--line:#634554;--header:#170f21;--hero-wash:#241332;--hero-ink:#fff3df;--tile-tint:#ffab63;--tile-mix:65%;background:var(--bg)}
 body.std-design.christmas{--bg:#eef7f6;--paper:#fffefa;--ink:#163c35;--muted:#526c66;--green:#b32636;--mint:#e1efe6;--line:#d5e3dc;--header:#103b31;--hero-wash:#e9f4ee;--hero-ink:#153f32;--tile-tint:#d8e9df;--tile-mix:60%;background:var(--bg)}
-body.std-design.dark:not(.halloween):not(.christmas){--header:#10261f;--hero-wash:#d4e9e0;--hero-ink:#153627}
+body.std-design.dark:not(.halloween):not(.christmas){--header:#202329;--hero-wash:#22252b;--hero-ink:#f3f4f6}
 body.std-design .std-hero h1 span{color:#149939}
 body.std-design.halloween .std-hero h1{ text-shadow:0 3px 14px #130b1c }
 body.std-design.halloween .std-hero h1 span{color:#ffb34e}
@@ -124,12 +124,12 @@ body.std-design .std-header-search svg{width:24px;height:24px}
 body.std-design .std-controls .iconbtn{width:44px;min-width:44px;flex-basis:44px;height:44px}
 body.std-design .std-hero-benefits{display:flex;justify-content:center;gap:16px;margin-top:22px;flex-wrap:wrap}
 body.std-design .std-hero-benefits span{padding:10px 14px;background:#ffffffe6;color:#183547;border-radius:16px;font-size:14px;font-weight:850;box-shadow:var(--shadow)}
-body.std-design .std-games{background:linear-gradient(125deg,var(--header),#12354f);color:#fff;box-shadow:0 10px 30px #15365322}
-body.std-design .std-games .std-section-heading>button{color:#c8e7ff}
-body.std-design .std-game-card{background:#ffffff0d;border-color:#ffffff25}
-body.std-design .std-game-copy{color:#fff;padding:12px}
-body.std-design .std-game-copy small,body.std-design .std-games-note{color:#c6dce8}
-body.std-design .std-game-copy>span{color:#9fe5ae}
+body.std-design .std-games{background:var(--paper);color:var(--ink);box-shadow:var(--shadow)}
+body.std-design .std-games .std-section-heading>button{color:var(--green)}
+body.std-design .std-game-card{background:var(--paper);border-color:var(--line)}
+body.std-design .std-game-copy{color:var(--ink);padding:12px}
+body.std-design .std-game-copy small,body.std-design .std-games-note{color:var(--muted)}
+body.std-design .std-game-copy>span{color:var(--green)}
 body.std-design .std-game-copy strong{min-height:40px}
 body.std-design .std-card-copy strong>span{width:28px;height:28px;border-radius:50%;background:var(--mint);text-align:center;flex:none}
 body.std-design .std-color-card h3{font-size:14px!important;min-height:36px}
@@ -192,7 +192,32 @@ body.std-design .advent-status-close{border:1px solid #ebcf91;border-radius:12px
  body.std-design .std-hero-benefits span{font-size:12px;padding:9px}
  body.std-design .wrap{padding:0 18px 28px}
 }
+
+/* Compact desktop bar keeps both sites, navigation and controls in one row. */
+@media(min-width:1200px){
+ body.std-design .std-topbar{gap:10px;padding:12px 18px}
+ body.std-design .std-brand,body.std-design .std-plugg{font-size:clamp(16px,1.35vw,22px);gap:6px}
+ body.std-design .std-brand img,body.std-design .std-plugg img{width:30px;height:30px}
+ body.std-design #stdNavigation button{font-size:12px;padding:10px 6px;gap:4px}
+ body.std-design #stdNavigation button>span{font-size:18px}
+ body.std-design .std-header-search{margin-left:0;flex:none}
+}
+@media(min-width:701px) and (max-width:1199px){
+ body.std-design .std-topbar{flex-wrap:wrap}
+ body.std-design .std-menu-toggle{display:flex;width:44px;height:44px;align-items:center;justify-content:center;flex-direction:column;gap:5px;border:0;border-radius:12px;background:#ffffff22}
+ body.std-design .std-menu-toggle span{width:21px;height:2px;background:#fff}
+ body.std-design #stdNavigation{display:none;order:4;flex:1 0 100%;flex-wrap:wrap}
+ body.std-design .menu-open #stdNavigation{display:flex}
+}
+body.std-design.dark:not(.halloween):not(.christmas) .std-categories>button{color:var(--ink)}
+body.std-design.dark:not(.halloween):not(.christmas) .std-hero h1,
+body.std-design.dark:not(.halloween):not(.christmas) .std-hero p{text-shadow:0 2px 10px #0008}
+body.std-design.dark:not(.halloween):not(.christmas) .std-hero h1 span{color:#e4e7ed}
+body.std-design.dark:not(.halloween):not(.christmas) .std-hero-benefits span{background:var(--paper);color:var(--ink)}
+body.std-design.dark:not(.halloween):not(.christmas) :is(.primary,.std-inspiration>button,.std-search button){color:#202329}
+
 @media(max-width:700px){
+ body.std-design .std-topbar{flex-wrap:wrap}
  body.std-design .std-topbar{padding:12px;gap:10px}
  body.std-design .std-brand,body.std-design .std-plugg{font-size:clamp(13px,3.8vw,21px);gap:6px;letter-spacing:-.5px;flex:1 1 auto}
  body.std-design .std-plugg{justify-content:flex-end}
