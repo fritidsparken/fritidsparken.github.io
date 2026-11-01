@@ -1,5 +1,6 @@
 (() => {
   const games=[
+    {id:'minigolf',title:'Minigolf',tag:'18 HÅL. SEX VÄRLDAR.',type:'3D · Minigolf',image:'minigolf/cover.svg',text:'Spela 18 galna minigolfhål genom piratvärldar, djungel, godisland, rymden och vulkaner!',module:'FPMinigolf'},
     {id:'penalty',title:'Straffläggaren',tag:'ETT SKOTT. EN RÄDDNING.',type:'3D · Fotboll',image:'strafflaggaren/cover.svg',text:'Svep, skruva och rädda! Avgör straffläggningen, lås upp arenor och hitta ditt perfekta skott.',module:'FPStrafflaggaren'},
     {id:'bowling',title:'Crazy Bowling',tag:'SIKTA. SKRUVA. STRIKE!',type:'3D · Bowling',image:'crazy-bowling/cover.svg',text:'Tio galna banor, sex unika klot och massor av strikes. Hur många stjärnor kan du samla?',module:'FPCrazyBowling'},
     {id:'construction',title:'Byggarbetsplatsen',tag:'DET DÄR BYGGDE JAG!',type:'3D · Byggspel',image:'byggarbetsplatsen/cover.webp',text:'Kör stora byggmaskiner, gräv, lyft och bygg fantastiska saker från grunden!',module:'FPConstruction'},
@@ -15,7 +16,7 @@
   function stop(){window.FPGameNavigation?.remove();for(const g of games)window[g.module]?.destroy?.();current=null;}
   function render(){stop();const root=document.querySelector('#catalog');if(!root)return;root.innerHTML=gallery();mount();}
   function mount(){const root=document.querySelector('#catalog');if(!root||root.dataset.gameHubBound)return;root.dataset.gameHubBound='true';root.addEventListener('click',e=>{const game=e.target.closest('[data-game-launch]');if(game){open(game.dataset.gameLaunch);return;}if(e.target.closest('[data-game-back]')){render();document.querySelector('.games-heading')?.scrollIntoView({behavior:'smooth',block:'start'});}});}
-  function open(id){const game=games.find(g=>g.id===id);if(!game)return;const api=window[game.module];if(!api)return;stop();const root=document.querySelector('#catalog'),stage=root?.querySelector('#gameStage');if(!stage)return;current=id;root.querySelector('.games-heading').hidden=true;root.querySelector('.games-grid').hidden=true;stage.innerHTML=`<div class="game-running"><button class="game-back" data-game-back>← Tillbaka till spelmenyn</button>${api.gallery()}</div>`;api.start();if(!['bowling','penalty'].includes(id))window.FPGameNavigation?.mount();stage.scrollIntoView({behavior:'smooth',block:'start'});}
+  function open(id){const game=games.find(g=>g.id===id);if(!game)return;const api=window[game.module];if(!api)return;stop();const root=document.querySelector('#catalog'),stage=root?.querySelector('#gameStage');if(!stage)return;current=id;root.querySelector('.games-heading').hidden=true;root.querySelector('.games-grid').hidden=true;stage.innerHTML=`<div class="game-running"><button class="game-back" data-game-back>← Tillbaka till spelmenyn</button>${api.gallery()}</div>`;api.start();if(!['bowling','penalty','minigolf'].includes(id))window.FPGameNavigation?.mount();stage.scrollIntoView({behavior:'smooth',block:'start'});}
   window.FPGameHub={games,gallery,mount,render,open,stop};
   if(document.querySelector('#filters .active')?.dataset.cat==='Spel'){render();if(window.FPPendingGame){open(window.FPPendingGame);delete window.FPPendingGame;}}
 })();
