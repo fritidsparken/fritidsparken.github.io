@@ -27,3 +27,12 @@
  .pilot-page.pilot-playing .pilot-instruments{bottom:175px}
  .pilot-page.pilot-playing .pilot-message{bottom:210px}
 }
+
+/* Keep the mobile joystick compact and clear of the centre of the view. */
+@media (pointer:coarse), (max-width:700px){
+ .pilot-page .pilot-joystick{width:104px;height:104px}
+ .pilot-page .pilot-stick-thumb{width:46px;height:46px;margin:-23px}
+ .pilot-page.pilot-playing .arcade-controls{justify-content:flex-start;margin-top:-125px;padding:8px 12px}
+ .pilot-page.pilot-playing .pilot-instruments{bottom:135px}
+ .pilot-page.pilot-playing .pilot-message{bottom:165px}
+}
