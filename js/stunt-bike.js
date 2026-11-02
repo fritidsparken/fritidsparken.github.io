@@ -28,12 +28,58 @@
     points.push([x+22,base],[x+55,base]);
     return {id:'city-'+i,name:m[0],tag:m[1],sky:m[2],accent:m[3],points,checkpoints,jumps,length:x+20,base,medal:(x+20)/12+12};
   }
-  const tracks=META.map((_,i)=>makeTrack(i));
-  function surface(t,x){const p=t.points;for(let i=1;i<p.length;i++)if(x<=p[i][0]){const a=p[i-1],b=p[i],s=(b[1]-a[1])/(b[0]-a[0]);return {y:a[1]+clamp((x-a[0])/(b[0]-a[0]),0,1)*(b[1]-a[1]),s};}return {y:p.at(-1)[1],s:0};}
-  function newRide(t,x=5){return {x,y:surface(t,x).y+.807,vx:0,vy:0,a:0,av:0,contact:[true,true],compression:[0,0],time:0,score:0,checkpoint:5,checkpointScore:0,air:0,airX:x,airA:0,peak:0,wheelie:0,stoppie:0,pending:0,jumpLatch:false,cooldown:0,landLock:0,combo:0,landing:null,perfect:0,tricks:0,doubles:0,failed:false,complete:false,events:[]};}
+  const tracks=META.map((_,i)=>({...makeTrack(i),night:i===4,loops:[],ravines:[]}));
+  const EXPANSION=[
+    ['Ravinparken',false,0,'En loop och breda språng över flodravinen'],
+    ['Kopparbron',false,1,'Dubbla loopar bland koppartorn och broar'],
+    ['Klipphoppet',false,2,'Långa hopp mellan klippornas utsiktsplatser'],
+    ['Solkustens final',false,3,'Solbelysta stålringar och stora ravinhopp'],
+    ['Neonravinen',true,0,'Följ ljusen över den mörka flodravinen'],
+    ['Midnattsbron',true,1,'Två lysande loopar över nattstaden'],
+    ['Månskenshamnen',true,2,'Hamnljus, höga ramper och öppet vatten'],
+    ['Nattens stålverk',true,3,'Industrins glöd längs ravinens kant'],
+    ['Stjärnpasset',true,4,'Höga klippor och breda språng i månsken'],
+    ['Ljusdalens loopar',true,5,'Fyra ringar genom stadens ljusdal'],
+    ['Skymningsklyftan',true,6,'Sväva över djupa klyftor bland höghusen'],
+    ['Nattens höjder',true,7,'Tekniska loopar och långa landningar'],
+    ['Midnattsfinalen',true,8,'Tre loopar och de största ravinhoppen']
+  ];
+  function expedition(spec,index){
+    const [name,night,variant,tag]=spec,base=0,points=[[-30,0],[15,0]],checkpoints=[5],jumps=[],loops=[],ravines=[];
+    let x=15;const sections=3+variant%2;
+    for(let j=0;j<sections;j++){
+      // Flat run-up gives the player room to reach loop speed after a checkpoint.
+      const cx=x+55+index%4*3;
+      if(j===0||variant%3===2||j===2&&variant%2===1)loops.push({x:cx,y:base,r:4.2+(variant%3)*.25});
+      points.push([cx+20,0]);checkpoints.push(cx+12);
+      const ramp=cx+52,h=5.5+(variant%3)*.65,lip=ramp+21,gap=12+(variant%3)*2+j+index%2;
+      points.push([ramp,0],[lip,h],[lip+.05,-28],[lip+gap-.05,-28],[lip+gap,h*.55],[lip+gap+24,0]);
+      ravines.push({from:lip,to:lip+gap,depth:28});jumps.push({x:lip,h,gap,kind:variant%4});
+      x=lip+gap+55;points.push([x,0]);checkpoints.push(x-8);
+    }
+    points.push([x+35,0],[x+65,0]);return {id:'expedition-'+index,name,night,variant,tag:tag+'. Håll gasen genom looparna',sky:night?0x101b38:0xaed9eb,accent:[0xffae55,0x74e6df,0xb0a5ff][variant%3],points,checkpoints,jumps,loops,ravines,length:x+32,base,medal:(x+32)/13+18};
+  }
+  EXPANSION.forEach((spec,i)=>tracks.push(expedition(spec,i)));
+  const inRavine=(t,x)=>(t.ravines||[]).some(g=>x>g.from&&x<g.to);
+  function loopStep(b,t,k,dt){
+    if(!b.loop){const ring=(t.loops||[]).find(l=>!b.loopsDone.includes(l.x)&&b.x<=l.x&&b.x+Math.max(0,b.vx)*dt>=l.x&&Math.abs(b.y-l.y-.807)<.6&&b.contact.some(Boolean));
+      if(!ring)return false;b.loop={ring,theta:0,speed:Math.max(0,b.vx)};b.loopsDone.push(ring.x);b.landing=null;b.pending=0;
+    }
+    const l=b.loop,r=l.ring.r-.807;
+    l.speed+=((k.gas?8:0)-(k.brake?30:0)-l.speed*.06-22*Math.sin(l.theta))*dt;
+    const detached=k.jump&&!b.jumpLatch||l.speed<1||l.speed*l.speed/r+22*Math.cos(l.theta)<0;
+    b.jumpLatch=!!k.jump;
+    if(detached){b.loop=null;b.contact=[false,false];b.air=.01;b.airA=b.a;b.airX=b.x;b.peak=b.y;b.vx=l.speed*Math.cos(l.theta);b.vy=l.speed*Math.sin(l.theta);b.av=l.speed/r;return false;}
+    l.theta+=l.speed/r*dt;const a=Math.min(TAU,l.theta);
+    b.x=l.ring.x+r*Math.sin(a);b.y=l.ring.y+l.ring.r-r*Math.cos(a);b.a=a;b.vx=l.speed*Math.cos(a);b.vy=l.speed*Math.sin(a);b.av=l.speed/r;b.contact=[true,true];b.compression=[.08,.08];b.air=0;
+    if(l.theta>=TAU){b.x=l.ring.x+.2;b.a=0;b.av=0;b.vy=0;b.vx=Math.min(23,l.speed);b.loop=null;b.score+=400;b.tricks++;b.events.push({type:'land',points:400,label:'LOOP!',turns:1,perfect:false});}
+    return true;
+  }
+  function surface(t,x){if(inRavine(t,x))return {y:t.base-28,s:0};const p=t.points;for(let i=1;i<p.length;i++)if(x<=p[i][0]){const a=p[i-1],b=p[i],s=(b[1]-a[1])/(b[0]-a[0]);return {y:a[1]+clamp((x-a[0])/(b[0]-a[0]),0,1)*(b[1]-a[1]),s};}return {y:p.at(-1)[1],s:0};}
+  function newRide(t,x=5){return {x,y:surface(t,x).y+.807,vx:0,vy:0,a:0,av:0,contact:[true,true],compression:[0,0],time:0,score:0,checkpoint:5,checkpointScore:0,air:0,airX:x,airA:0,peak:0,wheelie:0,stoppie:0,pending:0,jumpLatch:false,cooldown:0,landLock:0,combo:0,landing:null,perfect:0,tricks:0,doubles:0,failed:false,complete:false,events:[],loop:null,loopsDone:(t.loops||[]).filter(l=>l.x<x).map(l=>l.x)};}
   function step(b,t,k,dt){
     if(b.failed||b.complete)return;
-    b.events=[];b.time+=dt;b.cooldown=Math.max(0,b.cooldown-dt);b.landLock=Math.max(0,b.landLock-dt);
+    b.events=[];b.time+=dt;if(loopStep(b,t,k,dt))return;b.cooldown=Math.max(0,b.cooldown-dt);b.landLock=Math.max(0,b.landLock-dt);
     const c=Math.cos(b.a),s=Math.sin(b.a),lean=(k.left?1:0)-(k.right?1:0), wasGround=b.contact.some(Boolean);
     let fy=-22,fx=-b.vx*.075,torque=-b.av*.7, n=0;
     const impact=b.vy, groundAngle=Math.atan(surface(t,b.x).s);
@@ -78,17 +124,17 @@
   }
   // Pure physics is also executable by the regression harness, without a browser.
   if(typeof module!=='undefined'&&module.exports){module.exports={tracks,surface,newRide,step,wrap};return;}
-  const audioModuleURL=new URL('stunt-bike-audio.mjs?v=night-music-20261103-1',document.currentScript.src).href;
+  const audioModuleURL=new URL('stunt-bike-audio.mjs?v=expedition-20261103-1',document.currentScript.src).href;
   let audioLoading=false,audioGeneration=0;
   const KEY='fp-stunt-bike-city-v2', LEGACY='fp-stunt-bike-v1';
-  const bikes=[['Metro',0xff780b,'Alltid tillgänglig'],['Volt',0x49e8c5,'Klara tre banor'],['Precision',0x65b7ff,'Fem perfekta landningar'],['Neon',0xd786ff,'Gör en dubbelvolt'],['Legend',0xffd45b,'Klara alla sju banor']];
+  const bikes=[['Metro',0xff780b,'Alltid tillgänglig'],['Volt',0x49e8c5,'Klara tre banor'],['Precision',0x65b7ff,'Fem perfekta landningar'],['Neon',0xd786ff,'Gör en dubbelvolt'],['Legend',0xffd45b,'Klara sju banor']];
   let root,canvas,renderer,scene,camera,bike,world,lights,shadow,ctx,abort,observer,raf,ride,level=0,state='ready',keys={},pointers=new Map(),keyboard={},save={},legacy={},audio,muted=false,last=0,acc=0,clock=0,toastEnd=0,fx=[],traffic=[],camX=0,camY=0,zoom=1,garageYaw=0,loading=0,previousFocus;
   const $=s=>root?.querySelector(s),action=(a,label,cls='')=>`<button class="${cls}" data-bike-action="${a}">${label}</button>`;
-  function gallery(){return `<section class="bike-page arcade-shell"><header class="bike-heading"><div><span class="bike-eyebrow">FRITIDSPARKEN ORIGINAL · 3D TRIALS</span><h2>Stuntcykel <em>Stadens tak</em></h2><p>Sju stadsdelar. Två hjul. Ditt nästa perfekta hopp.</p></div><div class="bike-tools">${action('quality','Grafik: Auto')}${action('garage','Garage')}${action('sound','Ljud av')}${action('audio-menu','Ljudinställningar')}${action('pause','Ⅱ Paus')}</div></header><section class="bike-sound-panel" id="bikeAudioPanel" hidden aria-label="Ljudinställningar">${audioMenu()}</section><div class="bike-track-tabs" aria-label="Välj bana">${tracks.map((t,i)=>`<button data-bike-level="${i}" aria-pressed="${i===0}"><b>0${i+1}</b>${t.name}</button>`).join('')}</div><div class="bike-field"><canvas id="bikeCanvas" tabindex="0" aria-label="Stuntcykel i sidovy. Piltangenter styr. Mellanslag hoppar. P pausar."></canvas><div class="bike-hud"><div><small>HASTIGHET</small><strong id="bikeSpeed">0 <i>km/h</i></strong></div><div><small id="bikeTrackName"></small><strong id="bikeTime">0.0 s</strong></div><div><small>TRICKPOÄNG</small><strong id="bikeScore">0</strong></div></div><div class="bike-progress"><i id="bikeProgress"></i></div><div class="bike-toast" id="bikeToast" aria-live="polite"></div><div class="bike-bottom"><span id="bikeRecord"></span><span id="bikeRenderer"></span></div><div class="bike-overlay" id="bikeOverlay"></div></div><div class="bike-controls"><div>${control('left','↶','Bakåt')}${control('right','↷','Framåt')}</div>${control('jump','↑','Hoppa')}<div>${control('brake','↓','Broms')}${control('gas','»','Gas')}</div></div><footer class="bike-footer"><span>↑ W gas · ↓ S broms/backa · ← → A D balans · Mellanslag hopp · R kontrollpunkt · P paus</span>${action('retry','↻ Kontrollpunkt')}</footer><details class="bike-legacy"><summary>Tidigare rekord · Skog & sten</summary><div id="bikeLegacy"></div></details></section>`;}
+  function gallery(){return `<section class="bike-page arcade-shell"><header class="bike-heading"><div><span class="bike-eyebrow">FRITIDSPARKEN ORIGINAL · 3D TRIALS</span><h2>Stuntcykel <em>Stadens tak</em></h2><p>20 banor · 10 dag & 10 natt · Loopar, raviner och stora hopp.</p></div><div class="bike-tools">${action('quality','Grafik: Auto')}${action('garage','Garage')}${action('sound','Ljud av')}${action('audio-menu','Ljudinställningar')}${action('pause','Ⅱ Paus')}</div></header><section class="bike-sound-panel" id="bikeAudioPanel" hidden aria-label="Ljudinställningar">${audioMenu()}</section><div class="bike-tools" aria-label="Tid på dygnet"><button data-bike-time="day" aria-pressed="false">☀ Dag · 10 banor</button><button data-bike-time="night" aria-pressed="false">☾ Natt · 10 banor</button><button data-bike-time="all" aria-pressed="true">Alla 20</button></div><div class="bike-track-tabs" aria-label="Välj bana">${tracks.map((t,i)=>`<button data-bike-level="${i}" aria-pressed="${i===0}"><b>${String(i+1).padStart(2,'0')} · ${t.night?'NATT':'DAG'}</b>${t.name}</button>`).join('')}</div><div class="bike-field"><canvas id="bikeCanvas" tabindex="0" aria-label="Stuntcykel i sidovy. Piltangenter styr. Mellanslag hoppar. P pausar."></canvas><div class="bike-hud"><div><small>HASTIGHET</small><strong id="bikeSpeed">0 <i>km/h</i></strong></div><div><small id="bikeTrackName"></small><strong id="bikeTime">0.0 s</strong></div><div><small>TRICKPOÄNG</small><strong id="bikeScore">0</strong></div></div><div class="bike-progress"><i id="bikeProgress"></i></div><div class="bike-toast" id="bikeToast" aria-live="polite"></div><div class="bike-bottom"><span id="bikeRecord"></span><span id="bikeRenderer"></span></div><div class="bike-overlay" id="bikeOverlay"></div></div><div class="bike-controls"><div>${control('left','↶','Bakåt')}${control('right','↷','Framåt')}</div>${control('jump','↑','Hoppa')}<div>${control('brake','↓','Broms')}${control('gas','»','Gas')}</div></div><footer class="bike-footer"><span>↑ W gas · ↓ S broms/backa · ← → A D balans · Mellanslag hopp · R kontrollpunkt · P paus</span>${action('retry','↻ Kontrollpunkt')}</footer><details class="bike-legacy"><summary>Tidigare rekord · Skog & sten</summary><div id="bikeLegacy"></div></details></section>`;}
   function control(k,icon,text){return `<button data-bike-control="${k}" aria-label="${text}"><b>${icon}</b><small>${text}</small></button>`;}
   function readSave(){try{const d=JSON.parse(localStorage.getItem(KEY)||'{}');save=d&&typeof d==='object'&&!Array.isArray(d)?d:{};}catch{save={};}save.records=save.records&&typeof save.records==='object'?save.records:{};save.perfect=Number(save.perfect)||0;save.tricks=Number(save.tricks)||0;save.doubles=Number(save.doubles)||0;save.selected=clamp(Number(save.selected)||0,0,4);try{legacy=JSON.parse(localStorage.getItem(LEGACY)||'{}')||{};}catch{legacy={};}muted=save.muted===true;if(save.audioMixVersion!==2){save.audio={music:.75,motor:.06,effects:.04,musicOn:true};save.audioMixVersion=2;}save.audio={music:.75,motor:.06,effects:.04,musicOn:true,...save.audio};for(const k of ['music','motor','effects'])save.audio[k]=clamp(Number(save.audio[k])||0,0,1);persist();}
   function persist(){try{localStorage.setItem(KEY,JSON.stringify(save));}catch{toast('Rekord kan inte sparas i den här webbläsaren.');}}
-  function unlocked(i){const count=Object.values(save.records).filter(r=>r.completed).length;return i===0||(i===1&&count>=3)||(i===2&&save.perfect>=5)||(i===3&&save.doubles>0)||(i===4&&count===7);}
+  function unlocked(i){const count=Object.values(save.records).filter(r=>r.completed).length;return i===0||(i===1&&count>=3)||(i===2&&save.perfect>=5)||(i===3&&save.doubles>0)||(i===4&&count>=7);}
   function start(){destroy();root=document.querySelector('.bike-page');if(!root)return;previousFocus=document.activeElement;canvas=$('canvas');abort=new AbortController();const signal=abort.signal;readSave();if(!unlocked(save.selected))save.selected=0;
     root.addEventListener('click',click,{signal});root.addEventListener('input',audioInput,{signal});root.addEventListener('pointerdown',pointerDown,{signal});for(const e of ['pointerup','pointercancel','lostpointercapture'])root.addEventListener(e,pointerUp,{signal});
     window.addEventListener('keydown',key,{signal});window.addEventListener('keyup',key,{signal});window.addEventListener('blur',()=>pause(),{signal});document.addEventListener('visibilitychange',()=>{if(document.hidden)pause();},{signal});
@@ -101,36 +147,40 @@
   function pointerDown(e){const el=e.target.closest('[data-bike-control]');if(el&&state==='playing'){e.preventDefault();el.setPointerCapture(e.pointerId);pointers.set(e.pointerId,el.dataset.bikeControl);mergeKeys();soundStart();}}
   function pointerUp(e){pointers.delete(e.pointerId);mergeKeys();}
   function key(e){if(!root?.isConnected||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;const k=e.key.toLowerCase(),map={arrowup:'gas',w:'gas',arrowdown:'brake',s:'brake',arrowleft:'left',a:'left',arrowright:'right',d:'right',' ':'jump'};
-    if(map[k]&&state==='playing'){e.preventDefault();keyboard[map[k]]=e.type==='keydown';mergeKeys();}
+    if(map[k]&&state==='playing'){e.preventDefault();keyboard[map[k]]=e.type==='keydown';mergeKeys();if(e.type==='keydown'&&!e.repeat)soundStart();}
     if(e.type==='keydown'&&!e.repeat){if(k==='p'||k==='escape'){e.preventDefault();state==='paused'?resume():pause();}if(k==='r'&&['playing','crashed','paused'].includes(state)){e.preventDefault();retry();}}
   }
-  function click(e){const l=e.target.closest('[data-bike-level]');if(l){level=+l.dataset.bikeLevel;setup();return;}const b=e.target.closest('[data-bike-select]');if(b&&unlocked(+b.dataset.bikeSelect)){save.selected=+b.dataset.bikeSelect;persist();rebuildBike();garage();return;}const a=e.target.closest('[data-bike-action]')?.dataset.bikeAction;
-    if(a==='audio-menu'){$('#bikeAudioPanel').hidden=!$('#bikeAudioPanel').hidden;}if(a==='music'){save.audio.musicOn=!save.audio.musicOn;persist();$('#bikeAudioPanel').innerHTML=audioMenu();soundStart();}if(a==='quality'&&renderer){qualityMode=qualityMode==='auto'?'manual':quality===2?'auto':'manual';quality=qualityMode==='auto'?(innerWidth<650?0:1):(quality+1)%3;applyQuality();scene.fog.far=qualityProfiles[quality].far;}if(a==='start'||a==='resume')resume();if(a==='retry')retry();if(a==='restart'){setup();resume();}if(a==='pause'){state==='paused'?resume():pause();}if(a==='next'){level=(level+1)%7;setup();}if(a==='sound'){muted=!muted;save.muted=muted;persist();soundStart();updateSound();}if(a==='garage'){pause();garage();}if(a==='back'){setup();}if(a==='rotate-left')garageYaw-=.4;if(a==='rotate-right')garageYaw+=.4;
+  function click(e){const time=e.target.closest('[data-bike-time]');if(time){const mode=time.dataset.bikeTime;root.querySelectorAll('[data-bike-time]').forEach(b=>b.setAttribute('aria-pressed',b===time));root.querySelectorAll('[data-bike-level]').forEach(b=>b.hidden=mode!=='all'&&tracks[+b.dataset.bikeLevel].night!==(mode==='night'));if(mode!=='all'&&tracks[level].night!==(mode==='night')){level=tracks.findIndex(t=>t.night===(mode==='night'));setup();}return;}const l=e.target.closest('[data-bike-level]');if(l){level=+l.dataset.bikeLevel;setup();return;}const b=e.target.closest('[data-bike-select]');if(b&&unlocked(+b.dataset.bikeSelect)){save.selected=+b.dataset.bikeSelect;persist();rebuildBike();garage();return;}const a=e.target.closest('[data-bike-action]')?.dataset.bikeAction;
+    if(a==='start-music'){muted=false;save.muted=false;save.audio.musicOn=true;if(!save.audio.music)save.audio.music=.75;persist();$('#bikeAudioPanel').innerHTML=audioMenu();soundStart();updateSound();}if(a==='audio-menu'){$('#bikeAudioPanel').hidden=!$('#bikeAudioPanel').hidden;}if(a==='music'){save.audio.musicOn=!save.audio.musicOn;if(save.audio.musicOn){muted=false;save.muted=false;updateSound();}persist();$('#bikeAudioPanel').innerHTML=audioMenu();soundStart();}if(a==='quality'&&renderer){qualityMode=qualityMode==='auto'?'manual':quality===2?'auto':'manual';quality=qualityMode==='auto'?(innerWidth<650?0:1):(quality+1)%3;applyQuality();scene.fog.far=qualityProfiles[quality].far;}if(a==='start'||a==='resume')resume();if(a==='retry')retry();if(a==='restart'){setup();resume();}if(a==='pause'){state==='paused'?resume():pause();}if(a==='next'){level=(level+1)%tracks.length;setup();}if(a==='sound'){muted=!muted;save.muted=muted;persist();soundStart();updateSound();}if(a==='garage'){pause();garage();}if(a==='back'){setup();}if(a==='rotate-left')garageYaw-=.4;if(a==='rotate-right')garageYaw+=.4;
   }
   function setup(){clearKeys();ride=newRide(tracks[level]);state='ready';acc=0;clock=0;for(const p of fx){scene?.remove(p.o);particlePool.push(p.o);}fx=[];camX=ride.x+5;camY=ride.y-.85+Math.tan(39*Math.PI/360)*Math.max(23,26/(camera?.aspect||1))*.44;zoom=1;buildWorld();rebuildBike();root.querySelectorAll('[data-bike-level]').forEach((b,i)=>b.setAttribute('aria-pressed',i===level));$('#bikeTrackName').textContent=tracks[level].name;modal(tracks[level].name,tracks[level].tag+'. Gasa, balansera och hoppa. Landa säkert för att behålla trickpoängen.',action('start','Kör genom staden →','bike-primary'));hud();resize();}
   function resume(){if(!ride||ride.failed||ride.complete)return;state='playing';clearKeys();$('#bikeOverlay').hidden=true;last=0;acc=0;soundStart();canvas.focus({preventScroll:true});}
   function retry(){if(!ride)return;const old=ride;ride=newRide(tracks[level],old.checkpoint);ride.checkpoint=old.checkpoint;ride.score=old.checkpointScore;ride.checkpointScore=old.checkpointScore;ride.time=old.time;ride.perfect=old.perfect;ride.tricks=old.tricks;ride.doubles=old.doubles;camX=ride.x+5;camY=ride.y-.85+Math.tan(39*Math.PI/360)*Math.max(23,26/(camera?.aspect||1))*.44;resume();}
   function pause(){if(state!=='playing')return;state='paused';clearKeys();modal('En liten paus','Ditt nästa hopp väntar.',action('resume','Fortsätt →','bike-primary')+action('retry','Från kontrollpunkten')+action('restart','Starta om banan'));}
-  function modal(title,text,buttons){const el=$('#bikeOverlay');el.hidden=false;el.innerHTML=`<section class="bike-modal" role="dialog" aria-label="${title}"><span class="bike-eyebrow">STADENS TAK / 0${level+1}</span><h3>${title}</h3><p>${text}</p><div class="bike-modal-buttons">${buttons}</div></section>`;}
+  function modal(title,text,buttons){const el=$('#bikeOverlay');el.hidden=false;el.innerHTML=`<section class="bike-modal" role="dialog" aria-label="${title}"><span class="bike-eyebrow">STADENS TAK / ${String(level+1).padStart(2,'0')}</span><h3>${title}</h3><p>${text}</p><div class="bike-modal-buttons">${buttons}</div></section>`;}
   function garage(){state='garage';clearKeys();garageYaw=.15;modal('Ditt garage','Alla cyklar har samma rättvisa köregenskaper. Lås upp nya färger genom dina prestationer.',`<div class="bike-garage-options">${bikes.map((b,i)=>`<button data-bike-select="${i}" ${!unlocked(i)?'disabled':''} aria-pressed="${save.selected===i}"><i style="background:#${b[1].toString(16).padStart(6,'0')}"></i><b>${b[0]}</b><small>${unlocked(i)?save.selected===i?'Vald':'Upplåst':b[2]}</small></button>`).join('')}</div><div>${action('rotate-left','↶ Rotera')}${action('rotate-right','Rotera ↷')}</div>${action('back','Till banan →','bike-primary')}`);}
   function toast(t){$('#bikeToast').textContent=t;toastEnd=clock+2.3;}
   function processEvents(){for(const e of ride.events){if(e.type==='land'||e.type==='balance'){toast(e.label+' +'+e.points);tone(e.perfect?740:420,.14);particles(e.perfect?0xffe9ac:0xc7d4cd,12);}if(e.type==='jump')tone(240,.08);if(e.type==='checkpoint'){toast('KONTROLLPUNKT SPARAD ✓');tone(620,.1);}if(e.type==='crash'){state='crashed';ride.crashClock=clock;clearKeys();particles(0xffc88b,20);tone(100,.25);modal('Oj då! Försök igen!','Borsta av hjälmen och hoppa upp igen. Du fortsätter från din senaste kontrollpunkt.',action('retry','Försök igen →','bike-primary')+action('retry','Från kontrollpunkten')+action('restart','Starta om banan'));}if(e.type==='finish')finish();}}
   function finish(){state='complete';clearKeys();const t=tracks[level],old=save.records[t.id]||{},record=!old.time||ride.time<old.time||ride.score>(old.score||0);save.records[t.id]={time:Math.min(old.time||Infinity,ride.time),score:Math.max(old.score||0,ride.score),completed:true,bestLandings:Math.max(old.bestLandings||0,ride.perfect)};save.perfect+=ride.perfect;save.tricks+=ride.tricks;save.doubles+=ride.doubles;persist();const stars=ride.time<t.medal&&ride.score>=500?'★★★':ride.time<t.medal*1.7?'★★':'★';tone(880,.4);modal(record?'Nytt rekord!':'Snyggt kört!',`${stars} · ${ride.time.toFixed(1)} sekunder · ${ride.score} poäng. ${ride.perfect} perfekta landningar.`,action('next','Nästa stadsdel →','bike-primary')+action('restart','Förbättra ditt rekord')+action('garage','Till garaget'));}
-  function hud(){if(!ride)return;$('#bikeSpeed').innerHTML=Math.round(Math.abs(ride.vx)*3.6)+' <i>km/h</i>';$('#bikeTime').textContent=ride.time.toFixed(1)+' s';$('#bikeScore').textContent=ride.score.toLocaleString('sv-SE');$('#bikeProgress').style.width=clamp(ride.x/tracks[level].length*100,0,100)+'%';const r=save.records[tracks[level].id];$('#bikeRecord').textContent=r?`REKORD ${r.time.toFixed(1)} s · ${r.score} p`:'DIN FÖRSTA RUNDA · SÄTT REKORDET';if(clock>toastEnd)$('#bikeToast').textContent='';}
-  function audioMenu(){const v=save.audio||{music:.75,motor:.06,effects:.04,musicOn:true};return `<b>Ljudinställningar</b>${[['music','Musik'],['motor','Motor'],['effects','Effekter']].map(([k,name])=>`<label>${name}<input type="range" min="0" max="100" value="${Math.round(v[k]*100)}" data-bike-volume="${k}" aria-label="${name}volym"><output>${Math.round(v[k]*100)}%</output></label>`).join('')}${action('music',v.musicOn?'Musik på':'Musik av')}<p class="bike-sound-status" id="bikeAudioStatus" aria-live="polite"></p><details><summary>Musik och ljudkällor</summary><p>Musik: “Raving Energy” — Kevin MacLeod (incompetech.com), CC BY 4.0. Bearbetad loop.</p><p>Motor och metallkontakt: dklon, “Engines – Startup, Idle &amp; Rev”, CC BY-SA 3.0. Bearbetade inspelningar. Motorcykelmodell och cylindervolym är inte verifierade.</p><p>Trafik och vindfoley: Joseph SARDIN / BigSoundBank, CC0. Bearbetade loopar.</p><a href="/assets/stunt-bike/audio/LICENSES.md" target="_blank" rel="noopener">Alla filer, källor och licenser ↗</a></details>`;}
+  function hud(){if(!ride)return;$('#bikeSpeed').innerHTML=Math.round((ride.loop?ride.loop.speed:Math.abs(ride.vx))*3.6)+' <i>km/h</i>';$('#bikeTime').textContent=ride.time.toFixed(1)+' s';$('#bikeScore').textContent=ride.score.toLocaleString('sv-SE');$('#bikeProgress').style.width=clamp(ride.x/tracks[level].length*100,0,100)+'%';const r=save.records[tracks[level].id];$('#bikeRecord').textContent=r?`REKORD ${r.time.toFixed(1)} s · ${r.score} p`:'DIN FÖRSTA RUNDA · SÄTT REKORDET';if(clock>toastEnd)$('#bikeToast').textContent='';}
+  function audioMenu(){const v=save.audio||{music:.75,motor:.06,effects:.04,musicOn:true};return `<b>Ljudinställningar</b>${[['music','Musik'],['motor','Motor'],['effects','Effekter']].map(([k,name])=>`<label>${name}<input type="range" min="0" max="100" value="${Math.round(v[k]*100)}" data-bike-volume="${k}" aria-label="${name}volym"><output>${Math.round(v[k]*100)}%</output></label>`).join('')}${action('music',v.musicOn?'Musik på':'Musik av')}${action('start-music','▶ Starta musik')}<p class="bike-sound-status" id="bikeAudioStatus" aria-live="polite"></p><details><summary>Musik och ljudkällor</summary><p>Musik: “Raving Energy” — Kevin MacLeod (incompetech.com), CC BY 4.0. Bearbetad loop.</p><p>Motor och metallkontakt: dklon, “Engines – Startup, Idle &amp; Rev”, CC BY-SA 3.0. Bearbetade inspelningar. Motorcykelmodell och cylindervolym är inte verifierade.</p><p>Trafik och vindfoley: Joseph SARDIN / BigSoundBank, CC0. Bearbetade loopar.</p><a href="/assets/stunt-bike/audio/LICENSES.md" target="_blank" rel="noopener">Alla filer, källor och licenser ↗</a></details>`;}
   function audioInput(e){const k=e.target.dataset.bikeVolume;if(!k)return;save.audio[k]=clamp(Number(e.target.value)/100,0,1);e.target.nextElementSibling.textContent=e.target.value+'%';persist();}
   async function soundStart(){
     if(muted)return;if(audio?.errors?.length){audio.dispose();audio.ac.close().catch(()=>{});audio=null;}if(audio){audio.ac.resume().catch(()=>{});return;}if(audioLoading)return;
     const A=window.AudioContext||window.webkitAudioContext;if(!A)return;
     // Resume the context synchronously inside the user gesture, including Safari.
-    const ac=new A();ac.resume().catch(()=>{});audioLoading=true;const generation=audioGeneration;
-    try{const {BikeAudio}=await import(audioModuleURL);if(generation!==audioGeneration){ac.close();return;}audio=new BikeAudio(ac);const instance=audio;const errors=await instance.load();if(audio!==instance)return;const status=$('#bikeAudioStatus');if(status)status.textContent=errors?.length?'Några ljud kunde inte hämtas. Prova att slå av och på ljudet.':'';}
+    const ac=new A();ac.resume().catch(()=>{});audioLoading=true;const status=$('#bikeAudioStatus');if(status)status.textContent='Laddar musik…';const generation=audioGeneration;
+    try{const {BikeAudio}=await import(audioModuleURL);if(generation!==audioGeneration){ac.close();return;}audio=new BikeAudio(ac);const instance=audio;const errors=await instance.load();if(audio!==instance)return;if(ac.state==='suspended')ac.resume().catch(()=>{});const status=$('#bikeAudioStatus');if(status)status.textContent=errors?.length?'Några ljud kunde inte hämtas. Prova att slå av och på ljudet.':'';}
     catch(error){console.warn('Stuntcykel audio:',error);if(generation===audioGeneration){audio?.dispose();audio=null;const status=$('#bikeAudioStatus');if(status)status.textContent='Ljudet kunde inte laddas. Slå av och på för att försöka igen.';}ac.close().catch(()=>{});}
     finally{if(generation===audioGeneration)audioLoading=false;}
   }
   function updateSound(){const b=$('[data-bike-action="sound"]');if(b){b.textContent=muted?'Ljud av':'Ljud på';b.setAttribute('aria-pressed',!muted);}}
   function tone(f,d){if(muted||!audio||state==='ready')return;if(f<=100||f===420||f===740)audio.impact(f<=100?.9:.35);}
-  function engine(dt){audio?.mix(ride,keys,state==='playing',muted,save.audio,dt);}
+  function engine(dt){audio?.mix(ride,keys,state==='playing',muted,save.audio,dt);
+    const el=$('#bikeAudioStatus');if(!el)return;
+    const message=muted?'Allt ljud är av. Tryck på Starta musik.':!save.audio.musicOn?'Musiken är av.':audioLoading?'Laddar musik…':audio?.errors?.some(e=>e.includes('raving-energy'))?'Musikfilen kunde inte laddas. Tryck på Starta musik för att försöka igen.':audio&&audio.ac.state!=='running'?'Webbläsaren har pausat ljudet. Tryck på Starta musik.':audio?.musicPlaying&&state==='playing'?'Spelar: Raving Energy — Kevin MacLeod':state==='paused'?'Musiken är pausad.':'Musiken startar när du kör.';
+    el.dataset.context=audio?.ac.state||'not-started';el.dataset.musicTime=audio?.musicPlaying?String(Math.max(0,audio.ac.currentTime-audio.musicStart)):'0';if(el.textContent!==message)el.textContent=message;
+  }
   // Visual resources are independent of the fixed-step collision/score simulation.
   const materials=new Map(), geometries=new Map(), textures=new Map();
   const qualityProfiles=[
@@ -201,7 +251,7 @@
     applyQuality();if(ride){buildWorld();rebuildBike();}resize();
   }catch(error){console.warn('Stuntcykel WebGL:',error);renderer=null;initFallback();}}
   function buildAtmosphere(){
-    const night=level===4,dusk=level===2||level===6;
+    const night=tracks[level].night,dusk=level===2||level===6;
     const c=document.createElement('canvas');c.width=1024;c.height=512;const g=c.getContext('2d'),gradient=g.createLinearGradient(0,0,0,512);
     gradient.addColorStop(0,night?'#071322':dusk?'#6b91b1':'#347cba');gradient.addColorStop(.46,night?'#20354d':dusk?'#c5bbbc':'#9bc6e5');gradient.addColorStop(.61,night?'#182639':dusk?'#efd1ad':'#e3ded0');gradient.addColorStop(1,night?'#17212a':'#8c978a');g.fillStyle=gradient;g.fillRect(0,0,1024,512);
     const rand=seeded(83);for(let i=0;i<90;i++){const x=rand()*1024,y=40+rand()*190,r=12+rand()*45;const cl=g.createRadialGradient(x,y,1,x,y,r);cl.addColorStop(0,night?'rgba(160,180,200,.05)':'rgba(255,250,244,.28)');cl.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=cl;g.save();g.translate(x,y);g.scale(2.8,.4);g.translate(-x,-y);g.fillRect(x-r,y-r,2*r,2*r);g.restore();}
@@ -223,15 +273,16 @@
   }
   function buildWorld(){if(!scene)return;
     for(const p of fx){scene.remove(p.o);particlePool.push(p.o);}fx=[];
-    disposeGroup(world);world=new THREE.Group();scene.add(world);traffic=[];streetLights=[];birds=[];const t=tracks[level],night=level===4;
+    disposeGroup(world);world=new THREE.Group();scene.add(world);traffic=[];streetLights=[];birds=[];const t=tracks[level],night=tracks[level].night;
     buildAtmosphere();
     const asphalt=pbr('asphalt',0x999da0),concrete=pbr('concrete',0xc9c4b8),steel=pbr('metal',0x8b9291,.8),darkSteel=pbr('rust',0x776354,.65),wood=pbr('wood',0xac8a59),earth=pbr('gravel',0xa69a82);
-    surfaceBox(world,t.length+200,1,140,t.length/2,t.base-6.1,-35,earth,5);
+    surfaceBox(world,t.length+200,1,110,t.length/2,t.base-6.1,-65,earth,5);
+    let bank=-100;for(const g of [...(t.ravines||[]),{from:t.length+100,to:t.length+100}]){surfaceBox(world,g.from-bank,1,30,(bank+g.from)/2,t.base-6.1,5,earth,5);bank=g.to;}
     surfaceBox(world,t.length+180,.25,10,t.length/2,t.base-5.5,-12,asphalt,4);
     surfaceBox(world,t.length+180,.3,2,t.length/2,t.base-5.4,-6,concrete,3);
     const p=t.points;
     for(let i=1;i<p.length;i++){
-      const a=p[i-1],b=p[i],dx=b[0]-a[0],dy=b[1]-a[1];if(dx<.2)continue;
+      const a=p[i-1],b=p[i],dx=b[0]-a[0],dy=b[1]-a[1];if(dx<.2||inRavine(t,(a[0]+b[0])/2))continue;
       const len=Math.hypot(dx,dy),angle=Math.atan2(dy,dx),mid=(a[0]+b[0])/2,my=(a[1]+b[1])/2;
       const ramp=Math.abs(dy)>.5;const road=surfaceBox(world,len,.32,4,mid+.16*Math.sin(angle),my-.16*Math.cos(angle),0,ramp?pbr('tread',0xa5a7a3,.72):asphalt,ramp?2.6:3.8);road.rotation.z=angle;
       for(const z of [-2.03,2.03]){const edge=surfaceBox(world,len,.24,.14,mid,my-.16,z,steel,2);edge.rotation.z=angle;}
@@ -255,6 +306,30 @@
         for(let x=a[0]+.5;x<b[0];x+=2.8)rod(world,[x,my,-2.12],[x,my+.85,-2.12],.024,steel);
         for(const y of [.4,.85])rod(world,[a[0],my+y,-2.12],[b[0],my+y,-2.12],.028,steel);
       }
+    }
+    for(const ring of t.loops||[]){
+      const count=96,step=TAU/count,rr=ring.r+.16;
+      for(let j=0;j<count;j++){
+        const a=(j+.5)*step,x=ring.x+rr*Math.sin(a),y=ring.y+ring.r-rr*Math.cos(a);
+        const deck=surfaceBox(world,2*rr*Math.tan(step/2)+.012,.32,4,x,y,0,pbr('tread',0x92999c,.72),2);deck.rotation.z=a;deck.name='loop-deck';
+        for(const z of [-2.04,2.04]){const rail=box(world,2*rr*Math.tan(step/2)+.015,.16,.14,x,y,z,steel);rail.rotation.z=a;}
+        if(j%8===0)for(const z of [-2.15,2.15]){const marker=box(world,.36,.08,.08,x,y,z,mat(t.accent,.2,night?t.accent:0));marker.rotation.z=a;}
+      }
+      for(const z of [-1.7,1.7])for(const side of [-1,1]){
+        rod(world,[ring.x+side*ring.r,ring.y-5.5,z],[ring.x+side*ring.r,ring.y+ring.r,z],.12,steel);
+        rod(world,[ring.x+side*(ring.r+3),ring.y-5.5,z],[ring.x+side*ring.r,ring.y+ring.r,z],.09,steel);
+        surfaceBox(world,2,.4,1.2,ring.x+side*ring.r,ring.y-5.4,z,concrete,2);
+      }
+      sign(world,'LOOP · HÅLL GASEN',ring.x-10,ring.y+2,-3,t.accent,4);
+    }
+    for(const gap of t.ravines||[]){
+      const rock=pbr('concrete',0x777b79),mid=(gap.from+gap.to)/2;
+      for(const side of [-1,1])for(let j=0;j<5;j++){
+        const x=side<0?gap.from-3-j*.8:gap.to+3+j*.8;
+        const cliff=surfaceBox(world,5,18+j*.7,7,x,t.base-15,0,rock,4);cliff.rotation.z=side*.03*(j%3);
+      }
+      surfaceBox(world,gap.to-gap.from+4,.12,10,mid,t.base-25,0,pbr('metal',0x397b8a,.45),4);
+      for(const x of [gap.from-1,gap.to+1]){const y=surface(t,x).y;sign(world,x<mid?'RAVIN →':'LANDNING',x,y+2.5,-2.6,0xe9b64c,3);}
     }
     // Three dimensional layered city blocks with individual recessed window bays.
     const rand=seeded(191+level*23);
@@ -306,7 +381,7 @@
     if(level===0)crane(45,t.base-4,-32);
     for(let i=0;i<6;i++){const flock=new THREE.Group();flock.userData={origin:i*32-20,height:t.base+24+(i%3)*2,phase:i*1.7};flock.position.set(flock.userData.origin,flock.userData.height,-45);for(const side of [-1,1]){const wing=box(flock,.5,.045,.16,side*.24,0,0,mat(0x53616b));wing.rotation.z=side*.3;}world.add(flock);birds.push(flock);}
     for(let x=-10;x<t.length+20;x+=night?12:24){
-      const base=t.base-5.2,y=surface(t,x+1.2).y-.86;surfaceBox(world,.6,.2,.6,x,base,-5.2,concrete);rod(world,[x,base,-5.2],[x,y+7,-5.2],.065,steel);rod(world,[x,y+7,-5.2],[x+1.4,y+7,-5.2],.06,steel);
+      const base=t.base-5.2,y=(inRavine(t,x+1.2)?t.base:surface(t,x+1.2).y)-.86;surfaceBox(world,.6,.2,.6,x,base,-5.2,concrete);rod(world,[x,base,-5.2],[x,y+7,-5.2],.065,steel);rod(world,[x,y+7,-5.2],[x+1.4,y+7,-5.2],.06,steel);
       rounded(world,.9,.12,.4,x+1.2,y+6.95,-5.2,steel,.04);box(world,.7,.025,.3,x+1.2,y+6.86,-5.2,mat(0xffe8bd,0,night?0xffc67a:0));
       if(night){const glow=new THREE.Mesh(geo('lampglow',()=>new THREE.PlaneGeometry(5,8)),glowMaterial());glow.position.set(x+1.2,y+3,-5.1);world.add(glow);}
       if(Math.round(x)%3===0){surfaceBox(world,1.8,.12,.45,x+4,base+.55,-5.4,wood);for(const xx of [x+3.3,x+4.7])rod(world,[xx,base,-5.4],[xx,base+.55,-5.4],.045,steel);}
@@ -372,13 +447,13 @@
   function vehicle(x,y,z,color,type){const g=new THREE.Group();world.add(g);g.position.set(x,y,z);const len=type==='bus'?7:type==='truck'?6:3.8;const paint=mat(color,.35),glass=mat(0x6c8793,.65);glass.roughness=.15;
     rounded(g,len,.85,1.65,0,.7,0,paint,.2);rounded(g,type==='car'?2.15:len*.76,.85,1.45,-.15,1.48,0,glass,.25);rounded(g,type==='car'?2:len*.78,.09,1.52,-.15,1.95,0,paint,.04);
     for(const xx of [-.8,.85])box(g,.1,.9,1.49,xx,1.45,0,paint);box(g,len+.08,.12,1.68,0,.35,0,mat(0x424c4e,.6));for(const wz of [-.85,.85])for(const wx of [-len*.32,len*.32]){const wheel=new THREE.Mesh(geo('carwheel',()=>new THREE.CylinderGeometry(.43,.43,.22,24)),pbr('rubber',0x343a3d));wheel.rotation.x=Math.PI/2;wheel.position.set(wx,.43,wz);g.add(wheel);const hub=sphere(g,.23,wx,.43,wz*1.1,mat(0xaeb8ba,.75));hub.scale.z=.06;}
-    for(const zz of [-.56,.56]){box(g,.02,.2,.28,len/2+.04,.8,zz,mat(0xf7e9c8,0,level===4?0xffdcb3:0));box(g,.02,.15,.3,-len/2-.04,.8,zz,mat(0xa05147,0,0x4a0e09));}return g;}
+    for(const zz of [-.56,.56]){box(g,.02,.2,.28,len/2+.04,.8,zz,mat(0xf7e9c8,0,tracks[level].night?0xffdcb3:0));box(g,.02,.15,.3,-len/2-.04,.8,zz,mat(0xa05147,0,0x4a0e09));}return g;}
 
   function rebuildBike(){if(!scene)return;disposeGroup(bike);bike=new THREE.Group();scene.add(bike);
     const color=bikes[save.selected][1],paint=mat(color,.38),rubber=pbr('rubber',0x373c3d),alloy=pbr('metal',0xc1c7c6,.85),dark=pbr('metal',0x59615f,.75),suit=pbr('fabric',0x526b78),blackFabric=pbr('fabric',0x343f47);
-    const lens=sphere(bike,.14,.85,.65,0,mat(0xfff0cf,.1,level===4?0xffe5b0:0));lens.scale.x=.055;
+    const lens=sphere(bike,.14,.85,.65,0,mat(0xfff0cf,.1,tracks[level].night?0xffe5b0:0));lens.scale.x=.055;
     rounded(bike,.12,.34,.34,.77,.65,0,dark,.04);
-    const headlight=new THREE.SpotLight(0xffedcc,level===4?100:0,30,.38,.65,2);
+    const headlight=new THREE.SpotLight(0xffedcc,tracks[level].night?100:0,30,.38,.65,2);
     headlight.name='motorcycle-headlight';headlight.position.set(.96,.65,0);headlight.target.position.set(13,-2.1,0);headlight.castShadow=false;bike.add(headlight,headlight.target);bike.userData.headlight=headlight;
     paint.roughness=.24;bike.userData.wheels=[];bike.userData.forks=[];bike.userData.dynamicRods=[];bike.userData.calipers=[];
     for(const dx of [-1.05,1.05]){
@@ -405,9 +480,9 @@
     const tank=rounded(bike,.73,.32,.43,.03,.4,0,paint,.12);tank.rotation.z=-.18;
     rounded(bike,.85,.12,.36,-.52,.56,0,rubber,.055);
     const tail=rounded(bike,.75,.065,.35,-1,.43,0,paint,.025);tail.rotation.z=.16;
-    const tailLens=rounded(bike,.13,.12,.33,-1.35,.39,0,mat(0xc20c16,.15,level===4?0xff0715:0x270003),.035);
+    const tailLens=rounded(bike,.13,.12,.33,-1.35,.39,0,mat(0xc20c16,.15,tracks[level].night?0xff0715:0x270003),.035);
     tailLens.name='motorcycle-tail-lens';
-    const tailLight=new THREE.PointLight(0xff1020,level===4?2.5:0,3,2);tailLight.name='motorcycle-taillight';tailLight.position.set(-1.46,.4,.12);bike.add(tailLight);
+    const tailLight=new THREE.PointLight(0xff1020,tracks[level].night?2.5:0,3,2);tailLight.name='motorcycle-taillight';tailLight.position.set(-1.46,.4,.12);bike.add(tailLight);
     const fender=rounded(bike,.78,.06,.38,1.04,.2,0,paint,.025);fender.rotation.z=-.08;
     for(const z of [-.245,.245]){const panel=rounded(bike,.4,.23,.025,-.49,.27,z,paint,.05);panel.rotation.z=.3;box(bike,.19,.025,.032,-.48,.31,z*1.07,mat(0xe3e2d8));}
     rod(bike,[.56,.55,0],[.62,.85,0],.04,dark);rod(bike,[.62,.85,-.36],[.62,.85,.36],.026,alloy);for(const z of [-.3,.3])rod(bike,[.62,.85,z-.06],[.62,.85,z+.06],.043,rubber);
@@ -467,25 +542,25 @@
     target.addScaledVector(up,Math.round(target.dot(up)/sy)*sy-target.dot(up));
     lights.target.position.copy(target);lights.position.copy(target).add(offset);
     const start=Math.floor((ride.x+10)/12)-2;
-    streetLights.forEach((lamp,i)=>{const x=-10+(start+i)*12,ground=surface(t,x+1.2).y;
+    streetLights.forEach((lamp,i)=>{const x=-10+(start+i)*12,ground=inRavine(t,x+1.2)?t.base:surface(t,x+1.2).y;
       lamp.position.set(x+1.2,ground+6,-5.2);lamp.target.position.set(x+1.2,ground,0);
       lamp.intensity=x>=-10&&x<t.length+20?340:0;
     });
   }
-  function render(dt){if(!ride)return;const t=tracks[level];if(renderer&&bike){const garageMode=state==='garage';world.visible=!garageMode;root.dataset.mode=state;scene.background.set(garageMode?0x243b4c:level===4?0x132434:0xb7ccd1);bike.position.set(ride.x,ride.y,0);bike.rotation.set(0,garageMode?garageYaw:0,(garageMode?0:ride.a)+(state==='crashed'?Math.min(1,clock-ride.crashClock)*.65:0));animateBike(dt);if(state==='crashed'){const tumble=Math.min(1,(clock-ride.crashClock)*2);bike.userData.rider.position.x=tumble*.6;bike.userData.rider.position.y+=Math.sin(tumble*Math.PI)*.5;bike.userData.rider.rotation.z=-tumble*.8;}else{bike.userData.rider.position.x=0;bike.userData.rider.position.y=0;bike.userData.rider.rotation.z=0;}
+  function render(dt){if(!ride)return;const t=tracks[level];if(renderer&&bike){const garageMode=state==='garage';world.visible=!garageMode;root.dataset.mode=state;scene.background.set(garageMode?0x243b4c:tracks[level].night?0x132434:0xb7ccd1);bike.position.set(ride.x,ride.y,0);bike.rotation.set(0,garageMode?garageYaw:0,(garageMode?0:ride.a)+(state==='crashed'?Math.min(1,clock-ride.crashClock)*.65:0));animateBike(dt);if(state==='crashed'){const tumble=Math.min(1,(clock-ride.crashClock)*2);bike.userData.rider.position.x=tumble*.6;bike.userData.rider.position.y+=Math.sin(tumble*Math.PI)*.5;bike.userData.rider.rotation.z=-tumble*.8;}else{bike.userData.rider.position.x=0;bike.userData.rider.position.y=0;bike.userData.rider.rotation.z=0;}
       // Compose the tyre contact at 72% of the canvas, independent of aspect ratio.
       const viewDistance=Math.max(23,26/camera.aspect)*zoom;
       const halfHeight=Math.tan(camera.fov*Math.PI/360)*viewDistance;
       const lookAhead=camera.aspect<1?2.2:5+clamp(ride.vx*.15,0,3);
-      const landing=surface(t,ride.x+lookAhead).y;
+      const landing=inRavine(t,ride.x+lookAhead)?t.base:surface(t,ride.x+lookAhead).y;
       const followY=ride.air>.25?ride.y*.82+(landing+.85)*.18:ride.y;
-      const desiredX=ride.x+lookAhead,desiredY=followY-.85+halfHeight*.44;
+      const desiredX=ride.loop?ride.loop.ring.x+2:ride.x+lookAhead,desiredY=ride.loop?ride.loop.ring.y+ride.loop.ring.r+1:followY-.85+halfHeight*.44;
       camX+=(desiredX-camX)*(1-Math.exp(-dt*4));camY+=(desiredY-camY)*(1-Math.exp(-dt*4));zoom+=((ride.air>.55?1.18:1)-zoom)*(1-Math.exp(-dt*2));
       const distance=Math.max(23,26/camera.aspect)*zoom;camera.position.set(garageMode?(camera.aspect<1?ride.x:ride.x-1.8):camX,garageMode?(camera.aspect<1?ride.y-4:ride.y+1.2):camY,garageMode?(camera.aspect<1?15:10):distance);camera.lookAt(camera.position.x,camera.position.y,0); // Always +Z: never follows behind the motorcycle.
-      if(skyDome){skyDome.position.set(camX,t.base,0);skyDome.rotation.y=clock*.0008;}windTime.value=clock;for(const b of birds){b.position.x=b.userData.origin+Math.sin(clock*.07+b.userData.phase)*22;b.position.y=b.userData.height+Math.sin(clock*.5+b.userData.phase)*.6;b.children.forEach((w,i)=>w.rotation.z=(i?1:-1)*(.2+Math.sin(clock*5+b.userData.phase)*.25));}if(contactShadow){const ground=surface(t,ride.x),height=Math.max(0,ride.y-ground.y-.8);contactShadow.visible=Math.abs(surface(t,ride.x-2).s-ground.s)<.025&&Math.abs(surface(t,ride.x+2).s-ground.s)<.025;contactShadow.position.set(ride.x,ground.y+.045,0);contactShadow.rotation.set(-Math.PI/2,0,0);contactShadow.rotation.y=-Math.atan(ground.s);contactShadow.material.opacity=clamp(1-height/5,0,.8);contactShadow.scale.setScalar(1+height*.12);}updateLighting(t);for(const car of traffic)car.mesh.position.x=(car.start+clock*car.speed)%(t.length+80)-30;
+      if(skyDome){skyDome.position.set(camX,t.base,0);skyDome.rotation.y=clock*.0008;}windTime.value=clock;for(const b of birds){b.position.x=b.userData.origin+Math.sin(clock*.07+b.userData.phase)*22;b.position.y=b.userData.height+Math.sin(clock*.5+b.userData.phase)*.6;b.children.forEach((w,i)=>w.rotation.z=(i?1:-1)*(.2+Math.sin(clock*5+b.userData.phase)*.25));}if(contactShadow){contactShadow.visible=!ride.loop&&!inRavine(t,ride.x);const ground=surface(t,ride.x),height=Math.max(0,ride.y-ground.y-.8);contactShadow.visible=!ride.loop&&!inRavine(t,ride.x)&&Math.abs(surface(t,ride.x-2).s-ground.s)<.025&&Math.abs(surface(t,ride.x+2).s-ground.s)<.025;contactShadow.position.set(ride.x,ground.y+.045,0);contactShadow.rotation.set(-Math.PI/2,0,0);contactShadow.rotation.y=-Math.atan(ground.s);contactShadow.material.opacity=clamp(1-height/5,0,.8);contactShadow.scale.setScalar(1+height*.12);}updateLighting(t);for(const car of traffic)car.mesh.position.x=(car.start+clock*car.speed)%(t.length+80)-30;
       for(const p of fx){p.life-=dt;p.o.position.x+=p.vx*dt;p.o.position.y+=p.vy*dt;p.vy-=6*dt;p.o.scale.setScalar(Math.max(0,p.life));}fx=fx.filter(p=>{if(p.life<=0){scene.remove(p.o);particlePool.push(p.o);return false;}return true;});renderer.render(scene,camera);
     }else if(ctx)renderFallback();}
-  function renderFallback(){const w=canvas.width,h=canvas.height,c=ctx,t=tracks[level],scale=Math.min(w/25,h/15),cx=ride.x-w*.32/scale,cy=ride.y-.85+h*.72/scale;const X=x=>(x-cx)*scale,Y=y=>(cy-y)*scale;const gradient=c.createLinearGradient(0,0,0,h);gradient.addColorStop(0,'#'+t.sky.toString(16).padStart(6,'0'));gradient.addColorStop(1,level===4?'#273f5d':'#f0e4d1');c.fillStyle=gradient;c.fillRect(0,0,w,h);for(let i=-2;i<14;i++){const x=i*90-(ride.x*8%90);c.fillStyle=i%2?'#6e8a9a':'#8ba4b0';const bh=80+Math.abs(Math.sin(i*8))*150;c.fillRect(x,h*.65-bh,70,bh);c.fillStyle='#d3e1dd';for(let j=0;j<4;j++)c.fillRect(x+8,h*.65-bh+15+j*25,50,8);}c.fillStyle=level===4?'#111c28':'#89988a';c.fillRect(0,Y(t.base-5.6),w,h);c.strokeStyle='#3c4950';c.lineWidth=Math.max(5,scale*.38);c.beginPath();for(let x=cx;x<cx+w/scale+.4;x+=.25){const y=Y(surface(t,x).y);if(x===cx)c.moveTo(X(x),y);else c.lineTo(X(x),y);}c.stroke();c.strokeStyle='#c5bcaa';c.lineWidth=2;c.stroke();for(let x=Math.ceil(cx/14)*14;x<cx+w/scale;x+=14){const yy=surface(t,x).y;c.fillStyle='#9c9d93';c.fillRect(X(x)-scale*.32,Y(yy-.4),scale*.64,Math.max(0,Y(t.base-5.6)-Y(yy-.4)));c.fillStyle='#59666a';c.fillRect(X(x)-scale*.65,Y(yy-.4),scale*1.3,scale*.25);} c.save();c.translate(X(ride.x),Y(ride.y));c.rotate(-ride.a);c.scale(scale,scale);for(let i=0;i<2;i++){const x=i?1.05:-1.05,y=.45-ride.compression[i];c.fillStyle='#182c3c';c.beginPath();c.arc(x,y,.43,0,TAU);c.fill();c.strokeStyle='#d5e0dc';c.lineWidth=.05;c.stroke();}c.strokeStyle='#'+bikes[save.selected][1].toString(16);c.lineWidth=.12;c.beginPath();c.moveTo(-1.05,.45);c.lineTo(-.4,-.4);c.lineTo(.6,-.4);c.lineTo(1.05,.45);c.lineTo(-.1,.35);c.closePath();c.stroke();c.strokeStyle='#294c61';c.lineWidth=.25;c.beginPath();c.moveTo(.1,.1);c.lineTo(-.4,-.7);c.lineTo(-.1,-1.3);c.lineTo(.6,-.9);c.stroke();c.fillStyle='#ffb677';c.beginPath();c.arc(-.1,-1.55,.28,0,TAU);c.fill();c.restore();}
+  function renderFallback(){const w=canvas.width,h=canvas.height,c=ctx,t=tracks[level],scale=Math.min(w/25,h/15),cx=ride.x-w*.32/scale,cy=ride.y-.85+h*.72/scale;const X=x=>(x-cx)*scale,Y=y=>(cy-y)*scale;const gradient=c.createLinearGradient(0,0,0,h);gradient.addColorStop(0,'#'+t.sky.toString(16).padStart(6,'0'));gradient.addColorStop(1,tracks[level].night?'#273f5d':'#f0e4d1');c.fillStyle=gradient;c.fillRect(0,0,w,h);for(let i=-2;i<14;i++){const x=i*90-(ride.x*8%90);c.fillStyle=i%2?'#6e8a9a':'#8ba4b0';const bh=80+Math.abs(Math.sin(i*8))*150;c.fillRect(x,h*.65-bh,70,bh);c.fillStyle='#d3e1dd';for(let j=0;j<4;j++)c.fillRect(x+8,h*.65-bh+15+j*25,50,8);}c.fillStyle=tracks[level].night?'#111c28':'#89988a';c.fillRect(0,Y(t.base-5.6),w,h);c.strokeStyle='#3c4950';c.lineWidth=Math.max(5,scale*.38);c.beginPath();for(let x=cx;x<cx+w/scale+.4;x+=.25){const y=Y(surface(t,x).y);if(inRavine(t,x)){c.moveTo(X(x),y);continue;}if(x===cx||inRavine(t,x-.25))c.moveTo(X(x),y);else c.lineTo(X(x),y);}c.stroke();c.strokeStyle='#c5bcaa';c.lineWidth=2;c.stroke();for(let x=Math.ceil(cx/14)*14;x<cx+w/scale;x+=14){if(inRavine(t,x))continue;const yy=surface(t,x).y;c.fillStyle='#9c9d93';c.fillRect(X(x)-scale*.32,Y(yy-.4),scale*.64,Math.max(0,Y(t.base-5.6)-Y(yy-.4)));c.fillStyle='#59666a';c.fillRect(X(x)-scale*.65,Y(yy-.4),scale*1.3,scale*.25);} for(const ring of t.loops||[]){c.strokeStyle='#606e78';c.lineWidth=scale*.32;c.beginPath();c.arc(X(ring.x),Y(ring.y+ring.r),ring.r*scale,0,TAU);c.stroke();} c.save();c.translate(X(ride.x),Y(ride.y));c.rotate(-ride.a);c.scale(scale,scale);for(let i=0;i<2;i++){const x=i?1.05:-1.05,y=.45-ride.compression[i];c.fillStyle='#182c3c';c.beginPath();c.arc(x,y,.43,0,TAU);c.fill();c.strokeStyle='#d5e0dc';c.lineWidth=.05;c.stroke();}c.strokeStyle='#'+bikes[save.selected][1].toString(16);c.lineWidth=.12;c.beginPath();c.moveTo(-1.05,.45);c.lineTo(-.4,-.4);c.lineTo(.6,-.4);c.lineTo(1.05,.45);c.lineTo(-.1,.35);c.closePath();c.stroke();c.strokeStyle='#294c61';c.lineWidth=.25;c.beginPath();c.moveTo(.1,.1);c.lineTo(-.4,-.7);c.lineTo(-.1,-1.3);c.lineTo(.6,-.9);c.stroke();c.fillStyle='#ffb677';c.beginPath();c.arc(-.1,-1.55,.28,0,TAU);c.fill();c.restore();}
   function loop(now){if(!root?.isConnected){destroy();return;}const dt=Math.min(.05,last?(now-last)/1000:1/60);last=now;clock+=dt;if(state==='playing'){acc+=dt;while(acc>=1/120&&state==='playing'){step(ride,tracks[level],keys,1/120);processEvents();acc-=1/120;}if(keys.brake&&ride.contact[0]&&ride.vx>10&&Math.random()<.04)particles(0xc6c6b5,1);}adaptQuality(dt);engine(dt);hud();render(dt);raf=requestAnimationFrame(loop);}
   function destroy(){cancelAnimationFrame(raf);clearTimeout(loading);observer?.disconnect();abort?.abort();audioGeneration++;audioLoading=false;if(audio){audio.dispose();audio.ac.close().catch(()=>{});audio=null;}disposeGroup(world);disposeGroup(bike);for(const p of fx)scene?.remove(p.o);fx=[];materials.forEach(m=>{if(m.transparent||m===materials.get('hazard'))m.map?.dispose();m.dispose();});materials.clear();textures.forEach(m=>Object.values(m).forEach(t=>t.dispose()));textures.clear();environmentTarget?.dispose();environmentTarget=null;skyDome=null;contactShadow=null;particlePool=[];geometries.forEach(g=>g.dispose());geometries.clear();renderer?.dispose();renderer=null;scene=null;ctx=null;world=null;bike=null;root=null;canvas=null;keys={};keyboard={};pointers.clear();state='ready';ride=null;}
   window.FPStuntBike={gallery,start,destroy};

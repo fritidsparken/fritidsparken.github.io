@@ -11,7 +11,7 @@ export class BikeAudio {
   }
   async load(){
     const results=await Promise.allSettled(['idle','low','mid','high','overrun','metal-impact','raving-energy','city-traffic','wind'].map(async name=>{
-      const r=await fetch(asset(name+(['raving-energy','city-traffic','wind'].includes(name)?'.mp3':'.wav')));if(!r.ok)throw Error(name+': HTTP '+r.status);
+      const r=await fetch(asset(name+(['raving-energy','city-traffic','wind'].includes(name)?'.mp3':'.wav')), {signal:AbortSignal.timeout(20000)});if(!r.ok)throw Error(name+': HTTP '+r.status);
       const b=await this.ac.decodeAudioData(await r.arrayBuffer());if(this.disposed)return;this.buffers[name]=b;
       if(['city-traffic','wind'].includes(name)){
         const source=this.ac.createBufferSource(),gain=this.ac.createGain();source.buffer=b;source.loop=true;gain.gain.value=0;source.connect(gain);gain.connect(this.effects);source.start();this.ambience[name]={source,gain};this.nodes.push(source,gain);

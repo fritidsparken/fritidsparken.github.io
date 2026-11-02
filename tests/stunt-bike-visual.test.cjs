@@ -24,7 +24,7 @@ source=source.replace('  window.FPStuntBike={gallery,start,destroy};',`  window.
 vm.runInNewContext(source,sandbox);
 const api=sandbox.window.visualTest;api.init();
 const summary=[];const tracksForCamera=require('../js/stunt-bike.js').tracks;
-for(let pass=0;pass<2;pass++)for(let i=0;i<7;i++){
+for(let pass=0;pass<2;pass++)for(let i=0;i<tracksForCamera.length;i++){
   const {scene,world,bike,ride,camera}=api.build(i);
   for(const size of [[1366,580],[1024,490],[768,580],[390,430]]){
     [width,height]=size;camera.aspect=width/height;camera.updateProjectionMatrix();
@@ -38,11 +38,11 @@ for(let pass=0;pass<2;pass++)for(let i=0;i<7;i++){
   assert.ok((1-wheelContact.y)/2>.70&&(1-wheelContact.y)/2<.74,'wheel contact at 70–74% canvas height');
   const headlamp=scene.getObjectByName('motorcycle-headlight');
   assert.ok(headlamp?.isSpotLight,'real headlamp, not only an emissive lens');
-  assert.equal(headlamp.intensity,i===4?100:0);
+  assert.equal(headlamp.intensity,tracksForCamera[i].night?100:0);
   assert.equal(headlamp.parent,bike);assert.equal(headlamp.target.parent,bike);
-  const rear=scene.getObjectByName('motorcycle-taillight');assert.ok(rear?.isPointLight);assert.equal(rear.intensity,i===4?2.5:0);assert.equal(rear.parent,bike);
+  const rear=scene.getObjectByName('motorcycle-taillight');assert.ok(rear?.isPointLight);assert.equal(rear.intensity,tracksForCamera[i].night?2.5:0);assert.equal(rear.parent,bike);
   const lamps=world.children.filter(o=>o.isSpotLight);
-  assert.equal(lamps.length,i===4?6:0,'bounded street light pool');
+  assert.equal(lamps.length,tracksForCamera[i].night?6:0,'bounded street light pool');
   for(const lamp of lamps){assert.ok(lamp.position.y>lamp.target.position.y);assert.ok(lamp.distance>=20);}
   const groundY=require('../js/stunt-bike.js').tracks[i].base;
   const ray=new THREE.Raycaster(new THREE.Vector3(5,groundY+3,.37),new THREE.Vector3(0,-1,0));
@@ -65,7 +65,7 @@ for(let pass=0;pass<2;pass++)for(let i=0;i<7;i++){
   summary.push({pass,level:i+1,meshes,instances,mapped,cache:api.cache()});
 }
 // Rebuilding a previously visited course must not grow shared GPU resource caches.
-assert.deepEqual(summary[6].cache,summary[13].cache);
+assert.deepEqual(summary[tracksForCamera.length-1].cache,summary[tracksForCamera.length*2-1].cache);
 api.destroy();assert.deepEqual({...api.cache()},{materials:0,geometries:0,textures:0});
-console.log(JSON.stringify({passed:true,coverage:'7 scenes × 4 canvas sizes × 3 quality profiles × 3 poses, twice; cache reuse and cleanup. GPU rendering not tested.',scenes:summary.slice(0,7)},null,2));
+console.log(JSON.stringify({passed:true,coverage:'20 scenes × 4 canvas sizes × 3 quality profiles × 3 poses, twice; cache reuse and cleanup. GPU rendering not tested.',scenes:summary.slice(0,tracksForCamera.length)},null,2));
 
