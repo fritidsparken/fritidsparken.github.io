@@ -2,3 +2,5 @@
 @media(max-width:350px){.control-row{gap:8px}.spin{gap:4px}.spin>span{display:none}.spin button{width:34px}.control-row .primary{padding:10px 15px;gap:10px}.back{font-size:10px}.topbar{gap:5px;padding-left:12px;padding-right:12px}.top-actions{gap:5px}.top-actions button{width:40px;height:40px}.home-panel h1{font-size:49px}}
 @media(max-width:650px){.scoreboard{top:140px}.frame{padding:3px 2px}.frame span{height:14px}.frame b{font-size:8px}}
 @media(max-height:530px){.scoreboard{top:104px;left:16px;right:auto}.frame{flex:none;width:28px;font-size:9px;padding:3px 1px}.frame span{height:12px}.frame b{font-size:8px}}
+
+.quality-label{display:flex;gap:7px;align-items:center;font-size:11px;color:#d4e8e8}.quality-label select{color:#e6efec;background:#18333d;border:1px solid #50717b;border-radius:12px;padding:8px;max-width:85px}.vignette{opacity:.45}@media(max-width:600px){.quality-label span{display:none}.quality-label select{padding:6px;max-width:66px}}

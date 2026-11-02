@@ -32,3 +32,18 @@ WebGL; its checks cover the Canvas fallback. Its animation callbacks are heavily
 throttled, so the full-series QA fixture schedules the same loop with timers.
 The WebGL rendering path and performance on physical Chromebooks/iOS/Android
 have not been measured in this environment.
+
+## Graphics candidate (not yet visually approved)
+
+The candidate imports a local GLB asset kit and WebP PBR maps via `assets.mjs`.
+Authoring sources, provenance and rebuild commands are in `assets/README.md`.
+The new WebGL scene includes five lanes, furniture, return units, architectural
+lighting, score monitors, a static prefiltered environment probe, contact AO,
+reset sweep and a High-only depth AO/bright-source/AA finish pass. Auto/High/
+Medium/Low controls are exposed in the header. Physics and scoring are unchanged.
+
+The earlier statement that all assets are generated at runtime is superseded.
+The Canvas fallback remains the older renderer. Its screenshots cannot verify
+the new scene. See `tests/CRAZY_BOWLING_GRAPHICS_QA.md` for the publication gate.
+
+    node --test tests/crazy-bowling.test.mjs tests/crazy-bowling-assets.test.mjs
