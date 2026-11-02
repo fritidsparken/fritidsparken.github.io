@@ -18,9 +18,9 @@ export class LaneReflection {
  #include <opaque_fragment>`);
  };material.customProgramCacheKey=()=> 'bowling-lane-polish-v1';material.needsUpdate=true;
  }
- resize(quality){const w=quality==='high'?1024:512;this.target.setSize(w,w/2);}
+ resize(quality){const w=quality==='high'?768:256;this.target.setSize(w,w/2);}
  render(renderer,scene,camera,floors,quality){
- if(quality==='low'){this.enabled.value=0;return;}if(this.tick++%(quality==='high'?2:4)!==0)return;
+ if(quality!=='high'){this.enabled.value=0;return;}if(this.tick++%6!==0)return;
  const mirror=this.camera;camera.updateMatrixWorld();mirror.copy(camera,false);mirror.position.copy(camera.position);mirror.position.y=-camera.position.y;
  const aim=new T.Vector3();camera.getWorldDirection(aim);aim.add(camera.position);aim.y=-aim.y;mirror.up.set(0,-1,0);mirror.lookAt(aim);mirror.updateMatrixWorld();mirror.projectionMatrix.copy(camera.projectionMatrix);
  this.matrix.set(.5,0,0,.5,0,.5,0,.5,0,0,.5,.5,0,0,0,1).multiply(mirror.projectionMatrix).multiply(mirror.matrixWorldInverse);

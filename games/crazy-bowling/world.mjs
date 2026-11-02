@@ -1,23 +1,23 @@
-import {LaneReflection} from './reflections.mjs?v=20261103-neon';
-import {buildHall} from './hall.mjs?v=20261103-neon';
-import {FinishPass} from './post.mjs?v=20261103-neon';
+import {LaneReflection} from './reflections.mjs?v=20261103-smooth';
+import {buildHall} from './hall.mjs?v=20261103-smooth';
+import {FinishPass} from './post.mjs?v=20261103-smooth';
 const T=window.THREE;
 // Direct rendering is the fallback; only capable High devices use the HDR finish pass.
-const QUALITY={high:{ratio:1.8,shadow:2048,probe:256,detail:true,post:true},medium:{ratio:1.3,shadow:1024,probe:128,detail:true,post:false},low:{ratio:1,shadow:0,probe:64,detail:false,post:false}};
+const QUALITY={high:{ratio:1.5,shadow:1024,probe:256,detail:true,post:true},medium:{ratio:1.15,shadow:512,probe:128,detail:true,post:false},low:{ratio:1,shadow:0,probe:64,detail:false,post:false}};
 export class BowlingView{
  constructor(host,assets){
  this.host=host;this.assets=assets;this.geometries=new Set();this.materials=new Set();this.textures=new Set();this.models=assets.models;this.reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
  const canvas=document.createElement('canvas'),gl=canvas.getContext('webgl2',{antialias:true})||canvas.getContext('webgl',{antialias:true});
  this.renderer=gl?new T.WebGLRenderer({canvas,context:gl,antialias:true,powerPreference:'high-performance'}):window.BowlingSoftware.create(T);
  this.renderer.outputColorSpace=T.SRGBColorSpace;this.renderer.toneMapping=T.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.1;this.renderer.shadowMap.type=T.PCFSoftShadowMap;
- this.scene=new T.Scene();this.camera=new T.PerspectiveCamera(49,1,.1,180);this.camera.position.set(0,2.8,11);this.look=new T.Vector3(0,.3,-24);host.append(this.renderer.domElement);
- this.clock=0;this.samples=[];this.auto=true;this.quality=innerWidth<600?'low':navigator.hardwareConcurrency<=4?'medium':'high';
+ this.scene=new T.Scene();this.camera=new T.PerspectiveCamera(49,1,.1,180);this.camera.position.set(0,4.4,13);this.look=new T.Vector3(0,.3,-24);host.append(this.renderer.domElement);
+ this.clock=0;this.samples=[];this.auto=true;this.quality=innerWidth<600?'low':'medium';
  this.resize=()=>{const q=QUALITY[this.quality];this.renderer.setPixelRatio(Math.min(devicePixelRatio||1,q.ratio));this.renderer.setSize(innerWidth,innerHeight);this.camera.aspect=innerWidth/innerHeight;this.camera.fov=innerWidth<600?64:52;this.camera.updateProjectionMatrix();if(this.post){const s=this.renderer.getDrawingBufferSize(new T.Vector2());this.post.resize(s.x,s.y);}};addEventListener('resize',this.resize);this.setQuality(this.quality);
  if(this.renderer.debug)this.renderer.debug.onShaderError=()=>{this.finishFailed=true;queueMicrotask(()=>{if(this.reflection){this.reflection.dispose();this.reflection=null;this.wood.onBeforeCompile=()=>{};this.wood.customProgramCacheKey=()=> 'safe-polish';this.wood.needsUpdate=true;}});};
  host.dataset.renderer=this.renderer.isSoftware?'canvas':'webgl';
  }
  setQuality(name,manual=false){if(!QUALITY[name])return;this.quality=name;if(manual)this.auto=false;const q=QUALITY[name];this.renderer.shadowMap.enabled=!!q.shadow&&!this.renderer.isSoftware;
- if(this.sun){this.sun.shadow.map?.dispose();this.sun.shadow.map=null;this.sun.shadow.mapSize.set(q.shadow||512,q.shadow||512);}if(this.decor)this.decor.visible=true;for(const l of this.detailLights||[])l.visible=name!=='low';if(this.laneLight){this.laneLight.castShadow=name==='high';this.laneLight.shadow.map?.dispose();this.laneLight.shadow.map=null;}
+ if(this.sun){this.sun.shadow.map?.dispose();this.sun.shadow.map=null;this.sun.shadow.mapSize.set(q.shadow||512,q.shadow||512);}if(this.decor)this.decor.visible=true;for(const l of this.detailLights||[])l.visible=name==='high';for(const l of this.accentSpots||[])l.visible=name==='high';if(this.laneLight){this.laneLight.castShadow=false;this.laneLight.shadow.map?.dispose();this.laneLight.shadow.map=null;}
  this.post?.dispose();this.post=null;if(q.post&&!this.finishFailed&&this.renderer.capabilities?.isWebGL2&&this.renderer.extensions.has('EXT_color_buffer_float'))this.post=new FinishPass(this.renderer);
  this.reflection?.resize(name);for(const m of this.materials)m.needsUpdate=true;this.samples=[];this.resize();this.host.dataset.quality=name;
  }
@@ -35,7 +35,7 @@ export class BowlingView{
  const fill=new T.DirectionalLight('#a3b9ff',.75);fill.position.set(12,8,10);this.scene.add(fill);
  this.palette={pin:this.mat('#ffffff',{map:this.map('pin'),roughness:.18}),resin:this.resin(spec.color),shell:this.mat('#131724',{metalness:.15,roughness:.3,side:T.DoubleSide}),rubber:this.mat('#13191c',{roughness:.94}),metal:this.mat('#9aadb5',{metalness:.85,roughness:.27,side:T.DoubleSide}),led:this.mat(neon?'#c27cdb':'#84e1ca',{emissive:neon?'#9c40c0':'#3bbd9c',emissiveIntensity:1.5}),fabric:this.pbr('fabric','#b6efdf',1,[2,2]),walnut:this.pbr('maple','#674333',1,[1,1]),warmLight:this.mat('#ffefcc',{emissive:'#ffe7b0',emissiveIntensity:2}),screen:this.mat('#fff',{roughness:.26})};
  const p=this.palette;Object.assign(p,{
- leather:this.pbr('fabric','#a85329',.6,[3,3],{clearcoat:.35,clearcoatRoughness:.3}),stitch:this.mat('#53301e',{roughness:.75}),soil:this.mat('#18110e',{roughness:1}),bronze:this.mat('#b17b45',{metalness:.82,roughness:.27}),leaf:this.mat('#417c25',{roughness:.55,side:T.DoubleSide}),gold:this.mat('#ffc35c',{metalness:.65,roughness:.22,emissive:'#ca7623',emissiveIntensity:.35}),blueNeon:this.mat('#8cdbff',{emissive:'#185aff',emissiveIntensity:4}),pinkNeon:this.mat('#ffc2f9',{emissive:'#db18cc',emissiveIntensity:3})});
+ leather:this.pbr('fabric','#a85329',.6,[3,3],{clearcoat:.35,clearcoatRoughness:.3}),stitch:this.mat('#53301e',{roughness:.75}),soil:this.mat('#18110e',{roughness:1}),bronze:this.mat('#b17b45',{metalness:.82,roughness:.27}),leaf:this.mat('#417c25',{roughness:.55,side:T.DoubleSide}),gold:this.mat('#d0efff',{metalness:.05,roughness:.25,emissive:'#56aaff',emissiveIntensity:3.2}),blueNeon:this.mat('#8cdbff',{emissive:'#185aff',emissiveIntensity:4}),pinkNeon:this.mat('#ffc2f9',{emissive:'#db18cc',emissiveIntensity:3})});
  this.wood=this.pbr('oak','#ffe0a9',.4,[3,11],{normalScale:new T.Vector2(.12,.12),clearcoat:.95,clearcoatRoughness:.13,envMapIntensity:.9});const ice=this.pbr('resin','#9ce5ec',.5,[2,8],{metalness:.15,clearcoat:1});
  for(const o of physics.solids){let m;if(o.type==='bumper'){const profile=[new T.Vector2(0,-.65),new T.Vector2(.68,-.65),new T.Vector2(.8,-.5),new T.Vector2(.76,.4),new T.Vector2(.6,.65),new T.Vector2(0,.65)];m=this.mesh(new T.LatheGeometry(profile,48),p.shell);const ring=this.mesh(new T.TorusGeometry(.77,.04,8,48),p.led,m);ring.rotation.x=Math.PI/2;ring.position.y=.25;
  }else{let material=o.type==='wood'?this.wood:o.type==='ice'?ice:o.type==='rail'?p.metal:o.type==='ramp'?this.wood:o.type==='back'?p.rubber:o.type==='soft'?p.fabric:p.shell;m=this.box(o.w,o.h,o.d,material);}
@@ -63,11 +63,11 @@ export class BowlingView{
  this.aim.visible=ready;this.aim.position.x=x;this.aim.rotation.y=-aim;
  if(!paused)for(let i=this.particles.length-1;i>=0;i--){const p=this.particles[i];p.life-=dt;p.v.y-=dt*5;p.mesh.position.addScaledVector(p.v,dt);p.mesh.rotation.x+=dt*3;p.mesh.rotation.y+=dt*2;p.mesh.scale.setScalar(Math.min(1,Math.max(0,p.life)*2));if(p.life<=0){this.scene.remove(p.mesh);this.particles.splice(i,1);}}
  let pos,look;const portrait=innerWidth<600;
- if(home||ready){pos=new T.Vector3(0,portrait?3.6:innerHeight<550?2.5:2.8,portrait?14:innerHeight<550?12:11);look=new T.Vector3(0,portrait?.2:.3,-24);}
- else{const travel=Math.max(0,Math.min(24,2-this.ball.position.z));pos=new T.Vector3(travel>21?1.1:0,(portrait?4:2.8)+travel*.045,(portrait?13:11)-travel*.72);look=new T.Vector3(0,1.4,-24-travel*.15);}
+ if(home||ready){pos=new T.Vector3(0,portrait?4.6:innerHeight<550?3.7:4.4,portrait?16:innerHeight<550?14:13);look=new T.Vector3(0,portrait?.2:.3,-24);}
+ else{const travel=Math.max(0,Math.min(24,2-this.ball.position.z));pos=new T.Vector3(travel>21?1.1:0,(portrait?4.6:4.4)+travel*.025,(portrait?16:13)-travel*.72);look=new T.Vector3(0,1.4,-24-travel*.15);}
  const t=1-Math.exp(-dt*3.5);this.camera.position.lerp(pos,t);this.look.lerp(look,t);if(shake&&!this.reduced)this.camera.position.x+=Math.sin(this.clock*40)*Math.min(.025,shake*.02);this.camera.lookAt(this.look);
  if(this.reflection)this.reflection.render(this.renderer,this.scene,this.camera,this.floorMeshes,this.quality);
  if(this.post&&!this.finishFailed)this.post.render(this.scene,this.camera);else this.renderer.render(this.scene,this.camera);
- if(this.auto&&!paused&&!document.hidden&&this.clock>5){this.samples.push(dt);if(this.samples.length>=240){const avg=this.samples.reduce((a,b)=>a+b)/this.samples.length;if(avg>.026&&this.quality!=='low')this.setQuality(this.quality==='high'?'medium':'low');this.samples=[];}}
+ if(this.auto&&!paused&&!document.hidden&&this.clock>2){this.samples.push(dt);if(this.samples.length>=90){const avg=this.samples.reduce((a,b)=>a+b)/this.samples.length;if(avg>.026&&this.quality!=='low')this.setQuality(this.quality==='high'?'medium':'low');this.samples=[];}}
  }
 }
