@@ -1,0 +1,8 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {impactSample,rollingSample,roomImpulse} from '../games/crazy-bowling/sound-design.mjs';
+import {BowlingPhysics} from '../games/crazy-bowling/physics.mjs';
+import {Audio} from '../games/crazy-bowling/audio.mjs';
+test('Original sound buffers are finite, non-silent and have headroom at mobile and desktop sample rates',()=>{for(const rate of [22050,44100,48000])for(const data of [impactSample(rate,'pin'),impactSample(rate,'pinfall'),impactSample(rate,'bounce'),rollingSample(rate),roomImpulse(rate)]){let peak=0;for(const n of data){assert.ok(Number.isFinite(n));peak=Math.max(peak,Math.abs(n));}assert.ok(peak>.01&&peak<1);}});
+test('Impact variants differ and decay to silence; rolling loop has no amplitude jump',()=>{const a=impactSample(44100,'pin',1),b=impactSample(44100,'pin',2);assert.notDeepEqual(a,b);assert.ok(Math.abs(a.at(-1))<.001);const roll=rollingSample(44100);assert.ok(Math.abs(roll[0]-roll.at(-1))<.03);});
+test('A physical strike emits positional, strength-sensitive pin and floor audio',()=>{const p=new BowlingPhysics(0);p.launch({x:.15,power:.65});const kinds=new Set();for(let i=0;i<900;i++){p.step();for(const e of p.events.splice(0)){assert.ok(Number.isFinite(e.impact)&&Number.isFinite(e.x));kinds.add(e.kind);}}assert.ok(kinds.has('pin'));assert.ok(kinds.has('pinfall'));});
+test('Mute stops every active sound immediately and prevents context creation',()=>{const a=new Audio();let stopped=0;a.voices.add({stop(){stopped++;}});a.enabled=false;a.play('pin');assert.equal(stopped,1);assert.equal(a.voices.size,0);assert.equal(a.context,null);});
