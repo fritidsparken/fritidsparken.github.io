@@ -16,3 +16,8 @@
 #controls{position:fixed;left:0;right:0;width:100%;transform:none;justify-content:center;bottom:max(20px,env(safe-area-inset-bottom));padding:0 12px;grid-template-columns:repeat(3,58px);gap:8px;pointer-events:none;z-index:3}
 #controls button{pointer-events:auto;height:58px;user-select:none;-webkit-user-select:none}
 @media(max-height:500px){#controls{grid-template-columns:repeat(3,48px);gap:6px;bottom:max(12px,env(safe-area-inset-bottom))}#controls button{height:48px}}
+
+/* Reserve a lower band for the controls; the camera frames the frog above it. */
+.quality-setting{display:flex;align-items:center;justify-content:center;gap:10px;font-size:.8rem;font-weight:700;margin:10px 0}.quality-setting select{font:inherit;border:1px solid #74927c;border-radius:9px;padding:7px 10px;color:#244b39;background:#f6f4e8}
+@media(max-width:500px){#controls{grid-template-columns:repeat(3,50px);gap:7px;bottom:max(12px,env(safe-area-inset-bottom))}#controls button{height:50px}#area{font-size:.7rem}.stat span{padding:7px 9px}.panel{border-radius:22px}#notice{top:16%;font-size:1.15rem;width:85%}}
+@media(max-height:500px){#controls{grid-template-columns:repeat(3,38px);gap:5px;bottom:max(8px,env(safe-area-inset-bottom))}#controls button{height:38px;border-radius:11px}.stat span{font-size:.75rem;padding:6px 9px}}
