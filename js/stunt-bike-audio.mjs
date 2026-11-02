@@ -36,7 +36,7 @@ export class BikeAudio {
     let weights=centers.map(c=>Math.max(0,1-Math.abs(this.rpm-c)/.34)),norm=Math.sqrt(weights.reduce((a,w)=>a+w*w,0))||1;
     names.forEach((name,i)=>{const l=this.layers[name];if(!l)return;l.gain.gain.setTargetAtTime(weights[i]/norm*(keys.gas?1:.76),now,.055);l.source.playbackRate.setTargetAtTime(clamp(1+(this.rpm-centers[i])*.32,.92,1.08),now,.09);});
     this.layers.overrun?.gain.gain.setTargetAtTime(!keys.gas&&speed>.2?.23:0,now,.11);
-    this.music.gain.setTargetAtTime(active&&volumes.musicOn?volumes.music*(keys.gas?.19:.25):0,now,.18);
+    this.music.gain.setTargetAtTime(active&&volumes.musicOn?volumes.music*.65:0,now,.18);
     if(active&&volumes.musicOn&&this.buffers['raving-energy']){
       if(this.pausing){clearTimeout(this.pausing);this.pausing=null;}
       if(!this.musicPlaying)this.startMusic();

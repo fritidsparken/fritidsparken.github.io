@@ -78,7 +78,7 @@
   }
   // Pure physics is also executable by the regression harness, without a browser.
   if(typeof module!=='undefined'&&module.exports){module.exports={tracks,surface,newRide,step,wrap};return;}
-  const audioModuleURL=new URL('stunt-bike-audio.mjs?v=bridge-20261102-3',document.currentScript.src).href;
+  const audioModuleURL=new URL('stunt-bike-audio.mjs?v=night-music-20261103-1',document.currentScript.src).href;
   let audioLoading=false,audioGeneration=0;
   const KEY='fp-stunt-bike-city-v2', LEGACY='fp-stunt-bike-v1';
   const bikes=[['Metro',0xff780b,'Alltid tillgänglig'],['Volt',0x49e8c5,'Klara tre banor'],['Precision',0x65b7ff,'Fem perfekta landningar'],['Neon',0xd786ff,'Gör en dubbelvolt'],['Legend',0xffd45b,'Klara alla sju banor']];
@@ -86,7 +86,7 @@
   const $=s=>root?.querySelector(s),action=(a,label,cls='')=>`<button class="${cls}" data-bike-action="${a}">${label}</button>`;
   function gallery(){return `<section class="bike-page arcade-shell"><header class="bike-heading"><div><span class="bike-eyebrow">FRITIDSPARKEN ORIGINAL · 3D TRIALS</span><h2>Stuntcykel <em>Stadens tak</em></h2><p>Sju stadsdelar. Två hjul. Ditt nästa perfekta hopp.</p></div><div class="bike-tools">${action('quality','Grafik: Auto')}${action('garage','Garage')}${action('sound','Ljud av')}${action('audio-menu','Ljudinställningar')}${action('pause','Ⅱ Paus')}</div></header><section class="bike-sound-panel" id="bikeAudioPanel" hidden aria-label="Ljudinställningar">${audioMenu()}</section><div class="bike-track-tabs" aria-label="Välj bana">${tracks.map((t,i)=>`<button data-bike-level="${i}" aria-pressed="${i===0}"><b>0${i+1}</b>${t.name}</button>`).join('')}</div><div class="bike-field"><canvas id="bikeCanvas" tabindex="0" aria-label="Stuntcykel i sidovy. Piltangenter styr. Mellanslag hoppar. P pausar."></canvas><div class="bike-hud"><div><small>HASTIGHET</small><strong id="bikeSpeed">0 <i>km/h</i></strong></div><div><small id="bikeTrackName"></small><strong id="bikeTime">0.0 s</strong></div><div><small>TRICKPOÄNG</small><strong id="bikeScore">0</strong></div></div><div class="bike-progress"><i id="bikeProgress"></i></div><div class="bike-toast" id="bikeToast" aria-live="polite"></div><div class="bike-bottom"><span id="bikeRecord"></span><span id="bikeRenderer"></span></div><div class="bike-overlay" id="bikeOverlay"></div></div><div class="bike-controls"><div>${control('left','↶','Bakåt')}${control('right','↷','Framåt')}</div>${control('jump','↑','Hoppa')}<div>${control('brake','↓','Broms')}${control('gas','»','Gas')}</div></div><footer class="bike-footer"><span>↑ W gas · ↓ S broms/backa · ← → A D balans · Mellanslag hopp · R kontrollpunkt · P paus</span>${action('retry','↻ Kontrollpunkt')}</footer><details class="bike-legacy"><summary>Tidigare rekord · Skog & sten</summary><div id="bikeLegacy"></div></details></section>`;}
   function control(k,icon,text){return `<button data-bike-control="${k}" aria-label="${text}"><b>${icon}</b><small>${text}</small></button>`;}
-  function readSave(){try{const d=JSON.parse(localStorage.getItem(KEY)||'{}');save=d&&typeof d==='object'&&!Array.isArray(d)?d:{};}catch{save={};}save.records=save.records&&typeof save.records==='object'?save.records:{};save.perfect=Number(save.perfect)||0;save.tricks=Number(save.tricks)||0;save.doubles=Number(save.doubles)||0;save.selected=clamp(Number(save.selected)||0,0,4);try{legacy=JSON.parse(localStorage.getItem(LEGACY)||'{}')||{};}catch{legacy={};}muted=save.muted!==false;save.audio={music:.35,motor:.8,effects:.6,musicOn:true,...save.audio};for(const k of ['music','motor','effects'])save.audio[k]=clamp(Number(save.audio[k])||0,0,1);}
+  function readSave(){try{const d=JSON.parse(localStorage.getItem(KEY)||'{}');save=d&&typeof d==='object'&&!Array.isArray(d)?d:{};}catch{save={};}save.records=save.records&&typeof save.records==='object'?save.records:{};save.perfect=Number(save.perfect)||0;save.tricks=Number(save.tricks)||0;save.doubles=Number(save.doubles)||0;save.selected=clamp(Number(save.selected)||0,0,4);try{legacy=JSON.parse(localStorage.getItem(LEGACY)||'{}')||{};}catch{legacy={};}muted=save.muted===true;if(save.audioMixVersion!==2){save.audio={music:.75,motor:.06,effects:.04,musicOn:true};save.audioMixVersion=2;}save.audio={music:.75,motor:.06,effects:.04,musicOn:true,...save.audio};for(const k of ['music','motor','effects'])save.audio[k]=clamp(Number(save.audio[k])||0,0,1);persist();}
   function persist(){try{localStorage.setItem(KEY,JSON.stringify(save));}catch{toast('Rekord kan inte sparas i den här webbläsaren.');}}
   function unlocked(i){const count=Object.values(save.records).filter(r=>r.completed).length;return i===0||(i===1&&count>=3)||(i===2&&save.perfect>=5)||(i===3&&save.doubles>0)||(i===4&&count===7);}
   function start(){destroy();root=document.querySelector('.bike-page');if(!root)return;previousFocus=document.activeElement;canvas=$('canvas');abort=new AbortController();const signal=abort.signal;readSave();if(!unlocked(save.selected))save.selected=0;
@@ -117,7 +117,7 @@
   function processEvents(){for(const e of ride.events){if(e.type==='land'||e.type==='balance'){toast(e.label+' +'+e.points);tone(e.perfect?740:420,.14);particles(e.perfect?0xffe9ac:0xc7d4cd,12);}if(e.type==='jump')tone(240,.08);if(e.type==='checkpoint'){toast('KONTROLLPUNKT SPARAD ✓');tone(620,.1);}if(e.type==='crash'){state='crashed';ride.crashClock=clock;clearKeys();particles(0xffc88b,20);tone(100,.25);modal('Oj då! Försök igen!','Borsta av hjälmen och hoppa upp igen. Du fortsätter från din senaste kontrollpunkt.',action('retry','Försök igen →','bike-primary')+action('retry','Från kontrollpunkten')+action('restart','Starta om banan'));}if(e.type==='finish')finish();}}
   function finish(){state='complete';clearKeys();const t=tracks[level],old=save.records[t.id]||{},record=!old.time||ride.time<old.time||ride.score>(old.score||0);save.records[t.id]={time:Math.min(old.time||Infinity,ride.time),score:Math.max(old.score||0,ride.score),completed:true,bestLandings:Math.max(old.bestLandings||0,ride.perfect)};save.perfect+=ride.perfect;save.tricks+=ride.tricks;save.doubles+=ride.doubles;persist();const stars=ride.time<t.medal&&ride.score>=500?'★★★':ride.time<t.medal*1.7?'★★':'★';tone(880,.4);modal(record?'Nytt rekord!':'Snyggt kört!',`${stars} · ${ride.time.toFixed(1)} sekunder · ${ride.score} poäng. ${ride.perfect} perfekta landningar.`,action('next','Nästa stadsdel →','bike-primary')+action('restart','Förbättra ditt rekord')+action('garage','Till garaget'));}
   function hud(){if(!ride)return;$('#bikeSpeed').innerHTML=Math.round(Math.abs(ride.vx)*3.6)+' <i>km/h</i>';$('#bikeTime').textContent=ride.time.toFixed(1)+' s';$('#bikeScore').textContent=ride.score.toLocaleString('sv-SE');$('#bikeProgress').style.width=clamp(ride.x/tracks[level].length*100,0,100)+'%';const r=save.records[tracks[level].id];$('#bikeRecord').textContent=r?`REKORD ${r.time.toFixed(1)} s · ${r.score} p`:'DIN FÖRSTA RUNDA · SÄTT REKORDET';if(clock>toastEnd)$('#bikeToast').textContent='';}
-  function audioMenu(){const v=save.audio||{music:.35,motor:.8,effects:.6,musicOn:true};return `<b>Ljudinställningar</b>${[['music','Musik'],['motor','Motor'],['effects','Effekter']].map(([k,name])=>`<label>${name}<input type="range" min="0" max="100" value="${Math.round(v[k]*100)}" data-bike-volume="${k}" aria-label="${name}volym"><output>${Math.round(v[k]*100)}%</output></label>`).join('')}${action('music',v.musicOn?'Musik på':'Musik av')}<p class="bike-sound-status" id="bikeAudioStatus" aria-live="polite"></p><details><summary>Musik och ljudkällor</summary><p>Musik: “Raving Energy” — Kevin MacLeod (incompetech.com), CC BY 4.0. Bearbetad loop.</p><p>Motor och metallkontakt: dklon, “Engines – Startup, Idle &amp; Rev”, CC BY-SA 3.0. Bearbetade inspelningar. Motorcykelmodell och cylindervolym är inte verifierade.</p><p>Trafik och vindfoley: Joseph SARDIN / BigSoundBank, CC0. Bearbetade loopar.</p><a href="/assets/stunt-bike/audio/LICENSES.md" target="_blank" rel="noopener">Alla filer, källor och licenser ↗</a></details>`;}
+  function audioMenu(){const v=save.audio||{music:.75,motor:.06,effects:.04,musicOn:true};return `<b>Ljudinställningar</b>${[['music','Musik'],['motor','Motor'],['effects','Effekter']].map(([k,name])=>`<label>${name}<input type="range" min="0" max="100" value="${Math.round(v[k]*100)}" data-bike-volume="${k}" aria-label="${name}volym"><output>${Math.round(v[k]*100)}%</output></label>`).join('')}${action('music',v.musicOn?'Musik på':'Musik av')}<p class="bike-sound-status" id="bikeAudioStatus" aria-live="polite"></p><details><summary>Musik och ljudkällor</summary><p>Musik: “Raving Energy” — Kevin MacLeod (incompetech.com), CC BY 4.0. Bearbetad loop.</p><p>Motor och metallkontakt: dklon, “Engines – Startup, Idle &amp; Rev”, CC BY-SA 3.0. Bearbetade inspelningar. Motorcykelmodell och cylindervolym är inte verifierade.</p><p>Trafik och vindfoley: Joseph SARDIN / BigSoundBank, CC0. Bearbetade loopar.</p><a href="/assets/stunt-bike/audio/LICENSES.md" target="_blank" rel="noopener">Alla filer, källor och licenser ↗</a></details>`;}
   function audioInput(e){const k=e.target.dataset.bikeVolume;if(!k)return;save.audio[k]=clamp(Number(e.target.value)/100,0,1);e.target.nextElementSibling.textContent=e.target.value+'%';persist();}
   async function soundStart(){
     if(muted)return;if(audio?.errors?.length){audio.dispose();audio.ac.close().catch(()=>{});audio=null;}if(audio){audio.ac.resume().catch(()=>{});return;}if(audioLoading)return;
@@ -210,7 +210,7 @@
     environmentTarget?.dispose();const pmrem=new THREE.PMREMGenerator(renderer);environmentTarget=pmrem.fromEquirectangular(tex);pmrem.dispose();scene.environment=environmentTarget.texture;
     const skyMaterial=new THREE.MeshBasicMaterial({map:tex,side:THREE.BackSide,depthWrite:false,fog:false,toneMapped:false});skyDome=new THREE.Mesh(new THREE.SphereGeometry(270,32,16),skyMaterial);skyDome.userData.owned=true;skyDome.renderOrder=-100;world.add(skyDome);
     scene.fog=new THREE.Fog(night?0x101c2c:dusk?0xc3b7ad:0xb7ccd1,48,qualityProfiles[quality].far);scene.background=new THREE.Color(night?0x132434:0xb7ccd1);
-    scene.getObjectByName('skyLight').intensity=night?.16:1.1;lights.color.set(night?0xb4cbeb:0xffdfb4);lights.intensity=night?.22:2.6;
+    scene.getObjectByName('skyLight').intensity=night?.28:1.1;lights.color.set(night?0xb4cbeb:0xffdfb4);lights.intensity=night?.35:2.6;
   }
 
   function initFallback(){if(ctx)return;const old=canvas;canvas=old.cloneNode();old.replaceWith(canvas);ctx=canvas.getContext('2d');observer?.disconnect();observer?.observe(canvas);$('#bikeRenderer').textContent='ENKEL GRAFIK · WEBGL SAKNAS';const qualityButton=$('[data-bike-action="quality"]');if(qualityButton){qualityButton.disabled=true;qualityButton.textContent='Grafik: reservläge';}}
@@ -305,7 +305,7 @@
     }
     if(level===0)crane(45,t.base-4,-32);
     for(let i=0;i<6;i++){const flock=new THREE.Group();flock.userData={origin:i*32-20,height:t.base+24+(i%3)*2,phase:i*1.7};flock.position.set(flock.userData.origin,flock.userData.height,-45);for(const side of [-1,1]){const wing=box(flock,.5,.045,.16,side*.24,0,0,mat(0x53616b));wing.rotation.z=side*.3;}world.add(flock);birds.push(flock);}
-    for(let x=-10;x<t.length+20;x+=24){
+    for(let x=-10;x<t.length+20;x+=night?12:24){
       const base=t.base-5.2,y=surface(t,x+1.2).y-.86;surfaceBox(world,.6,.2,.6,x,base,-5.2,concrete);rod(world,[x,base,-5.2],[x,y+7,-5.2],.065,steel);rod(world,[x,y+7,-5.2],[x+1.4,y+7,-5.2],.06,steel);
       rounded(world,.9,.12,.4,x+1.2,y+6.95,-5.2,steel,.04);box(world,.7,.025,.3,x+1.2,y+6.86,-5.2,mat(0xffe8bd,0,night?0xffc67a:0));
       if(night){const glow=new THREE.Mesh(geo('lampglow',()=>new THREE.PlaneGeometry(5,8)),glowMaterial());glow.position.set(x+1.2,y+3,-5.1);world.add(glow);}
@@ -330,8 +330,8 @@
     for(const cp of t.checkpoints.slice(1)){rod(world,[cp,t.base,-2.4],[cp,t.base+3,-2.4],.045,steel);surfaceBox(world,1,.6,.03,cp+.5,t.base+2.6,-2.4,pbr('fabric',0x74ac8d),1);}
     const end=t.length;for(const z of [-2.35,2.35]){rod(world,[end,t.base,z],[end,t.base+5,z],.1,steel);}box(world,.2,.22,4.9,end,t.base+5,0,steel);sign(world,'MÅL',end,t.base+5,2.5,0x233d43,2.6);
     for(let i=0;i<12;i++)box(world,.45,.015,.33,end+(i%2)*.45,t.base+.02,-1.8+Math.floor(i/2)*.66,i%2?0xe4e1d7:0x2d3437);
-    if(night)for(let i=0;i<4;i++){
-      const lamp=new THREE.SpotLight(0xffd49b,125,28,Math.PI/3,.7,2);
+    if(night)for(let i=0;i<6;i++){
+      const lamp=new THREE.SpotLight(0xffdfad,340,32,Math.PI/3,.7,2);
       lamp.name='street-light-'+i;lamp.castShadow=false;world.add(lamp,lamp.target);streetLights.push(lamp);
     }
     // Soft local contact occlusion also remains visible on the low shadow preset.
@@ -405,6 +405,9 @@
     const tank=rounded(bike,.73,.32,.43,.03,.4,0,paint,.12);tank.rotation.z=-.18;
     rounded(bike,.85,.12,.36,-.52,.56,0,rubber,.055);
     const tail=rounded(bike,.75,.065,.35,-1,.43,0,paint,.025);tail.rotation.z=.16;
+    const tailLens=rounded(bike,.13,.12,.33,-1.35,.39,0,mat(0xc20c16,.15,level===4?0xff0715:0x270003),.035);
+    tailLens.name='motorcycle-tail-lens';
+    const tailLight=new THREE.PointLight(0xff1020,level===4?2.5:0,3,2);tailLight.name='motorcycle-taillight';tailLight.position.set(-1.46,.4,.12);bike.add(tailLight);
     const fender=rounded(bike,.78,.06,.38,1.04,.2,0,paint,.025);fender.rotation.z=-.08;
     for(const z of [-.245,.245]){const panel=rounded(bike,.4,.23,.025,-.49,.27,z,paint,.05);panel.rotation.z=.3;box(bike,.19,.025,.032,-.48,.31,z*1.07,mat(0xe3e2d8));}
     rod(bike,[.56,.55,0],[.62,.85,0],.04,dark);rod(bike,[.62,.85,-.36],[.62,.85,.36],.026,alloy);for(const z of [-.3,.3])rod(bike,[.62,.85,z-.06],[.62,.85,z+.06],.043,rubber);
@@ -463,10 +466,10 @@
     target.addScaledVector(right,Math.round(target.dot(right)/sx)*sx-target.dot(right));
     target.addScaledVector(up,Math.round(target.dot(up)/sy)*sy-target.dot(up));
     lights.target.position.copy(target);lights.position.copy(target).add(offset);
-    const start=Math.floor((ride.x+10)/24)-1;
-    streetLights.forEach((lamp,i)=>{const x=-10+(start+i)*24,ground=surface(t,x+1.2).y;
+    const start=Math.floor((ride.x+10)/12)-2;
+    streetLights.forEach((lamp,i)=>{const x=-10+(start+i)*12,ground=surface(t,x+1.2).y;
       lamp.position.set(x+1.2,ground+6,-5.2);lamp.target.position.set(x+1.2,ground,0);
-      lamp.intensity=x>=-10&&x<t.length+20?125:0;
+      lamp.intensity=x>=-10&&x<t.length+20?340:0;
     });
   }
   function render(dt){if(!ride)return;const t=tracks[level];if(renderer&&bike){const garageMode=state==='garage';world.visible=!garageMode;root.dataset.mode=state;scene.background.set(garageMode?0x243b4c:level===4?0x132434:0xb7ccd1);bike.position.set(ride.x,ride.y,0);bike.rotation.set(0,garageMode?garageYaw:0,(garageMode?0:ride.a)+(state==='crashed'?Math.min(1,clock-ride.crashClock)*.65:0));animateBike(dt);if(state==='crashed'){const tumble=Math.min(1,(clock-ride.crashClock)*2);bike.userData.rider.position.x=tumble*.6;bike.userData.rider.position.y+=Math.sin(tumble*Math.PI)*.5;bike.userData.rider.rotation.z=-tumble*.8;}else{bike.userData.rider.position.x=0;bike.userData.rider.position.y=0;bike.userData.rider.rotation.z=0;}

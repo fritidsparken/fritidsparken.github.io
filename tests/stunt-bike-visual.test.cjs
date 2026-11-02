@@ -40,8 +40,9 @@ for(let pass=0;pass<2;pass++)for(let i=0;i<7;i++){
   assert.ok(headlamp?.isSpotLight,'real headlamp, not only an emissive lens');
   assert.equal(headlamp.intensity,i===4?100:0);
   assert.equal(headlamp.parent,bike);assert.equal(headlamp.target.parent,bike);
+  const rear=scene.getObjectByName('motorcycle-taillight');assert.ok(rear?.isPointLight);assert.equal(rear.intensity,i===4?2.5:0);assert.equal(rear.parent,bike);
   const lamps=world.children.filter(o=>o.isSpotLight);
-  assert.equal(lamps.length,i===4?4:0,'bounded street light pool');
+  assert.equal(lamps.length,i===4?6:0,'bounded street light pool');
   for(const lamp of lamps){assert.ok(lamp.position.y>lamp.target.position.y);assert.ok(lamp.distance>=20);}
   const groundY=require('../js/stunt-bike.js').tracks[i].base;
   const ray=new THREE.Raycaster(new THREE.Vector3(5,groundY+3,.37),new THREE.Vector3(0,-1,0));
