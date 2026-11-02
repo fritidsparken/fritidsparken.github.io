@@ -35,7 +35,7 @@ for(let pass=0;pass<2;pass++)for(let i=0;i<7;i++){
   for(let n=0;n<240;n++)api.frame(1/60);
   camera.updateMatrixWorld(true);
   const wheelContact=new THREE.Vector3(ride.x,ride.y-.85,0).project(camera);
-  assert.ok((1-wheelContact.y)/2>.60&&(1-wheelContact.y)/2<.65,'wheel contact at 60–65% canvas height');
+  assert.ok((1-wheelContact.y)/2>.70&&(1-wheelContact.y)/2<.74,'wheel contact at 70–74% canvas height');
   const headlamp=scene.getObjectByName('motorcycle-headlight');
   assert.ok(headlamp?.isSpotLight,'real headlamp, not only an emissive lens');
   assert.equal(headlamp.intensity,i===4?100:0);
@@ -48,7 +48,9 @@ for(let pass=0;pass<2;pass++)for(let i=0;i<7;i++){
   const hits=ray.intersectObject(world,true).filter(h=>!h.object.material.transparent);
   const heights=[...new Set(hits.map(h=>Math.round(h.point.y*1000)/1000))];
   assert.ok(Math.abs(heights[0]-groundY)<.001,'road meets collision surface');
-  assert.ok(heights[0]-heights[1]>=.35,'foundation top is below asphalt, not coplanar');
+  assert.ok(heights[0]-heights[1]>=.35,'bridge structure is below asphalt, not coplanar');
+  const underDeck=new THREE.Raycaster(new THREE.Vector3(5,groundY-2,8),new THREE.Vector3(0,0,-1));
+  assert.equal(underDeck.intersectObject(world,true).filter(h=>h.distance<10&&!h.object.material.transparent).length,0,'open space under bridge at x=5, not a continuous wall');
   let meshes=0,instances=0,mapped=0;scene.traverse(o=>{
     assert.ok(o.matrixWorld.elements.every(Number.isFinite),'finite transforms: '+o.type);
     if(o.isMesh){meshes++;if(o.isInstancedMesh)instances+=o.count;if(o.material.map)mapped++;

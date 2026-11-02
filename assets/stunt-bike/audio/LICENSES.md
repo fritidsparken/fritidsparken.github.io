@@ -24,7 +24,7 @@ Changes: selected passages, mono/24 kHz conversion, DC removal, level normalizat
 | overrun.wav | 090912-022.mp3 | 11.7–13.3 | Throttle-release layer |
 | metal-impact.wav | kickstand_on_concrete_01.mp3 | 0–3.8 | Recorded metal contact, adapted for landings/crashes |
 
-The operating ranges are game mixing labels, not measured engine RPMs. The impact is recorded kickstand contact; it is not claimed to be a suspension or tyre recording. Dedicated asphalt, metal tyre rolling, tyre slip, exhaust backfire, wind and city traffic recordings are not yet included.
+The operating ranges are game mixing labels, not measured engine RPMs. The impact is recorded kickstand contact; it is not claimed to be a suspension or tyre recording. Dedicated asphalt, metal tyre rolling, tyre slip, exhaust backfire recordings are not yet included.
 
 ## Music
 
@@ -50,3 +50,15 @@ kyles' motocross recordings on Freesound are identified as CC0, but downloads we
 ## Rebuilding
 
 `tools/stunt-bike/build-audio.py` records the exact transformations. Provide the extracted original engine ZIP and original Raving Energy MP3 as its two arguments. Its outputs reproduce the edits and preserve the licenses above.
+
+## Bridge ambience additions
+
+Author: **Joseph SARDIN / BigSoundBank**. Both files **CC0 1.0**, allowing editing and redistribution in games: https://creativecommons.org/publicdomain/zero/1.0/
+Verified source pages 2026-11-02 explicitly permit commercial use and redistribution.
+
+| Distributed file | Source and download | Changes / use |
+|---|---|---|
+| city-traffic.mp3 | https://bigsoundbank.com/highway-s0122.html — https://bigsoundbank.com/UPLOAD/mp3/0122.mp3 | Actual cars/trucks recorded 50m from highway; excerpt 10–30s, quiet background traffic |
+| wind.mp3 | https://bigsoundbank.com/wind-s0595.html — https://bigsoundbank.com/UPLOAD/mp3/0595.mp3 | Recorded studio wind Foley, not outdoor wind; excerpt 12–24s, volume follows speed squared |
+
+Both: mono 24kHz, DC removal, RMS normalization, 0.5s seam crossfade, 64kbps MP3. Rebuild with `tools/stunt-bike/build-ambience.py 0122.mp3 0595.mp3`. Routed through effects/master controls and compressor, muted with pause.

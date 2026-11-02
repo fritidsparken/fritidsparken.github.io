@@ -3,16 +3,19 @@ const asset=name=>new URL('../assets/stunt-bike/audio/'+name,import.meta.url).hr
 const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
 export class BikeAudio {
   constructor(context){
-    this.ac=context;this.nodes=[];this.buffers={};this.layers={};this.rpm=0;this.previousGas=false;this.disposed=false;this.offset=0;this.musicStart=0;this.musicPlaying=false;this.pausing=null;
+    this.ac=context;this.nodes=[];this.buffers={};this.layers={};this.ambience={};this.rpm=0;this.previousGas=false;this.disposed=false;this.offset=0;this.musicStart=0;this.musicPlaying=false;this.pausing=null;
     this.master=context.createGain();this.master.gain.value=0;
     const limiter=context.createDynamicsCompressor();limiter.threshold.value=-9;limiter.knee.value=5;limiter.ratio.value=16;limiter.attack.value=.004;limiter.release.value=.18;
     this.master.connect(limiter);limiter.connect(context.destination);this.nodes.push(this.master,limiter);
     for(const channel of ['motor','music','effects']){this[channel]=context.createGain();this[channel].gain.value=0;this[channel].connect(this.master);this.nodes.push(this[channel]);}
   }
   async load(){
-    const results=await Promise.allSettled(['idle','low','mid','high','overrun','metal-impact','raving-energy'].map(async name=>{
-      const r=await fetch(asset(name+(name==='raving-energy'?'.mp3':'.wav')));if(!r.ok)throw Error(name+': HTTP '+r.status);
+    const results=await Promise.allSettled(['idle','low','mid','high','overrun','metal-impact','raving-energy','city-traffic','wind'].map(async name=>{
+      const r=await fetch(asset(name+(['raving-energy','city-traffic','wind'].includes(name)?'.mp3':'.wav')));if(!r.ok)throw Error(name+': HTTP '+r.status);
       const b=await this.ac.decodeAudioData(await r.arrayBuffer());if(this.disposed)return;this.buffers[name]=b;
+      if(['city-traffic','wind'].includes(name)){
+        const source=this.ac.createBufferSource(),gain=this.ac.createGain();source.buffer=b;source.loop=true;gain.gain.value=0;source.connect(gain);gain.connect(this.effects);source.start();this.ambience[name]={source,gain};this.nodes.push(source,gain);
+      }
       if(['idle','low','mid','high','overrun'].includes(name)){
         const source=this.ac.createBufferSource(),gain=this.ac.createGain();source.buffer=b;source.loop=true;gain.gain.value=0;source.connect(gain);gain.connect(this.motor);source.start();this.layers[name]={source,gain};this.nodes.push(source,gain);
       }
@@ -25,6 +28,8 @@ export class BikeAudio {
     this.master.gain.setTargetAtTime(active?.8:0,now,.06);
     this.motor.gain.setTargetAtTime(volumes.motor,now,.045);this.effects.gain.setTargetAtTime(volumes.effects,now,.06);
     const speed=clamp(Math.abs(ride.vx)/23),air=ride.air>.12;
+    this.ambience['city-traffic']?.gain.gain.setTargetAtTime(.13,now,.2);
+    this.ambience.wind?.gain.gain.setTargetAtTime(speed*speed*.25,now,.15);
     const target=keys.gas?clamp(.19+speed*.67+(air?.19:0)):.02+speed*.58;
     this.rpm+=(target-this.rpm)*(1-Math.exp(-dt*(keys.gas?11:4)));
     const centers=[0,.27,.59,.91],names=['idle','low','mid','high'];
