@@ -1,7 +1,7 @@
 import {LEVELS,BALLS,Match,cleanSave,finishLevel,starsFor,clamp} from './core.mjs';
 import {BowlingPhysics} from './physics.mjs?v=20261102-recorded';
-import {loadAssets} from './assets.mjs?v=20261103-smooth';
-import {BowlingView} from './world.mjs?v=20261103-smooth';
+import {loadAssets} from './assets.mjs?v=20261103-fixed-reflection';
+import {BowlingView} from './world.mjs?v=20261103-fixed-reflection';
 import {Audio} from './audio.mjs?v=20261102-recorded';
 const $=s=>document.querySelector(s),overlay=$('#overlay'),hud=$('#hud');
 const KEY='fritidsparken.crazy-bowling.v1';let save;try{save=cleanSave(JSON.parse(localStorage.getItem(KEY)));}catch{save=cleanSave();}

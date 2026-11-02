@@ -31,7 +31,6 @@ export function buildHall(v){
  // Clear neon lettering, without decorative pins in front of the sign.
  const sign=v.asset('sign');sign.name='crazy-bowling-neon-sign';sign.traverse(o=>{if(o.isMesh)o.castShadow=false;});sign.position.set(0,7.0,-34.1);sign.scale.setScalar(1.3);
  const glowCanvas=document.createElement('canvas');glowCanvas.width=256;glowCanvas.height=256;const gc=glowCanvas.getContext('2d');const gradient=gc.createRadialGradient(128,128,4,128,128,128);gradient.addColorStop(0,'rgba(50,130,255,.55)');gradient.addColorStop(.55,'rgba(160,35,230,.24)');gradient.addColorStop(1,'rgba(40,50,255,0)');gc.fillStyle=gradient;gc.fillRect(0,0,256,256);const glowMap=new T.CanvasTexture(glowCanvas);glowMap.colorSpace=T.SRGBColorSpace;v.textures.add(glowMap);const glowMaterial=new T.MeshBasicMaterial({map:glowMap,transparent:true,depthWrite:false,blending:T.AdditiveBlending,toneMapped:false});v.materials.add(glowMaterial);const halo=v.mesh(new T.PlaneGeometry(31,8),glowMaterial);halo.position.set(0,8,-34.3);halo.castShadow=false;halo.receiveShadow=false;
- const emblem=v.asset('ball');emblem.position.set(0,9.35,-32.7);emblem.scale.setScalar(2.15);
  for(const x of [-18,18]){const monitor=v.asset('monitor');monitor.position.set(x,8.4,-34);monitor.scale.setScalar(1.6);v.monitors.push(monitor);}
  // Side lounge and equipment display remain outside the active camera corridor.
  v.decor=new T.Group();scene.add(v.decor);

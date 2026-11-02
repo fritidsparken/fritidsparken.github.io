@@ -1,6 +1,6 @@
-import {LaneReflection} from './reflections.mjs?v=20261103-smooth';
-import {buildHall} from './hall.mjs?v=20261103-smooth';
-import {FinishPass} from './post.mjs?v=20261103-smooth';
+import {LaneReflection} from './reflections.mjs?v=20261103-fixed-reflection';
+import {buildHall} from './hall.mjs?v=20261103-fixed-reflection';
+import {FinishPass} from './post.mjs?v=20261103-fixed-reflection';
 const T=window.THREE;
 // Direct rendering is the fallback; only capable High devices use the HDR finish pass.
 const QUALITY={high:{ratio:1.5,shadow:1024,probe:256,detail:true,post:true},medium:{ratio:1.15,shadow:512,probe:128,detail:true,post:false},low:{ratio:1,shadow:0,probe:64,detail:false,post:false}};
@@ -66,7 +66,7 @@ export class BowlingView{
  if(home||ready){pos=new T.Vector3(0,portrait?4.6:innerHeight<550?3.7:4.4,portrait?16:innerHeight<550?14:13);look=new T.Vector3(0,portrait?.2:.3,-24);}
  else{const travel=Math.max(0,Math.min(24,2-this.ball.position.z));pos=new T.Vector3(travel>21?1.1:0,(portrait?4.6:4.4)+travel*.025,(portrait?16:13)-travel*.72);look=new T.Vector3(0,1.4,-24-travel*.15);}
  const t=1-Math.exp(-dt*3.5);this.camera.position.lerp(pos,t);this.look.lerp(look,t);if(shake&&!this.reduced)this.camera.position.x+=Math.sin(this.clock*40)*Math.min(.025,shake*.02);this.camera.lookAt(this.look);
- if(this.reflection)this.reflection.render(this.renderer,this.scene,this.camera,this.floorMeshes,this.quality);
+ if(this.reflection){const excluded=this.reflection.dirty?[this.ball,this.ballContact,this.sweep,this.aim,...this.pinMeshes.flatMap(p=>[p.mesh,p.shadow]),...this.parts.filter(p=>p.body.type!==2).map(p=>p.mesh)]:[];this.reflection.render(this.renderer,this.scene,this.camera,this.floorMeshes,this.quality,excluded);}
  if(this.post&&!this.finishFailed)this.post.render(this.scene,this.camera);else this.renderer.render(this.scene,this.camera);
  if(this.auto&&!paused&&!document.hidden&&this.clock>2){this.samples.push(dt);if(this.samples.length>=90){const avg=this.samples.reduce((a,b)=>a+b)/this.samples.length;if(avg>.026&&this.quality!=='low')this.setQuality(this.quality==='high'?'medium':'low');this.samples=[];}}
  }
