@@ -95,6 +95,7 @@ body.std-design .std-results-heading{display:flex;align-items:center;justify-con
 body.std-design .std-results-heading h2{font-size:28px;margin:0}
 body.std-design .std-results-heading>button,body.std-design .std-tool-shortcut{border:1px solid var(--line);background:var(--paper);color:var(--green);font-weight:750;padding:10px 16px;border-radius:12px}
 body.std-design.std-browsing .std-hero{height:300px}
+@media(min-width:701px){body.std-design.std-home .std-hero{height:400px}}
 body.std-design.std-browsing .std-hero-copy{top:40px}
 body.std-design.std-browsing .std-hero h1{font-size:48px}
 body.std-design #Aktiviteter{margin:16px 0 0;display:flex;justify-content:flex-end;align-items:center}
