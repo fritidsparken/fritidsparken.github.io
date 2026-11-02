@@ -30,6 +30,19 @@ for(let pass=0;pass<2;pass++)for(let i=0;i<7;i++){
     [width,height]=size;camera.aspect=width/height;camera.updateProjectionMatrix();
     for(let q=0;q<3;q++){assert.ok(api.profile(q)<=1.8);for(const pose of [{x:5,a:0,compression:[0,0],av:0},{x:70,a:.65,compression:[.2,.1],av:3},{x:90,a:Math.PI*2,compression:[.3,.3],av:0}]){Object.assign(ride,pose);api.frame(1/60);scene.updateMatrixWorld(true);}}
   }
+  const headlamp=scene.getObjectByName('motorcycle-headlight');
+  assert.ok(headlamp?.isSpotLight,'real headlamp, not only an emissive lens');
+  assert.equal(headlamp.intensity,i===4?100:0);
+  assert.equal(headlamp.parent,bike);assert.equal(headlamp.target.parent,bike);
+  const lamps=world.children.filter(o=>o.isSpotLight);
+  assert.equal(lamps.length,i===4?4:0,'bounded street light pool');
+  for(const lamp of lamps){assert.ok(lamp.position.y>lamp.target.position.y);assert.ok(lamp.distance>=20);}
+  const groundY=require('../js/stunt-bike.js').tracks[i].base;
+  const ray=new THREE.Raycaster(new THREE.Vector3(5,groundY+3,.37),new THREE.Vector3(0,-1,0));
+  const hits=ray.intersectObject(world,true).filter(h=>!h.object.material.transparent);
+  const heights=[...new Set(hits.map(h=>Math.round(h.point.y*1000)/1000))];
+  assert.ok(Math.abs(heights[0]-groundY)<.001,'road meets collision surface');
+  assert.ok(heights[0]-heights[1]>=.35,'foundation top is below asphalt, not coplanar');
   let meshes=0,instances=0,mapped=0;scene.traverse(o=>{
     assert.ok(o.matrixWorld.elements.every(Number.isFinite),'finite transforms: '+o.type);
     if(o.isMesh){meshes++;if(o.isInstancedMesh)instances+=o.count;if(o.material.map)mapped++;
