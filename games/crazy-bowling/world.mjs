@@ -1,6 +1,8 @@
-import {FinishPass} from './post.mjs';
+import {FinishPass} from './post.mjs?v=20261102-visibility';
 const T=window.THREE;
-const QUALITY={high:{ratio:1.8,shadow:2048,probe:256,detail:true,post:true},medium:{ratio:1.3,shadow:1024,probe:128,detail:true,post:false},low:{ratio:1,shadow:0,probe:64,detail:false,post:false}};
+// Render the textured scene directly on every tier. The optional finish pass
+// stays disabled until it has passed real WebGL validation.
+const QUALITY={high:{ratio:1.8,shadow:2048,probe:256,detail:true,post:false},medium:{ratio:1.3,shadow:1024,probe:128,detail:true,post:false},low:{ratio:1,shadow:0,probe:64,detail:false,post:false}};
 export class BowlingView{
  constructor(host,assets){
  this.host=host;this.assets=assets;this.geometries=new Set();this.materials=new Set();this.textures=new Set();this.models=assets.models;this.reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
