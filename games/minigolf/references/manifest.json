@@ -1,0 +1,127 @@
+[
+  {
+    "id": 1,
+    "name": "Första putten",
+    "file": "01-forsta-putten-original.png",
+    "type": "Bifogad ursprungsbild"
+  },
+  {
+    "id": 2,
+    "name": "Tunneln",
+    "file": "02-tunneln.webp",
+    "type": "AI-genererad visuell referens",
+    "prompt": "Botanical garden, raised slope and tunnel; full course photorealistic reference."
+  },
+  {
+    "id": 3,
+    "name": "Väderkvarnen",
+    "file": "03-vaderkvarnen.webp",
+    "type": "AI-genererad visuell referens",
+    "prompt": "Use case: stylized-concept. One separate landscape photorealistic architectural reference image for miniature golf hole 3, Väderkvarnen. Theme: Japanese garden with maple trees stone lanterns and a wooden windmill. High-end realistic 3D, physically plausible PBR, intricate planting, natural weathered materials, cinematic light and soft shadows, turf fibres, stone block kerbs. Camera elevated three quarter, show entire course or almost all. Preserve authored centerline in metres [x,height,z]: [[0,0,0],[0,0,-10],[0,0,-20],[-5,0,-26]]; green width 5m. Obstacles: [{\"type\":\"windmill\",\"node\":1}]. Gaps must stay gaps; do not add lanes or change obstacles. Readable playable surface. No people, no UI, no text. Each setting distinct."
+  },
+  {
+    "id": 4,
+    "name": "Piratbron",
+    "file": "04-piratbron.webp",
+    "type": "AI-genererad visuell referens",
+    "prompt": "Use case: stylized-concept. One separate landscape photorealistic architectural reference image for miniature golf hole 4, Piratbron. Theme: mossy woodland creek crossed by a weathered timber pirate bridge. High-end realistic 3D, physically plausible PBR, intricate planting, natural weathered materials, cinematic light and soft shadows, turf fibres, stone block kerbs. Camera elevated three quarter, show entire course or almost all. Preserve authored centerline in metres [x,height,z]: [[0,1,0],[0,2,-9],[5,2,-17],[5,1,-26]]; green width 3.3m. Obstacles: [{\"type\":\"bridge\",\"node\":1}]. Gaps must stay gaps; do not add lanes or change obstacles. Readable playable surface. No people, no UI, no text. Each setting distinct."
+  },
+  {
+    "id": 5,
+    "name": "Piratskeppet",
+    "file": "05-piratskeppet.webp",
+    "type": "AI-genererad visuell referens",
+    "prompt": "Use case: stylized-concept. One separate landscape photorealistic architectural reference image for miniature golf hole 5, Piratskeppet. Theme: Mediterranean harbour garden olive trees and wooden pirate ship. High-end realistic 3D, physically plausible PBR, intricate planting, natural weathered materials, cinematic light and soft shadows, turf fibres, stone block kerbs. Camera elevated three quarter, show entire course or almost all. Preserve authored centerline in metres [x,height,z]: [[0,0,0],[0,3,-10],[0,3,-23],[5,0,-32]]; green width 4.6m. Obstacles: [{\"type\":\"ship\",\"node\":1},{\"type\":\"barrel\",\"node\":2}]. Gaps must stay gaps; do not add lanes or change obstacles. Readable playable surface. No people, no UI, no text. Each setting distinct."
+  },
+  {
+    "id": 6,
+    "name": "Kanonen",
+    "file": "06-kanonen.webp",
+    "type": "AI-genererad visuell referens",
+    "prompt": "Use case: stylized-concept. One separate landscape photorealistic architectural reference image for miniature golf hole 6, Kanonen. Theme: tropical jungle cannon launch across ravine waterfall. High-end realistic 3D, physically plausible PBR, intricate planting, natural weathered materials, cinematic light and soft shadows, turf fibres, stone block kerbs. Camera elevated three quarter, show entire course or almost all. Preserve authored centerline in metres [x,height,z]: [[0,1,0],[0,1,-10],[0,1,-40],[4,1,-48]]; green width 5m. Obstacles: [{\"type\":\"cannon\",\"node\":1,\"exit\":2,\"gap\":true}]. Gaps must stay gaps; do not add lanes or change obstacles. Readable playable surface. No people, no UI, no text. Each setting distinct."
+  },
+  {
+    "id": 7,
+    "name": "Djungelstigen",
+    "file": "07-djungelstigen.webp",
+    "type": "AI-genererad visuell referens",
+    "prompt": "Use case: stylized-concept. One separate landscape photorealistic architectural reference image for miniature golf hole 7, Djungelstigen. Theme: coastal winding garden with sea view dune grass. High-end realistic 3D, physically plausible PBR, intricate planting, natural weathered materials, cinematic light and soft shadows, turf fibres, stone block kerbs. Camera elevated three quarter, show entire course or almost all. Preserve authored centerline in metres [x,height,z]: [[0,0,0],[-7,0,-6],[-7,0,-15],[5,0,-20],[5,0,-29],[-1,0,-35]]; green width 4m. Obstacles: []. Gaps must stay gaps; do not add lanes or change obstacles. Readable playable surface. No people, no UI, no text. Each setting distinct."
+  },
+  {
+    "id": 8,
+    "name": "Vattenfallet",
+    "file": "08-vattenfallet.webp",
+    "type": "AI-genererad visuell referens",
+    "prompt": "Use case: stylized-concept. One separate landscape photorealistic architectural reference image for miniature golf hole 8, Vattenfallet. Theme: formal palace garden cascading waterfall stone tunnel. High-end realistic 3D, physically plausible PBR, intricate planting, natural weathered materials, cinematic light and soft shadows, turf fibres, stone block kerbs. Camera elevated three quarter, show entire course or almost all. Preserve authored centerline in metres [x,height,z]: [[0,0,0],[0,4,-12],[0,4,-23],[7,1,-30],[10,1,-37]]; green width 4.7m. Obstacles: [{\"type\":\"waterfall\",\"node\":2},{\"type\":\"tunnel\",\"node\":2}]. Gaps must stay gaps; do not add lanes or change obstacles. Readable playable surface. No people, no UI, no text. Each setting distinct."
+  },
+  {
+    "id": 9,
+    "name": "Apans genväg",
+    "file": "09-apans-genvag.webp",
+    "type": "AI-genererad visuell referens",
+    "prompt": "Use case: stylized-concept. One separate landscape photorealistic architectural reference image for miniature golf hole 9, Apans genväg. Theme: pine mountain forest with hollow log shortcut. High-end realistic 3D, physically plausible PBR, intricate planting, natural weathered materials, cinematic light and soft shadows, turf fibres, stone block kerbs. Camera elevated three quarter, show entire course or almost all. Preserve authored centerline in metres [x,height,z]: [[0,0,0],[-9,0,-8],[-9,0,-22],[0,0,-29],[7,0,-34]]; green width 4m. Obstacles: [{\"type\":\"logShortcut\",\"node\":0,\"exit\":3}]. Gaps must stay gaps; do not add lanes or change obstacles. Readable playable surface. No people, no UI, no text. Each setting distinct."
+  },
+  {
+    "id": 10,
+    "name": "Godisvägen",
+    "file": "10-godisvagen.webp",
+    "type": "AI-genererad visuell referens",
+    "prompt": "Use case: stylized-concept. One separate landscape photorealistic architectural reference image for miniature golf hole 10, Godisvägen. Theme: sandstone oasis sculpted curving course palms and bumper. High-end realistic 3D, physically plausible PBR, intricate planting, natural weathered materials, cinematic light and soft shadows, turf fibres, stone block kerbs. Camera elevated three quarter, show entire course or almost all. Preserve authored centerline in metres [x,height,z]: [[0,0,0],[6,0,-8],[-4,1,-17],[6,1,-26],[0,0,-34]]; green width 5m. Obstacles: [{\"type\":\"bumper\",\"node\":2}]. Gaps must stay gaps; do not add lanes or change obstacles. Readable playable surface. No people, no UI, no text. Each setting distinct."
+  },
+  {
+    "id": 11,
+    "name": "Donutloopen",
+    "file": "11-donutloopen.webp",
+    "type": "AI-genererad visuell referens",
+    "prompt": "Use case: stylized-concept. One separate landscape photorealistic architectural reference image for miniature golf hole 11, Donutloopen. Theme: blue-hour garden with bronze loop and warm festoon lights. High-end realistic 3D, physically plausible PBR, intricate planting, natural weathered materials, cinematic light and soft shadows, turf fibres, stone block kerbs. Camera elevated three quarter, show entire course or almost all. Preserve authored centerline in metres [x,height,z]: [[0,0,0],[0,0,-12],[0,0,-23],[5,0,-31]]; green width 5m. Obstacles: [{\"type\":\"loop\",\"node\":1,\"exit\":2,\"radius\":3.1}]. Gaps must stay gaps; do not add lanes or change obstacles. Readable playable surface. No people, no UI, no text. Each setting distinct."
+  },
+  {
+    "id": 12,
+    "name": "Chokladfloden",
+    "file": "12-chokladfloden.webp",
+    "type": "AI-genererad visuell referens",
+    "prompt": "Use case: stylized-concept. One separate landscape photorealistic architectural reference image for miniature golf hole 12, Chokladfloden. Theme: alpine stream with wooden moving bridge chocolate-brown stone accents. High-end realistic 3D, physically plausible PBR, intricate planting, natural weathered materials, cinematic light and soft shadows, turf fibres, stone block kerbs. Camera elevated three quarter, show entire course or almost all. Preserve authored centerline in metres [x,height,z]: [[0,1,0],[0,1,-9],[0,1,-17],[7,2,-24],[7,2,-32],[0,1,-39]]; green width 3.8m. Obstacles: [{\"type\":\"movingBridge\",\"node\":1,\"exit\":2},{\"type\":\"bumper\",\"node\":4}]. Gaps must stay gaps; do not add lanes or change obstacles. Readable playable surface. No people, no UI, no text. Each setting distinct."
+  },
+  {
+    "id": 13,
+    "name": "Månbasen",
+    "file": "13-manbasen.webp",
+    "type": "AI-genererad visuell referens",
+    "prompt": "Use case: stylized-concept. One separate landscape photorealistic architectural reference image for miniature golf hole 13, Månbasen. Theme: luxury resort lunar research pavilion marble and fountain bumper. High-end realistic 3D, physically plausible PBR, intricate planting, natural weathered materials, cinematic light and soft shadows, turf fibres, stone block kerbs. Camera elevated three quarter, show entire course or almost all. Preserve authored centerline in metres [x,height,z]: [[0,0,0],[0,2,-10],[8,2,-19],[8,0,-30],[0,0,-36]]; green width 5m. Obstacles: [{\"type\":\"bumper\",\"node\":2}]. Gaps must stay gaps; do not add lanes or change obstacles. Readable playable surface. No people, no UI, no text. Each setting distinct."
+  },
+  {
+    "id": 14,
+    "name": "Planethoppet",
+    "file": "14-planethoppet.webp",
+    "type": "AI-genererad visuell referens",
+    "prompt": "Use case: stylized-concept. One separate landscape photorealistic architectural reference image for miniature golf hole 14, Planethoppet. Theme: enchanted luminous forest with two jump gaps landing platforms. High-end realistic 3D, physically plausible PBR, intricate planting, natural weathered materials, cinematic light and soft shadows, turf fibres, stone block kerbs. Camera elevated three quarter, show entire course or almost all. Preserve authored centerline in metres [x,height,z]: [[0,0,0],[0,2,-10],[0,1,-22],[5,3,-32],[5,1,-44],[0,1,-51]]; green width 4.5m. Obstacles: [{\"type\":\"jump\",\"node\":1,\"exit\":2,\"gap\":true},{\"type\":\"jump\",\"node\":3,\"exit\":4,\"gap\":true}]. Gaps must stay gaps; do not add lanes or change obstacles. Readable playable surface. No people, no UI, no text. Each setting distinct."
+  },
+  {
+    "id": 15,
+    "name": "Portalen",
+    "file": "15-portalen.webp",
+    "type": "AI-genererad visuell referens",
+    "prompt": "Use case: stylized-concept. One separate landscape photorealistic architectural reference image for miniature golf hole 15, Portalen. Theme: harbour promenade with two glowing transport portal gateways. High-end realistic 3D, physically plausible PBR, intricate planting, natural weathered materials, cinematic light and soft shadows, turf fibres, stone block kerbs. Camera elevated three quarter, show entire course or almost all. Preserve authored centerline in metres [x,height,z]: [[0,0,0],[0,0,-10],[8,1,-25],[8,1,-35],[-6,0,-47],[-6,0,-56]]; green width 5m. Obstacles: [{\"type\":\"portal\",\"node\":1,\"exit\":2,\"gap\":true},{\"type\":\"portal\",\"node\":3,\"exit\":4,\"gap\":true},{\"type\":\"returnPortal\",\"node\":4,\"exit\":2,\"offset\":1.8}]. Gaps must stay gaps; do not add lanes or change obstacles. Readable playable surface. No people, no UI, no text. Each setting distinct."
+  },
+  {
+    "id": 16,
+    "name": "Vulkangrottan",
+    "file": "16-vulkangrottan.webp",
+    "type": "AI-genererad visuell referens",
+    "prompt": "Use case: stylized-concept. One separate landscape photorealistic architectural reference image for miniature golf hole 16, Vulkangrottan. Theme: autumn volcanic grotto warm leaves weathered basalt tunnel. High-end realistic 3D, physically plausible PBR, intricate planting, natural weathered materials, cinematic light and soft shadows, turf fibres, stone block kerbs. Camera elevated three quarter, show entire course or almost all. Preserve authored centerline in metres [x,height,z]: [[0,3,0],[0,1,-12],[-6,1,-19],[-6,0,-29],[4,0,-37]]; green width 4m. Obstacles: [{\"type\":\"tunnel\",\"node\":2},{\"type\":\"bumper\",\"node\":3}]. Gaps must stay gaps; do not add lanes or change obstacles. Readable playable surface. No people, no UI, no text. Each setting distinct."
+  },
+  {
+    "id": 17,
+    "name": "Lavabron",
+    "file": "17-lavabron.webp",
+    "type": "AI-genererad visuell referens",
+    "prompt": "Use case: stylized-concept. One separate landscape photorealistic architectural reference image for miniature golf hole 17, Lavabron. Theme: nighttime volcanic bridge lit with cyan and amber strips over deep ravine. High-end realistic 3D, physically plausible PBR, intricate planting, natural weathered materials, cinematic light and soft shadows, turf fibres, stone block kerbs. Camera elevated three quarter, show entire course or almost all. Preserve authored centerline in metres [x,height,z]: [[0,1,0],[0,1,-10],[0,1,-19],[8,1,-26],[8,1,-35],[0,1,-42]]; green width 3m. Obstacles: [{\"type\":\"movingBridge\",\"node\":1,\"exit\":2},{\"type\":\"barrel\",\"node\":3}]. Gaps must stay gaps; do not add lanes or change obstacles. Readable playable surface. No people, no UI, no text. Each setting distinct."
+  },
+  {
+    "id": 18,
+    "name": "Den stora finalen",
+    "file": "18-den-stora-finalen.webp",
+    "type": "AI-genererad visuell referens",
+    "prompt": "Use case: stylized-concept. One separate landscape photorealistic architectural reference image for miniature golf hole 18, Den stora finalen. Theme: grand terraced estate garden extremely long multilevel final with loop cannon underwater glass tunnel. High-end realistic 3D, physically plausible PBR, intricate planting, natural weathered materials, cinematic light and soft shadows, turf fibres, stone block kerbs. Camera elevated three quarter, show entire course or almost all. Preserve authored centerline in metres [x,height,z]: [[0,14,0],[0,5,-22],[12,4,-27],[18,3,-17],[10,2,-10],[3,1,-19],[3,1,-34],[3,1,-45],[3,1,-57],[3,0,-90],[3,-2,-103],[3,0,-115],[3,2,-124],[3,1,-134]]; green width 5m. Obstacles: [{\"type\":\"barrel\",\"node\":3},{\"type\":\"tunnel\",\"node\":6},{\"type\":\"loop\",\"node\":7,\"exit\":8,\"radius\":3.1},{\"type\":\"cannon\",\"node\":8,\"exit\":9,\"gap\":true},{\"type\":\"underwaterTunnel\",\"node\":10}]. Gaps must stay gaps; do not add lanes or change obstacles. Readable playable surface. No people, no UI, no text. Each setting distinct."
+  }
+]
