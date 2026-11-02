@@ -38,12 +38,22 @@
   const hero = document.createElement('section');
   hero.className = 'std-hero standard-only';
   hero.setAttribute('aria-labelledby','stdTitle');
-  hero.innerHTML = `<img class="std-hero-image" src="./assets/standard/nature-hero.jpg" alt="Barn och en hund vid en trädkoja med utsikt över en svensk sjö" width="1536" height="1024" fetchpriority="high"><div class="std-hero-copy"><h1 id="stdTitle">Fritidsparken<span>.se</span></h1><p>Aktiviteter, pyssel, spel och inspiration<br>för en rolig fritid!</p><form class="std-search" role="search"><label class="std-sr-only" for="standardSearch">Sök bland aktiviteter, spel och färgläggning</label><span class="std-search-leading">${searchIcon}</span><input type="search" id="standardSearch" placeholder="Sök aktivitet, pyssel, spel eller idé..." autocomplete="off"><button type="submit" aria-label="Sök">${searchIcon}</button></form><div class="std-hero-benefits"><span>💡 Massor av idéer</span><span>💚 En roligare fritid</span><span>👋 För 6–12 år</span></div></div>`;
+  hero.innerHTML = `<img class="std-hero-image" src="./assets/standard/nature-hero.jpg" alt="Barn och en hund vid en trädkoja med utsikt över en svensk sjö" width="1536" height="1024" fetchpriority="high"><div class="std-hero-copy"><h1 id="stdTitle">Fritidsparken<span>.se</span></h1><p>Aktiviteter, pyssel, spel och inspiration<br>för en rolig fritid!</p><div class="std-hero-benefits"><span>💡 Massor av idéer</span><span>💚 En roligare fritid</span><span>👋 För 6–12 år</span></div></div>`;
   document.querySelector('main').before(hero);
   const home = document.createElement('div');
   home.id = 'standardHome';home.className = 'standard-only';
   document.querySelector('.hero').after(home);
   const categoryPanel = () => `<section class="std-categories" aria-label="Utforska kategorier">${categories.map(([label,cat,symbol],i)=>`<button type="button" data-standard-category="${cat}" ${cat==='Alla'?'data-standard-browse-all':''} style="--tile:${palettes[i]}">${icon(symbol)}<span>${label}</span></button>`).join('')}</section>`;
+  const categoryNavigation = document.createElement('div');
+  categoryNavigation.innerHTML = categoryPanel();
+  home.before(categoryNavigation);
+  const searchPanel = document.createElement('form');
+  searchPanel.className = 'std-search-panel standard-only';
+  searchPanel.setAttribute('role', 'search');
+  searchPanel.hidden = true;
+  searchPanel.innerHTML = `<label for="standardSearch">Sök på Fritidsparken</label><input type="search" id="standardSearch" placeholder="Sök aktivitet, pyssel eller spel..." autocomplete="off">`;
+  header.append(searchPanel);
+  header.querySelector('.std-header-search').setAttribute('aria-expanded', 'false');
   const gameItems = window.FPGameHub.games.map(g=>({...g,tag:g.type}));
   const shuffle = items => {const result=[...items];for(let i=result.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[result[i],result[j]]=[result[j],result[i]];}return result;};
   const photo = name => {const doc=new DOMParser().parseFromString(createPreview(name),'text/html');return doc.querySelector('img')?.getAttribute('src') || './assets/minifigurscen.jpg';};
@@ -66,7 +76,7 @@
     const colorPool=season==='standard'?mandalas.filter(m=>!['Halloween','Jul'].includes(m.type)&&!m.types?.some(t=>['Halloween','Jul'].includes(t))):mandalas.filter(m=>m.type===(season==='halloween'?'Halloween':'Jul')||m.types?.includes(season==='halloween'?'Halloween':'Jul'));
     const uniqueColors=[...new Map(colorPool.filter(m=>m.preview||m.img).map(m=>[m.preview||m.img,m])).values()];
     const newColors=shuffle(uniqueColors).slice(0,6);
-    return categoryPanel()+`<section class="std-panel std-popular">${sectionHead('Populära aktiviteter','Alla','★')}<div class="std-popular-grid">${popular}</div></section><div class="std-discover"><section class="std-panel std-games">${sectionHead('Spela direkt i webbläsaren','Spel','🎮')}<div class="std-game-grid">${shuffle(gameItems).slice(0,6).map(g=>`<button type="button" class="std-game-card" data-standard-game="${g.id}"><span class="std-game-art"><img src="./assets/${g.image}?v=game-covers-20261025-1" alt="" loading="lazy"><span class="std-play" aria-hidden="true">▶</span></span><span class="std-game-copy"><small>${g.tag}</small><strong>${g.title}</strong><span>Spela nu →</span></span></button>`).join('')}</div><div class="std-games-note">En liten spelpaus. Ett nytt äventyr. Välj ditt spel!</div></section><section class="std-panel std-coloring">${sectionHead('Nya färgläggningsbilder','Mandala','🖌️')}<div class="std-color-grid">${newColors.map(coloringCard).join('')}</div></section></div><section class="std-inspiration"><div>${icon('bulb')}</div><div><h2>Vad vill ni hitta på idag?</h2><p>En stund att skapa, en lek tillsammans eller något nytt att prova.</p></div><button type="button" data-standard-category="Roliga verktyg">Hitta en idé <span aria-hidden="true">→</span></button></section>`;
+    return `<section class="std-panel std-popular">${sectionHead('Populära aktiviteter','Alla','★')}<div class="std-popular-grid">${popular}</div></section><div class="std-discover"><section class="std-panel std-games">${sectionHead('Spela direkt i webbläsaren','Spel','🎮')}<div class="std-game-grid">${shuffle(gameItems).slice(0,6).map(g=>`<button type="button" class="std-game-card" data-standard-game="${g.id}"><span class="std-game-art"><img src="./assets/${g.image}?v=game-covers-20261025-1" alt="" loading="lazy"><span class="std-play" aria-hidden="true">▶</span></span><span class="std-game-copy"><small>${g.tag}</small><strong>${g.title}</strong><span>Spela nu →</span></span></button>`).join('')}</div><div class="std-games-note">En liten spelpaus. Ett nytt äventyr. Välj ditt spel!</div></section><section class="std-panel std-coloring">${sectionHead('Nya färgläggningsbilder','Mandala','🖌️')}<div class="std-color-grid">${newColors.map(coloringCard).join('')}</div></section></div><section class="std-inspiration"><div>${icon('bulb')}</div><div><h2>Vad vill ni hitta på idag?</h2><p>En stund att skapa, en lek tillsammans eller något nytt att prova.</p></div><button type="button" data-standard-category="Roliga verktyg">Hitta en idé <span aria-hidden="true">→</span></button></section>`;
   }
   let presentedSeason = null;
   const results = document.createElement('div');results.className='std-results-heading standard-only';results.setAttribute('aria-live','polite');
@@ -130,19 +140,22 @@
     document.getElementById('search').value='';document.getElementById('standardSearch').value='';
     header.classList.remove('menu-open');header.querySelector('.std-menu-toggle').setAttribute('aria-expanded','false');
     drawFilters();draw();
-    if(scroll)(cat==='Alla'?document.body:results).scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});
+    if(scroll)(cat==='Alla'?document.body:categoryNavigation).scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});
   }
   header.querySelector('.std-menu-toggle').addEventListener('click',e=>{const expanded=header.classList.toggle('menu-open');e.currentTarget.setAttribute('aria-expanded',String(expanded));});
   header.addEventListener('keydown',e=>{if(e.key==='Escape'){header.classList.remove('menu-open');header.querySelector('.std-menu-toggle').setAttribute('aria-expanded','false');header.querySelector('.std-menu-toggle').focus();}});
   const searchInput=document.getElementById('standardSearch');
-  header.querySelector('.std-header-search').addEventListener('click',()=>{hero.scrollIntoView({block:'start'});searchInput.focus({preventScroll:true});});
+  const searchButton=header.querySelector('.std-header-search');
+  function closeSearch(){searchPanel.hidden=true;searchButton.setAttribute('aria-expanded','false');}
+  searchButton.addEventListener('click',()=>{searchPanel.hidden=!searchPanel.hidden;searchButton.setAttribute('aria-expanded',String(!searchPanel.hidden));if(!searchPanel.hidden)searchInput.focus();});
   function search(){category='Alla';pearlPage=false;funTool=null;selectedPearl=null;browseAll=false;document.getElementById('search').value=searchInput.value;drawFilters();draw();}
   searchInput.addEventListener('input',search);
-  hero.querySelector('form').addEventListener('submit',e=>{e.preventDefault();search();results.scrollIntoView({behavior:'smooth',block:'start'});});
+  searchPanel.addEventListener('submit',e=>{e.preventDefault();search();closeSearch();results.scrollIntoView({behavior:'smooth',block:'start'});});
+  searchPanel.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSearch();searchButton.focus();}});
   document.getElementById('search').addEventListener('input',()=>{if(isStandard()){searchInput.value=document.getElementById('search').value;draw();}});
   document.addEventListener('click',e=>{
     if(!isStandard())return;
-    const nav=e.target.closest('[data-standard-category]');if(nav){e.preventDefault();navigate(nav.dataset.standardCategory,!nav.hasAttribute('data-standard-browse-all'));if(nav.hasAttribute('data-standard-browse-all')){browseAll=true;draw();results.scrollIntoView({behavior:'smooth'});}return;}
+    const nav=e.target.closest('[data-standard-category]');if(nav){e.preventDefault();closeSearch();navigate(nav.dataset.standardCategory,!nav.hasAttribute('data-standard-browse-all'));if(nav.hasAttribute('data-standard-browse-all')){browseAll=true;draw();categoryNavigation.scrollIntoView({behavior:'smooth'});}return;}
     const game=e.target.closest('[data-standard-game]');if(game){navigate('Spel',false);window.FPGameHub?.open(game.dataset.standardGame);return;}
     const activity=e.target.closest('[data-standard-activity]');if(activity){const title=activity.dataset.standardActivity;if(title==='Pärlmönster'){navigate('Pyssel',false);pearlPage=true;pearlLevel='Alla';draw();return;}if(title==='Klippdockor – färglägg och klipp ut'){navigate('Klippdockor');return;}const item=activities.find(a=>a[2]===title);if(item)open(item);return;}
     const gym=e.target.closest('[data-standard-gym]');if(gym){const g=gymGames.find(g=>g.name===gym.dataset.standardGym);if(g)open([g.emoji,'Fritidsgympa',g.name,g.description,g.minutes+' min',g.steps]);return;}
