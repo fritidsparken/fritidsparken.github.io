@@ -9,7 +9,7 @@ let width=1366,height=580;
 const element={textContent:'',style:{},dataset:{},setAttribute(){},addEventListener(){},getBoundingClientRect:()=>({width,height}),getContext:()=>context2d,querySelectorAll:()=>[],querySelector:()=>element};
 THREE.WebGLRenderer=class {constructor(){this.capabilities={getMaxAnisotropy:()=>8};this.shadowMap={};}setPixelRatio(r){this.ratio=r;}setSize(){}render(){}dispose(){}};
 THREE.PMREMGenerator=class {fromEquirectangular(){return {texture:new THREE.Texture(),dispose(){}};}dispose(){}};
-const sandbox={THREE,document:{createElement:()=>({...element}),querySelector:()=>element},window:{THREE},navigator:{hardwareConcurrency:8},innerWidth:1366,devicePixelRatio:1,AbortController,console,Uint8ClampedArray,setTimeout,clearTimeout,cancelAnimationFrame(){}};
+const sandbox={THREE,URL,document:{currentScript:{src:"https://fritidsparken.se/js/stunt-bike.js"},createElement:()=>({...element}),querySelector:()=>element},window:{THREE},navigator:{hardwareConcurrency:8},innerWidth:1366,devicePixelRatio:1,AbortController,console,Uint8ClampedArray,setTimeout,clearTimeout,cancelAnimationFrame(){}};
 let source=fs.readFileSync(require.resolve('../js/stunt-bike.js'),'utf8');
 source=source.replace('  window.FPStuntBike={gallery,start,destroy};',`  window.FPStuntBike={gallery,start,destroy};
   window.visualTest={
@@ -23,13 +23,19 @@ source=source.replace('  window.FPStuntBike={gallery,start,destroy};',`  window.
   };`);
 vm.runInNewContext(source,sandbox);
 const api=sandbox.window.visualTest;api.init();
-const summary=[];
+const summary=[];const tracksForCamera=require('../js/stunt-bike.js').tracks;
 for(let pass=0;pass<2;pass++)for(let i=0;i<7;i++){
   const {scene,world,bike,ride,camera}=api.build(i);
   for(const size of [[1366,580],[1024,490],[768,580],[390,430]]){
     [width,height]=size;camera.aspect=width/height;camera.updateProjectionMatrix();
     for(let q=0;q<3;q++){assert.ok(api.profile(q)<=1.8);for(const pose of [{x:5,a:0,compression:[0,0],av:0},{x:70,a:.65,compression:[.2,.1],av:3},{x:90,a:Math.PI*2,compression:[.3,.3],av:0}]){Object.assign(ride,pose);api.frame(1/60);scene.updateMatrixWorld(true);}}
   }
+  [width,height]=[1366,580];camera.aspect=width/height;api.profile(2);
+  ride.x=5;ride.y=tracksForCamera[i].base+.807;ride.a=0;ride.air=0;ride.vx=0;
+  for(let n=0;n<240;n++)api.frame(1/60);
+  camera.updateMatrixWorld(true);
+  const wheelContact=new THREE.Vector3(ride.x,ride.y-.85,0).project(camera);
+  assert.ok((1-wheelContact.y)/2>.60&&(1-wheelContact.y)/2<.65,'wheel contact at 60–65% canvas height');
   const headlamp=scene.getObjectByName('motorcycle-headlight');
   assert.ok(headlamp?.isSpotLight,'real headlamp, not only an emissive lens');
   assert.equal(headlamp.intensity,i===4?100:0);
@@ -59,3 +65,4 @@ for(let pass=0;pass<2;pass++)for(let i=0;i<7;i++){
 assert.deepEqual(summary[6].cache,summary[13].cache);
 api.destroy();assert.deepEqual({...api.cache()},{materials:0,geometries:0,textures:0});
 console.log(JSON.stringify({passed:true,coverage:'7 scenes × 4 canvas sizes × 3 quality profiles × 3 poses, twice; cache reuse and cleanup. GPU rendering not tested.',scenes:summary.slice(0,7)},null,2));
+

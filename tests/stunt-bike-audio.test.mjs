@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import {BikeAudio} from '../js/stunt-bike-audio.mjs';
+import fs from 'node:fs';
+const param=()=>({value:0,setTargetAtTime(value){assert.ok(Number.isFinite(value));this.value=value;}});
+const nodes=[];const node=()=>{const n={gain:param(),threshold:param(),knee:param(),ratio:param(),attack:param(),release:param(),playbackRate:{...param(),value:1},connect(){},disconnect(){},start(){this.started=true},stop(){this.stopped=true}};nodes.push(n);return n;};
+const ac={currentTime:0,destination:{},createGain:node,createDynamicsCompressor:node,createBufferSource:node,decodeAudioData:async()=>({duration:4})};
+globalThis.fetch=async url=>({ok:true,arrayBuffer:async()=>fs.readFileSync(new URL(url))});
+const audio=new BikeAudio(ac);await audio.load();assert.deepEqual(audio.errors,[]);assert.equal(Object.keys(audio.layers).length,5);
+const ride={vx:0,air:0},vol={motor:.8,music:.35,effects:.6,musicOn:true};
+audio.mix(ride,{},true,false,vol,1/60);assert.ok(audio.layers.idle.gain.gain.value>.7);assert.ok(audio.musicPlaying);
+ride.vx=23;ride.air=.5;for(let i=0;i<120;i++)audio.mix(ride,{gas:true},true,false,vol,1/60);
+assert.ok(audio.layers.high.gain.gain.value>.9);for(const l of Object.values(audio.layers))assert.ok(l.source.playbackRate.value>=.92&&l.source.playbackRate.value<=1.08);
+audio.mix(ride,{},true,false,vol,1/60);assert.ok(audio.layers.overrun.gain.gain.value>0);
+ac.currentTime=5;audio.mix(ride,{},false,false,vol,1/60);assert.equal(audio.master.gain.value,0);await new Promise(r=>setTimeout(r,260));assert.equal(audio.musicPlaying,false);assert.equal(audio.offset,5);
+audio.mix(ride,{},true,false,vol,1/60);assert.equal(audio.musicPlaying,true);audio.mix(ride,{},true,true,vol,1/60);assert.equal(audio.master.gain.value,0);
+audio.dispose();assert.ok(nodes.every(n=>!n.started||n.stopped));
+console.log('PASS: local assets, five sample layers, throttle crossfade, bounded pitch, overrun, pause/resume position, mute, disposal.');
