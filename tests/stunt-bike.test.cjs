@@ -12,6 +12,13 @@ const results=[];
 for(const t of tracks){let b=newRide(t);run(b,t,(_,b)=>{let target=b.contact.some(Boolean)?Math.atan(surface(t,b.x+1).s):0;let u=wrap(target-b.a)*4-b.av*1.5;return {gas:true,left:u>.3,right:u<-.3};},120);assert.ok(b.complete&&!b.failed,t.name+' is completable');assert.ok(b.checkpoint>5);assert.ok(Number.isFinite(b.score));results.push({track:t.name,time:+b.time.toFixed(2),score:b.score});}
 assert.equal(tracks.length,20);assert.equal(tracks.filter(t=>t.night).length,10);
 assert.equal(new Set(tracks.map(t=>t.id)).size,20);
+assert.equal(new Set(tracks.slice(7).map(t=>JSON.stringify(t.points))).size,13,'all new course profiles differ');
+assert.equal(new Set(tracks.slice(7).map(t=>t.theme)).size,13,'every new route has its own environment theme');
+for(const t of tracks.slice(7)){
+  const elevations=t.points.filter(p=>p[1]>-20).map(p=>p[1]);
+  assert.ok(Math.max(...elevations)-Math.min(...elevations)>=7,t.name+' has major elevation changes');
+  assert.ok(t.points[2][0]<70,t.name+' begins with a ramp, not a long flat runway');
+}
 for(const t of tracks.slice(7)){
   assert.ok(t.loops.length&&t.ravines.length);
   for(const ring of t.loops){

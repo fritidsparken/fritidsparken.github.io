@@ -44,20 +44,39 @@
     ['Nattens höjder',true,7,'Tekniska loopar och långa landningar'],
     ['Midnattsfinalen',true,8,'Tre loopar och de största ravinhoppen']
   ];
+  // Authored routes: each course has its own ordered terrain rhythm, not a repeated section.
+  const ROUTES=[
+    {theme:'park',landmark:'arches',plan:[['H',3,22],['H',5,28],['J',5,12],['U',4,28],['L',4.2],['H',7,34],['J',6,15],['U',0,32]]},
+    {theme:'copper',landmark:'cables',plan:[['U',6,36],['H',9,25],['L',4.4],['J',5.5,13],['U',1,34],['H',5,20],['L',4.2],['U',8,40],['J',6,16],['U',0,38]]},
+    {theme:'cliffs',landmark:'needles',plan:[['U',5,30],['J',6.5,16],['H',10,30],['U',-2,50],['H',3,24],['J',5,13],['U',6,45],['L',4.5],['J',7,18],['U',0,36]]},
+    {theme:'coast',landmark:'lighthouse',plan:[['H',4,25],['J',5,14],['U',7,40],['L',4.7],['U',2,32],['H',8,34],['J',6.5,17],['H',5,21],['L',4.2],['U',0,32]]},
+    {theme:'neon',landmark:'gates',plan:[['H',5,28],['U',-2,35],['J',6,15],['L',4.2],['U',6,42],['H',10,29],['J',7,18],['U',0,35]]},
+    {theme:'bridge',landmark:'cables',plan:[['U',8,48],['L',4.5],['H',12,30],['J',5,13],['U',3,35],['L',4.7],['H',8,27],['J',6,16],['U',0,35]]},
+    {theme:'harbor',landmark:'cranes',plan:[['H',2.8,20],['H',4,24],['J',5.5,14],['U',4,28],['H',7,24],['J',6,17],['L',4.4],['U',0,30],['H',5,30]]},
+    {theme:'industrial',landmark:'stacks',plan:[['U',3,24],['L',4.2],['H',7,22],['J',5,12],['H',6,25],['U',8,36],['J',6.5,17],['U',2,38],['L',4.5],['U',0,24]]},
+    {theme:'mountain',landmark:'needles',plan:[['U',9,52],['H',13,32],['J',6,16],['U',3,40],['H',8,27],['J',6.5,18],['U',-2,38],['L',4.3],['U',0,28]]},
+    {theme:'garden',landmark:'arches',plan:[['H',4,24],['L',4.2],['U',5,32],['L',4.6],['J',5.5,14],['U',1,26],['H',6,30],['L',4.4],['J',6,16],['U',0,28]]},
+    {theme:'canyon',landmark:'viaduct',plan:[['U',4,28],['J',6,17],['U',-2,42],['H',4,28],['L',4.7],['J',6.5,18],['U',7,48],['J',5.5,15],['H',10,26],['U',0,46]]},
+    {theme:'rooftops',landmark:'towers',plan:[['U',7,42],['L',4.4],['U',12,32],['J',5.5,15],['U',5,44],['H',9,25],['J',6.5,18],['U',2,30],['L',4.6],['U',0,25]]},
+    {theme:'festival',landmark:'gates',plan:[['H',4,22],['J',5,13],['U',6,38],['L',4.4],['H',10,28],['J',6,16],['U',1,40],['L',4.7],['U',8,45],['J',7,19],['H',12,30],['L',4.2],['U',0,50]]}
+  ];
   function expedition(spec,index){
-    const [name,night,variant,tag]=spec,base=0,points=[[-30,0],[15,0]],checkpoints=[5],jumps=[],loops=[],ravines=[];
-    let x=15;const sections=3+variant%2;
-    for(let j=0;j<sections;j++){
-      // Flat run-up gives the player room to reach loop speed after a checkpoint.
-      const cx=x+55+index%4*3;
-      if(j===0||variant%3===2||j===2&&variant%2===1)loops.push({x:cx,y:base,r:4.2+(variant%3)*.25});
-      points.push([cx+20,0]);checkpoints.push(cx+12);
-      const ramp=cx+52,h=5.5+(variant%3)*.65,lip=ramp+21,gap=12+(variant%3)*2+j+index%2;
-      points.push([ramp,0],[lip,h],[lip+.05,-28],[lip+gap-.05,-28],[lip+gap,h*.55],[lip+gap+24,0]);
-      ravines.push({from:lip,to:lip+gap,depth:28});jumps.push({x:lip,h,gap,kind:variant%4});
-      x=lip+gap+55;points.push([x,0]);checkpoints.push(x-8);
+    const [name,night,variant]=spec,route=ROUTES[index],base=0,points=[[-30,0],[15,0]],checkpoints=[5],jumps=[],loops=[],ravines=[];
+    let x=15,y=0;
+    const flat=n=>{x+=n;points.push([x,y]);};
+    const slope=(height,run)=>{x+=run;y=height;points.push([x,y]);};
+    for(const [kind,a,b] of route.plan){
+      if(kind==='U'){slope(a,b);flat(12);}
+      if(kind==='H'){const old=y;slope(a,b);flat(3);slope(old,b*.9);flat(14);}
+      if(kind==='L'){flat(8);checkpoints.push(x);flat(55);loops.push({x,y,r:a});flat(16);}
+      if(kind==='J'){
+        flat(8);checkpoints.push(x);flat(35);const floor=y; slope(y+a,21);const lip=x;
+        points.push([lip+.05,base-28],[lip+b-.05,base-28],[lip+b,floor+a*.55]);
+        ravines.push({from:lip,to:lip+b,depth:28});jumps.push({x:lip,h:y,gap:b,kind:index%4});x=lip+b;y=floor+a*.55;slope(floor,24);flat(24);
+      }
     }
-    points.push([x+35,0],[x+65,0]);return {id:'expedition-'+index,name,night,variant,tag:tag+'. Håll gasen genom looparna',sky:night?0x101b38:0xaed9eb,accent:[0xffae55,0x74e6df,0xb0a5ff][variant%3],points,checkpoints,jumps,loops,ravines,length:x+32,base,medal:(x+32)/13+18};
+    if(y!==0)slope(0,Math.max(25,Math.abs(y)*7));flat(28);checkpoints.push(x-8);const length=x+25;flat(65);
+    return {id:'expedition-v2-'+index,name,night,variant,theme:route.theme,landmark:route.landmark,routeIndex:index,tag:['Böljande parkramper, två raviner och en högre mittsektion','Klättra över kopparbroarna och dyk ner mellan två loopar','Från klippavsats till dalbotten med tre ravinhopp','Kustfyrar, två loopar och långa utförsramper','En låg dal följs av neonportar och en hög avslutning','Stig upp på brospannet, kör två loopar och hoppa ner','Korta kajramper växlar med stora hamnhopp','Ramper i flera våningar mellan skorstenar och stålringar','Lång bergsklättring följd av raviner och en djup utförsbacke','Tre loopar på olika höjder i en upplyst park','Tre klyftor och en dalgång före den sista höjden','Takplattformar på olika höjder med två loopar','Växlande ramper, tre loopar och tre stora finalhopp'][index]+'. Håll gasen i looparna',sky:night?0x101b38:0xaed9eb,accent:[0xffae55,0x74e6df,0xb0a5ff,0xeccf72][index%4],points,checkpoints,jumps,loops,ravines,length,base,medal:length/13+18};
   }
   EXPANSION.forEach((spec,i)=>tracks.push(expedition(spec,i)));
   const inRavine=(t,x)=>(t.ravines||[]).some(g=>x>g.from&&x<g.to);
@@ -334,6 +353,7 @@
     // Three dimensional layered city blocks with individual recessed window bays.
     const rand=seeded(191+level*23);
     for(let layer=0;layer<3;layer++)for(let x=-55;x<t.length+65;x+=layer===0?25:19){
+      if(t.theme&&['park','cliffs','coast','mountain','garden','canyon'].includes(t.theme)&&(layer===2||Math.floor((x+55)/19)%3!==0))continue;
       const r=rand(),h=layer===0?22+r*34:layer===1?16+r*24:9+r*18,w=10+Math.floor(rand()*4),z=-81+layer*28,base=t.base-4.8;
       const wall=pbr(layer===2&&r>.6?'brick':'concrete',[0xd2c8b7,0xb3bab9,0xbba58d][Math.floor(rand()*3)]);
       surfaceBox(world,w,h,8,x,base+h/2,z,wall,3);
@@ -363,6 +383,33 @@
         rod(world,[x+2,base+h,z],[x+2,base+h+3,z],.04,steel);
         for(let k=0;k<3;k++)rod(world,[x+1.4,base+h+2+k*.25,z],[x+2.6,base+h+2+k*.25,z],.015,steel);
       }
+    }
+    // Large three-dimensional landmarks distinguish each route from its opening view.
+    if(t.theme){
+      const stone=pbr('concrete',0x827d70),copper=pbr('metal',0xb88659,.65),trim=mat(t.accent,.3,night?t.accent:0);
+      for(let x=22;x<t.length;x+=65+(t.routeIndex%4)*9){
+        const y=surface(t,x).y,ground=t.base-5.4;
+        if(['needles','viaduct'].includes(t.landmark)){
+          for(let k=0;k<5;k++){const h=12+k*3+(t.routeIndex%3)*2;const rock=new THREE.Mesh(geo('rock-'+k,()=>new THREE.ConeGeometry(4+k*.5,h,5+k%3)),stone);rock.position.set(x+k*5,ground+h/2,-15-k*3);rock.rotation.y=k*.8;rock.castShadow=true;world.add(rock);}
+        }
+        if(['arches','gates','viaduct'].includes(t.landmark)){
+          const h=t.landmark==='gates'?12:8;for(const xx of [x-6,x+6])rod(world,[xx,ground,-9],[xx,y+h,-9],.28,t.landmark==='arches'?copper:steel);
+          rod(world,[x-6,y+h,-9],[x+6,y+h,-9],.3,steel);
+          for(const xx of [x-6,x+6])box(world,.08,h, .1,xx,y+h/2,-8.65,trim);
+        }
+        if(t.landmark==='cables'){
+          for(const xx of [x-9,x+9])surfaceBox(world,.8,20,1.2,xx,ground+10,-7,copper,3);
+          rod(world,[x-9,ground+20,-7],[x+9,y+1,-7],.055,steel);rod(world,[x+9,ground+20,-7],[x-9,y+1,-7],.055,steel);
+        }
+        if(t.landmark==='lighthouse'){
+          const tower=new THREE.Mesh(geo('lighthouse',()=>new THREE.CylinderGeometry(1.1,2,17,20)),pbr('concrete',0xe6dfcb));tower.position.set(x,ground+8.5,-14);tower.castShadow=true;world.add(tower);surfaceBox(world,3,.6,3,x,ground+17,-14,trim,2);
+        }
+        if(t.landmark==='cranes'){crane(x,ground,-19);for(let k=0;k<3;k++)surfaceBox(world,7,2.4,3,x+k*8,ground+1.2,-11,pbr('metal',[0xb06545,0x487b89,0xa99550][k],.4),3);}
+        if(t.landmark==='stacks'){for(let k=0;k<3;k++){const chimney=new THREE.Mesh(geo('chimney-'+k,()=>new THREE.CylinderGeometry(.8,1.2,14+k*3,16)),pbr('brick',0x93735f));chimney.position.set(x+k*4,ground+7+k*1.5,-13);world.add(chimney);box(world,2,.2,2,x+k*4,ground+14+k*3,-13,trim);}}
+        if(t.landmark==='towers'){for(let k=0;k<3;k++){surfaceBox(world,5,11+k*4,5,x+k*7,ground+5.5+k*2,-12,pbr('concrete',0xb1bdc2),3);rod(world,[x+k*7,ground+11+k*4,-12],[x+k*7,ground+17+k*4,-12],.06,steel);}}
+        if(['park','garden'].includes(t.theme)){for(let k=0;k<6;k++)tree(x+k*4,ground,-13-k%2*5,.8+k*.1);}
+      }
+      if(['coast','harbor','canyon'].includes(t.theme))surfaceBox(world,t.length+80,.1,20,t.length/2,t.base-5.2,-22,pbr('metal',0x407f96,.5),8);
     }
     // Ground-level promenade behind the open bridge.
     surfaceBox(world,t.length+100,.3,6,t.length/2,t.base-5.45,-6,concrete,2);
@@ -402,7 +449,7 @@
       for(let k=0;k<3;k++){const bush=sphere(world,.7,x+k-1,t.base-4.9,-18,pbr('grass',0x83916b));bush.scale.y=.48;bush.userData.detail=1;}
     }
     for(let i=0;i<4;i++){const car=vehicle(i*69,t.base-5,-12,i%2?0xbda07e:0x718a8e,'car');traffic.push({mesh:car,speed:3+i*.4,start:i*69});}
-    for(const cp of t.checkpoints.slice(1)){rod(world,[cp,t.base,-2.4],[cp,t.base+3,-2.4],.045,steel);surfaceBox(world,1,.6,.03,cp+.5,t.base+2.6,-2.4,pbr('fabric',0x74ac8d),1);}
+    for(const cp of t.checkpoints.slice(1)){const cy=surface(t,cp).y;rod(world,[cp,cy,-2.4],[cp,cy+3,-2.4],.045,steel);surfaceBox(world,1,.6,.03,cp+.5,cy+2.6,-2.4,pbr('fabric',0x74ac8d),1);}
     const end=t.length;for(const z of [-2.35,2.35]){rod(world,[end,t.base,z],[end,t.base+5,z],.1,steel);}box(world,.2,.22,4.9,end,t.base+5,0,steel);sign(world,'MÅL',end,t.base+5,2.5,0x233d43,2.6);
     for(let i=0;i<12;i++)box(world,.45,.015,.33,end+(i%2)*.45,t.base+.02,-1.8+Math.floor(i/2)*.66,i%2?0xe4e1d7:0x2d3437);
     if(night)for(let i=0;i<6;i++){
