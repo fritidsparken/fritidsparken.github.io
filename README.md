@@ -1,7 +1,5 @@
 # Fritidsparken
 
-🎨 Fritidsparken.se
-
 En roligare fritid – direkt i webbläsaren.
 
 Fritidsparken.se är en svensk webbplats för barn i åldern 6–12 år, fylld med kreativa aktiviteter, pyssel, färgläggning och webbläsarspel.
