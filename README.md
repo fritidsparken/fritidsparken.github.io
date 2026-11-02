@@ -1,15 +1,12 @@
 # Fritidsparken
 
-Ett statiskt aktivitetsverktyg för fritidshem F–6. 24 färdiga aktiviteter med instruktioner, sökning, filter, lokala favoriter, veckoplan och utskriftsvy.
+🎨 Fritidsparken.se
 
-## Publicera med GitHub Pages
+En roligare fritid – direkt i webbläsaren.
 
-Öppna Settings → Pages. Välj Deploy from a branch, grenen main och mappen / (root). Spara.
+Fritidsparken.se är en svensk webbplats för barn i åldern 6–12 år, fylld med kreativa aktiviteter, pyssel, färgläggning och webbläsarspel.
 
-Nuvarande Pages-adress: https://fritidsparken.se
+Målet är att samla roliga och lättillgängliga fritidsaktiviteter på ett ställe – hemma, i skolan eller på fritids.
 
-## Utveckling
+🌐 Webbplats: https://fritidsparken.se
 
-Ingen byggprocess eller API-nyckel behövs. Kör exempelvis python3 -m http.server 8080 i projektmappen. Innehåll och logik finns i app.js, design i style.css.
-
-Favoriter och veckoplan sparas endast i den aktuella webbläsarens localStorage. Inga elevuppgifter krävs. Google Fonts används med lokala sans-serif-typsnitt som reserv. Aktiviteterna är redaktionellt skrivna och genereras inte av ett API.
