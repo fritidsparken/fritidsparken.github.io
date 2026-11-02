@@ -1,9 +1,15 @@
 // Marching-squares contour of the union of all playable capsules.
 // Shared junctions have no internal walls; rounded ends are closed.
-export function boundarySegments(c,step=.22){
- const seg=c.path.slice(1).flatMap((b,i)=>c.features.some(f=>f.gap&&f.node===i)?[]:[{a:c.path[i],b}]);
+export function boundarySegments(c,step=.22,bridgeOffset=0){
+ const seg=c.path.slice(1).flatMap((b,i)=>c.features.some(f=>f.gap&&f.node===i)?[]:[{a:c.path[i],b,i}]);
  const radius=c.width/2+.165;
- const sample=(x,z)=>{let d=Infinity,y=0;for(const {a,b}of seg){const dx=b[0]-a[0],dz=b[2]-a[2],t=Math.max(0,Math.min(1,((x-a[0])*dx+(z-a[2])*dz)/(dx*dx+dz*dz))),v=Math.hypot(x-a[0]-t*dx,z-a[2]-t*dz);if(v<d){d=v;y=a[1]+t*(b[1]-a[1]);}}return {d:d-radius,y};};
+ const sample=(x,z)=>{let d=Infinity,y=0;
+ for(const {a,b,i} of seg){const moving=c.features.some(f=>f.type==='movingBridge'&&f.node===i),dx=b[0]-a[0],dz=b[2]-a[2],length=Math.hypot(dx,dz),xx=x-a[0]-(moving?bridgeOffset:0),zz=z-a[2],u=(xx*dx+zz*dz)/(length*length),t=Math.max(0,Math.min(1,u));let v;
+ if(moving){const across=Math.abs((xx*dz-zz*dx)/length)-1.05,along=Math.abs((u-.5)*length)-length/2;v=Math.hypot(Math.max(0,across),Math.max(0,along))+Math.min(Math.max(across,along),0)-.165;}
+ else v=Math.hypot(xx-t*dx,zz-t*dz)-radius;
+ if(v<d){d=v;y=a[1]+t*(b[1]-a[1]);}}
+ for(const p of c.path){const v=Math.hypot(x-p[0],z-p[2])-radius;if(v<d){d=v;y=p[1];}}
+ return {d,y};};
  const minX=Math.min(...c.path.map(p=>p[0]))-radius-step*2,minZ=Math.min(...c.path.map(p=>p[2]))-radius-step*2;
  const nx=Math.ceil((Math.max(...c.path.map(p=>p[0]))+radius+step*2-minX)/step),nz=Math.ceil((Math.max(...c.path.map(p=>p[2]))+radius+step*2-minZ)/step);
  const grid=Array.from({length:nz+1},(_,j)=>Array.from({length:nx+1},(_,i)=>sample(minX+i*step,minZ+j*step).d)),out=[];
@@ -17,13 +23,13 @@ export function boundarySegments(c,step=.22){
 
 // Batch the rounded rail pieces into one draw call per course.
 export function boundaryGeometry(T,segments){
- const positions=[],normals=[];
+ const positions=[],normals=[],uvs=[];
  for(const [a,b] of segments){
   const av=new T.Vector3(...a),bv=new T.Vector3(...b),delta=bv.clone().sub(av);
-  const g=new T.CylinderGeometry(.16,.16,delta.length()+.025,8,1,false);
+  const g=new T.CylinderGeometry(.16,.16,delta.length()+.025,8,1,true);
   g.applyQuaternion(new T.Quaternion().setFromUnitVectors(new T.Vector3(0,1,0),delta.normalize()));
   const mid=av.add(bv).multiplyScalar(.5);g.translate(mid.x,mid.y,mid.z);
-  const flat=g.toNonIndexed();positions.push(...flat.attributes.position.array);normals.push(...flat.attributes.normal.array);g.dispose();flat.dispose();
+  const flat=g.toNonIndexed();positions.push(...flat.attributes.position.array);normals.push(...flat.attributes.normal.array);for(let i=0;i<flat.attributes.position.count;i++)uvs.push(flat.attributes.position.getX(i)*.3,flat.attributes.position.getZ(i)*.3);g.dispose();flat.dispose();
  }
- const geometry=new T.BufferGeometry();geometry.setAttribute('position',new T.Float32BufferAttribute(positions,3));geometry.setAttribute('normal',new T.Float32BufferAttribute(normals,3));return geometry;
+ const geometry=new T.BufferGeometry();geometry.setAttribute('position',new T.Float32BufferAttribute(positions,3));geometry.setAttribute('normal',new T.Float32BufferAttribute(normals,3));geometry.setAttribute('uv',new T.Float32BufferAttribute(uvs,2));return geometry;
 }

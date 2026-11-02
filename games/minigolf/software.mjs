@@ -1,26 +1,29 @@
-/** Canvas renderer for devices where WebGL is unavailable. Uses the same scene,
- * camera, geometry and gameplay; no second physics implementation. */
+/** Textured, depth-buffered Canvas fallback. Same scene and physics as WebGL.
+ * Reduced resolution is deliberate: keep gameplay responsive without GPU access. */
 export function createSoftwareRenderer(T){
- const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d',{alpha:false});
- if(!ctx)throw new Error('Canvas 2D unavailable');
- let width=800,height=600,ratio=1;const vp=new T.Matrix4(),matrix=new T.Matrix4();const p=new T.Vector3(),a=new T.Vector3(),b=new T.Vector3(),c=new T.Vector3(),normal=new T.Vector3();const sun=new T.Vector3(-.4,.8,.3).normalize();
- const api={domElement:canvas,isSoftware:true,shadowMap:{enabled:false},setPixelRatio(r){ratio=Math.min(r,1.25);api.setSize(width,height);},setSize(w,h){width=w;height=h;canvas.width=Math.round(w*ratio);canvas.height=Math.round(h*ratio);canvas.style.width=w+'px';canvas.style.height=h+'px';},render(scene,camera){
- scene.updateMatrixWorld();camera.updateMatrixWorld();vp.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);ctx.setTransform(ratio,0,0,ratio,0,0);const sky=scene.background?.isColor?'#'+scene.background.getHexString():'#a6dbe4';ctx.fillStyle=sky;ctx.fillRect(0,0,width,height);const faces=[];
- scene.traverseVisible(o=>{if(!o.isMesh||!o.geometry?.attributes.position)return;const g=o.geometry,pos=g.attributes.position,index=g.index;let material=Array.isArray(o.material)?o.material[0]:o.material;if(!material||material.visible===false)return;
- const base=material.color?.clone()||new T.Color(o.name.includes('lava')?'#ed783a':'#48b9bf');if(material.map?.image?.getContext){const pixel=material.map.image.getContext('2d').getImageData(0,0,1,1).data;base.setRGB(pixel[0]/255,pixel[1]/255,pixel[2]/255,T.SRGBColorSpace);}matrix.multiplyMatrices(vp,o.matrixWorld);const count=index?index.count:pos.count;
- for(let i=0;i<count;i+=3){const ids=[0,1,2].map(j=>index?index.getX(i+j):i+j),coords=[];let clipped=false;
- for(const id of ids){p.fromBufferAttribute(pos,id).applyMatrix4(matrix);if(p.z< -1||p.z>1||!Number.isFinite(p.x)){clipped=true;break;}coords.push([(p.x*.5+.5)*width,(-p.y*.5+.5)*height,p.z]);}if(clipped)continue;
- if(coords.every(v=>v[0]<0)||coords.every(v=>v[0]>width)||coords.every(v=>v[1]<0)||coords.every(v=>v[1]>height))continue;
- const area=(coords[1][0]-coords[0][0])*(coords[2][1]-coords[0][1])-(coords[1][1]-coords[0][1])*(coords[2][0]-coords[0][0]);if(material.side!==T.DoubleSide&&area>0)continue;if(Math.abs(area)<.2)continue;
- a.fromBufferAttribute(pos,ids[0]).applyMatrix4(o.matrixWorld);b.fromBufferAttribute(pos,ids[1]).applyMatrix4(o.matrixWorld);c.fromBufferAttribute(pos,ids[2]).applyMatrix4(o.matrixWorld);normal.crossVectors(b.sub(a),c.sub(a)).normalize();const light=.62+.38*Math.max(0,normal.dot(sun));const color=base.clone().multiplyScalar(light);faces.push({coords,z:(coords[0][2]+coords[1][2]+coords[2][2])/3,color:'#'+color.getHexString(),opacity:material.opacity??1});
+ const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d',{alpha:false});if(!ctx)throw Error('Canvas unavailable');
+ let width=800,height=600,ratio=.65,w=520,h=390,frame,depth;const frustum=new T.Frustum(),sphere=new T.Sphere();const cache=new WeakMap(),vp=new T.Matrix4(),model=new T.Matrix4(),matrix=new T.Matrix4(),instance=new T.Matrix4(),normalM=new T.Matrix3(),vertex=new T.Vector4(),normal=new T.Vector3(),sun=new T.Vector3(-.45,.8,.25).normalize();
+ function texture(map){if(!map?.image)return null;const image=map.image;if(!image.width||image.complete===false)return null;if(cache.has(image))return cache.get(image);try{const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(image,0,0,128,128);const t={data:x.getImageData(0,0,128,128).data,width:128,height:128};cache.set(image,t);return t;}catch{return null;}}
+ function raster(a,b,c,mat,tex,shade){const area=(b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x);if(Math.abs(area)<.06)return;if(mat.side!==T.DoubleSide&&area>0)return;
+ const x0=Math.max(0,Math.floor(Math.min(a.x,b.x,c.x))),x1=Math.min(w-1,Math.ceil(Math.max(a.x,b.x,c.x))),y0=Math.max(0,Math.floor(Math.min(a.y,b.y,c.y))),y1=Math.min(h-1,Math.ceil(Math.max(a.y,b.y,c.y)));if(x1<x0||y1<y0)return;
+ const {color,em,alpha,rep,off}=shade,dst=frame.data;
+ for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
+ const u=((b.x-x)*(c.y-y)-(b.y-y)*(c.x-x))/area,v=((c.x-x)*(a.y-y)-(c.y-y)*(a.x-x))/area,q=1-u-v;if(u<-.001||v<-.001||q<-.001)continue;const z=u*a.z+v*b.z+q*c.z,at=y*w+x;if(z>depth[at]||z< -1||z>1)continue;
+ let r=255,g=255,bl=255,opacity=alpha;
+ if(tex){const inv=u*a.iw+v*b.iw+q*c.iw;let tx=(u*a.u*a.iw+v*b.u*b.iw+q*c.u*c.iw)/inv*(rep?.x||1)+(off?.x||0),ty=(u*a.v*a.iw+v*b.v*b.iw+q*c.v*c.iw)/inv*(rep?.y||1)+(off?.y||0);tx=mat.map.wrapS===T.RepeatWrapping?tx-Math.floor(tx):Math.max(0,Math.min(.9999,tx));ty=mat.map.wrapT===T.RepeatWrapping?ty-Math.floor(ty):Math.max(0,Math.min(.9999,ty));const p=(((1-ty)*127|0)*128+(tx*127|0))*4;r=tex.data[p];g=tex.data[p+1];bl=tex.data[p+2];opacity*=tex.data[p+3]/255;}
+ if(opacity<.02)continue;const light=mat.isMeshBasicMaterial?1:Math.max(.38,u*a.l+v*b.l+q*c.l),i=at*4;r=Math.min(255,r*color.r*light+em.r*35);g=Math.min(255,g*color.g*light+em.g*35);bl=Math.min(255,bl*color.b*light+em.b*35);dst[i]=r*opacity+dst[i]*(1-opacity);dst[i+1]=g*opacity+dst[i+1]*(1-opacity);dst[i+2]=bl*opacity+dst[i+2]*(1-opacity);if(mat.depthWrite!==false)depth[at]=z;
  }
- });faces.sort((a,b)=>b.z-a.z);for(const f of faces){ctx.globalAlpha=f.opacity;ctx.fillStyle=f.color;ctx.beginPath();f.coords.forEach((v,i)=>i?ctx.lineTo(v[0],v[1]):ctx.moveTo(v[0],v[1]));ctx.closePath();ctx.fill();}ctx.globalAlpha=1;
- // ArrowHelper's shaft is a Line, drawn separately for clear aiming.
- scene.traverseVisible(o=>{if(!o.isLine||!o.geometry?.attributes.position)return;const pos=o.geometry.attributes.position;matrix.multiplyMatrices(vp,o.matrixWorld);ctx.beginPath();let started=false;for(let i=0;i<pos.count;i++){p.fromBufferAttribute(pos,i).applyMatrix4(matrix);if(p.z< -1||p.z>1){started=false;continue;}const x=(p.x*.5+.5)*width,y=(-p.y*.5+.5)*height;if(started)ctx.lineTo(x,y);else ctx.moveTo(x,y);started=true;}ctx.strokeStyle='#ffecae';ctx.lineWidth=3;ctx.stroke();});
- },dispose(){canvas.remove();}};return api;
+ }
+ function draw(o,m){const geo=o.geometry;if(!geo.boundingSphere)geo.computeBoundingSphere();sphere.copy(geo.boundingSphere).applyMatrix4(m);if(!frustum.intersectsSphere(sphere))return;const pos=geo.attributes.position,norm=geo.attributes.normal,uv=geo.attributes.uv,indices=geo.index,mat=Array.isArray(o.material)?o.material[0]:o.material;if(!pos||!mat||mat.visible===false)return;matrix.multiplyMatrices(vp,m);normalM.getNormalMatrix(m);const shade={color:(mat.color||new T.Color('#619491')).clone().convertLinearToSRGB(),em:mat.emissive?mat.emissive.clone().multiplyScalar(mat.emissiveIntensity||1):new T.Color(0),alpha:mat.opacity??1,rep:mat.map?.repeat,off:mat.map?.offset};const tex=texture(mat.map),projected=new Array(pos.count);
+ for(let j=0;j<pos.count;j++){vertex.set(pos.getX(j),pos.getY(j),pos.getZ(j),1).applyMatrix4(matrix);const iw=1/vertex.w;let light=.85;if(norm){normal.fromBufferAttribute(norm,j).applyMatrix3(normalM).normalize();light=.64+.36*Math.max(0,normal.dot(sun));}projected[j]={x:(vertex.x*iw*.5+.5)*w,y:(.5-vertex.y*iw*.5)*h,z:vertex.z*iw,iw,u:uv?uv.getX(j):0,v:uv?uv.getY(j):0,l:light};}
+ const count=indices?indices.count:pos.count;for(let j=0;j<count;j+=3){const a=projected[indices?indices.getX(j):j],b=projected[indices?indices.getX(j+1):j+1],c=projected[indices?indices.getX(j+2):j+2];if(a.iw<=0||b.iw<=0||c.iw<=0)continue;raster(a,b,c,mat,tex,shade);}
+ }
+ const api={domElement:canvas,isSoftware:true,shadowMap:{enabled:false},setPixelRatio(){ratio=.65;api.setSize(width,height);},setSize(a,b){width=a;height=b;const scale=Math.min(ratio,480/a,340/b);w=Math.max(1,Math.round(a*scale));h=Math.max(1,Math.round(b*scale));canvas.width=w;canvas.height=h;canvas.style.width=a+'px';canvas.style.height=b+'px';frame=ctx.createImageData(w,h);depth=new Float32Array(w*h);},render(scene,camera){scene.updateMatrixWorld();camera.updateMatrixWorld();vp.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);frustum.setFromProjectionMatrix(vp);depth.fill(Infinity);
+ const sky=scene.background?.isColor?scene.background.clone().convertLinearToSRGB():new T.Color(scene.userData.skyColors?.[0]||'#9cbcc7');for(let y=0;y<h;y++){const t=y/h;for(let x=0;x<w;x++){const i=(y*w+x)*4;frame.data[i]=Math.min(255,sky.r*255+t*30);frame.data[i+1]=Math.min(255,sky.g*255+t*20);frame.data[i+2]=Math.min(255,sky.b*255+t*10);frame.data[i+3]=255;}}
+ const opaque=[],transparent=[];scene.traverseVisible(o=>{if(o.isMesh&&o.geometry){const mat=Array.isArray(o.material)?o.material[0]:o.material;(mat.transparent?transparent:opaque).push(o);}});
+ for(const o of [...opaque,...transparent]){if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,instance);model.multiplyMatrices(o.matrixWorld,instance);draw(o,model);}}else draw(o,o.matrixWorld);}
+ ctx.putImageData(frame,0,0);
+ scene.traverseVisible(o=>{if(!o.isLine)return;const pos=o.geometry?.attributes.position;if(!pos)return;matrix.multiplyMatrices(vp,o.matrixWorld);ctx.beginPath();for(let i=0;i<pos.count;i++){vertex.set(pos.getX(i),pos.getY(i),pos.getZ(i),1).applyMatrix4(matrix);const x=(vertex.x/vertex.w*.5+.5)*w,y=(.5-vertex.y/vertex.w*.5)*h;i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.strokeStyle='#ffedab';ctx.lineWidth=2;ctx.stroke();});
+ },dispose(){canvas.remove();}};api.setSize(width,height);return api;
 }
-export function createRenderer(T){
- const canvas=document.createElement('canvas');let context=null;
- try{context=canvas.getContext('webgl2',{antialias:true})||canvas.getContext('webgl',{antialias:true});if(context)return new T.WebGLRenderer({canvas,context,antialias:true});}catch(error){console.warn('WebGL unavailable; using Canvas renderer',error);}
- return createSoftwareRenderer(T);
-}
+export function createRenderer(T){const canvas=document.createElement('canvas');try{const context=canvas.getContext('webgl2',{antialias:true})||canvas.getContext('webgl',{antialias:true});if(context)return new T.WebGLRenderer({canvas,context,antialias:true});}catch(error){console.warn('WebGL unavailable; using textured Canvas renderer',error);}return createSoftwareRenderer(T);}
