@@ -16,3 +16,8 @@ The published MP3 was downloaded and decoded successfully (62.98 seconds). Enabl
 - Three.js scene test covers all 20 courses at four viewport sizes and three quality levels with repeated builds and disposal. GPU rendering is not covered by this test.
 - Audio mixer tests cover asset loading, engine crossfades, pause/resume, mute and disposal.
 - Real-browser playback state and visual observations are recorded separately in the delivery report; no measured mobile FPS or Safari result is implied.
+
+## Chrome observations after deployment
+- Live UI showed all 20 courses and exactly ten visible nighttime choices after filtering. Ravinparken and Neonravinen initialized in 3D HIGH.
+- AudioContext reported running and music playback time advanced past ten seconds. Starta musik recovered playback after explicitly muting the master; no console errors were reported. This verifies playback state, not a subjective listening assessment.
+- Existing visual style and bridge framing inspected in a real Chrome screenshot. Full-course GPU playthroughs, mobile FPS and Safari remain unverified.
