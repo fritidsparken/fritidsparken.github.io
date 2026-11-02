@@ -285,3 +285,13 @@ body.std-design.dark:not(.halloween):not(.christmas) :is(.primary,.std-inspirati
 body.std-design .std-categories>button>span{width:100%;max-width:100%;min-width:0;overflow-wrap:anywhere;hyphens:auto;font-size:clamp(11px,1.05vw,16px)}
 @media(max-width:900px){body.std-design .std-categories>button>span{width:auto;flex:1;font-size:14px}}
 @media(max-width:600px){body.std-design .std-categories>button>span{width:100%;flex:none;font-size:clamp(11px,3.2vw,14px)}}
+
+
+/* Keep complete rows on phones and tablets in either orientation. */
+@media (max-width:1100px) and (min-width:701px){
+ body.std-design .std-popular-grid > :nth-child(n+4){display:none}
+}
+@media (max-width:700px){
+ body.std-design .std-categories{grid-template-columns:repeat(2,minmax(0,1fr))}
+ body.std-design .std-popular-grid > :nth-child(n+5){display:none}
+}
