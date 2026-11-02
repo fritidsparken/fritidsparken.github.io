@@ -21,3 +21,7 @@
 .quality-setting{display:flex;align-items:center;justify-content:center;gap:10px;font-size:.8rem;font-weight:700;margin:10px 0}.quality-setting select{font:inherit;border:1px solid #74927c;border-radius:9px;padding:7px 10px;color:#244b39;background:#f6f4e8}
 @media(max-width:500px){#controls{grid-template-columns:repeat(3,50px);gap:7px;bottom:max(12px,env(safe-area-inset-bottom))}#controls button{height:50px}#area{font-size:.7rem}.stat span{padding:7px 9px}.panel{border-radius:22px}#notice{top:16%;font-size:1.15rem;width:85%}}
 @media(max-height:500px){#controls{grid-template-columns:repeat(3,38px);gap:5px;bottom:max(8px,env(safe-area-inset-bottom))}#controls button{height:38px;border-radius:11px}.stat span{font-size:.75rem;padding:6px 9px}}
+
+/* Sunny park: quiet translucent controls leave the world in view. */
+#controls button{background:rgba(60,78,43,.44);color:#fffef3;border:1px solid rgba(247,255,216,.58);box-shadow:0 3px 10px #15230c40,inset 0 1px 0 #ffffff35;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);border-radius:17px;text-shadow:0 1px 3px #24311170}
+#controls button:active{background:rgba(190,211,133,.6);transform:translateY(2px)}

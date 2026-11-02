@@ -44,3 +44,22 @@ for mapped surfaces. It is distinct from LOW WebGL quality.
 Actual GPU shader compilation, final PBR/reflection/shadow appearance, FPS on physical
 phones/Chromebooks/tablets, and native mobile touch remain unverified here. Do not
 report the software-renderer preview as proof of final GPU graphics or performance.
+
+## Reference-park redesign — revision 2
+
+The supplied Sunny Park image guides the composition; it is not shipped as a backdrop.
+`park-art.js` adds a sculpted torso, jointed thighs/shins/feet, four toes, dorsal ridges,
+eyelids, irregular spotted skin with generated normal/roughness maps and a landing settle.
+
+The park now uses individual instanced grass blades and folded leaves, branching trunks,
+ferns, flowers, mushrooms, rock clusters, slatted benches, lanterns, zebra crossings,
+wet asphalt patches and layered water-lily blossoms. Recursively batched static models
+retain independent wheel and frog joints. Ground texture strip alternation was removed.
+High/Medium add a shared planar water capture; Low keeps environment reflections and
+all surface maps. The control pad is translucent like the reference.
+
+Nine Node tests pass, including material-map presence/skin variation and reflection
+shader chunk compatibility and renderer-state restoration. These are CPU tests, not
+GPU shader compilation. The cloud browser again reports WebGL unavailable. Desktop
+composition, mobile UI and pointer controls were inspected using the software fallback;
+final PBR appearance, reference-image fidelity and device FPS remain unverified.
