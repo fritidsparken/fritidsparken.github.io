@@ -41,6 +41,13 @@ export class BowlingView{
  // Acoustic fins and continuous ceiling lights.
  for(let x=-28;x<=28;x+=2.8)this.box(.14,.45,66,p.shell,x,12.4,-13);
  for(const x of [-20,-10,0,10,20])for(const z of [-26,-12,2,14]){this.box(4.8,.07,.25,p.warmLight,x,12.07,z);this.box(5,.1,.45,p.shell,x,12.2,z);}
+ // Focused pools of warm light keep the lane readable beneath the closed ceiling.
+ for(const [z,color,power] of [[-4,'#ffe8c4',180],[-16,'#e0f3ff',210],[-27,'#fff1d8',250]]){
+ const spot=new T.SpotLight(color,power,32,.68,.75,2);spot.position.set(0,10.8,z+2);spot.target.position.set(0,0,z-1);this.scene.add(spot,spot.target);
+ const fixture=this.asset('lamp');fixture.position.copy(spot.position);fixture.scale.setScalar(.6);
+ }
+ const cyan=this.mat('#70eee5',{emissive:'#20c5b7',emissiveIntensity:2.2});const violet=this.mat('#baa2ff',{emissive:'#7852ce',emissiveIntensity:1.8});
+ for(const side of [-1,1]){this.box(.08,.12,55,cyan,side*28.65,3.1,-10);this.box(22,.1,.08,side<0?cyan:violet,side*14,9.2,-34.5);const wash=new T.PointLight(side<0?'#62d9d3':'#ac8fe6',55,17,2);wash.position.set(side*12,6,-31);this.scene.add(wash);}
  const mural=this.mat('#fff',{map:this.map('mural'),roughness:.8});this.box(53,5.2,.05,mural,0,6.1,-34.7);
  for(let x=-27;x<29;x+=1.4)this.box(.035,3,.1,p.walnut,x,1,-34.6);
  this.decor=new T.Group();this.scene.add(this.decor);

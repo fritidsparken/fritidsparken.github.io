@@ -4,3 +4,5 @@
 @media(max-height:530px){.scoreboard{top:104px;left:16px;right:auto}.frame{flex:none;width:28px;font-size:9px;padding:3px 1px}.frame span{height:12px}.frame b{font-size:8px}}
 
 .quality-label{display:flex;gap:7px;align-items:center;font-size:11px;color:#d4e8e8}.quality-label select{color:#e6efec;background:#18333d;border:1px solid #50717b;border-radius:12px;padding:8px;max-width:85px}.vignette{opacity:.45}@media(max-width:600px){.quality-label span{display:none}.quality-label select{padding:6px;max-width:66px}}
+
+#music{font-size:12px;min-width:64px}.audio-credits{font-size:12px;line-height:1.6;opacity:.85}.audio-credits a{color:#9de8d7}@media(max-width:600px){.brand{display:none}.top-actions{gap:4px}}

@@ -6,3 +6,15 @@ test('Original sound buffers are finite, non-silent and have headroom at mobile 
 test('Impact variants differ and decay to silence; rolling loop has no amplitude jump',()=>{const a=impactSample(44100,'pin',1),b=impactSample(44100,'pin',2);assert.notDeepEqual(a,b);assert.ok(Math.abs(a.at(-1))<.001);const roll=rollingSample(44100);assert.ok(Math.abs(roll[0]-roll.at(-1))<.03);});
 test('A physical strike emits positional, strength-sensitive pin and floor audio',()=>{const p=new BowlingPhysics(0);p.launch({x:.15,power:.65});const kinds=new Set();for(let i=0;i<900;i++){p.step();for(const e of p.events.splice(0)){assert.ok(Number.isFinite(e.impact)&&Number.isFinite(e.x));kinds.add(e.kind);}}assert.ok(kinds.has('pin'));assert.ok(kinds.has('pinfall'));});
 test('Mute stops every active sound immediately and prevents context creation',()=>{const a=new Audio();let stopped=0;a.voices.add({stop(){stopped++;}});a.enabled=false;a.play('pin');assert.equal(stopped,1);assert.equal(a.voices.size,0);assert.equal(a.context,null);});
+
+test('Recorded MP3 assets are present and the soundtrack has a separate persisted switch', async () => {
+ const {readFile,stat}=await import('node:fs/promises');
+ for(const name of ['pin','drop','roll','rack','funk-game-loop']){
+  const path=new URL(`../games/crazy-bowling/assets/audio/${name}.mp3`,import.meta.url);
+  assert.ok((await stat(path)).size>5000);
+  const bytes=await readFile(path);assert.equal(bytes.toString('ascii',0,3),'ID3');
+ }
+ const source=await readFile(new URL('../games/crazy-bowling/audio.mjs',import.meta.url),'utf8');
+ assert.ok(!source.includes('createOscillator'));assert.ok(source.includes('crazy-bowling-music'));
+ const a=new Audio(false);a.music={paused:false,pause(){this.paused=true;}};a.toggleMusic();assert.equal(a.musicEnabled,false);assert.equal(a.music.paused,true);assert.equal(a.enabled,false);
+});
