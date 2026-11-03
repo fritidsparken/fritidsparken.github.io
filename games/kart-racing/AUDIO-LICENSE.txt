@@ -1,0 +1,9 @@
+Kart Racing 3D – ljud och musik
+
+Racingmusiken i sound.js är en originalkomposition för Fritidsparken.
+Melodi, bas, slagverk, motor, miljöljud och effekter syntetiseras i
+webbläsaren. Inga externa inspelningar eller ljudsamplingar ingår.
+
+Kompositionen och det syntetiserade ljudmaterialet tillhandahålls under
+CC0 1.0 Universal och får användas, ändras och publiceras på webbplatsen.
+https://creativecommons.org/publicdomain/zero/1.0/

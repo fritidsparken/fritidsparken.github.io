@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#111c2b" />
+    <title>Kart Racing 3D · Fritidsparken</title>
+    <link rel="stylesheet" href="kart.css" />
+  </head>
+  <body>
+    <canvas id="view" aria-label="Racingbana i 3D"></canvas>
+    <main id="menu">
+      <header>
+        <a href="../../" class="brand">← Fritidsparken</a
+        ><span>FP MOTORSPORT &nbsp; / &nbsp; RACING SERIES</span>
+      </header>
+      <div class="garage">
+        <small>FRITIDSPARKENS RACINGKLUBB</small>
+        <h1>
+          KART<br />
+          RACING <i>3D</i>
+        </h1>
+        <p id="tagline">Tolv banor. Åtta förare. Din plats på startlinjen.</p>
+        <nav id="tabs">
+          <button data-tab="race" class="active">Tävla</button
+          ><button data-tab="garage">Garage</button
+          ><button data-tab="settings">Inställningar</button>
+        </nav>
+        <section id="raceTab">
+          <div class="modes" id="modes"></div>
+          <div class="fieldrow">
+            <label id="trackField">Bana<select id="track"></select></label
+            ><label id="cupField" hidden
+              >Cup<select id="cup">
+                <option>Strandcupen</option>
+                <option>Äventyrscupen</option>
+                <option>Stjärncupen</option>
+              </select></label
+            >
+          </div>
+          <div class="preview">
+            <img id="preview" alt="" />
+            <div>
+              <small id="trackNo"></small><strong id="landmark"></strong>
+            </div>
+          </div>
+          <div class="fieldrow">
+            <label
+              >Svårighetsgrad<select id="level">
+                <option>Lätt</option>
+                <option>Normal</option>
+                <option>Svår</option>
+              </select></label
+            ><label
+              >Varv<select id="laps">
+                <option>1</option>
+                <option>2</option>
+                <option selected>3</option>
+                <option>5</option>
+              </select></label
+            >
+          </div>
+          <button class="primary" id="go">Till startlinjen →</button>
+        </section>
+        <section id="garageTab" hidden>
+          <div class="fieldrow">
+            <label>Gokart<select id="kart"></select></label
+            ><label>Förare<select id="driver"></select></label>
+          </div>
+          <div class="swatches" id="paints"></div>
+          <div id="stats"></div>
+        </section>
+        <section id="settingsTab" hidden>
+          <label
+            >Grafikkvalitet<select id="quality">
+              <option>Låg</option>
+              <option>Medium</option>
+              <option>Hög</option>
+              <option>Ultra</option>
+            </select></label
+          >
+          <div id="volumes"></div>
+          <p class="hints">
+            Pilar eller WASD kör · Mellanslag driftar · Shift använder föremål ·
+            C byter kamera · Esc pausar. Handkontroll: RT gas, LT broms, A drift
+            och B föremål.
+          </p>
+        </section>
+      </div>
+    </main>
+    <div id="hud" hidden>
+      <div class="top">
+        <div><small id="trackTitle"></small><b id="place"></b></div>
+        <div><small>VARV</small><b id="lap"></b></div>
+        <div><small>VARVTID</small><b id="clock"></b></div>
+        <button id="cam" aria-label="Byt kamera">▣</button
+        ><button id="pause" aria-label="Pausa">Ⅱ</button>
+      </div>
+      <canvas id="map" width="160" height="130" aria-label="Minikarta"></canvas>
+      <div id="meters">
+        <strong id="speed"></strong> km/h <span id="item"></span
+        ><progress id="turbo" max="3" value="0"></progress>
+      </div>
+      <div id="touch">
+        <div>
+          <button data-key="left" aria-label="Styr vänster">◀</button
+          ><button data-key="right" aria-label="Styr höger">▶</button>
+        </div>
+        <div>
+          <button data-key="drift">Drift</button
+          ><button data-key="fire">Box</button
+          ><button data-key="brake">Broms</button
+          ><button data-key="gas">Gas</button>
+        </div>
+      </div>
+    </div>
+    <div id="count"></div>
+    <dialog id="dialog">
+      <div id="message"></div>
+      <div id="actions"></div>
+    </dialog>
+    <script src="../../js/vendor/three.min.js"></script>
+    <script type="module" src="main.js"></script>
+  </body>
+</html>
