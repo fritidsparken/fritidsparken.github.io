@@ -257,7 +257,8 @@ function world(scene, c) {
   sun.shadow.normalBias = 0.065;
   root.add(sun, sun.target);
   const dome = new T.Mesh(
-    new T.SphereGeometry(670, 48, 32),
+    // Keep the camera-centered sky entirely inside the 620-unit far plane.
+    new T.SphereGeometry(480, 48, 32),
     new T.ShaderMaterial({
       side: T.BackSide,
       depthWrite: false,
@@ -281,6 +282,7 @@ function world(scene, c) {
  }`,
     }),
   );
+  dome.renderOrder = -1000;
   root.add(dome);
   const groundName = stone || city ? "cliff" : "grass",
     groundTex = snow ? texture("land", 729) : artMap(groundName),

@@ -10,6 +10,7 @@
     <title>Skatepark · Fritidsparken</title>
     <link rel="icon" href="../../assets/game-icons-2026/new-skatepark.webp" />
     <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="../ride-stick.css?v=1" />
   </head>
   <body>
     <canvas id="game" aria-label="Skatepark i 3D"></canvas>
@@ -50,12 +51,7 @@
       <button id="pause" aria-label="Pausa">Ⅱ</button>
       <div id="message"></div>
       <div id="touch">
-        <div class="pad">
-          <button data-key="left" aria-label="Vänster">◀</button
-          ><button data-key="right" aria-label="Höger">▶</button
-          ><button data-key="brake">Broms</button
-          ><button data-key="go">Fart</button>
-        </div>
+        <div class="ride-stick" role="group" aria-label="Styrspak. Dra uppåt för fart och nedåt för broms."><span></span></div>
         <div class="pad tricks">
           <button data-key="z">Z</button><button data-key="x">X</button
           ><button data-key="c">C</button><button data-key="jump">Hopp</button>
@@ -67,7 +63,8 @@
       <div id="dialogBody"></div>
       <button id="back">Tillbaka</button>
     </dialog>
+    <script src="../ride-stick.js?v=1"></script>
     <script src="../../js/vendor/three.min.js"></script>
-    <script type="module" src="./game.js"></script>
+    <script type="module" src="./game.js?v=ride-stick-1"></script>
   </body>
 </html>

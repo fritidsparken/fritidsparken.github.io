@@ -8,7 +8,7 @@ import {
   multi,
   score,
   clamp,
-} from "./model.js";
+} from "./model.js?v=ride-stick-1";
 import { World } from "./world.js";
 import { Sound } from "./audio.js";
 const $ = (id) => document.getElementById(id),
@@ -103,7 +103,18 @@ function event(type, val) {
     flash(p.summary + (prize ? " · Upplåst: " + prize[0] + "!" : ""), 4);
   }
 }
+const stick = createRideStick(document.querySelector(".ride-stick"));
+function rideKeys() {
+  return {
+    ...keys,
+    left: Math.max(Number(!!keys.left), -stick.x),
+    right: Math.max(Number(!!keys.right), stick.x),
+    go: Math.max(Number(!!keys.go), stick.y),
+    brake: Math.max(Number(!!keys.brake), -stick.y),
+  };
+}
 function clearKeys() {
+  stick.reset();
   sources.clear();
   for (const k of Object.keys(keys)) keys[k] = false;
   document
@@ -119,7 +130,7 @@ function input(source, k, down) {
   document
     .querySelector('[data-key="' + k + '"]')
     ?.classList.toggle("pressed", keys[k]);
-  if (keys[k] && !before) act(p, keys, k, event);
+  if (keys[k] && !before) act(p, rideKeys(), k, event);
 }
 function start() {
   try {
@@ -139,7 +150,7 @@ function start() {
   resumeAudio();
   flash(
     matchMedia("(pointer:coarse)").matches
-      ? "Håll Fart för att rulla. Tryck Hopp och sedan Z!"
+      ? "Spak uppåt: fart. Nedåt: broms. Tryck Hopp och sedan Z!"
       : "Håll W för fart. Hoppa med mellanslag och tryck Z för en kickflip!",
     6,
   );
@@ -191,7 +202,7 @@ function openPanel(id) {
       button("home", "Byt park eller utrustning");
   if (id === "guide") {
     html =
-      "<small>SKATE CLUB / HANDBOKEN</small><h2>Trickguide</h2><p>W / ↑ ger fart, S / ↓ bromsar. Styr med A/D eller ←/→. Hoppa med mellanslag. R återställer och Esc pausar. På pekskärm använder du knapparna med samma namn.</p><p>Hoppa längs ett räcke och håll trickknappen när du når det. Håll en manual efter landningen för att fortsätta serien. Släpp för att räkna poängen.</p>";
+      "<small>SKATE CLUB / HANDBOKEN</small><h2>Trickguide</h2><p>W / ↑ ger fart, S / ↓ bromsar. Styr med A/D eller ←/→. Hoppa med mellanslag. R återställer och Esc pausar. På mobilen styr du med spaken. Dra uppåt för fart och nedåt för broms.</p><p>Hoppa längs ett räcke och håll trickknappen när du når det. Håll en manual efter landningen för att fortsätta serien. Släpp för att räkna poängen.</p>";
     for (const [title, a, b] of [
       ["Hopp och rotation", 0, 10],
       ["Grind och slide", 10, 15],
@@ -370,9 +381,10 @@ function frame(now) {
   const dt = Math.min(0.08, (now - last) / 1000);
   last = now;
   const steps = Math.max(1, Math.ceil(dt * 90));
+  const controls = rideKeys();
   for (let i = 0; i < steps; i++)
-    tick(p, keys, parks[s.park], dt / steps, event);
-  world.draw(p, keys, dt);
+    tick(p, controls, parks[s.park], dt / steps, event);
+  world.draw(p, controls, dt);
   sound?.roll(p, s.park);
   $("total").textContent = number(p.total);
   $("best").textContent = number(s.best[s.park]);

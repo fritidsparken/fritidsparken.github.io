@@ -1,0 +1,28 @@
+#touch .ride-stick {
+  width: clamp(92px, 20vmin, 112px);
+  aspect-ratio: 1;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  grid-template-columns: 1fr;
+  flex: none;
+  border-radius: 50%;
+  background: #102226ab;
+  border: 2px solid #ffffff68;
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.ride-stick span {
+  width: 42%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #f4f6f1dc;
+  box-shadow: 0 2px 6px #0006;
+  pointer-events: none;
+}
+#touch {
+  left: max(12px, env(safe-area-inset-left));
+  right: max(12px, env(safe-area-inset-right));
+}

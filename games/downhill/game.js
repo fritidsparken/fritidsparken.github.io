@@ -91,7 +91,7 @@ function dialog(title, msg, buttons) {
 $("help").onclick = () =>
   dialog(
     "Så spelar du",
-    "Trampa med ↑ eller W. Bromsa med ↓ eller S. Styr med ← → eller A och D. På pekskärm kan du hålla in två knappar samtidigt.\n\nHoppa med mellanslag. Ramper ger automatiska hopp. I luften gör T nästa trick. Med 1–7 väljer du trick direkt. Avsluta tricket innan hjulen tar mark.\n\nC byter kamera. Esc pausar. Vid en vurpa börjar du vid senaste kontrollpunkten.",
+    "Trampa med ↑ eller W. Bromsa med ↓ eller S. Styr med ← → eller A och D. På mobilen styr du med spaken. Dra uppåt för fart och nedåt för broms. Du kan hoppa och göra trick med andra tummen.\n\nHoppa med mellanslag. Ramper ger automatiska hopp. I luften gör T nästa trick. Med 1–7 väljer du trick direkt. Avsluta tricket innan hjulen tar mark.\n\nC byter kamera. Esc pausar. Vid en vurpa börjar du vid senaste kontrollpunkten.",
     [["Tillbaka", () => {}]],
   );
 function toast(msg, d = 1.6) {
@@ -105,7 +105,9 @@ function toast(msg, d = 1.6) {
     { duration: 160 },
   );
 }
+const stick = createRideStick(document.querySelector(".ride-stick"));
 function clearInput() {
+  stick.reset();
   input.clear();
   held.clear();
   document.querySelectorAll(".on").forEach((b) => b.classList.remove("on"));
@@ -245,7 +247,7 @@ function start() {
             ? "Rekord " + best.score + " p"
             : "Landa trick för poäng"
           : "Utforska fritt";
-  toast(c.name + " · Kör!", 2);
+  toast(matchMedia("(pointer: coarse)").matches ? "Spak uppåt: fart · Nedåt: broms" : c.name + " · Kör!", 3);
   renderRide(1, true);
   frame = requestAnimationFrame(loop);
 }
@@ -341,8 +343,7 @@ document.querySelectorAll("[data-key]").forEach((b) => {
     b.classList.add("on");
     act(b.dataset.key, true, e.pointerId);
   };
-  b.onlostpointercapture = () => b.classList.remove("on");
-  b.onpointercancel = b.onpointerup = (e) => {
+  b.onlostpointercapture = b.onpointercancel = b.onpointerup = (e) => {
     b.classList.remove("on");
     act(b.dataset.key, false, e.pointerId);
   };
@@ -459,9 +460,9 @@ function ground(s, l) {
 function step(dt) {
   let q = run,
     b = q.b,
-    br = input.has("brake"),
-    ped = input.has("pedal"),
-    steer = Number(input.has("right")) - Number(input.has("left")),
+    br = Math.max(Number(input.has("brake")), -stick.y),
+    ped = Math.max(Number(input.has("pedal")), stick.y),
+    steer = clamp(Number(input.has("right")) - Number(input.has("left")) + stick.x, -1, 1),
     e = c.feature(q.s),
     mat =
       e?.type === "i"
@@ -479,9 +480,9 @@ function step(dt) {
     q.v +
       dt *
         (2.1 +
-          (ped ? 5 : 0) -
+          ped * 5 -
           slope * 10 -
-          (br ? 14 * b[4] : 0) -
+          br * 14 * b[4] -
           q.v * q.v * (mat === "lera" ? 0.025 : 0.014)),
     br ? 0 : 2.6,
     26 * b[1],
@@ -629,7 +630,7 @@ function renderRide(dt, snap = false) {
     q.compression,
     q.phase,
     q.trick,
-    input.has("pedal"),
+    input.has("pedal") || stick.y > 0,
   );
   mount.group.visible = view !== 2;
   let back = view === 2 ? -0.35 : view === 1 ? 3.8 : 6.2 + q.v * 0.055,

@@ -139,7 +139,7 @@ export function rider() {
     holdFactor: 1,
   };
 }
-const turn = (k) => Number(!!k.right) - Number(!!k.left);
+const turn = (k) => (k.right || 0) - (k.left || 0);
 export function add(p, id, emit) {
   const repeats = p.combo.filter((n) => n === id).length;
   p.holdFactor = 1 / (1 + repeats);
@@ -277,8 +277,8 @@ export function tick(p, k, park, dt, emit) {
     p.speed = clamp(
       p.speed +
         dt *
-          ((k.go ? 6.9 : 0) -
-            (k.brake ? 13 : 0) -
+          ((k.go || 0) * 6.9 -
+            (k.brake || 0) * 13 -
             drag -
             p.speed * 0.085 -
             p.slope * 8),

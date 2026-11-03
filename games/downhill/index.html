@@ -9,6 +9,7 @@
     <meta name="theme-color" content="#111d20" />
     <title>DOWNHILL · Fritidsparken</title>
     <link rel="stylesheet" href="style.css?v=trail-preview-2" />
+    <link rel="stylesheet" href="../ride-stick.css?v=1" />
   </head>
   <body>
     <main id="lobby">
@@ -71,14 +72,9 @@
       <div id="raceGoal"></div>
       <div id="toast" role="status"></div>
       <div id="touch">
+        <div class="ride-stick" role="group" aria-label="Styrspak. Dra uppåt för fart och nedåt för broms."><span></span></div>
         <div>
-          <button data-key="left" aria-label="Vänster">◀</button
-          ><button data-key="right" aria-label="Höger">▶</button>
-        </div>
-        <div>
-          <button data-key="brake">Broms</button
-          ><button data-key="pedal">Trampa</button
-          ><button data-key="jump">Hopp</button
+          <button data-key="jump">Hopp</button
           ><button data-key="trick">Trick</button>
         </div>
       </div>
@@ -93,11 +89,12 @@
       <p id="message"></p>
       <div id="choices"></div>
     </dialog>
+    <script src="../ride-stick.js?v=1"></script>
     <script src="../../js/vendor/three.min.js"></script>
     <script src="courses.js"></script>
-    <script src="world.js"></script>
+    <script src="world.js?v=ride-stick-1"></script>
     <script src="rider.js"></script>
     <script src="audio.js"></script>
-    <script src="game.js"></script>
+    <script src="game.js?v=ride-stick-1"></script>
   </body>
 </html>
