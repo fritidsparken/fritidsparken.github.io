@@ -49,7 +49,7 @@
     const tailWheel=mesh(new T.CylinderGeometry(.12,.12,.1,10),dark,plane,0,-.35,1.55);tailWheel.rotation.z=Math.PI/2;
     const cowling=mesh(new T.CylinderGeometry(.33,.37,.36,20),trim,plane,0,.12,-1.78);cowling.rotation.x=Math.PI/2;
     plane.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});
-    let lodCrowns=[],riverMaterial;let worldGroup,worldRef,terrainMesh,water,windViews=[],coinViews=[],clouds=[],windsocks=[],parks=[],burst,previewMode=false,frame=0,slow=0,dead=false,reflection;
+    let lodCrowns=[],riverMaterial,sky;let worldGroup,worldRef,terrainMesh,water,windViews=[],coinViews=[],clouds=[],windsocks=[],parks=[],burst,previewMode=false,frame=0,slow=0,dead=false,reflection;
     const target=new T.Vector3(),look=new T.Vector3(),cameraGoal=new T.Vector3();let cameraReady=false;
     const persistentGeometry=new Set(geometries);
     const controls=[];for(const side of [-1,1]){const a=box(1.6,.05,.22,white,plane,side*2.1,.06,.42);controls.push(a);}
@@ -85,13 +85,13 @@
     }
     function build(w){
       if(worldGroup){scene.remove(worldGroup);worldGroup.traverse(o=>{if(o.material?.userData.transient){o.material.dispose();materials.delete(o.material);}if(o.geometry&&!persistentGeometry.has(o.geometry)){o.geometry.dispose();geometries.delete(o.geometry);}});}
-      worldTextures.forEach(t=>{t.dispose();textures.delete(t);});worldTextures.clear();lodCrowns=[];worldRef=w;windViews=[];coinViews=[];clouds=[];windsocks=[];parks=[];cameraReady=false;worldGroup=new T.Group();scene.add(worldGroup);
+      worldTextures.forEach(t=>{t.dispose();textures.delete(t);});worldTextures.clear();sky=null;lodCrowns=[];worldRef=w;windViews=[];coinViews=[];clouds=[];windsocks=[];parks=[];cameraReady=false;worldGroup=new T.Group();scene.add(worldGroup);
       const c=w.c;const terrainHeight=(x,d)=>P.terrain(x,d,w.stage)+Math.max(0,Math.abs(x)-210)*(.18+w.stage*.025)*(1+.25*Math.sin(d*.012));scene.background.set(c.sky);
       const themes=[['#688746','#305537'],['#718070','#244c42'],['#849064','#375848'],['#807044','#804d2a'],['#62766a','#294e47']];
       const foliage=themes[w.stage][1];
       hemi.intensity=w.stage===3?1.05:1.3;sun.intensity=w.stage===3?2.6:3.2;
       if(!software){
-        const skyMat=new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms:{top:{value:new T.Color(w.stage===3?'#4e627f':'#416f9e')},horizon:{value:new T.Color(c.fog)},warm:{value:new T.Color(c.sun)}},vertexShader:'varying vec3 v;void main(){v=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'varying vec3 v;uniform vec3 top,horizon,warm;void main(){vec3 n=normalize(v);float h=clamp(n.y*1.8,0.,1.);vec3 col=mix(horizon,top,pow(h,.6));float glow=pow(max(0.,dot(n,normalize(vec3(-.4,.22,-1.)))),28.);col+=warm*glow*.3;gl_FragColor=vec4(col,1.);}' });skyMat.userData.transient=true;materials.add(skyMat);const sky=mesh(new T.SphereGeometry(2100,32,16),skyMat,worldGroup,0,0,-c.length/2);sky.renderOrder=-10;
+        const skyMat=new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms:{top:{value:new T.Color(w.stage===3?'#4e627f':'#416f9e')},horizon:{value:new T.Color(c.fog)},warm:{value:new T.Color(c.sun)}},vertexShader:'varying vec3 v;void main(){v=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'varying vec3 v;uniform vec3 top,horizon,warm;void main(){vec3 n=normalize(v);float h=clamp(n.y*1.8,0.,1.);vec3 col=mix(horizon,top,pow(h,.6));float glow=pow(max(0.,dot(n,normalize(vec3(-.4,.22,-1.)))),28.);col+=warm*glow*.3;gl_FragColor=vec4(col,1.);}' });skyMat.userData.transient=true;materials.add(skyMat);sky=mesh(new T.SphereGeometry(800,48,24),skyMat,worldGroup);sky.frustumCulled=false;sky.renderOrder=-10;
       }
 scene.fog.color.set(c.fog);sun.color.set(c.sun);hemi.groundColor.set(c.grass);
       const span=c.length+800,segmentsX=software?24:settings.detail,segmentsZ=software?40:Math.ceil(span/8);
@@ -158,7 +158,7 @@ cloudMat.userData.cloud=true;
       if(!software){
         // One static capture per course supplies terrain/sky reflections to water and metal.
         scene.environment=null;reflection?.dispose();reflection=new T.WebGLCubeRenderTarget(128,{generateMipmaps:true,minFilter:T.LinearMipmapLinearFilter});
-        const capture=new T.CubeCamera(1,2400,reflection);capture.position.set(65,24,-c.length*.52);water.visible=false;plane.visible=false;
+        const capture=new T.CubeCamera(1,2400,reflection);capture.position.set(65,24,-c.length*.52);sky.position.copy(capture.position);water.visible=false;plane.visible=false;
         capture.update(renderer,scene);water.visible=true;plane.visible=true;scene.environment=reflection.texture;
       }
     }
@@ -170,7 +170,7 @@ cloudMat.userData.cloud=true;
       if(opt.preview){cameraGoal.set(8,8,-5);target.set(-2,4.5,-20);}else if(s.phase==='rollout'||s.phase==='done'){cameraGoal.set(s.x+16,s.y+6,-s.d+15);target.set(s.x,s.y,-s.d-5);}else{cameraGoal.set(s.x-s.vx*.17,s.y+(farCamera?10:6.5),-s.d+(farCamera?29:19));target.set(s.x+s.vx*.35,s.y+1,-s.d-30);}
       // Terrain also constrains the camera, avoiding underground viewpoints.
       cameraGoal.y=Math.max(cameraGoal.y,P.terrain(cameraGoal.x,-cameraGoal.z,s.stage)+3);
-      if(!cameraReady){camera.position.copy(cameraGoal);look.copy(target);cameraReady=true;}else{camera.position.lerp(cameraGoal,1-Math.exp(-opt.dt*5));look.lerp(target,1-Math.exp(-opt.dt*6));}camera.lookAt(look);camera.rotateZ(-s.roll*.08);
+      if(!cameraReady){camera.position.copy(cameraGoal);look.copy(target);cameraReady=true;}else{camera.position.lerp(cameraGoal,1-Math.exp(-opt.dt*5));look.lerp(target,1-Math.exp(-opt.dt*6));}camera.lookAt(look);camera.rotateZ(-s.roll*.08);if(sky)sky.position.copy(camera.position);
       sun.position.set(plane.position.x-100,plane.position.y+170,plane.position.z+65);sun.target.position.copy(plane.position);
       for(let i=0;i<windViews.length;i++)windViews[i].rotation.z=s.world.winds[i].angle;
       for(let i=0;i<coinViews.length;i++){coinViews[i].visible=!s.world.coins[i].taken;coinViews[i].rotation.y=s.time*1.4+i*.2;}
