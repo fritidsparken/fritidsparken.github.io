@@ -1,3 +1,4 @@
+import { loadHarbor } from "./harbor.js";
 import {
   parks,
   height,
@@ -30,7 +31,7 @@ function canvasTex(w, h, draw) {
   t.colorSpace = T.SRGBColorSpace;
   return t;
 }
-function noise() {
+function noise(courtyard) {
   let seed = 19;
   const t = canvasTex(192, 192, (c) => {
     const d = c.createImageData(192, 192);
@@ -40,6 +41,25 @@ function noise() {
       d.data.set([n, n, n, 255], i);
     }
     c.putImageData(d, 0, 0);
+    if (courtyard) {
+      // Patchy aggregate and fine wheel marks in the slab finish.
+      for (let j = 0; j < 32; j++) {
+        const x = (j * 73) % 192, y = (j * 43) % 192;
+        const cloud = c.createRadialGradient(x, y, 0, x, y, 18);
+        cloud.addColorStop(0, "rgba(72,66,58,.09)");
+        cloud.addColorStop(1, "rgba(72,66,58,0)");
+        c.fillStyle = cloud;
+        c.fillRect(x - 18, y - 18, 36, 36);
+      }
+      c.strokeStyle = "rgba(64,62,57,.14)";
+      c.lineWidth = 0.8;
+      for (let j = 0; j < 4; j++) {
+        c.beginPath();
+        c.moveTo(78 + j, 43);
+        c.quadraticCurveTo(90 + j, 61, 116 + j, 65);
+        c.stroke();
+      }
+    }
     c.strokeStyle = "#a6a5a1";
     c.lineWidth = 1.1;
     c.strokeRect(0, 0, 192, 192);
@@ -59,8 +79,9 @@ function plaza(park, scene) {
   const pos = geo.attributes.position,
     colors = [],
     uv = geo.attributes.uv;
-  const plain = new T.Color(park.floor),
-    stripe = new T.Color(park.ink),
+  const courtyard = park === parks[0];
+  const plain = new T.Color(courtyard ? 0xbdbab2 : park.floor),
+    stripe = new T.Color(courtyard ? 0x8e9691 : park.ink),
     color = new T.Color();
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i),
@@ -93,10 +114,33 @@ function plaza(park, scene) {
   geo.computeVertexNormals();
   const floor = new T.Mesh(
     geo,
-    mat(0xffffff, { map: noise(), vertexColors: true }),
+    mat(0xffffff, { map: noise(courtyard), vertexColors: true }),
   );
   floor.receiveShadow = true;
   scene.add(floor);
+}
+function harborSky() {
+  return canvasTex(1024, 512, (c) => {
+    const sky = c.createLinearGradient(0, 0, 0, 512);
+    sky.addColorStop(0, "#6195b4");
+    sky.addColorStop(0.35, "#92b9ce");
+    sky.addColorStop(0.52, "#d8e2df");
+    sky.addColorStop(1, "#879795");
+    c.fillStyle = sky;
+    c.fillRect(0, 0, 1024, 512);
+    for (let j = 0; j < 28; j++) {
+      const x = (j * 139) % 1024, y = 170 + 18 * Math.sin(j * 4.7);
+      c.save();
+      c.translate(x, y);
+      c.scale(4, 0.58);
+      const wisp = c.createRadialGradient(0, 0, 2, 0, 0, 19);
+      wisp.addColorStop(0, "rgba(255,253,244,.22)");
+      wisp.addColorStop(1, "rgba(255,253,244,0)");
+      c.fillStyle = wisp;
+      c.fillRect(-19, -19, 38, 38);
+      c.restore();
+    }
+  });
 }
 function skylineTexture(i) {
   return canvasTex(1024, 256, (c) => {
@@ -142,7 +186,7 @@ function mural(i) {
     c.fillText("FRITIDSPARKEN", 48, 122, 496);
     c.font = "bold 26px sans-serif";
     c.fillText(
-      ["01   /   GÅRDEN", "02   /   STRANDEN", "03   /   MAGASINET"][i],
+      ["01   /   STADSGÅRDEN", "02   /   STRANDEN", "03   /   MAGASINET"][i],
       52,
       207,
     );
@@ -185,17 +229,17 @@ function environment(scene, park, i) {
     );
   }
   plaza(park, scene);
-  const land = i === 1 ? 0xe3bc90 : i === 2 ? 0x464256 : 0x91a164;
+  const land = i === 1 ? 0xe3bc90 : i === 2 ? 0x464256 : 0x98968c;
   for (const side of [-1, 1]) {
     box(land, side * (halfWidth + 13), -0.35, 0, 26, 0.58, halfDepth * 2 + 12);
-    box(land, 0, -0.35, side * (halfDepth + 6), halfWidth * 2, 0.58, 12);
+    if (i !== 0 || side > 0) box(land, 0, -0.35, side * (halfDepth + 6), halfWidth * 2, 0.58, 12);
   }
 
   for (const r of park.rails) {
     let a = railPoint(park, r, 0);
     for (let n = 1; n <= 16; n++) {
       const b = railPoint(park, r, n / 16);
-      bar(a, b, 0.13, park.rail);
+      bar(a, b, 0.13, i === 0 ? 0x9a9fa0 : park.rail);
       if (n % 5 === 1)
         bar([b[0], height(park, b[0], b[2]) - 0.04, b[2]], b, 0.09, 0x52646a);
       a = b;
@@ -248,6 +292,8 @@ function environment(scene, park, i) {
       scene.add(new T.Mesh(g, mat(0xffeace, { side: T.DoubleSide })));
       ball(0x385873, x, 0.1, -halfDepth - 24, 2.8, 0.37, 0.7);
     }
+  } else if (i === 0) {
+    loadHarbor(scene).catch(error => console.warn("Stadsgården", error));
   } else {
     const facade = mat(0xffffff, { map: skylineTexture(i) });
     for (let j = 0; j < 3; j++) {
@@ -524,6 +570,7 @@ export class World {
   }
   build(i, shirt, deck, q) {
     if (this.scene) {
+      this.scene.userData.disposed = true;
       const materials = new Set(),
         geometry = new Set();
       this.scene.traverse((o) => {
@@ -543,7 +590,7 @@ export class World {
     const park = parks[i];
     this.park = park;
     this.scene = new T.Scene();
-    const sky = new T.TextureLoader().load("vista-" + i + ".webp");
+    const sky = i === 0 ? harborSky() : new T.TextureLoader().load("vista-" + i + ".webp");
     sky.mapping = T.EquirectangularReflectionMapping;
     sky.colorSpace = T.SRGBColorSpace;
     this.scene.background = sky;
@@ -559,7 +606,7 @@ export class World {
       i === 2 ? 0xb3cbff : 0xffe3b5,
       i === 2 ? 1.65 : 2.05,
     );
-    sun.position.set(-36, 82, 42);
+    sun.position.set(-36, i === 0 ? 47 : 82, 42);
     sun.castShadow = true;
     Object.assign(sun.shadow.camera, {
       left: -80,
