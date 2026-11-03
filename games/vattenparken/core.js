@@ -59,7 +59,9 @@
       this.events=[]; if(this.done) return this.events;
       dt=clamp(dt,0,.05);const c=this.course,old=this.distance/c.length;
       const slope=-c.frame(old).tangent.y;
-      const target=c.pace+slope*13+(input.forward?3.5:0)-(input.brake?6:0)+(this.boostTime>0?12:0);
+      const bend=1-c.frame(Math.min(1,old+4/c.length)).tangent.dot(c.frame(old).tangent);
+      const runout=clamp((old-.94)/.06,0,1);
+      const target=c.pace*(1-.43*runout)+slope*13-Math.min(3,bend*16)+(input.forward?3.5:0)-(input.brake?6:0)+(this.boostTime>0?12:0);
       this.speed += (target-this.speed)*Math.min(1,dt*1.8);this.speed=clamp(this.speed,5,37);
       this.lateral += ((input.steer||0)*5.6-this.lateral)*Math.min(1,dt*12);
       this.lane=clamp(this.lane+this.lateral*dt,-2.6,2.6);this.time+=dt;
@@ -79,10 +81,11 @@
     }
   }
   function cleanSave(value) {
-    const s={version:2,unlocked:1,records:{},sound:true,music:true,quality:'auto',secret:false};
+    const s={version:2,unlocked:1,records:{},sound:true,music:true,soundLevel:.30,musicLevel:.72,quality:'auto',secret:false};
     if(!value||typeof value!=='object')return s;
     s.unlocked=Number.isInteger(value.unlocked)?clamp(value.unlocked,1,6):1;
     for(const key of ['sound','music','secret'])if(typeof value[key]==='boolean')s[key]=value[key];
+    for(const key of ['soundLevel','musicLevel'])if(Number.isFinite(value[key]))s[key]=clamp(value[key],0,1);
     if(['auto','low','medium','high'].includes(value.quality))s.quality=value.quality;
     for(let i=0;i<6;i++){const r=value.records?.[i];if(r&&Number.isFinite(r.time)&&r.time>0&&Number.isFinite(r.stars)){s.records[i]={time:r.time,stars:clamp(r.stars,0,24),rating:clamp(Math.floor(r.rating||1),1,3),score:Math.max(0,Number.isFinite(r.score)?r.score:0)};}}
     return s;
