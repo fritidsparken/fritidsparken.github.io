@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#142326" />
+    <title>Skatepark · Fritidsparken</title>
+    <link rel="icon" href="../../assets/game-icons-2026/new-skatepark.webp" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <canvas id="game" aria-label="Skatepark i 3D"></canvas>
+    <main id="menu">
+      <section class="shell">
+        <header>
+          <a href="../../">← Fritidsparken</a
+          ><b>FP &nbsp; / &nbsp; SKATE CLUB</b>
+        </header>
+        <div id="hero">
+          <div class="hero-copy">
+            <small>FRI ÅKNING &nbsp; / &nbsp; VOL. 01</small>
+            <h1>SKATEPARK<span>®</span></h1>
+            <p>Din bräda. Din linje.</p>
+          </div>
+        </div>
+        <div class="content">
+          <div class="heading">
+            <h2>Välj skatepark</h2>
+            <small>01 — 03</small>
+          </div>
+          <div id="parks"></div>
+          <div class="actions">
+            <button class="primary" id="play">Spela &nbsp; ▶</button
+            ><button data-panel="guide">Trickguide</button
+            ><button data-panel="kit">Min utrustning</button
+            ><button data-panel="settings">Inställningar</button>
+          </div>
+          <p id="error" role="alert"></p>
+        </div>
+      </section>
+    </main>
+    <div id="ride" hidden>
+      <div class="stats">
+        <div><small>POÄNG</small><strong id="total">0</strong></div>
+        <div><small>REKORD</small><strong id="best">0</strong></div>
+      </div>
+      <button id="pause" aria-label="Pausa">Ⅱ</button>
+      <div id="message"></div>
+      <div id="touch">
+        <div class="pad">
+          <button data-key="left" aria-label="Vänster">◀</button
+          ><button data-key="right" aria-label="Höger">▶</button
+          ><button data-key="brake">Broms</button
+          ><button data-key="go">Fart</button>
+        </div>
+        <div class="pad tricks">
+          <button data-key="z">Z</button><button data-key="x">X</button
+          ><button data-key="c">C</button><button data-key="jump">Hopp</button>
+        </div>
+      </div>
+      <button id="reset" aria-label="Återställ åkaren">↺</button>
+    </div>
+    <dialog id="dialog">
+      <div id="dialogBody"></div>
+      <button id="back">Tillbaka</button>
+    </dialog>
+    <script src="../../js/vendor/three.min.js"></script>
+    <script type="module" src="./game.js"></script>
+  </body>
+</html>

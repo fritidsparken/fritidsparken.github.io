@@ -1,5 +1,6 @@
 (() => {
   const games=[
+    {id:'skatepark',title:'Skatepark',tag:'HITTA DITT FLYT',type:'3D · Skateboard',image:'game-icons-2026/new-skatepark.webp',text:'Åk fritt i tre parker. Sätt din första kickflip, grinda ett räcke och bygg din egen trickserie.',url:'./games/skatepark/'},
     {id:'downhill',title:'DOWNHILL',tag:'HITTA DIN LINJE',type:'3D · Mountainbike',image:'game-icons-2026/new-downhill.webp',text:'Cykla från alpängar till neonramper på 20 leder. Välj cykel, hoppa över raviner och landa trick.',url:'./games/downhill/'},
     {id:'kart',title:'Kart Racing',tag:'DIN PLATS PÅ STARTLINJEN',type:'3D · Racing',image:'game-icons-2026/new-kart.webp',text:'Drifta genom tolv världar, samla föremål och tävla om tre cuper med åtta gokarts.',url:'./games/kart-racing/'},
     {id:'minigolf',title:'Minigolf',tag:'18 HÅL. SEX VÄRLDAR.',type:'3D · Minigolf',image:'game-icons-2026/new-minigolf.webp',text:'Spela 18 galna minigolfhål genom piratvärldar, djungel, godisland, rymden och vulkaner!',module:'FPMinigolf'},
