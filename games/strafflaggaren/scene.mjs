@@ -1,7 +1,7 @@
-import {softwareRenderer} from './software.mjs?v=matchday-20261103';
-import {keeperPose} from './physics.mjs?v=matchday-20261103';
+import {softwareRenderer} from './software.mjs?v=keeper-click-20261103';
+import {keeperPose} from './physics.mjs?v=keeper-click-20261103';
 import {createStadium} from './stadium.mjs';
-import {createPlayers,createMatchBall} from './players.mjs';
+import {createPlayers,createMatchBall} from './players.mjs?v=keeper-click-20261103';
 
 const T=window.THREE;
 const smooth=(rate,dt)=>1-Math.exp(-rate*dt);

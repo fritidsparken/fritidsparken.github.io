@@ -50,8 +50,22 @@ function human(T,scene,keeper,materials) {
     }
   }
   function surface(b,m,rings,segments=20,next=null,rowStep=1){
+    const garment=m===materials.kit||m===materials.red||m===materials.shorts||m===materials.keeperShorts||m===materials.socks;
+    if(garment&&rings.length>2){
+      // Interpolate the cloth profile so hems, shoulders and shorts curve continuously.
+      const profile=rings.map(r=>Array.from({length:6},(_,i)=>r[i]||0)), rounded=[];
+      for(let k=0;k<profile.length-1;k++)for(let step=0;step<3;step++){
+        const t=step/3,p0=profile[Math.max(0,k-1)],p1=profile[k],p2=profile[k+1],p3=profile[Math.min(profile.length-1,k+2)];
+        rounded.push(p1.map((v,i)=>{
+          if(i===0||i===5)return v+(p2[i]-v)*t;
+          const value=.5*((2*v)+(-p0[i]+p2[i])*t+(2*p0[i]-5*v+4*p2[i]-p3[i])*t*t+(-p0[i]+3*v-3*p2[i]+p3[i])*t*t*t);
+          return i===1||i===2?Math.max(.001,value):value;
+        }));
+      }
+      rounded.push(profile.at(-1));rings=rounded;segments=36;
+    }
     const d=batch(m),base=d.xyz.length/3, o=origin.get(b);
-    coarse(d,base,segments,rings.length,segments>=20?2:Math.max(1,Math.floor(segments/8)),rowStep);
+    coarse(d,base,segments,rings.length,garment?1:segments>=20?2:Math.max(1,Math.floor(segments/8)),rowStep);
     for(let k=0;k<rings.length;k++){
       const [y,rx,rz,x=0,z=0,w=0]=rings[k];
       for(let j=0;j<=segments;j++){
@@ -127,7 +141,19 @@ function human(T,scene,keeper,materials) {
     const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(d.xyz,3));
     geo.setAttribute('uv',new T.Float32BufferAttribute(d.uv,2));
     geo.setAttribute('skinIndex',new T.Uint16BufferAttribute(d.joints,4));geo.setAttribute('skinWeight',new T.Float32BufferAttribute(d.weights,4));
-    geo.userData.softwareIndices=new Uint16Array(d.lod);geo.setIndex(d.indices);geo.computeVertexNormals();const mesh=new T.SkinnedMesh(geo,material);
+    geo.userData.softwareIndices=new Uint16Array(d.lod);geo.setIndex(d.indices);geo.computeVertexNormals();
+    const normals=geo.attributes.normal,positions=geo.attributes.position,seams=new Map();
+    for(let i=0;i<positions.count;i++){
+      const key=[positions.getX(i),positions.getY(i),positions.getZ(i)].map(v=>v.toFixed(6)).join(',');
+      if(!seams.has(key))seams.set(key,[]);seams.get(key).push(i);
+    }
+    for(const ids of seams.values()){
+      if(ids.length<2)continue;
+      const normal=new T.Vector3();
+      for(const i of ids)normal.add(new T.Vector3().fromBufferAttribute(normals,i));
+      normal.normalize();for(const i of ids)normals.setXYZ(i,normal.x,normal.y,normal.z);
+    }
+    const mesh=new T.SkinnedMesh(geo,material);
     mesh.castShadow=true;mesh.receiveShadow=true;mesh.frustumCulled=false;turn.add(mesh);mesh.bind(skeleton,new T.Matrix4());
   }
   const decal=new T.Mesh(new T.PlaneGeometry(.259,.246),print(T,keeper?1:10,keeper));

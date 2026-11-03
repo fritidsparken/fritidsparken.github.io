@@ -1,6 +1,6 @@
-import {clamp,winner,launch,step,swipe,keeperPose} from './physics.mjs?v=matchday-20261103';
+import {clamp,winner,launch,step,swipe,keeperPose} from './physics.mjs?v=keeper-click-20261103';
 import {arenaAudio} from './audio.mjs';
-import {createWorld} from './scene.mjs?v=matchday-20261103';
+import {createWorld} from './scene.mjs?v=keeper-click-20261103';
 const $=s=>document.querySelector(s), overlay=$('#overlay'),KEY='fp-strafflaggaren-v1';
 let data={wins:0,xp:0,ball:0,kit:0,gloves:0,net:0,arena:0,record:0,completed:[],tutorial:false,sound:true};
 let storedDifficulty;
@@ -26,13 +26,13 @@ function levelMax(){return arenas.length-1;}
 function applyCosmetics(){data.ball=clamp(data.ball,0,4);data.kit=clamp(data.kit,0,2);data.gloves=clamp(data.gloves,0,2);data.net=clamp(data.net,0,1);world.cosmetics(data.ball,data.kit,data.gloves,data.net);}
 function menu(){paused=false;arenaAudio.pause(false);resetPointer();replayCursor=-1;state.phase='menu';state.role='shoot';state.ball=null;state.keeper={tx:0,ty:.94,time:0};$('#hud').hidden=true;$('#feedback').textContent='';world.view('shoot');data.arena=clamp(data.arena,0,levelMax());world.setArena(data.arena);applyCosmetics();
  panel(`<span class="eyebrow">FRITIDSPARKENS FOTBOLLSKLUBB</span><h1>STRAFF<span style="color:#d4f86e">LÄGGAREN</span></h1><p class="lead">Skjut för Fritidsparken och ställ dig sedan i mål.<br>Fem straffar var avgör matchen.</p><button class="primary wide" data-play="match">SPELA MATCH <span style="float:right">⚽ →</span></button><div class="grid"><button data-play="practice">🎯 Träning<small>Hitta ditt perfekta skott</small></button><button data-play="keeper">🧤 Målvaktsträning<small>Gör matchens räddning</small></button><button data-action="challenges">✨ Utmaningar<small>${data.completed.length} av 5 avklarade</small></button><button data-action="collection">⚽ Mina bollar & ställ<small>Spela och lås upp</small></button></div><label>Svårighet<select id="difficulty"><option value="0">Lätt</option><option value="1">Medel</option><option value="2">Svår</option><option value="3">Mycket svår</option></select></label><label>Arena<select id="arena">${arenas.map((a,i)=>`<option value="${i}" ${i>levelMax()?'disabled':''}>${a}${i>levelMax()?` · ${i*12} poäng 🔒`:''}</option>`).join('')}</select></label><button class="wide" data-action="help">Så spelar du →</button>${arenaAudio.controls()}<p class="footnote">${data.wins} vunna matcher · ${data.xp} spelpoäng · Rekord ${data.record} km/h<br>Inga köp. Inget konto. Bara fotboll.</p>`);$('#difficulty').value=difficulty;$('#arena').value=data.arena;}
-function help(nextMode=null){pendingMode=nextMode;panel(`<span class="eyebrow">EN MINUT TILL AVSPARK</span><h1>DIN <em>TUR!</em></h1><ol class="tutorial"><li><strong>Sikta.</strong> Peka mot målet med musen. På pekskärm börjar du ditt svep vid bollen.</li><li><strong>Skjut.</strong> Håll musknappen för att ladda och släpp för att skjuta. På pekskärm ger ett längre svep mer kraft.</li><li><strong>Skruva.</strong> Böj ditt svep för skruv. Med musen kan du också hålla Skift och dra i sidled.</li><li><strong>Rädda.</strong> Tryck ”Jag är redo”. Flytta dig med musen eller piltangenterna. Klicka, svep eller tryck mellanslag för att kasta dig. Tidpunkten spelar roll.</li></ol><p>Fem straffar var. Flest mål vinner! Vid lika resultat får båda ett nytt försök. Matchen slutar tidigare om ett lag inte kan komma ikapp.</p><button class="primary wide" data-action="tutorialDone">${nextMode?'DIN TUR!':'TILLBAKA'}</button>${nextMode?'<button class="wide" data-action="tutorialDone">Hoppa över</button>':''}`);}
+function help(nextMode=null){pendingMode=nextMode;panel(`<span class="eyebrow">EN MINUT TILL AVSPARK</span><h1>DIN <em>TUR!</em></h1><ol class="tutorial"><li><strong>Sikta.</strong> Peka mot målet med musen. På pekskärm börjar du ditt svep vid bollen.</li><li><strong>Skjut.</strong> Håll musknappen för att ladda och släpp för att skjuta. På pekskärm ger ett längre svep mer kraft.</li><li><strong>Skruva.</strong> Böj ditt svep för skruv. Med musen kan du också hålla Skift och dra i sidled.</li><li><strong>Rädda.</strong> Motståndaren skjuter automatiskt. Klicka eller tryck i målet där målvakten ska rädda. Tidpunkten spelar roll.</li></ol><p>Fem straffar var. Flest mål vinner! Vid lika resultat får båda ett nytt försök. Matchen slutar tidigare om ett lag inte kan komma ikapp.</p><button class="primary wide" data-action="tutorialDone">${nextMode?'DIN TUR!':'TILLBAKA'}</button>${nextMode?'<button class="wide" data-action="tutorialDone">Hoppa över</button>':''}`);}
 function start(m){mode=m;paused=false;overlay.innerHTML='';match={a:[],b:[]};stats={shots:0,goals:0,saves:0,faced:0,best:0};streak=0;wonChallenge=false;$('#hud').hidden=false;prepare();}
-function prepare(){resetPointer();keeperX=positionGoal=0;recording=[];replayCursor=-1;replayOffered=false;landingSound=false;stepIndex=-1;$('#replay').hidden=true;state.role=mode==='keeper'||(mode==='challenge'&&challenge===4)||(mode==='match'&&match.a.length>match.b.length)?'save':'shoot';state.phase='aim';state.clock=0;state.ball=null;state.keeper={tx:0,ty:.94,time:0};state.power=20;shot=null;aiActed=false;hitSound=false;saveSound=false;netSound=false;input=[];pointer=null;$('#swipePath').setAttribute('d','');$('#feedback').textContent='';$('#next').hidden=true;$('#ready').hidden=false;$('#ready').textContent=state.role==='shoot'?'JAG ÄR REDO ⚽':'JAG ÄR REDO 🧤';world.view(state.role);world.target.visible=false;hud();audio('whistle');}
+function prepare(){resetPointer();keeperX=positionGoal=0;recording=[];replayCursor=-1;replayOffered=false;landingSound=false;stepIndex=-1;$('#replay').hidden=true;state.role=mode==='keeper'||(mode==='challenge'&&challenge===4)||(mode==='match'&&match.a.length>match.b.length)?'save':'shoot';state.phase='aim';state.clock=0;state.ball=null;state.keeper={tx:0,ty:.94,time:0};state.power=20;shot=null;aiActed=false;hitSound=false;saveSound=false;netSound=false;input=[];pointer=null;$('#swipePath').setAttribute('d','');$('#feedback').textContent='';$('#next').hidden=true;$('#ready').hidden=state.role==='save';$('#ready').textContent='JAG ÄR REDO ⚽';world.view(state.role);world.target.visible=false;hud();audio('whistle');}
 function decisive(){if(mode!=='match')return false;const a=match.a.filter(Boolean).length,b=match.b.filter(Boolean).length;const aa=[...match.a],bb=[...match.b];(state.role==='shoot'?aa:bb).push(true);if(winner(aa,bb)!==null)return true;(state.role==='shoot'?aa:bb)[(state.role==='shoot'?aa:bb).length-1]=false;return winner(aa,bb)!==null;}
 function hud(){const a=match.a.filter(Boolean).length,b=match.b.filter(Boolean).length;$('#score').textContent=mode==='match'?`${a} : ${b}`:`${stats.goals} ⚽ ${stats.saves} 🧤`;const dots=ar=>Array.from({length:Math.max(5,ar.length)},(_,i)=>`<i class="dot ${i<ar.length?(ar[i]?'goal':'miss'):''}" title="${i<ar.length?(ar[i]?'Mål':'Miss'):'Återstår'}"></i>`).join('');
-$('#homeDots').innerHTML=dots(match.a);$('#awayDots').innerHTML=dots(match.b);world.score(a,b);$('#badge').textContent=mode==='challenge'?tasks[challenge]:decisive()?'AVGÖRANDE STRAFF!':mode==='match'&&match.b.length>=5?'SUDDEN DEATH · ETT FÖRSÖK VAR':arenas[data.arena]+' · '+levels[difficulty];$('#round').textContent=mode==='match'?`STRAFF ${Math.min(match.a.length,match.b.length)+1} · ${match.b.length>=5?'SUDDEN DEATH':'FEM FÖRSÖK VAR'}`:`${stats.shots} SKOTT · ${stats.faced} MÖTTA · ${stats.shots?Math.round(stats.goals/stats.shots*100):0}% MÅL`;$('#turn').textContent=state.role==='shoot'?'SKJUT! ⚽':'RÄDDA! 🧤';$('#hint').textContent=state.role==='shoot'?(matchMedia('(pointer: coarse)').matches?'Svep från bollen mot målet. Böj för skruv.':'Sikta med musen. Håll för kraft och släpp för att skjuta.'):'Tryck redo. Läs skottet och svep åt rätt håll!';}
-function beginRun(s){shot=s;state.phase='run';state.clock=0;state.power=s.speed;world.target.visible=false;$('#ready').hidden=true;$('#hint').textContent=state.role==='save'?'Läs ansatsen. Svep åt rätt håll – eller stå kvar!':'Vilket skott blir det?';}
+$('#homeDots').innerHTML=dots(match.a);$('#awayDots').innerHTML=dots(match.b);world.score(a,b);$('#badge').textContent=mode==='challenge'?tasks[challenge]:decisive()?'AVGÖRANDE STRAFF!':mode==='match'&&match.b.length>=5?'SUDDEN DEATH · ETT FÖRSÖK VAR':arenas[data.arena]+' · '+levels[difficulty];$('#round').textContent=mode==='match'?`STRAFF ${Math.min(match.a.length,match.b.length)+1} · ${match.b.length>=5?'SUDDEN DEATH':'FEM FÖRSÖK VAR'}`:`${stats.shots} SKOTT · ${stats.faced} MÖTTA · ${stats.shots?Math.round(stats.goals/stats.shots*100):0}% MÅL`;$('#turn').textContent=state.role==='shoot'?'SKJUT! ⚽':'RÄDDA! 🧤';$('#hint').textContent=state.role==='shoot'?(matchMedia('(pointer: coarse)').matches?'Svep från bollen mot målet. Böj för skruv.':'Sikta med musen. Håll för kraft och släpp för att skjuta.'):'Motståndaren skjuter strax. Tryck där du vill rädda!';}
+function beginRun(s){shot=s;state.phase='run';state.clock=0;state.power=s.speed;world.target.visible=false;$('#ready').hidden=true;$('#hint').textContent=state.role==='save'?'Tryck i målet där du vill rädda!':'Vilket skott blir det?';}
 function dive(tx,ty){if(aiActed)return;aiActed=true;state.keeper.startX=keeperX;state.keeper.tx=clamp(tx,-3,3);state.keeper.ty=clamp(ty,.35,2.1);state.keeper.time=.001;}
 function resolve(){if(state.phase!=='flight')return;const b=state.ball;const wasDecisive=decisive();state.phase='result';resultClock=0;const goal=b.goal,own=state.role==='shoot',beforeArena=levelMax(),beforeBalls=unlocks.filter(n=>data.xp>=n).length;
  if(own){stats.shots++;if(goal)stats.goals++;stats.best=Math.max(stats.best,Math.round(state.power*3.6));data.record=Math.max(data.record,stats.best);}else{stats.faced++;if(b.saved&&!goal)stats.saves++;}
@@ -47,7 +47,12 @@ function challenges(){state.phase='menu';panel(`<span class="eyebrow">FEM SÄTT 
 function collection(){panel(`<span class="eyebrow">DIN MATCH. DIN STIL.</span><h1>OMKLÄDNINGS<em>RUMMET</em></h1><p>${data.xp} spelpoäng · Allt låses upp genom att spela.</p><h3>Fotbollar</h3><div class="grid">${ballNames.map((n,i)=>`<button class="${data.ball===i?'chosen':''}" data-ball="${i}" ${data.xp<unlocks[i]?'disabled':''}>${['⚽','🟡','🔥','❄️','💚'][i]} ${n}<small>${data.xp<unlocks[i]?`${unlocks[i]} poäng 🔒`:'Samma bollfysik · ny stil'}</small></button>`).join('')}</div><h3>Matchställ</h3><div class="grid">${['Solgult','Mintgrönt','Lavendel'].map((n,i)=>`<button data-kit="${i}" ${data.xp<i*15?'disabled':''} class="${data.kit===i?'chosen':''}">${n} ${data.xp<i*15?'🔒 '+i*15+' p':''}</button>`).join('')}</div><h3>Handskar & nät</h3><div class="grid">${['Lime','Rosa','Isblå'].map((n,i)=>`<button data-gloves="${i}" ${data.xp<i*12?'disabled':''} class="${data.gloves===i?'chosen':''}">🧤 ${n} ${data.xp<i*12?'🔒 '+i*12+' p':''}</button>`).join('')}<button data-net="${1-data.net}" ${data.xp<18?'disabled':''}>🥅 ${data.net?'Vitt nät':'Isblått nät'} ${data.xp<18?'🔒 18 p':''}</button></div><button class="wide" data-action="menu">← Huvudmeny</button>`);}
 function pause(){if(['menu','end'].includes(state.phase)||paused)return;paused=true;arenaAudio.pause(true);resetPointer();input=[];pointer=null;$('#swipePath').setAttribute('d','');world.target.visible=false;panel(`<span class="eyebrow">TA EN ANDNINGSPAUS</span><h1>TIME <em>OUT</em></h1><p>Matchen väntar på dig. Ingenting händer medan du pausar.</p><button class="primary wide" data-action="resume">FORTSÄTT →</button><button class="wide" data-action="menu">HUVUDMENY</button>${arenaAudio.controls()}`);}
 function next(){stopReplay();if(state.phase!=='result')return;if(mode==='match'&&winner(match.a,match.b)!==null){finish();return;}if(wonChallenge){confetti();audio('win');challenges();return;}prepare();}
-$('#next').onclick=next;$('#ready').onclick=()=>{if(state.role==='shoot'){ $('#ready').hidden=true;audio('tap');return; }if(state.phase==='aim'&&state.role==='save'){audio('tap');beginRun({x:(Math.random()<.5?-1:1)*(.3+Math.pow(Math.random(),1/(1+difficulty*.45))*3.25),y:.18+Math.random()*2.1,speed:[16,20,24,27][difficulty]+Math.random()*2,spin:(Math.random()-.5)*.8});}};
+function opponentShot(){
+ beginRun({x:(Math.random()<.5?-1:1)*(.3+Math.pow(Math.random(),1/(1+difficulty*.45))*3.25),y:.18+Math.random()*2.1,speed:[16,20,24,27][difficulty]+Math.random()*2,spin:(Math.random()-.5)*.8});
+}
+$('#next').onclick=next;
+$('#ready').onclick=()=>{if(state.role==='shoot'){ $('#ready').hidden=true;audio('tap'); }};
+
 $('#pause').onclick=pause;$('#sound').onclick=()=>{data.sound=!data.sound;arenaAudio.setEnabled(data.sound);arenaAudio.unlock();save();soundUI();audio('tap');};
 overlay.addEventListener('change',e=>{if(e.target.id==='difficulty'){difficulty=Number(e.target.value);save();}if(e.target.id==='arena'){data.arena=Number(e.target.value);difficulty=data.arena;$('#difficulty').value=difficulty;save();world.setArena(data.arena);applyCosmetics();}});
 overlay.addEventListener('click',e=>{const el=e.target.closest('button');if(!el)return;audio('tap');const d=el.dataset;if(d.play){if(!data.tutorial)help(d.play);else start(d.play);return;}if(d.challenge!==undefined){challenge=+d.challenge;start('challenge');return;}for(const k of ['ball','kit','gloves','net'])if(d[k]!==undefined){data[k]=+d[k];save();applyCosmetics();collection();return;}
@@ -68,12 +73,18 @@ function inputDown(e){
        $('#hint').textContent='Börja svepet vid bollen.';return;
      }
    }else{chargeStart=performance.now();$('#charge').hidden=false;sight(e);}
- }else if(!['run','flight'].includes(state.phase))return;
+ }else{
+   if(!['run','flight'].includes(state.phase)||aiActed)return;
+   const target=world.aim(e.clientX,e.clientY);
+   dive(target.x,target.y);
+   world.target.visible=false;
+   return;
+ }
  pointer=e.pointerId;input=[point(e)];e.currentTarget.setPointerCapture(pointer);
 }
 function inputMove(e){
  if(paused||overlay.innerHTML||replayCursor>=0)return;
- if(e.pointerType==='mouse'&&state.role==='save'&&!aiActed&&['aim','run','flight'].includes(state.phase))positionGoal=clamp(world.aim(e.clientX,e.clientY).x,-1.5,1.5);
+ if(e.pointerType==='mouse'&&state.role==='save'&&!aiActed&&['run','flight'].includes(state.phase))sight(e);
  if(state.role==='shoot'&&state.phase==='aim'&&(e.pointerType==='mouse'||e.pointerId===pointer))sight(e);
  if(e.pointerId!==pointer)return;
  input.push(point(e));if(input.length>160)input.splice(1,1);
@@ -90,10 +101,6 @@ function inputUp(e){
    }else if(shotInput){
      shotInput.speed=14+15*clamp(Math.hypot(dx,dy)/(innerHeight*.45),0,1);beginRun(shotInput);
    }
- }else if(state.role==='save'&&['run','flight'].includes(state.phase)){
-   // Behind the net screen-left corresponds to positive world X.
-   if(e.pointerType!=='mouse'&&Math.hypot(dx,dy)>18)dive(keeperX-clamp(dx/(innerWidth*.24),-1,1)*3,clamp(.85-dy/(innerHeight*.23),.35,2.1));
-   else dive(a.x,a.y);
  }
  resetPointer();
 }
@@ -117,6 +124,7 @@ try{world=createWorld($('#world'));const canvas=world.renderer.domElement;canvas
    if(replayTime>=recording.at(-1).time+.12)stopReplay();
    return;
  }
+ if(state.role==='save'&&state.phase==='aim'){state.clock+=dt;if(state.clock>=1.1)opponentShot();}
  if(chargeStart)$('#charge i').style.transform='scaleX('+clamp((performance.now()-chargeStart)/1000,0,1)+')';
  if(!aiActed&&state.role==='save'){
    keeperX+=(positionGoal-keeperX)*(1-Math.exp(-dt*6));
