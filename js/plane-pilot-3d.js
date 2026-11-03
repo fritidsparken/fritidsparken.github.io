@@ -54,7 +54,6 @@
     const persistentGeometry=new Set(geometries);
     const controls=[];for(const side of [-1,1]){const a=box(1.6,.05,.22,white,plane,side*2.1,.06,.42);controls.push(a);}
     const elevator=box(1.8,.045,.23,trim,plane,0,.2,1.96);controls.push(elevator);
-    const blur=mesh(new T.CircleGeometry(1.18,40),material('#c6cbd0',{transparent:true,opacity:.12,side:T.DoubleSide,depthWrite:false}),prop,0,0,.03);
     let farCamera=false;
 
     const cached=new Map();
@@ -165,7 +164,7 @@ cloudMat.userData.cloud=true;
     }
     function paint(s,p,opt){
       if(dead)return;if(worldRef!==s.world)build(s.world);
-      controls[0].rotation.x=s.roll*.7;controls[1].rotation.x=-s.roll*.7;controls[2].rotation.x=-s.pitch*.6;blur.visible=s.speed>12;white.color.set(p.color);trim.color.set(p.trim);prop.rotation.z=s.time*48+opt.angle*15;
+      controls[0].rotation.x=s.roll*.7;controls[1].rotation.x=-s.roll*.7;controls[2].rotation.x=-s.pitch*.6;white.color.set(p.color);trim.color.set(p.trim);prop.rotation.z=s.time*48+opt.angle*15;
       if(opt.preview){plane.position.set(0,5,-20);plane.rotation.set(.06,opt.angle,0);}else{plane.position.set(s.x,s.y,-s.d);plane.rotation.set(s.pitch,s.heading,s.roll,'YXZ');}
       if(previewMode!==opt.preview){cameraReady=false;previewMode=opt.preview;}
       if(opt.preview){cameraGoal.set(8,8,-5);target.set(-2,4.5,-20);}else if(s.phase==='rollout'||s.phase==='done'){cameraGoal.set(s.x+16,s.y+6,-s.d+15);target.set(s.x,s.y,-s.d-5);}else{cameraGoal.set(s.x-s.vx*.17,s.y+(farCamera?10:6.5),-s.d+(farCamera?29:19));target.set(s.x+s.vx*.35,s.y+1,-s.d-30);}
