@@ -1,7 +1,7 @@
 (() => {
   const games=[
     {id:'downhill',title:'DOWNHILL',tag:'HITTA DIN LINJE',type:'3D · Mountainbike',image:'game-icons-2026/new-downhill.webp',text:'Cykla från alpängar till neonramper på 20 leder. Välj cykel, hoppa över raviner och landa trick.',url:'./games/downhill/'},
-    {id:'kart',title:'Kart Racing 3D',tag:'DIN PLATS PÅ STARTLINJEN',type:'3D · Racing',image:'game-icons-2026/new-kart.webp',text:'Drifta genom tolv världar, samla föremål och tävla om tre cuper med åtta gokarts.',url:'./games/kart-racing/'},
+    {id:'kart',title:'Kart Racing',tag:'DIN PLATS PÅ STARTLINJEN',type:'3D · Racing',image:'game-icons-2026/new-kart.webp',text:'Drifta genom tolv världar, samla föremål och tävla om tre cuper med åtta gokarts.',url:'./games/kart-racing/'},
     {id:'minigolf',title:'Minigolf',tag:'18 HÅL. SEX VÄRLDAR.',type:'3D · Minigolf',image:'game-icons-2026/new-minigolf.webp',text:'Spela 18 galna minigolfhål genom piratvärldar, djungel, godisland, rymden och vulkaner!',module:'FPMinigolf'},
     {id:'penalty',title:'Straffläggaren',tag:'ETT SKOTT. EN RÄDDNING.',type:'3D · Fotboll',image:'game-icons-2026/new-penalty.webp',text:'Svep, skruva och rädda! Avgör straffläggningen, lås upp arenor och hitta ditt perfekta skott.',module:'FPStrafflaggaren'},
     {id:'bowling',title:'Crazy Bowling',tag:'SIKTA. SKRUVA. STRIKE!',type:'3D · Bowling',image:'game-icons-2026/new-bowling.webp',text:'Tio galna banor, sex unika klot och massor av strikes. Hur många stjärnor kan du samla?',module:'FPCrazyBowling'},
