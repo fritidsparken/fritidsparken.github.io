@@ -42,20 +42,32 @@ button:focus-visible {
   flex-direction: column;
   justify-content: space-between;
 }
+/* Keep the course artwork in a separate panel beside the controls. */
+#lobby {
+  background: #132421;
+}
 .cover {
   position: absolute;
-  z-index: -2;
-  inset: 0;
+  top: 5.5rem;
+  right: 4vw;
+  bottom: 5rem;
+  width: min(43vw, calc(100% - 650px));
   background-size: cover;
   background-position: center;
+  border: 1px solid #ffffff29;
+  border-radius: 14px;
+  pointer-events: none;
 }
-.cover:after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(90deg, #0d1919f5 1%, #10201edb 33%, transparent 83%),
-    linear-gradient(0deg, #091514bf, transparent 57%);
+@media (max-width: 900px) {
+  .cover {
+    position: static;
+    width: 92%;
+    height: clamp(8rem, 24vh, 15rem);
+    margin: 0 auto 1rem;
+    order: 1;
+  }
+  #credit { display: none; }
+  #lobby { justify-content: flex-start; }
 }
 header {
   display: flex;
@@ -296,9 +308,6 @@ dialog p {
   }
   .setup {
     padding: 1.5rem 0 1.8rem 4vw;
-  }
-  .cover:after {
-    background: linear-gradient(0deg, #10221ff7 18%, #10221fbc 60%, #10221f2b);
   }
   .location {
     margin: 1.25em 0;
