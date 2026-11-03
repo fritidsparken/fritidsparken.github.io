@@ -491,8 +491,8 @@ function readInput() {
   const is = (a, b, c) => keys.has(a) || keys.has(b) || touch.has(c);
   let input = {
     turn: clamp(
-      +!!is("ArrowRight", "KeyD", "right") -
-        !!is("ArrowLeft", "KeyA", "left") +
+      +!!is("ArrowLeft", "KeyA", "left") -
+        !!is("ArrowRight", "KeyD", "right") -
         (Math.abs(axis) > 0.13 ? axis : 0),
       -1,
       1,
