@@ -9,3 +9,17 @@ test('keeper body contacts actually deflect; corners evade stationary keeper',()
 test('dive moves contact volumes and lands',()=>{const p=keeperPose({tx:2.5,ty:1.9,time:.42});assert.ok(p.x>2.4);assert.ok(p.parts.some(s=>s.x>2.5));assert.ok(keeperPose({tx:2.5,ty:1.9,time:1.6}).y<.4);});
 test('net reacts after a valid goal; all shots have a watchdog',()=>{const b=fly(launch(2,1));assert.ok(b.goal&&b.net&&b.done);assert.ok(fly(launch(0,.14,14)).done);});
 test('short input ignored, extreme speed capped, curve measured',()=>{assert.equal(swipe([{x:0,y:0,t:0},{x:1,y:2,t:1}],{x:0,y:1}),null);const s=swipe([{x:0,y:300,t:0},{x:150,y:150,t:1},{x:0,y:0,t:2}],{x:100,y:100});assert.equal(s.speed,29);assert.equal(s.x,4.8);assert.equal(s.y,3.5);assert.ok(s.spin>.5);});
+test('a keeper starts a dive from the chosen position without snapping back to centre',()=>{
+ const keeper={startX:1.25,tx:-2.2,ty:.5,time:0};
+ assert.equal(keeperPose(keeper).x,1.25);
+ keeper.time=.001;assert.ok(Math.abs(keeperPose(keeper).x-1.25)<.001);
+ keeper.time=.42;assert.ok(Math.abs(keeperPose(keeper).x+2.2)<1e-8);
+});
+test('the whole ball must clear the line before a goal is counted',()=>{
+ const ball=launch(1,1.2,23,.5);
+ while(ball.z>0)step(ball,1/240);
+ assert.equal(ball.goal,false);
+ while(ball.z>=-.11)step(ball,1/240);
+ assert.equal(ball.goal,true);
+ assert.ok(Math.abs(ball.crossing.x-1)<.07);
+});
