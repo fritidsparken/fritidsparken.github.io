@@ -1,4 +1,12 @@
-import { parks, height, surface, railPoint, clamp } from "./model.js";
+import {
+  parks,
+  height,
+  surface,
+  railPoint,
+  clamp,
+  halfWidth,
+  halfDepth,
+} from "./model.js?v=street-lines-2";
 const T = window.THREE,
   v = (x, y, z) => new T.Vector3(x, y, z);
 const sphere = new T.SphereGeometry(1, 16, 12),
@@ -46,7 +54,7 @@ function noise() {
   return t;
 }
 function plaza(park, scene) {
-  const geo = new T.PlaneGeometry(62, 56, 186, 168);
+  const geo = new T.PlaneGeometry(halfWidth * 2, halfDepth * 2, 256, 240);
   geo.rotateX(-Math.PI / 2);
   const pos = geo.attributes.position,
     colors = [],
@@ -179,8 +187,8 @@ function environment(scene, park, i) {
   plaza(park, scene);
   const land = i === 1 ? 0xe3bc90 : i === 2 ? 0x464256 : 0x91a164;
   for (const side of [-1, 1]) {
-    box(land, side * 44, -0.35, 0, 26, 0.58, 70);
-    box(land, 0, -0.35, side * 34, 62, 0.58, 12);
+    box(land, side * (halfWidth + 13), -0.35, 0, 26, 0.58, halfDepth * 2 + 12);
+    box(land, 0, -0.35, side * (halfDepth + 6), halfWidth * 2, 0.58, 12);
   }
 
   for (const r of park.rails) {
@@ -194,41 +202,51 @@ function environment(scene, park, i) {
     }
   }
   if (i === 1) {
-    box(0x54b4bc, -0.5, -0.43, -63, 200, 0.2, 48);
+    box(0x54b4bc, -0.5, -0.43, -halfDepth - 35, 200, 0.2, 48);
     for (let j = 0; j < 45; j++)
       box(
         0xb8e4dd,
         Math.sin(j * 12.5) * 74,
         -0.316,
-        -41 - j * 0.66,
+        -halfDepth - 13 - j * 0.66,
         2 + (j % 5),
         0.03,
         0.13,
       );
-    for (let j = 0; j < 85; j++)
+    for (let j = 0; j < 142; j++)
       box(
         j % 2 ? 0xba9570 : 0xc49b75,
-        -33 + j * 0.79,
+        -halfWidth + j * 0.79,
         -0.14,
-        -32,
+        -halfDepth - 4,
         0.76,
         0.26,
         9,
       );
     for (let j = 0; j < 3; j++) {
       const x = -31 + j * 29;
-      bar([x, -0.3, -52], [x, 6, -52], 0.12, 0x6e655c);
+      bar([x, -0.3, -halfDepth - 24], [x, 6, -halfDepth - 24], 0.12, 0x6e655c);
       const g = new T.BufferGeometry();
       g.setAttribute(
         "position",
         new T.Float32BufferAttribute(
-          [x, 5.9, -52, x + 3, 0.6, -52, x, 0.6, -52],
+          [
+            x,
+            5.9,
+            -halfDepth - 24,
+            x + 3,
+            0.6,
+            -halfDepth - 24,
+            x,
+            0.6,
+            -halfDepth - 24,
+          ],
           3,
         ),
       );
       g.computeVertexNormals();
       scene.add(new T.Mesh(g, mat(0xffeace, { side: T.DoubleSide })));
-      ball(0x385873, x, 0.1, -52, 2.8, 0.37, 0.7);
+      ball(0x385873, x, 0.1, -halfDepth - 24, 2.8, 0.37, 0.7);
     }
   } else {
     const facade = mat(0xffffff, { map: skylineTexture(i) });
@@ -240,25 +258,33 @@ function environment(scene, park, i) {
         facade,
         27 + j * 15,
         h / 2,
-        -38 - (j % 2) * 4,
+        -halfDepth - 10 - (j % 2) * 4,
         13,
         h,
         7,
       );
-      box(0x535361, 27 + j * 15, h, -38 - (j % 2) * 4, 13.5, 0.5, 7.6);
+      box(
+        0x535361,
+        27 + j * 15,
+        h,
+        -halfDepth - 10 - (j % 2) * 4,
+        13.5,
+        0.5,
+        7.6,
+      );
     }
   }
   const sign = new T.Mesh(
     new T.PlaneGeometry(16, 4),
     mat(0xffffff, { map: mural(i), side: T.DoubleSide }),
   );
-  sign.position.set(0, 2.1, -28.5);
+  sign.position.set(0, 2.1, -halfDepth - 0.5);
   scene.add(sign);
-  for (let j = 0; j < 28; j++) {
-    const x = -32 + (j % 14) * 5,
-      z = j < 14 ? -29 : 29;
+  for (let j = 0; j < 46; j++) {
+    const x = -55 + (j % 23) * 5,
+      z = j < 23 ? -halfDepth - 1 : halfDepth + 1;
     bar([x, 0, z], [x, 1.55, z], 0.09, 0x435859);
-    if (j % 14 < 13) {
+    if (j % 23 < 22) {
       bar([x, 1.42, z], [x + 5, 1.42, z], 0.08, 0x526c69);
       bar([x, 0.65, z], [x + 5, 0.65, z], 0.06, 0x526c69);
     }
@@ -275,8 +301,8 @@ function environment(scene, park, i) {
     side: T.DoubleSide,
   });
   for (let j = 0; j < 20; j++) {
-    const x = (j % 2 ? -1 : 1) * (34 + (j % 4)),
-      z = -40 + Math.floor(j / 2) * 9;
+    const x = (j % 2 ? -1 : 1) * (halfWidth + 3 + (j % 4)),
+      z = -halfDepth + Math.floor(j / 2) * 11;
     const h = 4 + (j % 3);
     bar([x, 0, z], [x + 0.25, h, z], 0.39, 0x86654b);
     const layers = i === 1 ? 2 : 4;
@@ -303,8 +329,8 @@ function environment(scene, park, i) {
   }
   for (let j = 0; j < 8; j++) {
     const side = j % 2 ? 1 : -1,
-      x = side * 31,
-      z = -21 + Math.floor(j / 2) * 14;
+      x = side * (halfWidth + 1),
+      z = -40 + Math.floor(j / 2) * 26;
     bar([x, 0, z], [x, 5.7, z], 0.15, 0x394955);
     box(0x374654, x - side * 0.48, 5.7, z, 1.1, 0.22, 0.56);
     box(
@@ -533,14 +559,14 @@ export class World {
       i === 2 ? 0xb3cbff : 0xffe3b5,
       i === 2 ? 1.65 : 2.05,
     );
-    sun.position.set(-23, 41, 19);
+    sun.position.set(-36, 82, 42);
     sun.castShadow = true;
     Object.assign(sun.shadow.camera, {
-      left: -40,
-      right: 40,
-      top: 38,
-      bottom: -38,
-      far: 96,
+      left: -80,
+      right: 80,
+      top: 74,
+      bottom: -74,
+      far: 185,
     });
     sun.shadow.mapSize.set(1024, 1024);
     sun.shadow.bias = -0.001;
@@ -595,23 +621,34 @@ export class World {
       steer = Number(!!k.right) - Number(!!k.left);
     group.position.set(p.x, p.y + 0.015, p.z);
     group.rotation.order = "YXZ";
-    group.rotation.y = p.dir + p.spin;
-    group.rotation.x = air ? 0 : Math.atan(p.slope || 0);
+    const blend = this.snap ? 1 : 1 - Math.exp(-dt * 24);
+    const follow = (from, to) =>
+      from + Math.atan2(Math.sin(to - from), Math.cos(to - from)) * blend;
+    group.rotation.y = follow(group.rotation.y, p.dir + p.stance + p.spin);
+    group.rotation.x = follow(
+      group.rotation.x,
+      air ? 0 : Math.atan(p.slope || 0) * Math.cos(p.stance),
+    );
     group.rotation.z = steer * 0.095;
     const push = !air && !p.manual && !p.rail && k.go ? Math.sin(p.kick) : 0,
       crouch = p.squat * 0.16 + (air ? 0.095 : 0);
-    body.position.y = -crouch;
+    body.position.y += (-crouch - body.position.y) * blend;
     body.rotation.z = -0.085 - steer * 0.085;
     body.rotation.x = push * 0.045;
     for (const { leg, arm, s } of limbs) {
       leg.rotation.x = s === 1 ? push * 0.54 : -crouch * 0.85;
       leg.position.y = 0.86 + crouch * 0.4;
-      arm.rotation.x =
+      arm.rotation.x = follow(
+        arm.rotation.x,
         -s *
           (0.27 + (air ? 0.83 : 0) + (p.manual !== null || p.rail ? 0.36 : 0)) +
-        push * 0.15;
+          push * 0.15,
+      );
       arm.rotation.z = 0.19 + steer * 0.28;
     }
+    const prevX = board.rotation.x,
+      prevY = board.rotation.y,
+      prevZ = board.rotation.z;
     board.rotation.set(
       p.manual === 15
         ? -0.21
@@ -639,6 +676,9 @@ export class World {
           ? a / 2
           : 0;
     }
+    board.rotation.x = follow(prevX, board.rotation.x);
+    board.rotation.y = follow(prevY, p.deckYaw + board.rotation.y);
+    board.rotation.z = follow(prevZ, board.rotation.z);
     const ground = height(this.park, p.x, p.z);
     this.blob.position.set(p.x, ground + 0.027, p.z);
     this.blob.material.opacity = clamp(1 - (p.y - ground) * 0.16, 0.22, 1);
@@ -646,9 +686,9 @@ export class World {
     const sx = Math.sin(p.dir),
       cz = Math.cos(p.dir);
     this.want.set(
-      clamp(p.x + sx * dist + 0.95 * cz, -30.2, 30.2),
+      clamp(p.x + sx * dist + 0.95 * cz, 0.6 - halfWidth, halfWidth - 0.6),
       p.y + 2.75 + p.speed * 0.055,
-      clamp(p.z + cz * dist - 0.95 * sx, -27.3, 27.3),
+      clamp(p.z + cz * dist - 0.95 * sx, 0.6 - halfDepth, halfDepth - 0.6),
     );
     this.want.y = Math.max(
       this.want.y,

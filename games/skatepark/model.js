@@ -14,11 +14,30 @@ export const parks = [
       ["quarter", -18, 14, 12, 8, 2.4],
       ["manual", 12, 9, 5, 11, 0.55],
       ["steps", 23, 14, 7, 11, 1.5],
+      ["funbox", -37, 12, 10, 16, 1.55],
+      ["steps", -39, -13, 9, 13, 1.9],
+      ["quarter", -44, -35, 16, 13, 3.8],
+      ["pyramid", -17, -36, 12, 12, 2.55],
+      ["manual", 4, -35, 5, 15, 0.7],
+      ["half", 31, -37, 23, 16, 3.6],
+      ["quarter", 40, -9, 17, 11, 2.85],
+      ["manual", 40, 13, 6, 17, 0.95],
+      ["bowl", 32, 36, 23, 19, -3.4],
+      ["funbox", 6, 34, 13, 15, 1.7],
+      ["pyramid", -21, 33, 13, 12, 2.1],
+      ["quarter", -43, 34, 12, 12, 3.1],
     ],
     rails: [
       [-5, 7, -5, 19, 0.63],
       [14.4, 4, 14.4, 14, 0.14],
       [23, 10, 23, 18, 0.7],
+      [-37, 5, -37, 18, 0.62],
+      [-39, -18, -39, -9, 0.8],
+      [6, -41, 6, -29, 0.24],
+      [36, -21, 46, -22, 0.84],
+      [42, 6, 42, 20, 0.26],
+      [-9, 32, 0, 39, 0.76],
+      [-48, 18, -48, 31, 0.68],
     ],
   },
   {
@@ -36,11 +55,29 @@ export const parks = [
       ["quarter", -4, -21, 16, 8, 2.7],
       ["manual", 19, 15, 5, 12, 0.8],
       ["pyramid", -1, -8, 7, 8, 1],
+      ["bowl", -36, -30, 27, 21, -3.4],
+      ["quarter", -10, -37, 18, 12, 3.1],
+      ["funbox", 13, -37, 10, 15, 2],
+      ["steps", 40, -28, 10, 19, 2.3],
+      ["half", 39, 3, 16, 25, 3.4],
+      ["quarter", 39, 33, 17, 12, 3.7],
+      ["steps", 12, 35, 10, 15, 1.7],
+      ["funbox", -12, 34, 14, 15, 1.6],
+      ["pyramid", -40, 30, 14, 14, 2.4],
+      ["manual", -36, 6, 6, 19, 0.8],
+      ["quarter", -43, -10, 11, 9, 2.35],
     ],
     rails: [
       [4, 4, 4, 12, 0.65],
       [21.3, 10, 21.3, 20, 0.12],
       [-6, 18, 3, 18, 0.68],
+      [14, -43, 14, -31, 0.64],
+      [40, -36, 40, -20, 0.72],
+      [27, -6, 27, 9, 0.8],
+      [12, 29, 12, 41, 0.75],
+      [-25, 40, -16, 33, 0.72],
+      [-34, 0, -34, 13, 0.22],
+      [-48, -4, -48, 8, 0.66],
     ],
   },
   {
@@ -58,14 +95,34 @@ export const parks = [
       ["quarter", -17, -16, 12, 9, 3],
       ["funbox", 3, 13, 9, 11, 1.3],
       ["manual", 17, -17, 5, 11, 0.95],
+      ["half", -34, -32, 21, 20, 4],
+      ["pyramid", -5, -36, 15, 16, 2.6],
+      ["steps", 24, -34, 12, 20, 2.7],
+      ["quarter", 44, -27, 12, 16, 3.5],
+      ["manual", 40, -5, 8, 19, 0.9],
+      ["funbox", 40, 21, 14, 16, 2.15],
+      ["bowl", 17, 35, 21, 21, -3.6],
+      ["quarter", -7, 36, 14, 12, 3.6],
+      ["steps", -34, 30, 12, 17, 2.1],
+      ["funbox", -39, 6, 11, 17, 1.9],
+      ["manual", -40, -11, 8, 10, 0.75],
     ],
     rails: [
       [0, -14, 0, -2, 0.72],
       [19.3, -21, 19.3, -13, 0.14],
       [-8, 0, 1, 0, 0.67],
+      [24, -41, 24, -27, 0.75],
+      [43, -12, 43, 2, 0.23],
+      [40, 15, 40, 27, 0.7],
+      [-34, 23, -34, 36, 0.8],
+      [-39, 0, -39, 12, 0.71],
+      [-35, -15, -28, -20, 0.86],
+      [2, 22, 9, 15, 0.76],
     ],
   },
 ];
+export const halfWidth = 56,
+  halfDepth = 52;
 export const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
 const edge = (t) => clamp((1 - Math.abs(t)) * 5, 0, 1);
 export function surface(shape, x, z) {
@@ -104,7 +161,7 @@ export const tricks = [
   ["360 shove-it", 225, "Höger + C i luften"],
   ["Varial kickflip", 250, "Vänster + Z i luften"],
   ["Tre flip / 360 flip", 400, "Höger + Z i luften"],
-  ["50-50 grind", 150, "Håll Z vid räcket"],
+  ["50-50 grind", 150, "Landa längs räcket, eller håll Z"],
   ["5-0 grind", 200, "Håll vänster + Z vid räcket"],
   ["Nosegrind", 250, "Håll höger + Z vid räcket"],
   ["Boardslide", 200, "Håll X vid räcket"],
@@ -123,6 +180,11 @@ export function rider() {
     air: false,
     spin: 0,
     spinCount: 0,
+    stance: 0,
+    deckYaw: 0,
+    settle: 0,
+    rollingRise: 0,
+    ignoredRail: null,
     flip: null,
     rail: null,
     manual: null,
@@ -171,6 +233,7 @@ export function reset(p, park) {
 export function act(p, k, key, emit) {
   if (p.recover > 0) return;
   if (key === "jump" && (!p.air || p.rail)) {
+    if (p.rail) p.ignoredRail = p.rail.r;
     p.rail = null;
     p.manual = null;
     p.air = true;
@@ -203,26 +266,64 @@ export function act(p, k, key, emit) {
 export function railPoint(park, r, t) {
   const x = r[0] + (r[2] - r[0]) * t,
     z = r[1] + (r[3] - r[1]) * t;
-  return [x, height(park, x, z) + r[4], z];
+  // A handrail is one straight bar, including above steps and ledges.
+  let profile = railProfiles.get(r);
+  if (!profile) {
+    const start = height(park, r[0], r[1]),
+      end = height(park, r[2], r[3]);
+    let clearance = 0;
+    for (let j = 0; j <= 32; j++) {
+      const u = j / 32;
+      clearance = Math.max(
+        clearance,
+        height(park, r[0] + (r[2] - r[0]) * u, r[1] + (r[3] - r[1]) * u) -
+          (start + (end - start) * u),
+      );
+    }
+    profile = [start + r[4] + clearance, end - start];
+    railProfiles.set(r, profile);
+  }
+  return [x, profile[0] + profile[1] * t, z];
 }
-function catchRail(p, k, park, emit) {
-  if (!(k.z || k.x || k.c) || p.speed < 1 || p.vy > 1) return;
+const railProfiles = new WeakMap();
+function catchRail(p, k, park, emit, previousY) {
+  const holding = !!(k.z || k.x || k.c);
+  if ((!holding && !p.air) || p.speed < 0.9 || (p.air && p.vy > 0.8)) return;
   for (const r of park.rails) {
+    if (r === p.ignoredRail) continue;
     const dx = r[2] - r[0],
       dz = r[3] - r[1],
-      len = Math.hypot(dx, dz),
-      t = ((p.x - r[0]) * dx + (p.z - r[1]) * dz) / (len * len);
-    if (t < 0 || t > 1) continue;
-    const [x, y, z] = railPoint(park, r, t);
+      len = Math.hypot(dx, dz);
+    const raw = ((p.x - r[0]) * dx + (p.z - r[1]) * dz) / (len * len);
+    if (raw < -0.35 / len || raw > 1 + 0.35 / len) continue;
+    const t = clamp(raw, 0, 1),
+      [x, y, z] = railPoint(park, r, t);
     const align = (-Math.sin(p.dir) * dx - Math.cos(p.dir) * dz) / len;
     if (
-      Math.hypot(x - p.x, z - p.z) > 0.88 ||
-      Math.abs(y - p.y) > 0.48 ||
-      Math.abs(align) < 0.52
+      Math.hypot(x - p.x, z - p.z) > (holding ? 0.94 : 0.64) ||
+      Math.abs(align) < (holding ? 0.28 : 0.46)
     )
       continue;
-    const id = k.z ? (k.left ? 11 : k.right ? 12 : 10) : k.x ? 13 : 14;
-    p.rail = { r, t, len, sign: Math.sign(align), id };
+    // Catch a downward crossing, or deliberately roll onto a low ledge.
+    if (
+      p.air
+        ? Math.max(previousY, p.y) < y - 0.22 || p.y > y + 0.18
+        : Math.abs(y - p.y) > 0.44
+    )
+      continue;
+    const id = !holding
+      ? 10
+      : k.z
+        ? k.left
+          ? 11
+          : k.right
+            ? 12
+            : 10
+        : k.x
+          ? 13
+          : 14;
+    p.rail = { r, t, len, sign: Math.sign(align), id, held: holding };
+    p.slope = (railProfiles.get(r)[1] * p.rail.sign) / len;
     p.air = false;
     p.flip = null;
     p.manual = null;
@@ -242,10 +343,15 @@ export function tick(p, k, park, dt, emit) {
     p.recover -= dt;
     return;
   }
+  p.settle = Math.max(0, p.settle - dt);
   p.squat = Math.max(0, p.squat - dt * 3);
   if (p.flip) {
     p.flip.t += dt;
-    if (p.flip.t >= p.flip.duration) p.flip = null;
+    if (p.flip.t >= p.flip.duration) {
+      if ([4, 8].includes(p.flip.id))
+        p.deckYaw = (p.deckYaw + Math.PI) % (Math.PI * 2);
+      p.flip = null;
+    }
   }
   if (p.rail) {
     const g = p.rail;
@@ -253,11 +359,11 @@ export function tick(p, k, park, dt, emit) {
     p.speed = Math.max(1, p.speed - dt * 0.48);
     [p.x, p.y, p.z] = railPoint(park, g.r, clamp(g.t, 0, 1));
     p.base += p.speed * dt * 15 * p.holdFactor;
-    if (g.t <= 0 || g.t >= 1 || !(k.z || k.x || k.c)) {
+    if (g.t <= 0 || g.t >= 1 || (g.held && !(k.z || k.x || k.c))) {
       p.rail = null;
       p.air = true;
-      p.y += 0.08;
-      p.vy = 0.4;
+      p.ignoredRail = g.r;
+      p.vy = 0;
       p.spin = 0;
       p.spinCount = 0;
     }
@@ -313,8 +419,8 @@ export function tick(p, k, park, dt, emit) {
   }
   const nx = p.x - Math.sin(p.dir) * p.speed * dt,
     nz = p.z - Math.cos(p.dir) * p.speed * dt;
-  p.x = clamp(nx, -29, 29);
-  p.z = clamp(nz, -26, 26);
+  p.x = clamp(nx, 1 - halfWidth, halfWidth - 1);
+  p.z = clamp(nz, 1 - halfDepth, halfDepth - 1);
   if (nx !== p.x || nz !== p.z) {
     p.speed *= 0.88;
     if (p.speed > 3 && p.squat === 0) {
@@ -323,30 +429,37 @@ export function tick(p, k, park, dt, emit) {
     }
   }
   const floor = height(park, p.x, p.z);
+  const rise = (floor - ground) / dt;
   if (
     !p.air &&
-    p.slope > 0.42 &&
+    p.settle === 0 &&
+    p.rollingRise > 2.4 &&
     p.speed > 4 &&
-    floor - ground < dt * p.speed * p.slope * 0.52
+    rise < p.rollingRise * 0.52
   ) {
     p.air = true;
-    p.vy = Math.min(8, p.speed * p.slope);
+    p.vy = Math.min(8, p.rollingRise);
     p.spin = 0;
     p.spinCount = 0;
     p.manual = null;
   }
+  p.rollingRise = p.air ? 0 : rise;
   if (p.air) {
+    const previousY = p.y;
     p.vy -= 17.5 * dt;
     p.y += p.vy * dt;
-    catchRail(p, k, park, emit);
+    catchRail(p, k, park, emit, previousY);
     if (p.rail) return;
-    if (p.y < floor && p.vy > 0) p.y = floor;
-    if (p.y <= floor && p.vy <= 0) {
+    if (p.y <= floor && p.vy <= Math.max(0, rise)) {
       const mis = Math.abs(Math.sin(p.spin));
       const unfinished = p.flip && p.flip.t / p.flip.duration < 0.57;
       p.y = floor;
       p.air = false;
-      p.dir += Math.round(p.spin / Math.PI) * Math.PI;
+      // After a 180 the rider rolls switch; the velocity and chase camera keep their heading.
+      p.stance =
+        (p.stance + Math.round(p.spin / Math.PI) * Math.PI) % (2 * Math.PI);
+      p.settle = 0.32;
+      p.ignoredRail = null;
       p.spin = 0;
       p.flip = null;
       p.grace = 0.52;
@@ -363,6 +476,8 @@ export function tick(p, k, park, dt, emit) {
     }
   } else {
     p.y = floor;
+    catchRail(p, k, park, emit, p.y);
+    if (p.rail) return;
     if (!p.manual && p.combo.length) {
       p.grace -= dt;
       if (p.grace <= 0) {
@@ -380,7 +495,11 @@ export function tick(p, k, park, dt, emit) {
         clear(p);
       }
     }
-    if (Math.abs(floor) < 0.02 && Math.abs(p.x) < 27 && Math.abs(p.z) < 24)
+    if (
+      Math.abs(floor) < 0.02 &&
+      Math.abs(p.x) < halfWidth - 3 &&
+      Math.abs(p.z) < halfDepth - 3
+    )
       p.safe = [p.x, p.z];
   }
 }

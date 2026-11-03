@@ -8,8 +8,8 @@ import {
   multi,
   score,
   clamp,
-} from "./model.js?v=ride-stick-1";
-import { World } from "./world.js";
+} from "./model.js?v=street-lines-2";
+import { World } from "./world.js?v=street-lines-2";
 import { Sound } from "./audio.js";
 const $ = (id) => document.getElementById(id),
   number = (n) => n.toLocaleString("sv-SE"),
@@ -202,7 +202,7 @@ function openPanel(id) {
       button("home", "Byt park eller utrustning");
   if (id === "guide") {
     html =
-      "<small>SKATE CLUB / HANDBOKEN</small><h2>Trickguide</h2><p>W / ↑ ger fart, S / ↓ bromsar. Styr med A/D eller ←/→. Hoppa med mellanslag. R återställer och Esc pausar. På mobilen styr du med spaken. Dra uppåt för fart och nedåt för broms.</p><p>Hoppa längs ett räcke och håll trickknappen när du når det. Håll en manual efter landningen för att fortsätta serien. Släpp för att räkna poängen.</p>";
+      "<small>SKATE CLUB / HANDBOKEN</small><h2>Trickguide</h2><p>W / ↑ ger fart, S / ↓ bromsar. Styr med A/D eller ←/→. Hoppa med mellanslag. R återställer och Esc pausar. På mobilen styr du med spaken. Dra uppåt för fart och nedåt för broms.</p><p>Hoppa mot ett räcke i åkriktningen. Landa längs räcket för automatisk 50-50. Håll X för boardslide eller C för lipslide. Hoppa av när du vill eller glid till slutet. Håll en manual efter landningen för att fortsätta serien. Släpp för att räkna poängen.</p>";
     for (const [title, a, b] of [
       ["Hopp och rotation", 0, 10],
       ["Grind och slide", 10, 15],
@@ -379,6 +379,7 @@ function frame(now) {
   requestAnimationFrame(frame);
   if (mode !== "play") return;
   const dt = Math.min(0.08, (now - last) / 1000);
+  if (dt <= 0) return;
   last = now;
   const steps = Math.max(1, Math.ceil(dt * 90));
   const controls = rideKeys();
