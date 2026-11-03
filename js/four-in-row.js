@@ -61,10 +61,10 @@
     sound?.effect('release');
     await new Promise(resolve=>{
       const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const distance=r+1, gravity=34, impact=reduced?.06:Math.sqrt(2*distance/gravity), settle=reduced?0:.22;
+      const distance=r+1, gravity=34, impact=reduced?.06:Math.sqrt(2*distance/gravity), settle=reduced?0:.42;
       let startTime,hit=false;
       const frame=now=>{if(ticket!==generation){resolve();return;}startTime??=now;const t=(now-startTime)/1000;
-        let offset;if(t<impact)offset=-distance*(1-(t/impact)**2);else{if(!hit){hit=true;sound?.effect(r===5?'bottom':'land');}const u=t-impact;offset=-.065*Math.exp(-13*u)*Math.abs(Math.sin(u*35));}
+        let offset;if(t<impact)offset=-distance*(1-(t/impact)**2);else{if(!hit){hit=true;sound?.effect(r===5?'bottom':'land');}const u=t-impact; if(u<.26){const phase=u/.26;offset=-.27*4*phase*(1-phase);}else if(u<.42){const phase=(u-.26)/.16;offset=-.07*4*phase*(1-phase);}else offset=0;}
         token.style.transform=`translate(-50%,calc(-50% + ${offset*root.querySelector('#fourBoard').clientHeight/6}px)) rotate(${hit?Math.sin((t-impact)*50)*Math.exp(-18*(t-impact))*.7:0}deg)`;
         if(t<impact+settle)raf=requestAnimationFrame(frame);else{token.style.transform='translate(-50%,-50%)';resolve();}
       };raf=requestAnimationFrame(frame);
