@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#111d20" />
+    <title>DOWNHILL · Fritidsparken</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main id="lobby">
+      <div class="cover"></div>
+      <header>
+        <a href="../../">← Fritidsparken</a
+        ><b>FP &nbsp;/&nbsp; TRAIL DIVISION</b>
+      </header>
+      <section class="setup">
+        <small>● &nbsp; MOUNTAIN BIKE SERIES</small>
+        <h1>DOWNHILL</h1>
+        <p class="intro">Hitta din linje. Från alpäng till midnattsljus.</p>
+        <div class="location">
+          <span id="number"></span>
+          <h2 id="name"></h2>
+          <div id="summary"></div>
+        </div>
+        <div class="options">
+          <label>Bana<select id="tracks"></select></label
+          ><label
+            >Spelläge<select id="mode">
+              <option>Downhill Race</option>
+              <option>Trick Challenge</option>
+              <option>Time Trial</option>
+              <option>Free Ride</option>
+            </select></label
+          ><label>Cykel<select id="bikes"></select></label
+          ><label
+            >Ramfärg<select id="color">
+              <option value="#f97931">Mandarin</option>
+              <option value="#35c2aa">Turkos</option>
+              <option value="#eb466e">Hallon</option>
+              <option value="#498dda">Kobolt</option>
+              <option value="#e7dfc6">Pärlemor</option>
+            </select></label
+          >
+        </div>
+        <div id="modeHint"></div>
+        <div class="actions">
+          <button id="start">▶ &nbsp; Starta åket</button
+          ><button id="help">Så spelar du</button>
+        </div>
+      </section>
+      <aside id="credit">BANREFERENS &nbsp; / &nbsp; 01</aside>
+    </main>
+    <div id="stage" hidden>
+      <div id="viewport"></div>
+      <div id="hud">
+        <div class="chip">
+          <small id="hudName"></small><strong id="time">0:00</strong>
+        </div>
+        <div class="chip"><small>KM/H</small><strong id="speed">0</strong></div>
+        <div class="chip">
+          <small>POÄNG</small><strong id="points">0</strong>
+        </div>
+        <button id="camera" aria-label="Byt kamera">Vy</button
+        ><button id="pause" aria-label="Pausa">Ⅱ</button>
+      </div>
+      <div id="progress"><i></i></div>
+      <div id="raceGoal"></div>
+      <div id="toast" role="status"></div>
+      <div id="touch">
+        <div>
+          <button data-key="left" aria-label="Vänster">◀</button
+          ><button data-key="right" aria-label="Höger">▶</button>
+        </div>
+        <div>
+          <button data-key="brake">Broms</button
+          ><button data-key="pedal">Trampa</button
+          ><button data-key="jump">Hopp</button
+          ><button data-key="trick">Trick</button>
+        </div>
+      </div>
+      <div id="keyHint">
+        ↑ Trampa &nbsp; ↓ Bromsa &nbsp; ← → Styr &nbsp; Mellanslag Hoppa &nbsp;
+        T Trick &nbsp; C Kamera
+      </div>
+    </div>
+    <dialog id="panel">
+      <small>DOWNHILL &nbsp;/&nbsp; TRAIL DIVISION</small>
+      <h2 id="title"></h2>
+      <p id="message"></p>
+      <div id="choices"></div>
+    </dialog>
+    <script src="../../js/vendor/three.min.js"></script>
+    <script src="courses.js"></script>
+    <script src="world.js"></script>
+    <script src="rider.js"></script>
+    <script src="audio.js"></script>
+    <script src="game.js"></script>
+  </body>
+</html>

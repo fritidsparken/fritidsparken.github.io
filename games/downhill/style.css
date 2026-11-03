@@ -1,0 +1,344 @@
+* {
+  box-sizing: border-box;
+}
+:root {
+  color-scheme: dark;
+  font:
+    16px system-ui,
+    sans-serif;
+  color: #f6f4ea;
+  background: #132421;
+}
+body {
+  margin: 0;
+}
+button,
+select {
+  font: inherit;
+}
+button,
+a,
+select {
+  touch-action: manipulation;
+}
+button {
+  cursor: pointer;
+  border: 1px solid #ffffff38;
+  background: #20302e;
+  color: white;
+  border-radius: 10px;
+  padding: 0.74em 1em;
+  font-weight: 750;
+}
+button:hover,
+button:focus-visible {
+  outline: 2px solid #f5ba4d;
+}
+#lobby {
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.cover {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+}
+.cover:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, #0d1919f5 1%, #10201edb 33%, transparent 83%),
+    linear-gradient(0deg, #091514bf, transparent 57%);
+}
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.45rem 5vw;
+  font-size: 0.78rem;
+  letter-spacing: 0.13em;
+}
+header a {
+  color: white;
+  text-decoration: none;
+  letter-spacing: 0;
+  font-weight: bold;
+  background: #192420bb;
+  padding: 0.65em 1em;
+  border-radius: 25px;
+}
+small,
+aside,
+#number,
+.chip small {
+  font-weight: 800;
+  font-size: 0.72rem;
+  letter-spacing: 0.17em;
+  color: #ffca70;
+}
+.setup {
+  width: min(670px, 95%);
+  padding: 2rem 0 3rem 5vw;
+}
+h1 {
+  font-size: clamp(4rem, 9vw, 8rem);
+  line-height: 0.87;
+  letter-spacing: -0.085em;
+  font-weight: 950;
+  font-style: italic;
+  margin: 0.18em 0;
+}
+.intro {
+  color: #e0e9de;
+}
+.location {
+  margin: 2.4em 0 1.2em;
+  border-left: 4px solid #fbb74b;
+  padding-left: 1em;
+}
+h2 {
+  margin: 0.12em 0;
+  font-size: clamp(1.6rem, 3.3vw, 2.6rem);
+  letter-spacing: -0.045em;
+}
+#summary,
+#modeHint {
+  font-size: 0.86rem;
+  color: #dee5d7;
+}
+.options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 500px;
+}
+.options label {
+  font-size: 0.72rem;
+  color: #c6d3cc;
+  font-weight: bold;
+}
+select {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  border-radius: 9px;
+  background: #192824ec;
+  border: 1px solid #82978c7a;
+  padding: 0.65em;
+  color: white;
+  font-size: 0.96rem;
+}
+#modeHint {
+  margin: 12px 0;
+  min-height: 1.4em;
+}
+.actions,
+#choices {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+#start,
+#choices button:first-child {
+  background: #ffc251;
+  color: #1d251c;
+  border: 0;
+}
+aside {
+  position: absolute;
+  right: 4vw;
+  bottom: 4vh;
+  text-shadow: 0 1px 3px #000;
+}
+#stage {
+  position: fixed;
+  inset: 0;
+  background: #162725;
+  touch-action: none;
+  user-select: none;
+}
+#viewport,
+#viewport canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+#hud {
+  position: absolute;
+  top: max(10px, env(safe-area-inset-top));
+  left: 12px;
+  right: 12px;
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+}
+.chip,
+#hud button,
+#touch button,
+#toast,
+#keyHint {
+  background: #101e20d9;
+  border: 1px solid #b8d5cb52;
+  border-radius: 10px;
+}
+.chip {
+  padding: 0.35em 0.8em;
+}
+.chip small {
+  display: block;
+  font-size: 0.59em;
+}
+.chip strong {
+  font-variant-numeric: tabular-nums;
+}
+#camera {
+  margin-left: auto;
+}
+#progress {
+  position: absolute;
+  height: 4px;
+  top: 70px;
+  left: 15px;
+  right: 15px;
+  background: #0005;
+  border-radius: 4px;
+}
+#progress i {
+  display: block;
+  height: 100%;
+  background: #ffc351;
+  width: 0;
+}
+#toast {
+  position: absolute;
+  top: 23%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.65em 1.2em;
+  text-align: center;
+  font-weight: 800;
+  pointer-events: none;
+}
+#toast:empty {
+  display: none;
+}
+#touch {
+  display: none;
+  position: absolute;
+  bottom: max(14px, env(safe-area-inset-bottom));
+  left: 10px;
+  right: 10px;
+  justify-content: space-between;
+  align-items: flex-end;
+  pointer-events: none;
+}
+#touch div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+#touch button {
+  touch-action: none;
+  pointer-events: auto;
+  min-width: 46px;
+  min-height: 48px;
+  padding: 0.4em;
+  font-size: 0.85rem;
+}
+#touch button.on {
+  background: #926527;
+}
+#keyHint {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.4em 0.85em;
+  white-space: nowrap;
+  font-size: 0.76rem;
+}
+dialog {
+  color: #f7f4e9;
+  background: #192c2b;
+  border: 1px solid #688278;
+  border-radius: 18px;
+  padding: 1.6em;
+  width: min(440px, 92%);
+}
+dialog::backdrop {
+  background: #0b1619bf;
+}
+dialog p {
+  white-space: pre-line;
+  line-height: 1.55;
+}
+@media (pointer: coarse), (max-width: 750px) {
+  #touch {
+    display: flex;
+  }
+  #keyHint {
+    display: none;
+  }
+  aside {
+    display: none;
+  }
+}
+@media (max-width: 600px) {
+  header {
+    padding: 0.7em 4vw;
+  }
+  .setup {
+    padding: 1.5rem 0 1.8rem 4vw;
+  }
+  .cover:after {
+    background: linear-gradient(0deg, #10221ff7 18%, #10221fbc 60%, #10221f2b);
+  }
+  .location {
+    margin: 1.25em 0;
+  }
+  .chip {
+    padding: 0.35em 0.45em;
+  }
+  .chip small {
+    letter-spacing: 0.06em;
+  }
+  #hud {
+    left: 5px;
+    right: 5px;
+  }
+  #hud button {
+    padding: 0.55em;
+  }
+  .intro {
+    margin: 0.6em 0;
+  }
+}
+@media (max-height: 490px) {
+  .setup {
+    padding-top: 0;
+  }
+  .location {
+    margin: 0.7em 0;
+  }
+  h1 {
+    font-size: 3.4rem;
+  }
+}
+#raceGoal {
+  position: absolute;
+  top: 80px;
+  left: 15px;
+  background: #102020c9;
+  border-radius: 6px;
+  padding: 0.28em 0.65em;
+  font-size: 0.72rem;
+  color: #ffdc98;
+  font-weight: 700;
+}
