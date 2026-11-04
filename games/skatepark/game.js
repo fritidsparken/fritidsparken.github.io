@@ -11,8 +11,8 @@ import {
   multi,
   score,
   clamp,
-} from "./model.js?v=ramp-2";
-import { World } from "./world.js?v=ramp-2";
+} from "./model.js?v=rail-3";
+import { World } from "./world.js?v=rail-3";
 import { Sound } from "./audio.js?v=river1";
 const $ = (id) => document.getElementById(id),
   number = (n) => n.toLocaleString("sv-SE"),
@@ -274,7 +274,7 @@ function openPanel(id) {
       button("home", "Byt park eller utrustning");
   if (id === "guide") {
     html =
-      "<small>SKATE CLUB / HANDBOKEN</small><h2>Trickguide</h2><p>W / ↑ ger fart, S / ↓ bromsar. Styr med A/D eller ←/→. Hoppa med mellanslag. R återställer och Esc pausar. På mobilen styr du med vänster spak. Dra uppåt för fart och nedåt för broms. Svep högerspaken åt det håll du vill hoppa. Tricket beror på riktningen. Ett tryck i mitten ger en ollie.</p><p>Hoppa mot ett räcke i åkriktningen. Landa längs räcket för automatisk 50-50. Håll X för boardslide eller C för lipslide. Hoppa av när du vill eller glid till slutet. Håll en manual efter landningen för att fortsätta serien. Släpp för att räkna poängen.</p>";
+      "<small>SKATE CLUB / HANDBOKEN</small><h2>Trickguide</h2><p>W / ↑ ger fart, S / ↓ bromsar. Styr med A/D eller ←/→. Hoppa med mellanslag. R återställer och Esc pausar. På mobilen styr du med vänster spak. Dra uppåt för fart och nedåt för broms. Svep högerspaken åt det håll du vill hoppa. Tricket beror på riktningen. Ett tryck i mitten ger en ollie.</p><p>Hoppa mot ett räcke i åkriktningen. Landa längs räcket för automatisk 50-50. Håll X för boardslide eller C för lipslide. På räcket byter Z till grind, X till boardslide och C till lipslide. Vänster eller höger tillsammans med Z ger 5-0 eller nosegrind. Hoppa med mellanslag, gör ett lufttrick och landa längs samma räcke för att fortsätta serien. På mobilen väljer ett svep på högerspaken lufttrick och håller hoppet längs räcket. Håll en manual efter landningen för att fortsätta serien. Släpp för att räkna poängen.</p>";
     html += '<h3>Högerspakens hopp</h3><div class="rows"><span>Tryck</span><b>Ollie</b>'
       + swipeMoves.map(([arrow,id]) => "<span>"+arrow+"</span><b>"+tricks[id][0]+"</b>").join("")
       + "<span>↓ Långt svep</span><b>360 shove-it</b></div>";

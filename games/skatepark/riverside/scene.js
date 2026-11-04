@@ -1,7 +1,7 @@
 import {buildAvenue} from "./avenue.js?v=ramp-2";
 import {GLTFLoader} from "../kaj/vendor/GLTFLoader.js";
 import {riverside} from "./layout.js?v=evening";
-import {height, railPoint} from "../model.js?v=ramp-2";
+import {height, railPoint} from "../model.js?v=rail-3";
 const T=window.THREE;
 function placard(scene,word,x,y,z,w,h,graffiti=false){
  const c=document.createElement('canvas');c.width=768;c.height=256;const g=c.getContext('2d');

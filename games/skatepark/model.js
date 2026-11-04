@@ -258,18 +258,28 @@ export function reset(p, park) {
 export function act(p, k, key, emit) {
   if (p.recover > 0 || p.loop) return;
   if (key === "jump" && (!p.air || p.rail)) {
-    if (p.rail) p.ignoredRail = p.rail.r;
+    const fromRail=!!p.rail;
+    if (fromRail) p.ignoredRail=null;
     p.rail = null;
     p.manual = null;
     p.air = true;
     p.spin = 0;
     p.spinCount = 0;
-    p.vy = 7.8 + clamp(p.slope || 0, 0, 1) * p.speed * 0.45;
+    p.vy = fromRail ? 6.8 : 7.8 + clamp(p.slope || 0, 0, 1) * p.speed * 0.45;
     p.y += 0.06;
-    p.justPopped = true;
+    p.justPopped = !fromRail;
     p.nollie = !!k.brake;
     add(p, k.brake ? 1 : 0, emit);
     emit("pop");
+    return;
+  }
+  if (p.rail && ["z","x","c"].includes(key)) {
+    const id=grindTrick(k,key);
+    if (id!==p.rail.id) {
+      p.rail.id=id;
+      if (p.rail.sinceChange>=1) add(p,id,emit);
+      p.rail.sinceChange=0;
+    }
     return;
   }
   if (p.air && !p.flip && !p.stunt && ["volt","backflip","grab","melon"].includes(key)) {
@@ -309,12 +319,13 @@ export function swipeMove(x, up, full) {
 }
 export function swipeJump(p, id, x, up, emit) {
   if (p.loop || p.recover > 0 || (p.air && !p.rail)) return;
+  const fromRail=!!p.rail;
   act(p, { brake: id === 1 }, "jump", emit);
   const len = Math.hypot(x, up);
   if (!id || !len) return;
   // Add a short impulse in the camera's travel frame without turning the camera
   // or replacing the rider's forward speed. It dies away during the flight.
-  const scale = 3.2 / len;
+  const scale = fromRail ? 0 : 3.2 / len;
   p.swipe = {
     vx: scale * (x * Math.cos(p.dir) - up * Math.sin(p.dir)),
     vz: scale * (-x * Math.sin(p.dir) - up * Math.cos(p.dir)),
@@ -346,6 +357,10 @@ export function railPoint(park, r, t) {
   return [x, profile[0] + profile[1] * t, z];
 }
 const railProfiles = new WeakMap();
+function grindTrick(k,key) {
+  if (key==="z") return k.left?11:k.right?12:10;
+  return key==="x"?13:key==="c"?14:10;
+}
 function catchRail(p, k, park, emit, previousY) {
   const holding = !!(k.z || k.x || k.c);
   if ((!holding && !p.air) || p.speed < 0.9 || (p.air && p.vy > 0.8)) return;
@@ -371,20 +386,10 @@ function catchRail(p, k, park, emit, previousY) {
         : Math.abs(y - p.y) > 0.44
     )
       continue;
-    const id = !holding
-      ? 10
-      : k.z
-        ? k.left
-          ? 11
-          : k.right
-            ? 12
-            : 10
-        : k.x
-          ? 13
-          : 14;
+    const id=grindTrick(k,k.z?"z":k.x?"x":k.c?"c":"");
     p.swipe = null;
     p.stunt=null;
-    p.rail = { r, t, len, sign: Math.sign(align), id, held: holding };
+    p.rail = { r, t, len, sign: Math.sign(align), id, sinceChange: 0 };
     p.slope = ((r.profile || railProfiles.get(r))[1] * p.rail.sign) / len;
     p.air = false;
     p.flip = null;
@@ -430,6 +435,7 @@ export function tick(p, k, park, dt, emit) {
   }
   if (p.rail) {
     const g = p.rail;
+    g.sinceChange+=p.speed*dt;
     g.t += (g.sign * p.speed * dt) / g.len;
     // Carry excess distance across the welded segments of a curved bar.
     while ((g.t > 1 && g.r.next) || (g.t < 0 && g.r.prev)) {
@@ -445,7 +451,7 @@ export function tick(p, k, park, dt, emit) {
     p.speed = Math.max(1, p.speed - dt * 0.48);
     [p.x, p.y, p.z] = railPoint(park, g.r, clamp(g.t, 0, 1));
     p.base += p.speed * dt * 15 * p.holdFactor;
-    if ((g.t <= 0 && !g.r.prev) || (g.t >= 1 && !g.r.next) || (g.held && !(k.z || k.x || k.c))) {
+    if ((g.t <= 0 && !g.r.prev) || (g.t >= 1 && !g.r.next)) {
       p.rail = null;
       p.air = true;
       p.ignoredRail = g.r;
@@ -522,7 +528,7 @@ export function tick(p, k, park, dt, emit) {
       const launch=Math.max(p.vy,8.2+.32*p.speed);
       const outward=Math.max(0,(lip*size/2-(axis-center)*side));
       p.transition={across,side,cx,cz,w,d,time:0,flight:2*launch/17.5,
-        start:axis,excursion:Math.min(outward,1.1),dir:p.dir,
+        centerline:center,size,lip,start:axis,excursion:Math.min(outward,1.1),dir:p.dir,
         turn:Math.atan2(Math.sin((across?-p.dir:Math.PI-p.dir)-p.dir),Math.cos((across?-p.dir:Math.PI-p.dir)-p.dir))};
       p.vy=launch;p.air=true;p.manual=null;
       break;

@@ -6,7 +6,7 @@ import {
   clamp,
   halfWidth,
   halfDepth,
-} from "./model.js?v=ramp-2";
+} from "./model.js?v=rail-3";
 const T = window.THREE,
   v = (x, y, z) => new T.Vector3(x, y, z);
 const sphere = new T.SphereGeometry(1, 16, 12),
@@ -451,13 +451,13 @@ export class World {
     this.quality(q);
     {
       const [{ loadSunnyRider }, { finishSunnyPark }] = await Promise.all([
-        import("./sunny-rider.js?v=ramp-2"),
+        import("./sunny-rider.js?v=rail-3"),
         import("./sunny-visuals.js?v=evening-1"),
       ]);
       const results = await Promise.allSettled([
         loadSunnyRider(this.scene, !this.renderer.shadowMap.enabled,
           shirt === 0x187e75 ? null : shirt, deck === 0xe4a963 ? null : deck),
-        i===3 ? import("./riverside/scene.js?v=ramp-2").then(m=>m.buildRiverside(this.scene,floor,!this.renderer.shadowMap.enabled)) : finishSunnyPark(this.scene, floor, this.sun, q, i),
+        i===3 ? import("./riverside/scene.js?v=rail-3").then(m=>m.buildRiverside(this.scene,floor,!this.renderer.shadowMap.enabled)) : finishSunnyPark(this.scene, floor, this.sun, q, i),
       ]);
       this.sunnyRider = results[0].value;
       const failure = results.find(result => result.status === "rejected");
@@ -508,12 +508,31 @@ export class World {
     const ground = height(this.park, p.x, p.z);
     this.blob.position.set(p.x, ground + 0.027, p.z);
     this.blob.material.opacity = clamp(1 - (p.y - ground) * 0.16, 0.22, 1);
-    const dist = (innerWidth < innerHeight ? 6.1 : 5.15) + p.speed * 0.075;
-    const sx = Math.sin(p.dir),
-      cz = Math.cos(p.dir);
+    if (this.snap) this.rampView=null;
+    if (p.transition && this.rampView?.transition!==p.transition) {
+      this.rampView={transition:p.transition,yaw:p.transition.dir,zoom:0};
+    }
+    let heading=p.dir,zoom=0;
+    const view=this.rampView;
+    if (view) {
+      const tr=view.transition, axis=tr.across?p.x:p.z;
+      const depth=(axis-tr.centerline)*tr.side/(tr.size*.5);
+      if (!p.transition && (depth<.32 || Math.abs((tr.across?p.z-tr.cz:p.x-tr.cx))>(tr.across?tr.d:tr.w)*.5)) view.returning=true;
+      const extra=view.returning?0:2.2+Math.max(0,p.y-ground)*.65;
+      view.zoom+=(extra-view.zoom)*(1-Math.exp(-4*dt));
+      if(view.returning) {
+        const angle=Math.atan2(Math.sin(p.dir-view.yaw),Math.cos(p.dir-view.yaw));
+        view.yaw+=angle*(1-Math.exp(-2.5*dt));
+        if(Math.abs(angle)<.012 && view.zoom<.03)this.rampView=null;
+      }
+      heading=view.yaw;zoom=view.zoom;
+    }
+    const dist = zoom + (innerWidth < innerHeight ? 6.1 : 5.15) + p.speed * 0.075;
+    const sx = Math.sin(heading),
+      cz = Math.cos(heading);
     this.want.set(
       clamp(p.x + sx * dist + 0.95 * cz, this.scene.userData.lightAvenue && p.z>52?-83:0.6-halfWidth,this.scene.userData.lightAvenue && p.z>52?83:halfWidth-.6),
-      p.y + 2.75 + p.speed * 0.055,
+      p.y + 2.75 + zoom*.45 + p.speed * 0.055,
       clamp(p.z + cz * dist - 0.95 * sx, 0.6 - halfDepth, this.scene.userData.lightAvenue?85:halfDepth-.6),
     );
     this.want.y = Math.max(
@@ -529,6 +548,17 @@ export class World {
       this.camera.position.y,
       height(this.park, this.camera.position.x, this.camera.position.z) + 0.65,
     );
+    if(view) {
+      // Clear the entire sightline, including the coping between camera and skater.
+      const eye=this.camera.position;
+      let safeY=eye.y;
+      for(let i=1;i<=24;i++){
+        const u=i/24,x=p.x+(eye.x-p.x)*u,z=p.z+(eye.z-p.z)*u;
+        const targetY=p.y+.65;
+        safeY=Math.max(safeY,targetY+(height(this.park,x,z)+.35-targetY)/u);
+      }
+      eye.y=safeY;
+    }
     this.camera.lookAt(this.focus);
     this.snap = false;
     this.renderer.render(this.scene, this.camera);
