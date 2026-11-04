@@ -115,3 +115,128 @@
   }
   .fp-paint-back .fp-paint-stage { min-height: 65px !important; }
 }
+
+/* Landscape coloring: permanent sidebar, full toolset and palette, no scrolling. */
+@media (orientation: landscape) and (max-height: 600px) and (min-width: 560px) {
+  .fp-paint-back { padding: 0 !important; }
+  .fp-paint-back .fp-paint-dialog,
+  .fp-paint-back .fp-paint-dialog:is(.fp-paint-ghost,.fp-paint-unified) {
+    box-sizing: border-box;
+    display: grid !important;
+    width: 100% !important;
+    height: 100dvh !important;
+    max-width: 100% !important;
+    max-height: 100dvh !important;
+    grid-template-columns: minmax(270px, 42%) minmax(0, 1fr) !important;
+    grid-template-rows: auto minmax(0, 1fr) auto auto !important;
+    gap: 4px 8px !important;
+    padding: max(4px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right)) max(4px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left)) !important;
+    border-radius: 0 !important;
+    overflow: hidden !important;
+  }
+  .fp-paint-back .fp-paint-head {
+    grid-column: 1 / -1 !important;
+    grid-row: 1 !important;
+    min-height: 30px;
+    max-height: 38px;
+    gap: 6px;
+  }
+  .fp-paint-back .fp-paint-head > div { padding-top: 0 !important; }
+  .fp-paint-back .fp-paint-head h2 { font-size: 16px !important; line-height: 1.1; }
+  .fp-paint-back .fp-paint-head p { display: none !important; }
+  .fp-paint-back .fp-paint-navigation {
+    position: static !important;
+    transform: none !important;
+    gap: 5px !important;
+  }
+  .fp-paint-back .fp-paint-navigation button,
+  .fp-paint-back .fp-paint-close {
+    width: 32px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+  }
+  .fp-paint-back .fp-paint-tools,
+  .fp-paint-back .fp-paint-dialog:is(.fp-paint-ghost,.fp-paint-unified) .fp-paint-tools {
+    box-sizing: border-box;
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    grid-auto-rows: minmax(0, 1fr) !important;
+    gap: 4px !important;
+    align-content: stretch !important;
+    align-items: stretch !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+  .fp-paint-back .fp-paint-tools button,
+  .fp-paint-back .fp-paint-tools select,
+  .fp-paint-back .fp-paint-dialog:is(.fp-paint-ghost,.fp-paint-unified) .fp-paint-tools button,
+  .fp-paint-back .fp-paint-dialog:is(.fp-paint-ghost,.fp-paint-unified) .fp-paint-tools select {
+    width: 100%;
+    min-width: 0;
+    min-height: 0 !important;
+    height: 100% !important;
+    padding: 2px 3px !important;
+    border-radius: 8px !important;
+    font-size: clamp(10px, 1.7dvh, 12px) !important;
+    line-height: 1.05 !important;
+    white-space: normal !important;
+    overflow-wrap: break-word !important;
+    text-align: center;
+  }
+  .fp-paint-back .fp-paint-palette,
+  .fp-paint-back .fp-paint-dialog:is(.fp-paint-ghost,.fp-paint-unified) .fp-paint-palette {
+    box-sizing: border-box;
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-content: center !important;
+    align-items: center !important;
+    gap: 3px !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: 2px 0 !important;
+    overflow: visible !important;
+  }
+  .fp-paint-back .fp-paint-swatch,
+  .fp-paint-back .fp-paint-dialog:is(.fp-paint-ghost,.fp-paint-unified) .fp-paint-swatch {
+    box-sizing: border-box;
+    width: clamp(17px, 3.5dvh, 23px) !important;
+    height: clamp(17px, 3.5dvh, 23px) !important;
+    flex: 0 0 auto;
+  }
+  .fp-paint-back .fp-paint-custom,
+  .fp-paint-back .fp-paint-dialog:is(.fp-paint-ghost,.fp-paint-unified) .fp-paint-custom {
+    grid-column: auto !important;
+    gap: 3px !important;
+    font-size: 10px !important;
+  }
+  .fp-paint-back .fp-paint-custom input {
+    width: 23px !important;
+    height: 23px !important;
+  }
+  .fp-paint-back .fp-paint-stage,
+  .fp-paint-back .fp-paint-dialog:is(.fp-paint-ghost,.fp-paint-unified) .fp-paint-stage {
+    grid-column: 2 !important;
+    grid-row: 2 / 4 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100%;
+    border-radius: 10px !important;
+  }
+  .fp-paint-back .fp-auto-progress,
+  .fp-paint-back .fp-paint-dialog:is(.fp-paint-ghost,.fp-paint-unified) .fp-auto-progress {
+    grid-column: 1 / -1 !important;
+    grid-row: 4 !important;
+    height: 6px !important;
+    margin: 0 !important;
+  }
+  .fp-paint-back .fp-paint-status,
+  .fp-paint-back .fp-paint-dialog:is(.fp-paint-ghost,.fp-paint-unified) .fp-paint-status {
+    display: none !important;
+  }
+}
