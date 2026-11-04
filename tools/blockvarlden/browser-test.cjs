@@ -4,7 +4,7 @@ const fs=require('node:fs');
 const assert=require('node:assert/strict');
 const out='/tmp/blockvarlden-results';
 fs.mkdirSync(out,{recursive:true});
-const entry=fs.existsSync('games/blockvarlden/expedition.html')?'expedition.html':'';
+const entry='';
 const runs=[
  ['desktop',chromium,{viewport:{width:1100,height:680}}],
  ['touch-landscape',chromium,{...devices['Pixel 7'],viewport:{width:850,height:393}}],

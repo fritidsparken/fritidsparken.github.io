@@ -12,16 +12,26 @@ export function column(x,z,s){
  const biome=height<SEA-1?10:height<=SEA+1?9:height>44?4:height>38?3:heat>.66?(humid<.38?5:humid>.57?6:7):humid>.76?(heat<.38?11:8):heat<.35?1:humid<.46?2:0;
  return {height,biome};
 }
+export function worldColumn(x,z,seed,legacy){
+ const c=column(x,z,seed);
+ if(legacy){const distance=Math.max(0,-13-x,x-12,-13-z,z-12);
+  if(distance<40){const t=distance/40;c.height=Math.floor(4+(c.height-4)*t);c.biome=0}}
+ return c;
+}
 export function generate(cx,cz,seed,ids,legacy,edits){
  const data=new Uint16Array(18*18*HEIGHT), idx=(x,y,z)=>x+18*(z+18*y);
  for(let z=0;z<18;z++)for(let x=0;x<18;x++){
-  const wx=cx*16+x-1,wz=cz*16+z-1,{height:h,biome:b}=column(wx,wz,seed);
-  const top=[1,ids.moss,1,3,ids.snow,6,1,1,ids.clay,6,6,ids.moss][b]||1;
+  const wx=cx*16+x-1,wz=cz*16+z-1,{height:h,biome:b}=worldColumn(wx,wz,seed,legacy);
+  const patch=hash(Math.floor(wx/5),Math.floor(wz/5),seed+51);
+  const top=[patch>.87?24:1,patch>.65?19:ids.moss,1,patch>.58?14:3,ids.snow,patch>.72?22:6,1,patch>.7?24:1,patch>.65?18:ids.clay,patch>.79?7:6,patch>.76?8:6,ids.moss][b];
+  const strata=[3,3,12,13,14,15,21,27,28,29],rockAt=y=>strata[(Math.floor(y/6)+Math.floor(patch*4))%strata.length];
+  const nearLegacy=legacy&&Math.max(-13-wx,wx-12,-13-wz,wz-12)<40;
+  const sea=nearLegacy?0:SEA;
   const phase=wx*.137+Math.sin(wz*.075+seed%81), arch=wz*.111+Math.cos(wx*.063+seed%39);
   const sectorX=Math.floor(wx/96),sectorZ=Math.floor(wz/96), chamberX=sectorX*96+18+Math.floor(hash(sectorX,sectorZ,seed+101)*58),chamberZ=sectorZ*96+18+Math.floor(hash(sectorX,sectorZ,seed+102)*58);
   const rx=Math.abs(wx-chamberX),rz=Math.abs(wz-chamberZ),level=9+Math.floor(hash(sectorX,sectorZ,seed+103)*5);
-  for(let y=0;y<=Math.max(h,SEA);y++){
-   let id=y>h?ids.water:y===h?top:y>=h-2?(top===6?6:2):3;
+  for(let y=0;y<=Math.max(h,sea);y++){
+   let id=y>h?ids.water:y===h?top:y>=h-2?([6,22].includes(top)?top:b===8?17:2):rockAt(y);
    if(y>1&&y<h-2){const cave=Math.sin(phase+y*.142)+Math.cos(arch-y*.159)+.72*Math.sin(wx*.062+wz*.09+y*.24);if(cave>1.57)id=y<5?ids.lava:y<9?ids.water:0;else if(hash(wx+y*29,wz-y*7,seed)>.975)id=76+Math.floor(hash(wx-y,wz+y,seed+13)*(y<18?12:5));}
    if(rx<=5&&rz<=5&&h>level+5&&y>=level&&y<=level+4){
     if(y===level||y===level+4||((rx===5||rz===5)&&rx+rz>5))id=y===level&&rx===0&&rz===0?142:93;
