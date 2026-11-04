@@ -71,8 +71,7 @@ function cards() {
     .map(
       (i, position) => {
         const a = parks[i];
-        return
-        '<button class="card" data-park="' +
+        return '<button class="card" data-park="' +
         i +
         '" aria-pressed="' +
         (s.park === i) +
