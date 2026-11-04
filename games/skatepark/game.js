@@ -123,6 +123,18 @@ touchLayout.addEventListener("change", () => {
   updateControls();
 });
 updateControls();
+// Prevent Safari's double-tap zoom while playing without blocking simultaneous touches.
+let lastTapEnd = 0;
+document.addEventListener("touchend", (event) => {
+  if (mode !== "play" || event.touches.length || event.changedTouches.length !== 1) {
+    lastTapEnd = 0;
+    return;
+  }
+  const now = performance.now();
+  if (now - lastTapEnd < 300 && event.cancelable) event.preventDefault();
+  lastTapEnd = now;
+}, { passive: false });
+
 window.addEventListener("pointerdown", e => {
   if (e.pointerType === "touch" && touchLayout.matches && keyboardUsed) {
     keyboardUsed = false;
