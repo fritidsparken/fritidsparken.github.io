@@ -54,7 +54,7 @@
     const landscape = window.innerWidth > window.innerHeight;
     if (!dialog || !landscape) {
       restore();
-      if (lastDialog) lastDialog.removeAttribute("data-fp-layout");
+      if (lastDialog) { lastDialog.removeAttribute("data-fp-layout"); lastDialog.querySelector(".fp-layout-indicator")?.remove(); }
       lastDialog = dialog;
       return;
     }
