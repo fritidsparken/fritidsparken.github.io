@@ -43,7 +43,7 @@ const s = {
   deck: 0,
   shirt: 0,
   riverside: true,
-  park: (stored.park!==3 || stored.riverside) && parks[stored.park] ? stored.park : 0,
+  park: (stored.park!==3 || stored.riverside) && parks[stored.park] ? stored.park : 3,
 };
 if (new URLSearchParams(location.search).get("bana")==="riverside") s.park=3;
 for (const [slot, items] of [
@@ -67,27 +67,30 @@ const keys = {},
   sources = new Map(),
   dialog = $("dialog");
 function cards() {
-  $("parks").innerHTML = parks
+  $("parks").innerHTML = [3, 0, 1, 2]
     .map(
-      (a, i) =>
+      (i, position) => {
+        const a = parks[i];
+        return
         '<button class="card" data-park="' +
         i +
         '" aria-pressed="' +
         (s.park === i) +
         '"><img src="park-' +
         i +
-        '.webp?v=evening" alt=""><div><small>0' +
-        (i + 1) +
+        '.webp?v=riverside-icon-1" alt=""><div><small>0' +
+        (position + 1) +
         " / " +
         a.area +
         "</small><strong>" +
         a.name +
         "</strong><span>Rekord " +
         number(s.best[i]) +
-        " p</span></div></button>",
+        " p</span></div></button>";
+      },
     )
     .join("");
-  $("hero").style.backgroundImage = 'url("park-' + s.park + '.webp?v=evening")';
+  $("hero").style.backgroundImage = 'url("park-' + s.park + '.webp?v=riverside-icon-1")';
 }
 function flash(t, seconds = 3) {
   $("message").textContent = t;
