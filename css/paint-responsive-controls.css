@@ -1,0 +1,117 @@
+/* Keep all painting controls reachable in portrait and landscape.
+   The drawing stage keeps its own touch/zoom handling; only controls scroll. */
+.fp-paint-back .fp-paint-dialog {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 100% !important;
+}
+.fp-paint-back .fp-paint-head,
+.fp-paint-back .fp-paint-tools,
+.fp-paint-back .fp-paint-palette,
+.fp-paint-back .fp-paint-stage {
+  min-width: 0;
+}
+.fp-paint-back .fp-paint-tools {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+.fp-paint-back .fp-paint-tools [data-action="auto"],
+.fp-paint-back .fp-paint-tools [data-action="reference"],
+.fp-paint-back .fp-paint-tools [data-action="save"] {
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 700px) {
+  .fp-paint-back .fp-paint-dialog {
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    padding: max(6px, env(safe-area-inset-top)) 8px max(6px, env(safe-area-inset-bottom)) !important;
+    gap: 5px !important;
+    overflow: hidden !important;
+  }
+  .fp-paint-back .fp-paint-head > div { padding-top: 0 !important; min-width: 0; }
+  .fp-paint-back .fp-paint-head h2 { font-size: 17px !important; }
+  .fp-paint-back .fp-paint-head p { font-size: 11px !important; }
+  .fp-paint-back .fp-paint-navigation {
+    position: static !important;
+    transform: none !important;
+    flex: 0 0 auto;
+    gap: 3px !important;
+  }
+  .fp-paint-back .fp-paint-navigation button { width: 32px !important; height: 32px !important; }
+  .fp-paint-back .fp-paint-close { width: 34px !important; height: 34px !important; }
+  .fp-paint-back .fp-paint-tools {
+    flex: 0 1 auto !important;
+    min-height: 70px !important;
+    max-height: min(30dvh, 180px) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    align-content: flex-start;
+    padding: 2px 2px 5px;
+  }
+  .fp-paint-back .fp-paint-tools button,
+  .fp-paint-back .fp-paint-tools select {
+    min-height: 34px !important;
+    white-space: normal !important;
+    line-height: 1.2 !important;
+  }
+  .fp-paint-back .fp-paint-palette {
+    flex: 0 1 auto !important;
+    max-height: 64px !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    padding: 3px 3px 4px;
+  }
+  .fp-paint-back .fp-paint-stage { flex: 1 1 0 !important; min-height: 85px !important; }
+  .fp-paint-back .fp-paint-status { font-size: 10px !important; }
+}
+@media (max-width: 700px) and (orientation: landscape) {
+  .fp-paint-back .fp-paint-head p { display: none !important; }
+  .fp-paint-back .fp-paint-tools {
+    max-height: min(29dvh, 112px) !important;
+    min-height: 44px !important;
+  }
+  .fp-paint-back .fp-paint-palette { max-height: 38px !important; }
+  .fp-paint-back .fp-paint-stage { min-height: 72px !important; }
+  .fp-paint-back .fp-paint-swatch { width: 25px !important; height: 25px !important; }
+}
+@media (min-width: 701px) {
+  .fp-paint-back .fp-paint-dialog:is(.fp-paint-ghost,.fp-paint-unified) {
+    width: min(1480px, 100%) !important;
+    max-height: calc(100dvh - 32px) !important;
+    min-height: 0 !important;
+    grid-template-rows: auto minmax(0, 1fr) auto auto auto !important;
+  }
+  .fp-paint-back .fp-paint-dialog:is(.fp-paint-ghost,.fp-paint-unified) .fp-paint-tools {
+    min-height: 0 !important;
+    max-height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+  .fp-paint-back .fp-paint-dialog:is(.fp-paint-ghost,.fp-paint-unified) .fp-paint-palette {
+    max-height: min(22dvh, 155px);
+    overflow-y: auto;
+  }
+}
+@media (min-width: 701px) and (max-height: 550px) {
+  .fp-paint-back .fp-paint-dialog {
+    height: calc(100dvh - 16px) !important;
+    max-height: calc(100dvh - 16px) !important;
+    padding: 6px !important;
+    gap: 4px !important;
+  }
+  .fp-paint-back .fp-paint-head > div { padding-top: 0 !important; }
+  .fp-paint-back .fp-paint-navigation { position: static !important; transform: none !important; }
+  .fp-paint-back .fp-paint-head p { display: none !important; }
+  .fp-paint-back .fp-paint-dialog:not(.fp-paint-ghost):not(.fp-paint-unified) .fp-paint-tools {
+    max-height: 100px !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+  }
+  .fp-paint-back .fp-paint-dialog:not(.fp-paint-ghost):not(.fp-paint-unified) .fp-paint-palette {
+    max-height: 38px !important;
+    overflow-y: auto !important;
+  }
+  .fp-paint-back .fp-paint-stage { min-height: 65px !important; }
+}
