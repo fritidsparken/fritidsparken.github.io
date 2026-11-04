@@ -1,5 +1,6 @@
 (() => {
   const games=[
+    {id:'blockvarlden',title:'Blockvärlden',tag:'BYGG DIN EGEN VÄRLD',type:'3D · Bygg & äventyr',image:'game-icons-2026/blockvarlden.svg',text:'Gräv, samla och bygg i en helt egen färgglad kubvärld. Välj kreativt läge eller överlevnad!',url:'./games/blockvarlden/'},
     {id:'skatepark',title:'Skatepark',tag:'HITTA DITT FLYT',type:'3D · Skateboard',image:'game-icons-2026/new-skatepark.webp',text:'Åk fritt i fyra parker och testa loopen i Riverside. Sätt din första kickflip, grinda ett räcke och bygg din egen trickserie.',url:'./games/skatepark/'},
     {id:'downhill',title:'DOWNHILL',tag:'HITTA DIN LINJE',type:'3D · Mountainbike',image:'game-icons-2026/new-downhill.webp',text:'Cykla från alpängar till neonramper på 20 leder. Välj cykel, hoppa över raviner och landa trick.',url:'./games/downhill/'},
     {id:'kart',title:'Kart Racing',tag:'DIN PLATS PÅ STARTLINJEN',type:'3D · Racing',image:'game-icons-2026/new-kart.webp',text:'Drifta genom tolv världar, samla föremål och tävla om tre cuper med åtta gokarts.',url:'./games/kart-racing/'},
