@@ -1,6 +1,6 @@
 import { GLTFLoader } from "./kaj/vendor/GLTFLoader.js";
 import { addSunnyCity } from "./sunny-city.js";
-import { parks, halfWidth, halfDepth } from "./model.js?v=sunny-flick-1";
+import { parks, halfWidth, halfDepth } from "./model.js?v=coast-neon-1";
 
 const T = window.THREE;
 const shared = new URL("../../assets/skatepark/shared/", import.meta.url);
@@ -41,12 +41,12 @@ async function plantAvenues(scene, loader, low) {
   }));
 }
 
-function addCoping(scene) {
+function addCoping(scene, park) {
   const metal = new T.MeshStandardMaterial({
     color: 0xa7aba5, roughness: 0.37, metalness: 0.65,
     envMap: scene.background, envMapIntensity: 0.52
   });
-  for (const [kind, x, z, w, d] of parks[0].shapes) {
+  for (const [kind, x, z, w, d] of park.shapes) {
     if (kind !== "bowl") continue;
     const points = Array.from({length: 64}, (_, i) => {
       const angle = i * Math.PI / 32;
@@ -78,12 +78,12 @@ function addLawn(scene, turf) {
   }
 }
 
-export async function finishSunnyPark(scene, floor, sun, quality) {
+export async function finishSunnyPark(scene, floor, sun, quality, i) {
   const low = quality === "låg" || (quality === "auto" &&
     (matchMedia("(pointer:coarse)").matches || innerWidth < 700));
   const loader = new GLTFLoader(), textures = new T.TextureLoader();
   const [ground, mineral, grass] = await Promise.all([
-    textures.loadAsync(new URL("./sunny/courtyard.webp", import.meta.url).href),
+    textures.loadAsync(new URL(["./sunny/courtyard.webp","./sunny/boardwalk.webp","./sunny/night.webp"][i], import.meta.url).href),
     textures.loadAsync(new URL("textures/cast-mineral.jpg", shared).href),
     textures.loadAsync(new URL("../downhill/art/grass.webp", import.meta.url).href)
   ]);
@@ -104,16 +104,17 @@ export async function finishSunnyPark(scene, floor, sun, quality) {
   floor.material.needsUpdate = true;
 
   const fill = scene.children.find(light => light.isHemisphereLight);
-  fill.color.setHex(0xe2f0ff);
-  fill.groundColor.setHex(0xb59d83);
+  fill.color.setHex([0xe2f0ff,0xffede3,0xa5afff][i]);
+  fill.groundColor.setHex([0xb59d83,0xcaa582,0x846ca5][i]);
   fill.intensity = 1.32;
-  sun.color.setHex(0xffe0ac);
-  sun.intensity = 2.15;
+  sun.color.setHex([0xffe0ac,0xffcb93,0xaecbff][i]);
+  sun.intensity = [2.15,2.1,1.25][i];
   sun.position.set(-54,59,38);
   sun.shadow.normalBias = .025;
-  scene.fog.color.setHex(0xc5d4cf);
+  scene.fog.color.setHex([0xc5d4cf,0xedc3aa,0x484368][i]);
   scene.fog.density = .0048;
-  addLawn(scene, grass);
-  addCoping(scene);
-  await Promise.all([plantAvenues(scene,loader,low), addSunnyCity(scene,loader,low)]);
+  if(i===0) addLawn(scene, grass); else grass.dispose();
+  addCoping(scene, parks[i]);
+  if(i===0) await Promise.all([plantAvenues(scene,loader,low), addSunnyCity(scene,loader,low)]);
+  if(i===2) await addSunnyCity(scene,loader,true);
 }

@@ -121,9 +121,6 @@ export const parks = [
     ],
   },
 ];
-// Keep the three original park indices stable for existing records and saves.
-export const quayIndex = parks.length;
-parks.push({ name: "Stadsgårdskajen", area: "STOCKHOLM", shapes: [], rails: [], halfWidth: 52, halfDepth: 56 });
 export const halfWidth = 56,
   halfDepth = 52;
 export const clamp = (x, a, b) => Math.max(a, Math.min(b, x));

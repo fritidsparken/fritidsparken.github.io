@@ -6,7 +6,7 @@ import {
   clamp,
   halfWidth,
   halfDepth,
-} from "./model.js?v=sunny-flick-1";
+} from "./model.js?v=coast-neon-1";
 const T = window.THREE,
   v = (x, y, z) => new T.Vector3(x, y, z);
 const sphere = new T.SphereGeometry(1, 16, 12),
@@ -203,6 +203,16 @@ function environment(scene, park, i) {
     }
   }
   if (i === 1) {
+    // Timber beach cabins along the promenade leave an open sightline to the sea.
+    for (let n=0;n<6;n++) {
+      const x=-47+n*6.3,z=-halfDepth-6,paint=[0x54a9a3,0xe6af74,0xcd7868][n%3];
+      box(paint,x,1.36,z,4,2.72,3.5);
+      box(0xf5e5c9,x,2.84,z,4.45,.32,3.95);
+      box(0x466877,x-.70,1.08,z+1.76,.96,2.16,.09);
+      box(0xf7edda,x+.80,1.72,z+1.77,1.18,1.04,.1);
+      box(0x7dadaf,x+.80,1.72,z+1.84,.99,.84,.07);
+      for(const offset of [-1.88,1.88])box(0xf3dfbd,x+offset,1.35,z+1.76,.14,2.7,.12);
+    }
     box(0x54b4bc, -0.5, -0.43, -halfDepth - 35, 200, 0.2, 48);
     for (let j = 0; j < 45; j++)
       box(
@@ -248,31 +258,6 @@ function environment(scene, park, i) {
       g.computeVertexNormals();
       scene.add(new T.Mesh(g, mat(0xffeace, { side: T.DoubleSide })));
       ball(0x385873, x, 0.1, -halfDepth - 24, 2.8, 0.37, 0.7);
-    }
-  } else if (i !== 0) {
-    const facade = mat(0xffffff, { map: skylineTexture(i) });
-    for (let j = 0; j < 3; j++) {
-      const h = 4 + ((j * 13) % 5);
-      part(
-        scene,
-        cube,
-        facade,
-        27 + j * 15,
-        h / 2,
-        -halfDepth - 10 - (j % 2) * 4,
-        13,
-        h,
-        7,
-      );
-      box(
-        0x535361,
-        27 + j * 15,
-        h,
-        -halfDepth - 10 - (j % 2) * 4,
-        13.5,
-        0.5,
-        7.6,
-      );
     }
   }
   const sign = new T.Mesh(
@@ -389,130 +374,6 @@ function environment(scene, park, i) {
   }
   return floor;
 }
-function skater(shirt, deck) {
-  const group = new T.Group(),
-    body = new T.Group(),
-    board = new T.Group();
-  group.add(board, body);
-  const skin = mat(0xd8a17e),
-    helmet = mat(0x233646),
-    cloth = mat(shirt),
-    pants = mat(0x34475a),
-    shoe = mat(0x202938),
-    white = mat(0xf6e6cf),
-    black = mat(0x283136),
-    silver = mat(0xb9c3c4, { metalness: 0.65 }),
-    paint = mat(deck);
-  const blob = (parent, m, x, y, z, a, b, c) =>
-    part(parent, sphere, m, x, y, z, a, b, c);
-  blob(board, paint, 0, 0.13, 0, 0.25, 0.063, 0.68);
-  blob(board, black, 0, 0.166, 0, 0.24, 0.043, 0.66);
-  for (const sign of [-1, 1]) {
-    blob(board, paint, 0, 0.18, 0.53 * sign, 0.235, 0.055, 0.19).rotation.x =
-      -sign * 0.22;
-    part(board, cube, silver, 0, 0.087, sign * 0.38, 0.4, 0.09, 0.08);
-    for (const x of [-0.205, 0.205])
-      part(
-        board,
-        tube,
-        white,
-        x,
-        0.082,
-        sign * 0.38,
-        0.154,
-        0.084,
-        0.154,
-      ).rotation.z = Math.PI / 2;
-  }
-  const graphic = canvasTex(256, 512, (c) => {
-    c.fillStyle = "#" + deck.toString(16).padStart(6, "0");
-    c.fillRect(0, 0, 256, 512);
-    c.strokeStyle = "#143a43";
-    c.lineWidth = 16;
-    if (deck === 0xe4a963) {
-      for (let n = 0; n < 5; n++) {
-        c.beginPath();
-        c.moveTo(0, 65 + n * 90);
-        c.lineTo(256, n * 90);
-        c.stroke();
-      }
-    } else if (deck === 0xff704f) {
-      for (let n = 0; n < 4; n++) {
-        c.beginPath();
-        c.arc(128, 250, 33 + n * 39, 0, Math.PI * 2);
-        c.stroke();
-      }
-    } else {
-      for (let n = 0; n < 18; n++) {
-        const x = (n * 91) % 246,
-          y = (n * 47) % 500;
-        c.fillStyle = n % 3 ? "#f4ffff" : "#254979";
-        c.fillRect(x, y, 8, 8);
-      }
-    }
-    c.fillStyle = "#ffedd0";
-    c.font = "italic bold 90px sans-serif";
-    c.fillText("FP", 58, 285);
-  });
-  const print = new T.Mesh(
-    new T.CircleGeometry(1, 36),
-    mat(0xffffff, { map: graphic }),
-  );
-  print.scale.set(0.23, 0.62, 1);
-  print.rotation.x = Math.PI / 2;
-  print.position.y = 0.071;
-  board.add(print);
-  for (const z of [-0.38, 0.38])
-    for (const x of [-0.07, 0.07])
-      blob(board, silver, x, 0.212, z, 0.014, 0.007, 0.014);
-  const torso = blob(body, cloth, 0, 1.01, 0.015, 0.28, 0.33, 0.265);
-  blob(body, cloth, 0.045, 1.25, 0.06, 0.25, 0.14, 0.22);
-  blob(body, cloth, 0, 0.83, 0.015, 0.263, 0.12, 0.238);
-  blob(body, helmet, 0, 0.86, 0.206, 0.135, 0.075, 0.085);
-  blob(body, skin, 0, 1.48, -0.035, 0.192, 0.237, 0.193);
-  blob(body, helmet, 0, 1.61, -0.027, 0.216, 0.17, 0.213);
-  blob(body, helmet, 0, 1.58, -0.13, 0.205, 0.057, 0.147);
-  for (const x of [-0.203, 0.203])
-    blob(body, helmet, x, 1.45, -0.02, 0.025, 0.1, 0.022);
-  const badge = canvasTex(128, 96, (c) => {
-    c.fillStyle = "#fff5cf";
-    c.font = "italic 900 67px sans-serif";
-    c.fillText("FP", 9, 74);
-  });
-  const logo = new T.Mesh(
-    new T.PlaneGeometry(0.205, 0.14),
-    new T.MeshBasicMaterial({ map: badge, transparent: true }),
-  );
-  logo.position.set(0, 1.09, 0.26);
-  body.add(logo);
-  for (let n = 0; n < 3; n++) {
-    blob(body, black, -0.1 + n * 0.1, 1.735, -0.045, 0.021, 0.015, 0.055);
-  }
-  blob(body, skin, 0.17, 1.47, -0.04, 0.039, 0.06, 0.043);
-  blob(body, skin, 0.04, 1.48, -0.208, 0.051, 0.04, 0.049);
-  const limbs = [];
-  for (const s of [-1, 1]) {
-    const leg = new T.Group();
-    leg.position.set(0, 0.86, s * 0.25);
-    body.add(leg);
-    blob(leg, pants, -0.03, -0.16, 0.015 * s, 0.13, 0.24, 0.137);
-    blob(leg, pants, 0.015, -0.43, 0.04 * s, 0.11, 0.19, 0.12);
-    blob(leg, helmet, 0.055, -0.34, 0.035 * s, 0.099, 0.094, 0.11);
-    blob(leg, shoe, -0.035, -0.61, 0.04 * s, 0.19, 0.085, 0.115);
-    blob(leg, white, -0.035, -0.659, 0.04 * s, 0.19, 0.038, 0.116);
-    const arm = new T.Group();
-    arm.position.set(0, 1.2, s * 0.22);
-    body.add(arm);
-    blob(arm, cloth, 0.025, -0.105, s * 0.045, 0.12, 0.17, 0.118);
-    blob(arm, skin, 0.047, -0.31, s * 0.1, 0.078, 0.16, 0.081);
-    blob(arm, skin, 0.045, -0.44, s * 0.12, 0.084, 0.087, 0.078);
-    limbs.push({ leg, arm, s });
-  }
-  group.traverse((o) => {
-    if (o.isMesh) o.castShadow = true;
-  });
-  return { group, body, board, limbs, torso };
-}
 export class World {
   constructor(canvas) {
     this.renderer = new T.WebGLRenderer({
@@ -582,22 +443,19 @@ export class World {
     this.sun = sun;
     const floor = environment(this.scene, park, i);
     this.quality(q);
-    if (i === 0) {
+    {
       const [{ loadSunnyRider }, { finishSunnyPark }] = await Promise.all([
         import("./sunny-rider.js"),
-        import("./sunny-visuals.js?v=sun-1"),
+        import("./sunny-visuals.js?v=coast-neon-1"),
       ]);
       const results = await Promise.allSettled([
         loadSunnyRider(this.scene, !this.renderer.shadowMap.enabled,
           shirt === 0x187e75 ? null : shirt, deck === 0xe4a963 ? null : deck),
-        finishSunnyPark(this.scene, floor, this.sun, q),
+        finishSunnyPark(this.scene, floor, this.sun, q, i),
       ]);
       this.sunnyRider = results[0].value;
       const failure = results.find(result => result.status === "rejected");
       if (failure) throw failure.reason;
-    } else {
-      this.avatar = skater(shirt, deck);
-      this.scene.add(this.avatar.group);
     }
     const shadow = canvasTex(64, 64, (c) => {
       const g = c.createRadialGradient(32, 32, 1, 32, 32, 32);
@@ -638,74 +496,8 @@ export class World {
     this.camera.fov = innerWidth < innerHeight ? 66 : 55;
     this.camera.updateProjectionMatrix();
   }
-  updateParkSkater(p, k, dt) {
-    const { group, body, board, limbs } = this.avatar,
-      air = p.air,
-      steer = Number(!!k.right) - Number(!!k.left);
-    group.position.set(p.x, p.y + 0.015, p.z);
-    group.rotation.order = "YXZ";
-    const blend = this.snap ? 1 : 1 - Math.exp(-dt * 24);
-    const follow = (from, to) =>
-      from + Math.atan2(Math.sin(to - from), Math.cos(to - from)) * blend;
-    group.rotation.y = follow(group.rotation.y, p.dir + p.stance + p.spin);
-    group.rotation.x = follow(
-      group.rotation.x,
-      air ? 0 : Math.atan(p.slope || 0) * Math.cos(p.stance),
-    );
-    group.rotation.z = steer * 0.095;
-    const push = !air && !p.manual && !p.rail && k.go ? Math.sin(p.kick) : 0,
-      crouch = p.squat * 0.16 + (air ? 0.095 : 0);
-    body.position.y += (-crouch - body.position.y) * blend;
-    body.rotation.z = -0.085 - steer * 0.085;
-    body.rotation.x = push * 0.045;
-    for (const { leg, arm, s } of limbs) {
-      leg.rotation.x = s === 1 ? push * 0.54 : -crouch * 0.85;
-      leg.position.y = 0.86 + crouch * 0.4;
-      arm.rotation.x = follow(
-        arm.rotation.x,
-        -s *
-          (0.27 + (air ? 0.83 : 0) + (p.manual !== null || p.rail ? 0.36 : 0)) +
-          push * 0.15,
-      );
-      arm.rotation.z = 0.19 + steer * 0.28;
-    }
-    const prevX = board.rotation.x,
-      prevY = board.rotation.y,
-      prevZ = board.rotation.z;
-    board.rotation.set(
-      p.manual === 15
-        ? -0.21
-        : p.manual === 16
-          ? 0.21
-          : p.rail?.id === 11
-            ? -0.17
-            : p.rail?.id === 12
-              ? 0.17
-              : 0,
-      0,
-      0,
-    );
-    if (p.rail?.id >= 13)
-      board.rotation.y = p.rail.id === 13 ? Math.PI / 2 : -Math.PI / 2;
-    if (air)
-      board.rotation.x = (p.nollie ? -1 : 1) * clamp(p.vy / 16, -0.24, 0.34);
-    if (p.flip) {
-      const a = Math.PI * 2 * clamp(p.flip.t / p.flip.duration, 0, 1);
-      const id = p.flip.id;
-      board.rotation.z = id === 3 ? -a : [2, 8, 9].includes(id) ? a : 0;
-      board.rotation.y = [7, 9].includes(id)
-        ? a
-        : [4, 8].includes(id)
-          ? a / 2
-          : 0;
-    }
-    board.rotation.x = follow(prevX, board.rotation.x);
-    board.rotation.y = follow(prevY, p.deckYaw + board.rotation.y);
-    board.rotation.z = follow(prevZ, board.rotation.z);
-  }
   draw(p, k, dt) {
-    if (this.sunnyRider) this.sunnyRider.update(p, k, dt, this.snap);
-    else this.updateParkSkater(p, k, dt);
+    this.sunnyRider.update(p, k, dt, this.snap);
     const ground = height(this.park, p.x, p.z);
     this.blob.position.set(p.x, ground + 0.027, p.z);
     this.blob.material.opacity = clamp(1 - (p.y - ground) * 0.16, 0.22, 1);
