@@ -6,7 +6,7 @@ import {
   clamp,
   halfWidth,
   halfDepth,
-} from "./model.js?v=street-lines-2";
+} from "./model.js?v=sunny-flick-1";
 const T = window.THREE,
   v = (x, y, z) => new T.Vector3(x, y, z);
 const sphere = new T.SphereGeometry(1, 16, 12),
@@ -97,6 +97,7 @@ function plaza(park, scene) {
   );
   floor.receiveShadow = true;
   scene.add(floor);
+  return floor;
 }
 function skylineTexture(i) {
   return canvasTex(1024, 256, (c) => {
@@ -184,7 +185,7 @@ function environment(scene, park, i) {
       e.z,
     );
   }
-  plaza(park, scene);
+  const floor = plaza(park, scene);
   const land = i === 1 ? 0xe3bc90 : i === 2 ? 0x464256 : 0x91a164;
   for (const side of [-1, 1]) {
     box(land, side * (halfWidth + 13), -0.35, 0, 26, 0.58, halfDepth * 2 + 12);
@@ -248,7 +249,7 @@ function environment(scene, park, i) {
       scene.add(new T.Mesh(g, mat(0xffeace, { side: T.DoubleSide })));
       ball(0x385873, x, 0.1, -halfDepth - 24, 2.8, 0.37, 0.7);
     }
-  } else {
+  } else if (i !== 0) {
     const facade = mat(0xffffff, { map: skylineTexture(i) });
     for (let j = 0; j < 3; j++) {
       const h = 4 + ((j * 13) % 5);
@@ -289,41 +290,44 @@ function environment(scene, park, i) {
       bar([x, 0.65, z], [x + 5, 0.65, z], 0.06, 0x526c69);
     }
   }
-  const foliage = new T.TextureLoader().load(
-    "../downhill/art/" + (i === 1 ? "palm" : "oak") + ".webp",
-  );
-  foliage.colorSpace = T.SRGBColorSpace;
-  const leafGeo = new T.PlaneGeometry(1, 1);
-  leafGeo.rotateX(-Math.PI / 2);
-  const leaves = mat(0xffffff, {
-    map: foliage,
-    alphaTest: 0.33,
-    side: T.DoubleSide,
-  });
-  for (let j = 0; j < 20; j++) {
-    const x = (j % 2 ? -1 : 1) * (halfWidth + 3 + (j % 4)),
-      z = -halfDepth + Math.floor(j / 2) * 11;
-    const h = 4 + (j % 3);
-    bar([x, 0, z], [x + 0.25, h, z], 0.39, 0x86654b);
-    const layers = i === 1 ? 2 : 4;
-    for (let level = 0; level < layers; level++) {
-      for (let k = 0; k < 8; k++) {
-        const angle = (k * Math.PI) / 4 + level * 0.83 + j * 0.75,
-          len =
-            (i === 1 ? 3.7 : 3.5 - level * 0.5) * (1 + 0.11 * Math.sin(j + k));
-        stamp(
-          leafGeo,
-          0xffffff,
-          x + Math.sin(angle) * len * 0.39,
-          h - 0.45 + level * (i === 1 ? 0.22 : 0.64),
-          z + Math.cos(angle) * len * 0.39,
-          len,
-          1,
-          len * 0.86,
-          0.28 + level * 0.08,
-          angle - Math.PI / 2,
-          0,
-        );
+  let leafGeo, leaves;
+  if (i !== 0) {
+    const foliage = new T.TextureLoader().load(
+      "../downhill/art/" + (i === 1 ? "palm" : "oak") + ".webp",
+    );
+    foliage.colorSpace = T.SRGBColorSpace;
+    leafGeo = new T.PlaneGeometry(1, 1);
+    leafGeo.rotateX(-Math.PI / 2);
+    leaves = mat(0xffffff, {
+      map: foliage,
+      alphaTest: 0.33,
+      side: T.DoubleSide,
+    });
+    for (let j = 0; j < 20; j++) {
+      const x = (j % 2 ? -1 : 1) * (halfWidth + 3 + (j % 4)),
+        z = -halfDepth + Math.floor(j / 2) * 11;
+      const h = 4 + (j % 3);
+      bar([x, 0, z], [x + 0.25, h, z], 0.39, 0x86654b);
+      const layers = i === 1 ? 2 : 4;
+      for (let level = 0; level < layers; level++) {
+        for (let k = 0; k < 8; k++) {
+          const angle = (k * Math.PI) / 4 + level * 0.83 + j * 0.75,
+            len =
+              (i === 1 ? 3.7 : 3.5 - level * 0.5) * (1 + 0.11 * Math.sin(j + k));
+          stamp(
+            leafGeo,
+            0xffffff,
+            x + Math.sin(angle) * len * 0.39,
+            h - 0.45 + level * (i === 1 ? 0.22 : 0.64),
+            z + Math.cos(angle) * len * 0.39,
+            len,
+            1,
+            len * 0.86,
+            0.28 + level * 0.08,
+            angle - Math.PI / 2,
+            0,
+          );
+        }
       }
     }
   }
@@ -383,6 +387,7 @@ function environment(scene, park, i) {
     mesh.castShadow = mesh.receiveShadow = true;
     scene.add(mesh);
   }
+  return floor;
 }
 function skater(shirt, deck) {
   const group = new T.Group(),
@@ -522,14 +527,17 @@ export class World {
     this.want = v(0, 0, 0);
     this.target = v(0, 0, 0);
   }
-  build(i, shirt, deck, q) {
+  async build(i, shirt, deck, q) {
+    this.sunnyRider?.dispose();
+    this.sunnyRider = null;
     if (this.scene) {
       const materials = new Set(),
         geometry = new Set();
       this.scene.traverse((o) => {
         if (o.geometry && ![cube, tube, sphere].includes(o.geometry))
           geometry.add(o.geometry);
-        if (o.material) materials.add(o.material);
+        for (const material of [].concat(o.material || [])) materials.add(material);
+        if (o.skeleton) o.skeleton.dispose();
         if (o.isInstancedMesh) o.dispose();
       });
       geometry.forEach((g) => g.dispose());
@@ -572,9 +580,25 @@ export class World {
     sun.shadow.bias = -0.001;
     this.scene.add(sun);
     this.sun = sun;
-    environment(this.scene, park, i);
-    this.avatar = skater(shirt, deck);
-    this.scene.add(this.avatar.group);
+    const floor = environment(this.scene, park, i);
+    this.quality(q);
+    if (i === 0) {
+      const [{ loadSunnyRider }, { finishSunnyPark }] = await Promise.all([
+        import("./sunny-rider.js"),
+        import("./sunny-visuals.js?v=sun-1"),
+      ]);
+      const results = await Promise.allSettled([
+        loadSunnyRider(this.scene, !this.renderer.shadowMap.enabled,
+          shirt === 0x187e75 ? null : shirt, deck === 0xe4a963 ? null : deck),
+        finishSunnyPark(this.scene, floor, this.sun, q),
+      ]);
+      this.sunnyRider = results[0].value;
+      const failure = results.find(result => result.status === "rejected");
+      if (failure) throw failure.reason;
+    } else {
+      this.avatar = skater(shirt, deck);
+      this.scene.add(this.avatar.group);
+    }
     const shadow = canvasTex(64, 64, (c) => {
       const g = c.createRadialGradient(32, 32, 1, 32, 32, 32);
       g.addColorStop(0, "#0009");
@@ -595,7 +619,6 @@ export class World {
     this.blob.rotation.x = -Math.PI / 2;
     this.scene.add(this.blob);
     this.snap = true;
-    this.quality(q);
   }
   quality(q) {
     const light =
@@ -615,7 +638,7 @@ export class World {
     this.camera.fov = innerWidth < innerHeight ? 66 : 55;
     this.camera.updateProjectionMatrix();
   }
-  draw(p, k, dt) {
+  updateParkSkater(p, k, dt) {
     const { group, body, board, limbs } = this.avatar,
       air = p.air,
       steer = Number(!!k.right) - Number(!!k.left);
@@ -679,6 +702,10 @@ export class World {
     board.rotation.x = follow(prevX, board.rotation.x);
     board.rotation.y = follow(prevY, p.deckYaw + board.rotation.y);
     board.rotation.z = follow(prevZ, board.rotation.z);
+  }
+  draw(p, k, dt) {
+    if (this.sunnyRider) this.sunnyRider.update(p, k, dt, this.snap);
+    else this.updateParkSkater(p, k, dt);
     const ground = height(this.park, p.x, p.z);
     this.blob.position.set(p.x, ground + 0.027, p.z);
     this.blob.material.opacity = clamp(1 - (p.y - ground) * 0.16, 0.22, 1);

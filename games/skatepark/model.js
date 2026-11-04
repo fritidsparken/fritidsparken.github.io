@@ -184,6 +184,7 @@ export function rider() {
     air: false,
     spin: 0,
     spinCount: 0,
+    swipe: null,
     stance: 0,
     deckYaw: 0,
     settle: 0,
@@ -263,9 +264,37 @@ export function act(p, k, key, emit) {
         : k.right
           ? 7
           : 4;
+  startFlip(p, id, emit);
+}
+function startFlip(p, id, emit) {
   p.flip = { id, t: 0, duration: id === 9 ? 0.48 : 0.38 };
   add(p, id, emit);
   emit("swish");
+}
+// Eight thumb directions clockwise from up. A longer downward flick adds a full shove-it.
+export const swipeMoves = [
+  ["↑", 1], ["↗", 9], ["→", 3], ["↘", 6],
+  ["↓", 4], ["↙", 5], ["←", 2], ["↖", 8],
+];
+export function swipeMove(x, up, full) {
+  if (Math.hypot(x, up) < .29) return 0;
+  const sector = (Math.round(Math.atan2(x, up) / (Math.PI / 4)) + 8) % 8;
+  return sector === 4 && full ? 7 : swipeMoves[sector][1];
+}
+export function swipeJump(p, id, x, up, emit) {
+  if (p.recover > 0 || (p.air && !p.rail)) return;
+  act(p, { brake: id === 1 }, "jump", emit);
+  const len = Math.hypot(x, up);
+  if (!id || !len) return;
+  // Add a short impulse in the camera's travel frame without turning the camera
+  // or replacing the rider's forward speed. It dies away during the flight.
+  const scale = 3.2 / len;
+  p.swipe = {
+    vx: scale * (x * Math.cos(p.dir) - up * Math.sin(p.dir)),
+    vz: scale * (-x * Math.sin(p.dir) - up * Math.cos(p.dir)),
+    spin: id === 5 ? Math.PI : id === 6 ? -Math.PI : 0,
+  };
+  if (id > 1 && !p.swipe.spin) startFlip(p, id, emit);
 }
 export function railPoint(park, r, t) {
   const x = r[0] + (r[2] - r[0]) * t,
@@ -327,6 +356,7 @@ function catchRail(p, k, park, emit, previousY) {
         : k.x
           ? 13
           : 14;
+    p.swipe = null;
     p.rail = { r, t, len, sign: Math.sign(align), id, held: holding };
     p.slope = ((r.profile || railProfiles.get(r))[1] * p.rail.sign) / len;
     p.air = false;
@@ -426,15 +456,24 @@ export function tick(p, k, park, dt, emit) {
     }
     p.manual = manual;
   } else {
-    p.spin -= turn(k) * dt * (park.sampleHeight ? 7.1 : 5.8);
+    if (p.swipe?.spin) {
+      p.spin = Math.sign(p.swipe.spin) * Math.min(Math.PI, Math.abs(p.spin) + 7.6 * dt);
+    } else if (!p.swipe) {
+      p.spin -= turn(k) * dt * (park.sampleHeight ? 7.1 : 5.8);
+    }
     const n = Math.floor((Math.abs(p.spin) + 0.1) / Math.PI);
     if (n > p.spinCount) {
       p.spinCount = n;
       add(p, park.sampleHeight && n % 2 === 0 ? 17 : p.spin > 0 ? 5 : 6, emit);
     }
   }
-  const nx = p.x - Math.sin(p.dir) * p.speed * dt,
-    nz = p.z - Math.cos(p.dir) * p.speed * dt;
+  const nx = p.x + ((p.swipe?.vx || 0) - Math.sin(p.dir) * p.speed) * dt,
+    nz = p.z + ((p.swipe?.vz || 0) - Math.cos(p.dir) * p.speed) * dt;
+  if (p.swipe) {
+    const drag = Math.exp(-2.8 * dt);
+    p.swipe.vx *= drag;
+    p.swipe.vz *= drag;
+  }
   const limitX = park.halfWidth || halfWidth, limitZ = park.halfDepth || halfDepth;
   p.x = clamp(nx, 1 - limitX, limitX - 1);
   p.z = clamp(nz, 1 - limitZ, limitZ - 1);
@@ -475,11 +514,12 @@ export function tick(p, k, park, dt, emit) {
       // After a 180 the rider rolls switch; the velocity and chase camera keep their heading.
       p.stance =
         (p.stance + Math.round(p.spin / Math.PI) * Math.PI) % (2 * Math.PI);
-      if (park.sampleHeight) {
+      if (park.sampleHeight && !p.swipe) {
         // Roll away regular along the landing heading after a completed half-turn.
         p.dir += Math.round(p.spin / Math.PI) * Math.PI;
         p.stance = 0;
       }
+      p.swipe = null;
       p.settle = 0.32;
       p.ignoredRail = null;
       p.spin = 0;

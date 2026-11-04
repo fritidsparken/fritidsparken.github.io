@@ -357,6 +357,7 @@ dialog button {
   color: #182326;
 }
 #touch #jumpStick {
+  position: relative;
   grid-column: 1 / -1;
   justify-self: end;
   width: clamp(76px, 17vmin, 96px);
@@ -433,4 +434,19 @@ dialog button {
   dialog {
     max-height: 93dvh;
   }
+}
+
+#jumpStick small, #jumpPreview {
+  position: absolute;
+  pointer-events: none;
+}
+#jumpStick small { opacity: .78; font-size: .69rem; line-height: 1; }
+#jumpStick small:nth-of-type(1) { top: 4px; }
+#jumpStick small:nth-of-type(2) { right: 4px; }
+#jumpStick small:nth-of-type(3) { bottom: 4px; }
+#jumpStick small:nth-of-type(4) { left: 4px; }
+#jumpPreview:not(:empty) {
+  right: calc(100% + 6px); bottom: 12%;
+  white-space: nowrap; background: #142428ed; color: var(--mint);
+  padding: 3px 7px; border-radius: 6px; font-size: .7rem;
 }

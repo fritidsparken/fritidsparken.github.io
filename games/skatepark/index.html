@@ -10,7 +10,7 @@
     <title>Skatepark · Fritidsparken</title>
     <link rel="stylesheet" href="./kaj/controls.css" />
     <link rel="icon" href="../../assets/game-icons-2026/new-skatepark.webp" />
-    <link rel="stylesheet" href="./style.css?v=touch-pair-1" />
+    <link rel="stylesheet" href="./style.css?v=sunny-flick-1" />
     <link rel="stylesheet" href="../ride-stick.css?v=1" />
   </head>
   <body>
@@ -55,7 +55,7 @@
         <div class="ride-stick" role="group" aria-label="Styrspak. Dra uppåt för fart och nedåt för broms."><span></span></div>
         <div class="pad tricks">
           <button data-key="z">Z</button><button data-key="x">X</button
-          ><button data-key="c">C</button><button id="jumpStick" class="ride-stick" aria-label="Hoppa. Dra uppåt eller tryck."><span>Hopp</span></button>
+          ><button data-key="c">C</button><button id="jumpStick" class="ride-stick" aria-label="Svep i hoppriktningen för ett trick. Tryck för ollie."><span>Hopp</span><small aria-hidden="true">↑</small><small aria-hidden="true">→</small><small aria-hidden="true">↓</small><small aria-hidden="true">←</small><output id="jumpPreview"></output></button>
         </div>
       </div>
       <button id="reset" aria-label="Återställ åkaren">↺</button>
@@ -66,6 +66,6 @@
     </dialog>
     <script src="../ride-stick.js?v=1"></script>
     <script src="../../js/vendor/three.min.js"></script>
-    <script type="module" src="./game.js?v=touch-pair-1"></script>
+    <script type="module" src="./game.js?v=sunny-flick-1"></script>
   </body>
 </html>

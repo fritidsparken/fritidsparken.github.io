@@ -4,13 +4,16 @@ import {
   tricks,
   rider,
   act,
+  swipeJump,
+  swipeMove,
+  swipeMoves,
   tick,
   reset,
   multi,
   score,
   clamp,
-} from "./model.js?v=quay-studio-1";
-import { World } from "./world.js?v=street-lines-2";
+} from "./model.js?v=sunny-flick-1";
+import { World } from "./world.js?v=sunny-flick-1";
 import { Sound } from "./audio.js";
 import { KajSound } from "../../assets/skatepark/shared/sounds/kaj-sound.js";
 const $ = (id) => document.getElementById(id),
@@ -112,7 +115,7 @@ const stick = createRideStick(document.querySelector(".ride-stick"));
 const jumpBase = $("jumpStick");
 const jumpStick = createRideStick(jumpBase);
 const touchLayout = matchMedia("(pointer: coarse) and (hover: none) and (any-hover: none)");
-let jumpPointer = null, jumpStarted = false, keyboardUsed = false;
+let jumpPointer = null, keyboardUsed = false;
 function updateControls() {
   const hide = !touchLayout.matches || keyboardUsed;
   if (hide && !$("touch").hidden) clearKeys();
@@ -129,29 +132,38 @@ window.addEventListener("pointerdown", e => {
     updateControls();
   }
 }, true);
-function triggerJump() {
-  if (mode === "play" && !jumpStarted) {
-    jumpStarted = true;
-    act(p, rideKeys(), "jump", event);
+function readJumpGesture(e, release) {
+  const gesture = jumpPointer;
+  if (e.pointerId !== gesture?.id || gesture.fired || mode !== "play") return;
+  const x = (e.clientX - gesture.x) / gesture.radius;
+  const up = (gesture.y - e.clientY) / gesture.radius;
+  const full = Math.hypot(x, up) >= .92;
+  const id = swipeMove(x, up, full);
+  $("jumpPreview").textContent = tricks[id][0];
+  if (full || release) {
+    gesture.fired = true;
+    swipeJump(p, id, x, up, event);
   }
+}
+function clearJumpGesture() {
+  jumpPointer = null;
+  $("jumpPreview").textContent = "";
 }
 jumpBase.addEventListener("pointerdown", e => {
   if (!jumpBase.hasPointerCapture(e.pointerId)) return;
-  jumpPointer = e.pointerId;
-  jumpStarted = false;
-  if (jumpStick.y > .25) triggerJump();
+  jumpPointer = { id: e.pointerId, x: e.clientX, y: e.clientY,
+    radius: jumpBase.clientWidth * .30, fired: false };
+  $("jumpPreview").textContent = tricks[0][0];
 });
-jumpBase.addEventListener("pointermove", e => {
-  if (e.pointerId === jumpPointer && jumpStick.y > .25) triggerJump();
-});
+jumpBase.addEventListener("pointermove", e => readJumpGesture(e, false));
 jumpBase.addEventListener("pointerup", e => {
-  if (e.pointerId !== jumpPointer) return;
-  triggerJump();
-  jumpPointer = null;
+  if (e.pointerId !== jumpPointer?.id) return;
+  readJumpGesture(e, true);
+  clearJumpGesture();
 });
 for (const type of ["pointercancel", "lostpointercapture"]) {
   jumpBase.addEventListener(type, e => {
-    if (e.pointerId === jumpPointer) jumpPointer = null;
+    if (e.pointerId === jumpPointer?.id) clearJumpGesture();
   });
 }
 function rideKeys() {
@@ -164,7 +176,7 @@ function rideKeys() {
   };
 }
 function clearKeys() {
-  jumpPointer = null;
+  clearJumpGesture();
   jumpStick.reset();
   stick.reset();
   sources.clear();
@@ -205,7 +217,7 @@ async function start() {
       await world.build(s.kajQuality, s.shirt && shirts[s.shirt][1], s.deck && decks[s.deck][1]);
     } else {
       world = legacyWorld;
-      world.build(s.park, shirts[s.shirt][1], decks[s.deck][1], s.quality);
+      await world.build(s.park, shirts[s.shirt][1], decks[s.deck][1], s.quality);
       sound = legacySound;
     }
   } catch (e) {
@@ -236,7 +248,7 @@ async function start() {
   resumeAudio();
   flash(
     !$("touch").hidden
-      ? "Styr med vänster spak. Dra högerspaken uppåt eller tryck på Hopp!"
+      ? "Styr med vänster spak. Svep med högerspaken för att hoppa åt det hållet och göra ett trick!"
       : "Håll W för fart. Hoppa med mellanslag och tryck Z för en kickflip!",
     6,
   );
@@ -292,7 +304,10 @@ function openPanel(id) {
       button("home", "Byt park eller utrustning");
   if (id === "guide") {
     html =
-      "<small>SKATE CLUB / HANDBOKEN</small><h2>Trickguide</h2><p>W / ↑ ger fart, S / ↓ bromsar. Styr med A/D eller ←/→. Hoppa med mellanslag. R återställer och Esc pausar. På mobilen styr du med vänster spak. Dra uppåt för fart och nedåt för broms. Dra högerspaken uppåt eller tryck på den för att hoppa.</p><p>Hoppa mot ett räcke i åkriktningen. Landa längs räcket för automatisk 50-50. Håll X för boardslide eller C för lipslide. Hoppa av när du vill eller glid till slutet. Håll en manual efter landningen för att fortsätta serien. Släpp för att räkna poängen.</p>";
+      "<small>SKATE CLUB / HANDBOKEN</small><h2>Trickguide</h2><p>W / ↑ ger fart, S / ↓ bromsar. Styr med A/D eller ←/→. Hoppa med mellanslag. R återställer och Esc pausar. På mobilen styr du med vänster spak. Dra uppåt för fart och nedåt för broms. Svep högerspaken åt det håll du vill hoppa. Tricket beror på riktningen. Ett tryck i mitten ger en ollie.</p><p>Hoppa mot ett räcke i åkriktningen. Landa längs räcket för automatisk 50-50. Håll X för boardslide eller C för lipslide. Hoppa av när du vill eller glid till slutet. Håll en manual efter landningen för att fortsätta serien. Släpp för att räkna poängen.</p>";
+    html += '<h3>Högerspakens hopp</h3><div class="rows"><span>Tryck</span><b>Ollie</b>'
+      + swipeMoves.map(([arrow,id]) => "<span>"+arrow+"</span><b>"+tricks[id][0]+"</b>").join("")
+      + "<span>↓ Långt svep</span><b>360 shove-it</b></div>";
     for (const [title, a, b] of [
       ["Hopp och rotation", 0, 10],
       ["Grind och slide", 10, 15],
