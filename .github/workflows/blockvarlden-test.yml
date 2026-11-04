@@ -1,0 +1,33 @@
+name: Blockvärlden browser test
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'games/blockvarlden/**'
+      - 'assets/blockvarlden/**'
+      - 'tools/blockvarlden/**'
+      - '.github/workflows/blockvarlden-test.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install browser test dependencies in temporary storage
+        run: |
+          npm install --prefix "$RUNNER_TEMP/bv-test" --no-save playwright@1.55.0
+          "$RUNNER_TEMP/bv-test/node_modules/.bin/playwright" install --with-deps chromium webkit
+      - name: Test desktop and touch game flows
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          python3 -m http.server 8124 --bind 127.0.0.1 >/tmp/blockvarlden-http.log 2>&1 &
+          NODE_PATH="$RUNNER_TEMP/bv-test/node_modules" node tools/blockvarlden/browser-test.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: blockvarlden-browser-results
+          path: /tmp/blockvarlden-results
