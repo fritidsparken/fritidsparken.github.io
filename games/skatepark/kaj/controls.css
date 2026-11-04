@@ -1,0 +1,7 @@
+#menu #parks { grid-template-columns: repeat(4,minmax(0,1fr)); }
+@media(max-width:640px){ #menu #parks {grid-template-columns:repeat(2,minmax(0,1fr));} }
+#ride.kaj #touch { bottom:max(15px,env(safe-area-inset-bottom)); }
+#ride.kaj .ride-stick { width:clamp(78px,19vmin,108px); align-self:end; }
+#ride.kaj .tricks { grid-template-columns:repeat(3,minmax(42px,54px)); }
+#ride.kaj .tricks button { font-size:.76rem; }
+@media(max-height:480px){#ride.kaj #message {top:11px;max-width:44%;font-size:.77rem;} }

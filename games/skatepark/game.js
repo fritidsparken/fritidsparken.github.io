@@ -1,5 +1,6 @@
 import {
   parks,
+  quayIndex,
   tricks,
   rider,
   act,
@@ -8,9 +9,10 @@ import {
   multi,
   score,
   clamp,
-} from "./model.js?v=street-lines-2";
+} from "./model.js?v=quay-studio-1";
 import { World } from "./world.js?v=street-lines-2";
 import { Sound } from "./audio.js";
+import { KajSound } from "../../assets/skatepark/shared/sounds/kaj-sound.js";
 const $ = (id) => document.getElementById(id),
   number = (n) => n.toLocaleString("sv-SE"),
   key = "fp-skatepark-v1";
@@ -37,10 +39,13 @@ const s = {
   quality: ["auto", "låg", "hög"].includes(stored.quality)
     ? stored.quality
     : "auto",
+  kajQuality: ["auto","low","medium","high"].includes(stored.kajQuality) ? stored.kajQuality : "auto",
+  kajMusicEnabled: stored.kajMusicEnabled !== false,
   deck: 0,
   shirt: 0,
   park: parks[stored.park] ? stored.park : 0,
 };
+if (new URLSearchParams(location.search).get("bana") === "stadsgardskajen") s.park = quayIndex;
 for (const [slot, items] of [
   ["deck", decks],
   ["shirt", shirts],
@@ -51,7 +56,7 @@ function save() {
     localStorage.setItem(key, JSON.stringify(s));
   } catch {}
 }
-let world,
+let legacyWorld, legacySound, quaySound, world,
   sound,
   p,
   mode = "home",
@@ -132,17 +137,51 @@ function input(source, k, down) {
     ?.classList.toggle("pressed", keys[k]);
   if (keys[k] && !before) act(p, rideKeys(), k, event);
 }
-function start() {
+async function start() {
+  if (mode !== "home") return;
+  const quay = s.park === quayIndex;
+  const play = $("play");
+  mode = "loading";
+  $("menu").inert = true;
+  play.textContent = quay ? "Laddar kajen …" : "Spela ▶";
+  $("error").textContent = "";
   try {
-    world ??= new World($("game"));
-    world.build(s.park, shirts[s.shirt][1], decks[s.deck][1], s.quality);
+    legacyWorld ??= new World($("game"));
+    if (quay) {
+      quaySound ??= new KajSound();
+      sound = quaySound;
+      // Resume inside the original touch gesture before fetching the model modules.
+      try { sound.start(s.park,s); } catch { /* Gameplay also works with audio disabled. */ }
+      const { KajWorld, configurePhysics } = await import("./kaj/world.js");
+      configurePhysics(parks[quayIndex]);
+      world = new KajWorld(legacyWorld.renderer);
+      await world.build(s.kajQuality, s.shirt && shirts[s.shirt][1], s.deck && decks[s.deck][1]);
+    } else {
+      world = legacyWorld;
+      world.build(s.park, shirts[s.shirt][1], decks[s.deck][1], s.quality);
+      sound = legacySound;
+    }
   } catch (e) {
     console.error(e);
+    if (quay) { quaySound?.stop(); world?.dispose?.(); world = legacyWorld; }
+    mode = "home";
     $("error").textContent =
       "3D kunde inte starta. Aktivera grafikacceleration i webbläsaren och försök igen.";
+    if (quay && legacyWorld) $("error").textContent = "Kajen kunde inte laddas. Kontrollera uppkopplingen och tryck Spela igen.";
     return;
+  } finally {
+    $("menu").inert = false;
+    play.textContent = "Spela ▶";
   }
   p = rider();
+  if (quay) {
+    p.z = 30;
+    p.safe = [0, 30];
+  }
+  $("ride").classList.toggle("kaj", quay);
+  for (const [key, label] of [["z","Flip"],["x","Hälflip"],["c","Shove"]]) {
+    document.querySelector('[data-key="' + key + '"]').textContent = quay ? label : key.toUpperCase();
+  }
   $("menu").hidden = true;
   $("ride").hidden = false;
   mode = "play";
@@ -158,7 +197,7 @@ function start() {
 }
 function resumeAudio() {
   try {
-    sound ??= new Sound();
+    if (!sound) sound = legacySound ??= new Sound();
     sound.start(s.park, s);
   } catch {
     flash("Ljudet kunde inte starta. Du kan fortsätta åka.");
@@ -179,6 +218,10 @@ function resume() {
 }
 function home() {
   dialog.close();
+  if (s.park === quayIndex && world !== legacyWorld) {
+    world?.dispose?.();
+    world = legacyWorld;
+  }
   clearKeys();
   mode = "home";
   sound?.stop();
@@ -253,6 +296,15 @@ function openPanel(id) {
         )
         .join("") +
       '</select></label><h3>Ljudkällor</h3><p>Musik: Funk Game Loop av Kevin MacLeod. Hela låten, nivåjusterad och omkodad. <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100839" target="_blank" rel="noopener">Original</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.</p><p>Parkljud av Joseph SARDIN och Axeline T., omkodade till mono. <a href="https://bigsoundbank.com/ambiance-skate-parc-parisien-1-s3543.html" target="_blank" rel="noopener">BigSoundBank · CC0</a>. Hav och syrsor: transitking och Ted Kerr. <a href="../minigolf/assets/audio/credits.html" target="_blank" rel="noopener">Ljudkällor och licenser</a>. Brädans rörelseljud skapas i spelet.</p>';
+  if (id === "settings" && s.park === quayIndex) {
+    const options = [["auto","Automatiskt"],["low","Låg"],["medium","Mellan"],["high","Hög"]]
+      .map(([value,label]) => '<option value="' + value + '" ' + (s.kajQuality === value ? 'selected' : '') + '>' + label + '</option>').join("");
+    html = html.slice(0, html.indexOf('<label>Grafikkvalitet')) +
+      '<label>Bakgrundsmusik<input type="checkbox" data-setting="kajMusicEnabled" ' + (s.kajMusicEnabled ? 'checked' : '') + '></label>' +
+      '<label>Grafikkvalitet<select data-setting="kajQuality">' + options + '</select></label>' +
+      '<p>Grafikläget används nästa gång du öppnar kajen. Kaj Evening Session och skateboardljuden är skapade för Stadsgårdskajen och får återanvändas under CC0.</p>';
+  }
+  if (id === "guide" && s.park === quayIndex) html += "<p>På kajen motsvarar Flip, Hälflip och Shove tangenterna Z, X och C. Håll svängen genom luften för en 360.</p>";
   if (id === "kit") {
     html =
       "<small>SKATE CLUB / UTRUSTNING</small><h2>Min utrustning</h2><p>Samla poäng i valfri park. Hittills: " +
@@ -315,7 +367,8 @@ document.addEventListener("click", (e) => {
 dialog.addEventListener("input", (e) => {
   const k = e.target.dataset.setting;
   if (!k) return;
-  s[k] = k === "quality" ? e.target.value : Number(e.target.value);
+  s[k] = k === "kajMusicEnabled" ? e.target.checked :
+    (k === "quality" || k === "kajQuality") ? e.target.value : Number(e.target.value);
   save();
   sound?.volumes(s);
   if (k === "quality" && world?.scene) world.quality(s.quality);

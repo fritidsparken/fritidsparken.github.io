@@ -121,6 +121,9 @@ export const parks = [
     ],
   },
 ];
+// Keep the three original park indices stable for existing records and saves.
+export const quayIndex = parks.length;
+parks.push({ name: "Stadsgårdskajen", area: "STOCKHOLM", shapes: [], rails: [], halfWidth: 52, halfDepth: 56 });
 export const halfWidth = 56,
   halfDepth = 52;
 export const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
@@ -149,7 +152,7 @@ export function surface(shape, x, z) {
   }
 }
 export const height = (park, x, z) =>
-  park.shapes.reduce((sum, s) => sum + surface(s, x, z), 0);
+  park.sampleHeight ? park.sampleHeight(x, z) : park.shapes.reduce((sum, s) => sum + surface(s, x, z), 0);
 export const tricks = [
   ["Ollie", 50, "Hopp"],
   ["Nollie", 75, "Broms + hopp"],
@@ -168,6 +171,7 @@ export const tricks = [
   ["Lipslide", 250, "Håll C vid räcket"],
   ["Manual", 100, "Håll X på marken"],
   ["Nose manual", 150, "Håll C på marken"],
+  ["360", 300, "Håll svängen ett helt varv i luften"],
 ];
 export function rider() {
   return {
@@ -267,6 +271,7 @@ export function railPoint(park, r, t) {
   const x = r[0] + (r[2] - r[0]) * t,
     z = r[1] + (r[3] - r[1]) * t;
   // A handrail is one straight bar, including above steps and ledges.
+  if (r.profile) return [x, r.profile[0] + r.profile[1] * t, z];
   let profile = railProfiles.get(r);
   if (!profile) {
     const start = height(park, r[0], r[1]),
@@ -290,7 +295,7 @@ function catchRail(p, k, park, emit, previousY) {
   const holding = !!(k.z || k.x || k.c);
   if ((!holding && !p.air) || p.speed < 0.9 || (p.air && p.vy > 0.8)) return;
   for (const r of park.rails) {
-    if (r === p.ignoredRail) continue;
+    if (r === p.ignoredRail || (r.line && r.line === p.ignoredRail?.line)) continue;
     const dx = r[2] - r[0],
       dz = r[3] - r[1],
       len = Math.hypot(dx, dz);
@@ -323,7 +328,7 @@ function catchRail(p, k, park, emit, previousY) {
           ? 13
           : 14;
     p.rail = { r, t, len, sign: Math.sign(align), id, held: holding };
-    p.slope = (railProfiles.get(r)[1] * p.rail.sign) / len;
+    p.slope = ((r.profile || railProfiles.get(r))[1] * p.rail.sign) / len;
     p.air = false;
     p.flip = null;
     p.manual = null;
@@ -356,10 +361,21 @@ export function tick(p, k, park, dt, emit) {
   if (p.rail) {
     const g = p.rail;
     g.t += (g.sign * p.speed * dt) / g.len;
+    // Carry excess distance across the welded segments of a curved bar.
+    while ((g.t > 1 && g.r.next) || (g.t < 0 && g.r.prev)) {
+      const advance = g.t > 1;
+      const excess = (advance ? g.t - 1 : g.t) * g.len;
+      g.r = advance ? g.r.next : g.r.prev;
+      const dx = g.r[2] - g.r[0], dz = g.r[3] - g.r[1];
+      g.len = Math.hypot(dx, dz);
+      g.t = (advance ? 0 : 1) + excess / g.len;
+      p.dir = Math.atan2(-dx * g.sign, -dz * g.sign);
+      p.slope = g.r.profile[1] * g.sign / g.len;
+    }
     p.speed = Math.max(1, p.speed - dt * 0.48);
     [p.x, p.y, p.z] = railPoint(park, g.r, clamp(g.t, 0, 1));
     p.base += p.speed * dt * 15 * p.holdFactor;
-    if (g.t <= 0 || g.t >= 1 || (g.held && !(k.z || k.x || k.c))) {
+    if ((g.t <= 0 && !g.r.prev) || (g.t >= 1 && !g.r.next) || (g.held && !(k.z || k.x || k.c))) {
       p.rail = null;
       p.air = true;
       p.ignoredRail = g.r;
@@ -410,17 +426,18 @@ export function tick(p, k, park, dt, emit) {
     }
     p.manual = manual;
   } else {
-    p.spin -= turn(k) * dt * 5.8;
+    p.spin -= turn(k) * dt * (park.sampleHeight ? 7.1 : 5.8);
     const n = Math.floor((Math.abs(p.spin) + 0.1) / Math.PI);
     if (n > p.spinCount) {
       p.spinCount = n;
-      add(p, p.spin > 0 ? 5 : 6, emit);
+      add(p, park.sampleHeight && n % 2 === 0 ? 17 : p.spin > 0 ? 5 : 6, emit);
     }
   }
   const nx = p.x - Math.sin(p.dir) * p.speed * dt,
     nz = p.z - Math.cos(p.dir) * p.speed * dt;
-  p.x = clamp(nx, 1 - halfWidth, halfWidth - 1);
-  p.z = clamp(nz, 1 - halfDepth, halfDepth - 1);
+  const limitX = park.halfWidth || halfWidth, limitZ = park.halfDepth || halfDepth;
+  p.x = clamp(nx, 1 - limitX, limitX - 1);
+  p.z = clamp(nz, 1 - limitZ, limitZ - 1);
   if (nx !== p.x || nz !== p.z) {
     p.speed *= 0.88;
     if (p.speed > 3 && p.squat === 0) {
@@ -458,6 +475,11 @@ export function tick(p, k, park, dt, emit) {
       // After a 180 the rider rolls switch; the velocity and chase camera keep their heading.
       p.stance =
         (p.stance + Math.round(p.spin / Math.PI) * Math.PI) % (2 * Math.PI);
+      if (park.sampleHeight) {
+        // Roll away regular along the landing heading after a completed half-turn.
+        p.dir += Math.round(p.spin / Math.PI) * Math.PI;
+        p.stance = 0;
+      }
       p.settle = 0.32;
       p.ignoredRail = null;
       p.spin = 0;
@@ -470,7 +492,7 @@ export function tick(p, k, park, dt, emit) {
         clear(p);
         p.summary = "Oj! Upp på brädan igen.";
         p.speed *= 0.3;
-        p.recover = 0.45;
+        p.recover = park.sampleHeight ? 0.95 : 0.45;
         emit("bail");
       }
     }
