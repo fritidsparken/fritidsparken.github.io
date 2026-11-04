@@ -2,16 +2,19 @@
 const {chromium,webkit,devices}=require('playwright');
 const fs=require('node:fs');
 const assert=require('node:assert/strict');
-const out='/tmp/blockvarlden-results';
+const path=require('node:path');
+const out=path.join(process.env.RUNNER_TEMP||require('node:os').tmpdir(),'blockvarlden-results');
 fs.mkdirSync(out,{recursive:true});
 const entry='';
-const runs=[
+const linuxRuns=[
  ['desktop',chromium,{viewport:{width:1100,height:680}}],
  ['touch-landscape',chromium,{...devices['Pixel 7'],viewport:{width:850,height:393}}],
  ['touch-portrait',webkit,{...devices['iPhone 13'],viewport:{width:390,height:844}}]
 ];
+const native=process.env.BLOCKVARLDEN_PLATFORM;
+const runs=native==='windows'?[['windows-chrome',chromium,{viewport:{width:1100,height:680}}]]:native==='macos'?[['macos-webkit',webkit,{viewport:{width:1100,height:680}}]]:linuxRuns;
 async function test([name,type,device]){
- const browser=await type.launch(type===chromium?{args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']}:{});
+ const browser=await type.launch(native==='windows'?{channel:'chrome'}:type===chromium?{args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']}:{});
  const page=await browser.newPage(device),errors=[];page.setDefaultTimeout(25000);
  page.on('pageerror',e=>errors.push(e.message));
  page.on('console',m=>{if(m.type()==='error'&&/shader|WebGL|THREE|Uncaught/i.test(m.text()))errors.push(m.text())});
@@ -41,7 +44,7 @@ async function test([name,type,device]){
   await page.locator('#home').waitFor({state:'visible'});
   await page.reload();await page.getByRole('button',{name:'Fortsätt'}).click();
   await page.locator('#stats').filter({hasText:'Mat'}).waitFor();
-  assert.deepEqual(errors,[]);console.log(JSON.stringify({name,fps,renderer:'CI software graphics',flow:'pass'}));
+  assert.deepEqual(errors,[]);console.log(JSON.stringify({name,fps,renderer:native?'hosted runner':'CI software graphics',flow:'pass'}));
  }catch(e){await page.screenshot({path:out+'/'+name+'-failure.png'}).catch(()=>{});console.error(name,errors,await page.locator('body').innerText().catch(()=>''));throw e}finally{await browser.close()}
 }
 (async()=>{let failed=false;for(const r of runs)try{await test(r)}catch(e){failed=true;console.error(e)}if(failed)process.exitCode=1})();

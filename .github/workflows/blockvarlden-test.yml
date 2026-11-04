@@ -30,4 +30,37 @@ jobs:
         if: always()
         with:
           name: blockvarlden-browser-results
-          path: /tmp/blockvarlden-results
+          path: ${{ runner.temp }}/blockvarlden-results
+
+  native-desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: windows
+          - os: macos-latest
+            platform: macos
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 12
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install test driver
+        run: npm install --prefix "$RUNNER_TEMP/bv-test" --no-save playwright@1.55.0
+      - name: Install WebKit for macOS
+        if: runner.os == 'macOS'
+        run: node "$RUNNER_TEMP/bv-test/node_modules/playwright/cli.js" install webkit
+      - name: Exercise the published game entry point
+        env:
+          BLOCKVARLDEN_PLATFORM: ${{ matrix.platform }}
+        run: |
+          python -m http.server 8124 --bind 127.0.0.1 > "$RUNNER_TEMP/blockvarlden-http.log" 2>&1 &
+          NODE_PATH="$RUNNER_TEMP/bv-test/node_modules" node tools/blockvarlden/browser-test.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: blockvarlden-${{ matrix.platform }}-results
+          path: ${{ runner.temp }}/blockvarlden-results
