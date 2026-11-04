@@ -21,7 +21,12 @@ async function test([name,type,device]){
  try{
   await page.goto('http://127.0.0.1:8124/games/blockvarlden/'+entry);
   await page.getByRole('button',{name:'Spela',exact:false}).first().click();
-  await page.getByLabel('Världsfrö').fill('Expedition');
+  const seedField=page.getByLabel('Världsfrö');
+  await seedField.fill('Expedition');
+  assert.equal(await seedField.evaluate(e=>e.dispatchEvent(new Event('selectstart',{bubbles:true,cancelable:true}))),true);
+  const createButton=page.getByRole('button',{name:'Skapa värld'});
+  assert.equal(await createButton.evaluate(e=>getComputedStyle(e).userSelect||getComputedStyle(e).webkitUserSelect),'none');
+  assert.equal(await createButton.evaluate(e=>e.dispatchEvent(new Event('contextmenu',{bubbles:true,cancelable:true}))),false);
   await page.getByRole('button',{name:'Skapa värld'}).click();
   await page.locator('#stats').filter({hasText:'Kreativt'}).waitFor();
   await page.getByRole('button',{name:'Byt kameravy'}).click();

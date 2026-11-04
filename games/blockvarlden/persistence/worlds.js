@@ -13,6 +13,8 @@ export function validateImport(v,defs,props){if(v?.version!==2||!v.world||!Array
  const m=fresh(s.name,s.mode,s.seed,['Lätt','Normal','Utmanande'].includes(s.difficulty)?s.difficulty:'Lätt'),point=p=>Array.isArray(p)&&p.length===3&&p.every(n=>Number.isFinite(n)&&Math.abs(n)<1e7);
  const validId=k=>Object.hasOwn(defs,k)||props.includes(k);
  const counts=obj=>Object.fromEntries(Object.entries(obj||{}).filter(([k,n])=>validId(k)&&Number.isSafeInteger(n)&&n>=0));
+ m.fly=s.fly===true;
+ m.drops=Array.isArray(s.drops)?s.drops.filter(r=>r&&validId(r.id)&&point(r.p)&&Number.isInteger(r.count)&&r.count>0&&r.count<=64).map(r=>({id:r.id,count:r.count,p:r.p,ready:0})):[];
  if(point(s.position))m.position=s.position;
  for(const k of ['yaw','pitch'])if(Number.isFinite(s[k]))m[k]=s[k];
  m.wear=counts(s.wear);m.removed=Array.isArray(s.removed)?s.removed.filter(k=>typeof k==='string'&&/^-?\d+,-?\d+$/.test(k)):[];

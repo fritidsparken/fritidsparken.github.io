@@ -2,13 +2,15 @@ export const eye=1.55;
 export function occupied(world,p){for(const x of [p.x-.28,p.x+.28])for(const z of [p.z-.28,p.z+.28])for(const y of [p.y+.02,p.y+.88,p.y+1.73])if(world.solid(x,y,z))return true;return false}
 export function move(player,world,dt,input,mode,onLand,collideProp,stepProp){
  const {p}=player;if(world.at(p.x,0,p.z)===null)return;
- const swim=world.at(p.x,p.y+.7,p.z)===25,fly=mode==='creative'&&player.fly,speed=fly?8:swim?2.7:input.sprint?6:4.5;
+ const swim=world.at(p.x,p.y+.7,p.z)===25,fly=mode==='creative'&&player.fly,sneak=input.down&&!fly&&!swim,speed=fly?(input.sprint?12:8):swim?2.7:sneak?1.45:input.sprint&&input.f>0?6:4.5;
+ player.sneak=sneak;
  const norm=Math.max(1,Math.hypot(input.f,input.r)),x=(-Math.sin(player.yaw)*input.f+Math.cos(player.yaw)*input.r)/norm,z=(-Math.cos(player.yaw)*input.f-Math.sin(player.yaw)*input.r)/norm;
  if(!fly&&!swim&&player.grounded&&input.up)player.v=7.4;
  player.v=fly?(Number(input.up)-Number(input.down))*speed:swim?(input.up?3:input.down?-3:-.5):Math.max(-30,player.v-20*dt);
  const hit=()=>occupied(world,p)||collideProp?.(p);
  const steps=Math.max(1,Math.ceil(Math.max(Math.abs(player.v),speed)*dt/.18));
- for(let i=0;i<steps;i++){for(const [axis,delta] of [['x',x*speed],['z',z*speed],['y',player.v]]){if(!delta)continue;const prev=p[axis];p[axis]+=delta*dt/steps;if(hit()){if(axis!=='y'&&!fly&&player.grounded&&stepProp){const before=p.y;p.y=stepProp(p);if(p.y>before&&!hit())continue;p.y=before}p[axis]=prev;if(axis==='y'){if(player.v<0){if(!player.grounded)onLand(-player.v);player.grounded=true}player.v=0}}else if(axis==='y')player.grounded=false}}
+ for(let i=0;i<steps;i++){for(const [axis,delta] of [['x',x*speed],['z',z*speed],['y',player.v]]){if(!delta)continue;const prev=p[axis];p[axis]+=delta*dt/steps;if(axis!=='y'&&sneak&&player.grounded&&!input.up){const foot=p.y;p.y-=.12;const supported=hit();p.y=foot;if(!supported){p[axis]=prev;continue}}
+ if(hit()){if(axis!=='y'&&!fly&&player.grounded&&stepProp){const before=p.y;p.y=stepProp(p);if(p.y>before&&!hit())continue;p.y=before}p[axis]=prev;if(axis==='y'){if(player.v<0){if(!player.grounded)onLand(-player.v);player.grounded=true}player.v=0}}else if(axis==='y')player.grounded=false}}
  p.y=Math.min(95,Math.max(.05,p.y));player.swim=swim;player.moving=Math.abs(x)+Math.abs(z)>.05;
 }
 // Traverse voxel boundaries exactly, including negative world coordinates.

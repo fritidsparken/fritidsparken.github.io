@@ -1,0 +1,15 @@
+/* Native buttons, their labels and joystick handles share one gesture policy. */
+:where([data-game-page], .games-page, #gameStage, body:has(.game-running))
+:is(button, [role="button"], a[href], input[type="button"], input[type="submit"], #stick, [data-move]),
+:where([data-game-page], .games-page, #gameStage, body:has(.game-running))
+:is(button, [role="button"], a[href], #stick, [data-move]) * {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+}
+:where([data-game-page], .games-page, #gameStage, body:has(.game-running))
+:is(input[type="text"], input[type="search"], input:not([type]), textarea, [contenteditable="true"]) {
+  -webkit-user-select: text;
+  user-select: text;
+}
