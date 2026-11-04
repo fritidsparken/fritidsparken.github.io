@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "author": "Fritidsparken / Blockvärlden",
+  "license": "CC0-1.0",
+  "source": "../../../games/blockvarlden/audio/sound.js",
+  "production": "Original instrumental motifs and synthesized effects, generated in real time with Web Audio. No external recordings or samples.",
+  "music": ["explore","forest","mountain","cave","night","creative"],
+  "effects": ["step","dig","place","break","tool","craft","inventory","splash","water","fire","animal","eat","hurt","jump"],
+  "surfaces": ["stone","wood","sand","grass","glass","metal","snow","earth","water"],
+  "ambience": ["wind","rain","thunder","waves","underwater","birds"]
+}

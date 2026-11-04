@@ -1,0 +1,11 @@
+{
+  "author": "Fritidsparken / Blockvärlden",
+  "license": "CC0-1.0",
+  "source": "../../../tools/blender/blockvarlden/cover.py",
+  "blender": "4.3.2",
+  "renderer": "Cycles, CPU, 12 samples",
+  "assets": [
+    {"id": "angsdalen-cover", "path": "cover.webp", "width": 1080, "height": 660, "use": "Panorama för startmenyn"},
+    {"id": "angsdalen-icon", "path": "icon.webp", "width": 448, "height": 448, "use": "Kvadratisk spelikon"}
+  ]
+}

@@ -1,0 +1,315 @@
+{
+  "generator": "Blender 4.3.2",
+  "license": "CC0-1.0",
+  "source": "tools/blender/blockvarlden/props.py",
+  "unit": "block",
+  "pivot": "grounded centre",
+  "assets": [
+    {
+      "id": "oak",
+      "name": "Ängsek",
+      "category": "Vegetation",
+      "node": "oak",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 684
+    },
+    {
+      "id": "pine",
+      "name": "Dagggran",
+      "category": "Vegetation",
+      "node": "pine",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 1016
+    },
+    {
+      "id": "palm",
+      "name": "Solpalm",
+      "category": "Vegetation",
+      "node": "palm",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 432
+    },
+    {
+      "id": "shrub",
+      "name": "Lingonris",
+      "category": "Vegetation",
+      "node": "shrub",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 972
+    },
+    {
+      "id": "flowers",
+      "name": "Sommarblommor",
+      "category": "Vegetation",
+      "node": "flowers",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 690
+    },
+    {
+      "id": "mushroom",
+      "name": "Lyktvaxskivling",
+      "category": "Vegetation",
+      "node": "mushroom",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 504
+    },
+    {
+      "id": "log",
+      "name": "Nedfallen ekstock",
+      "category": "Vegetation",
+      "node": "log",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 344
+    },
+    {
+      "id": "roots",
+      "name": "Frilagda rötter",
+      "category": "Vegetation",
+      "node": "roots",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 240
+    },
+    {
+      "id": "rocks",
+      "name": "Mossklippor",
+      "category": "Vegetation",
+      "node": "rocks",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 312
+    },
+    {
+      "id": "reeds",
+      "name": "Kaveldun",
+      "category": "Vegetation",
+      "node": "reeds",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 322
+    },
+    {
+      "id": "door",
+      "name": "Spegelport",
+      "category": "Byggnadsdelar",
+      "node": "door",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 660
+    },
+    {
+      "id": "window",
+      "name": "Spröjsfönster",
+      "category": "Byggnadsdelar",
+      "node": "window",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 352
+    },
+    {
+      "id": "stairs",
+      "name": "Trappa i skiffer",
+      "category": "Byggnadsdelar",
+      "node": "stairs",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 352
+    },
+    {
+      "id": "slab",
+      "name": "Halvplatta i skiffer",
+      "category": "Byggnadsdelar",
+      "node": "slab",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 88
+    },
+    {
+      "id": "fence",
+      "name": "Ängsstaket",
+      "category": "Byggnadsdelar",
+      "node": "fence",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 200
+    },
+    {
+      "id": "railing",
+      "name": "Bryggräcke",
+      "category": "Byggnadsdelar",
+      "node": "railing",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 164
+    },
+    {
+      "id": "roof",
+      "name": "Tegelnock",
+      "category": "Byggnadsdelar",
+      "node": "roof",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 1084
+    },
+    {
+      "id": "table",
+      "name": "Snickarbord",
+      "category": "Inredning",
+      "node": "table",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 396
+    },
+    {
+      "id": "chair",
+      "name": "Köksstol",
+      "category": "Inredning",
+      "node": "chair",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 484
+    },
+    {
+      "id": "bed",
+      "name": "Fältsäng",
+      "category": "Inredning",
+      "node": "bed",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 484
+    },
+    {
+      "id": "chest",
+      "name": "Expeditionskista",
+      "category": "Inredning",
+      "node": "chest",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 484
+    },
+    {
+      "id": "lantern",
+      "name": "Bärnstenslykta",
+      "category": "Inredning",
+      "node": "lantern",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 224
+    },
+    {
+      "id": "workbench",
+      "name": "Snickarbänk",
+      "category": "Inredning",
+      "node": "workbench",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 548
+    },
+    {
+      "id": "pickaxe",
+      "name": "Bergshacka",
+      "category": "Verktyg",
+      "node": "pickaxe",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 276
+    },
+    {
+      "id": "axe",
+      "name": "Skogsyxa",
+      "category": "Verktyg",
+      "node": "axe",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 224
+    },
+    {
+      "id": "shovel",
+      "name": "Planteringsspade",
+      "category": "Verktyg",
+      "node": "shovel",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 88
+    },
+    {
+      "id": "hammer",
+      "name": "Verkstadshammare",
+      "category": "Verktyg",
+      "node": "hammer",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 256
+    },
+    {
+      "id": "rod",
+      "name": "Fiskespö",
+      "category": "Verktyg",
+      "node": "rod",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 136
+    },
+    {
+      "id": "torch",
+      "name": "Kådfackla",
+      "category": "Verktyg",
+      "node": "torch",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 156
+    },
+    {
+      "id": "backpack",
+      "name": "Vandrarsäck",
+      "category": "Föremål",
+      "node": "backpack",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 388
+    },
+    {
+      "id": "apple",
+      "name": "Äpple",
+      "category": "Mat",
+      "node": "apple",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 94
+    },
+    {
+      "id": "bread",
+      "name": "Havrelimpa",
+      "category": "Mat",
+      "node": "bread",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 200
+    },
+    {
+      "id": "potion",
+      "name": "Blåbärssaft",
+      "category": "Mat",
+      "node": "potion",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 168
+    },
+    {
+      "id": "planter",
+      "name": "Örtkruka",
+      "category": "Inredning",
+      "node": "planter",
+      "license": "CC0-1.0",
+      "path": "assets/blockvarlden/props/explorer-kit.glb",
+      "triangles": 120
+    }
+  ]
+}

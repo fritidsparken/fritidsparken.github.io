@@ -1,0 +1,285 @@
+{
+  "blender": "4.3.2",
+  "license": "CC0-1.0",
+  "author": "Fritidsparken – original procedural sculptures and animations",
+  "actors": [
+    {
+      "id": "ko",
+      "name": "Ko",
+      "file": "ko.glb",
+      "kind": "animal",
+      "aquatic": false,
+      "animations": [
+        "idle",
+        "walk",
+        "run",
+        "eat",
+        "rest",
+        "flee",
+        "swim"
+      ],
+      "sha256": "bc73fb5fb1dc40b5a2b0fd00b204a79e78a8ca47149edd796ed5f25098146b5e"
+    },
+    {
+      "id": "far",
+      "name": "Får",
+      "file": "far.glb",
+      "kind": "animal",
+      "aquatic": false,
+      "animations": [
+        "idle",
+        "walk",
+        "run",
+        "eat",
+        "rest",
+        "flee",
+        "swim"
+      ],
+      "sha256": "d7a5e4b3a56cc6ac507cd68d2784fad0ca45a6f3fa8a65efaa1009c76d84daac"
+    },
+    {
+      "id": "gris",
+      "name": "Gris",
+      "file": "gris.glb",
+      "kind": "animal",
+      "aquatic": false,
+      "animations": [
+        "idle",
+        "walk",
+        "run",
+        "eat",
+        "rest",
+        "flee",
+        "swim"
+      ],
+      "sha256": "a2893fbf480f5a174734683b8f9dec5d8d7c1db07e516c32da97c15b0422a763"
+    },
+    {
+      "id": "hona",
+      "name": "Höna",
+      "file": "hona.glb",
+      "kind": "animal",
+      "aquatic": false,
+      "animations": [
+        "idle",
+        "walk",
+        "run",
+        "eat",
+        "rest",
+        "flee",
+        "swim"
+      ],
+      "sha256": "dae39760370a412307cc0ae320b5df5db4abf785bf2626b455d2ce64c0210587"
+    },
+    {
+      "id": "hast",
+      "name": "Häst",
+      "file": "hast.glb",
+      "kind": "animal",
+      "aquatic": false,
+      "animations": [
+        "idle",
+        "walk",
+        "run",
+        "eat",
+        "rest",
+        "flee",
+        "swim"
+      ],
+      "sha256": "187002f81a42fbfa05db32e882e44f4d6859641537eb3f7f8e2e409ea20a6157"
+    },
+    {
+      "id": "kanin",
+      "name": "Kanin",
+      "file": "kanin.glb",
+      "kind": "animal",
+      "aquatic": false,
+      "animations": [
+        "idle",
+        "walk",
+        "run",
+        "eat",
+        "rest",
+        "flee",
+        "swim"
+      ],
+      "sha256": "d141b13307ce90f399ff6e703d5c3fc47541a25b539acf2b3c3ea471747808cc"
+    },
+    {
+      "id": "rav",
+      "name": "Räv",
+      "file": "rav.glb",
+      "kind": "animal",
+      "aquatic": false,
+      "animations": [
+        "idle",
+        "walk",
+        "run",
+        "eat",
+        "rest",
+        "flee",
+        "swim"
+      ],
+      "sha256": "63c468cf4a99107ab21cee9f0fcaab25a5723befbd4b7c87069840b70e9c4d1f"
+    },
+    {
+      "id": "varg",
+      "name": "Varg",
+      "file": "varg.glb",
+      "kind": "animal",
+      "aquatic": false,
+      "animations": [
+        "idle",
+        "walk",
+        "run",
+        "eat",
+        "rest",
+        "flee",
+        "swim"
+      ],
+      "sha256": "208a9abe56f331d8ab623adf25b65211ac1d83bd6e0e98ecf788ad73fda200bb"
+    },
+    {
+      "id": "bjorn",
+      "name": "Björn",
+      "file": "bjorn.glb",
+      "kind": "animal",
+      "aquatic": false,
+      "animations": [
+        "idle",
+        "walk",
+        "run",
+        "eat",
+        "rest",
+        "flee",
+        "swim"
+      ],
+      "sha256": "2366b2efdc9f66c3779f7b06071184af48791c5368a7e7d27f7935509e08356f"
+    },
+    {
+      "id": "fisk",
+      "name": "Fisk",
+      "file": "fisk.glb",
+      "kind": "animal",
+      "aquatic": true,
+      "animations": [
+        "idle",
+        "walk",
+        "run",
+        "eat",
+        "rest",
+        "flee",
+        "swim"
+      ],
+      "sha256": "ceece76fea7d7107868500194056c12be5fc7673560332bb9bd344311c45f190"
+    },
+    {
+      "id": "lyktmott",
+      "name": "Lyktmott",
+      "file": "lyktmott.glb",
+      "kind": "creature",
+      "aquatic": false,
+      "animations": [
+        "idle",
+        "walk",
+        "run",
+        "eat",
+        "rest",
+        "flee",
+        "swim"
+      ],
+      "sha256": "ade6454c0b5a24618b93b67a60e0818656c44fddd3ec506b20a16ff841bd9dc3"
+    },
+    {
+      "id": "mosslynx",
+      "name": "Mosslo",
+      "file": "mosslynx.glb",
+      "kind": "creature",
+      "aquatic": false,
+      "animations": [
+        "idle",
+        "walk",
+        "run",
+        "eat",
+        "rest",
+        "flee",
+        "swim"
+      ],
+      "sha256": "a74e551d77b057f1efbdca2d8205a10b6f1a5eeec10128e6d37f813d9e5735e5"
+    },
+    {
+      "id": "skifferbagge",
+      "name": "Skifferbagge",
+      "file": "skifferbagge.glb",
+      "kind": "creature",
+      "aquatic": false,
+      "animations": [
+        "idle",
+        "walk",
+        "run",
+        "eat",
+        "rest",
+        "flee",
+        "swim"
+      ],
+      "sha256": "38f48bae753b61196b268770968ee391ce1c3706b61656f86f12396d2e8eb8b4"
+    },
+    {
+      "id": "korallvandrare",
+      "name": "Korallvandrare",
+      "file": "korallvandrare.glb",
+      "kind": "creature",
+      "aquatic": false,
+      "animations": [
+        "idle",
+        "walk",
+        "run",
+        "eat",
+        "rest",
+        "flee",
+        "swim"
+      ],
+      "sha256": "2d12be8d12700b81e753ae778727b582b3abccafb59145ac9c44350b50701cf3"
+    },
+    {
+      "id": "rimfena",
+      "name": "Rimfena",
+      "file": "rimfena.glb",
+      "kind": "creature",
+      "aquatic": true,
+      "animations": [
+        "idle",
+        "walk",
+        "run",
+        "eat",
+        "rest",
+        "flee",
+        "swim"
+      ],
+      "sha256": "b95c71e734d6f0b63f87726b0d5e1844b092bccd1e35a02af0e2f26f35967b07"
+    },
+    {
+      "id": "stigfinnare",
+      "name": "Stigfinnaren",
+      "file": "stigfinnare.glb",
+      "kind": "player",
+      "aquatic": false,
+      "animations": [
+        "idle",
+        "walk",
+        "run",
+        "jump",
+        "land",
+        "swim",
+        "dig",
+        "chop",
+        "build",
+        "use",
+        "climb",
+        "hurt",
+        "rest"
+      ],
+      "sha256": "993c70a74e7a8215ba1b1185ce6d03164ecf4a843a107aeee111d0238a603554"
+    }
+  ]
+}
