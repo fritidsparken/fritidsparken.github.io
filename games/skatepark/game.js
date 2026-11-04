@@ -12,7 +12,7 @@ import {
   score,
   clamp,
 } from "./model.js?v=rail-3";
-import { World } from "./world.js?v=rail-3";
+import { World } from "./world.js?v=park-lights-1";
 import { Sound } from "./audio.js?v=river1";
 const $ = (id) => document.getElementById(id),
   number = (n) => n.toLocaleString("sv-SE"),

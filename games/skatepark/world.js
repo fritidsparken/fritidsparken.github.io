@@ -443,8 +443,8 @@ export class World {
     this.sun = sun;
     if(i===3){
       const fill=this.scene.children.find(o=>o.isHemisphereLight);
-      fill.color.setHex(0xa9badb);fill.groundColor.setHex(0x746575);fill.intensity=.62;
-      sun.color.setHex(0xbacafa);sun.intensity=.61;sun.position.set(-48,71,-32);
+      fill.color.setHex(0xa9badb);fill.groundColor.setHex(0x746575);fill.intensity=.85;
+      sun.color.setHex(0xbacafa);sun.intensity=.75;sun.position.set(-48,71,-32);
       this.scene.fog.color.setHex(0x28324a);
     }
     const floor = i===3 ? plaza(park,this.scene) : environment(this.scene, park, i);
@@ -457,7 +457,7 @@ export class World {
       const results = await Promise.allSettled([
         loadSunnyRider(this.scene, !this.renderer.shadowMap.enabled,
           shirt === 0x187e75 ? null : shirt, deck === 0xe4a963 ? null : deck),
-        i===3 ? import("./riverside/scene.js?v=rail-3").then(m=>m.buildRiverside(this.scene,floor,!this.renderer.shadowMap.enabled)) : finishSunnyPark(this.scene, floor, this.sun, q, i),
+        i===3 ? import("./riverside/scene.js?v=park-lights-1").then(m=>m.buildRiverside(this.scene,floor,!this.renderer.shadowMap.enabled)) : finishSunnyPark(this.scene, floor, this.sun, q, i),
       ]);
       this.sunnyRider = results[0].value;
       const failure = results.find(result => result.status === "rejected");

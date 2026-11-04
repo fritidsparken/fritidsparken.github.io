@@ -1,4 +1,4 @@
-import {road,loops,jumps,loopPoint,tau,laneHalf,lamps} from './layout.js?v=evening';
+import {road,loops,jumps,loopPoint,tau,laneHalf,lamps as originalLamps,riverside} from './layout.js?v=evening';
 const T=window.THREE;
 function plankTexture(){
  const c=document.createElement('canvas');c.width=512;c.height=256;const g=c.getContext('2d');
@@ -9,6 +9,14 @@ function plankTexture(){
  const t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;t.wrapS=t.wrapT=T.RepeatWrapping;t.anisotropy=4;return t;
 }
 export function buildAvenue(scene,box,bar,low){
+ const lamps=originalLamps.slice();
+ // Add lighting at open areas and along the park boundary, clear of obstacles and rails.
+ for(const z of [-50,-38,-25,-12,1,14,27,40,50])for(const x of [-53,-40,-27,-14,0,14,28,41,53]){
+   if(lamps.some(([lx,lz])=>Math.hypot(lx-x,lz-z)<9))continue;
+   if(riverside.shapes.some(([,cx,cz,w,d])=>Math.abs(x-cx)<w/2+1.5&&Math.abs(z-cz)<d/2+1.5))continue;
+   if(riverside.rails.some(r=>{const dx=r[2]-r[0],dz=r[3]-r[1],t=Math.max(0,Math.min(1,((x-r[0])*dx+(z-r[1])*dz)/(dx*dx+dz*dz)));return Math.hypot(x-r[0]-t*dx,z-r[1]-t*dz)<2;}))continue;
+   lamps.push([x,z,6.1]);
+ }
  const wood=new T.MeshStandardMaterial({map:plankTexture(),side:T.DoubleSide,roughness:.68});
  const edge=new T.MeshStandardMaterial({color:0x597373,side:T.DoubleSide,metalness:.48,roughness:.42});
  const glow=new T.MeshBasicMaterial({color:0xffc178,side:T.DoubleSide});
@@ -53,7 +61,7 @@ export function buildAvenue(scene,box,bar,low){
    bar([x,0,z],[x,y,z],.14,0x465055);box(0x59616a,x,.25,z,.38,.5,.38);
    box(0x3a3b40,x,y+.12,z,.85,.12,.85);o.position.set(x,y-.12,z);o.scale.set(.33,.27,.33);o.updateMatrix();bulbs.setMatrixAt(i,o.matrix);
  });scene.add(bulbs);
- const near=Array.from({length:low?3:5},()=>{const l=new T.PointLight(0xffbc75,23,22,1.45);scene.add(l);return l;});
+ const near=Array.from({length:low?4:6},()=>{const l=new T.PointLight(0xffc784,32,26,1.45);scene.add(l);return l;});
  let lastX=Infinity,lastZ=Infinity;
  scene.userData.lightAvenue=(x,z)=>{if(Math.hypot(x-lastX,z-lastZ)<1)return;lastX=x;lastZ=z;
  const closest=lamps.slice().sort((a,b)=>Math.hypot(a[0]-x,a[1]-z)-Math.hypot(b[0]-x,b[1]-z));near.forEach((l,n)=>l.position.set(closest[n][0],closest[n][2]-.35,closest[n][1]));};

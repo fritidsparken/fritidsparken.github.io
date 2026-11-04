@@ -1,4 +1,4 @@
-import {buildAvenue} from "./avenue.js?v=ramp-2";
+import {buildAvenue} from "./avenue.js?v=park-lights-1";
 import {GLTFLoader} from "../kaj/vendor/GLTFLoader.js";
 import {riverside} from "./layout.js?v=evening";
 import {height, railPoint} from "../model.js?v=rail-3";
