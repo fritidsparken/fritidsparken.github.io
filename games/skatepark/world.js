@@ -6,7 +6,7 @@ import {
   clamp,
   halfWidth,
   halfDepth,
-} from "./model.js?v=coast-neon-1";
+} from "./model.js?v=riverside-1";
 const T = window.THREE,
   v = (x, y, z) => new T.Vector3(x, y, z);
 const sphere = new T.SphereGeometry(1, 16, 12),
@@ -441,17 +441,17 @@ export class World {
     sun.shadow.bias = -0.001;
     this.scene.add(sun);
     this.sun = sun;
-    const floor = environment(this.scene, park, i);
+    const floor = i===3 ? plaza(park,this.scene) : environment(this.scene, park, i);
     this.quality(q);
     {
       const [{ loadSunnyRider }, { finishSunnyPark }] = await Promise.all([
-        import("./sunny-rider.js"),
-        import("./sunny-visuals.js?v=coast-neon-1"),
+        import("./sunny-rider.js?v=river1"),
+        import("./sunny-visuals.js?v=riverside-1"),
       ]);
       const results = await Promise.allSettled([
         loadSunnyRider(this.scene, !this.renderer.shadowMap.enabled,
           shirt === 0x187e75 ? null : shirt, deck === 0xe4a963 ? null : deck),
-        finishSunnyPark(this.scene, floor, this.sun, q, i),
+        i===3 ? import("./riverside/scene.js").then(m=>m.buildRiverside(this.scene,floor,!this.renderer.shadowMap.enabled)) : finishSunnyPark(this.scene, floor, this.sun, q, i),
       ]);
       this.sunnyRider = results[0].value;
       const failure = results.find(result => result.status === "rejected");
@@ -514,6 +514,7 @@ export class World {
       height(this.park, this.want.x, this.want.z) + 1.45,
     );
     this.target.set(p.x - sx * 2.35, p.y + 1.05, p.z - cz * 2.35);
+    if(p.loop){this.want.set(p.x+11,6.7+p.y*.28,p.z+9);this.target.set(p.x,p.y+.8,p.z);}
     const smooth = this.snap ? 1 : 1 - Math.exp(-8 * dt);
     this.camera.position.lerp(this.want, smooth);
     this.focus.lerp(this.target, smooth);

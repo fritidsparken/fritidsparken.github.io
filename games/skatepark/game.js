@@ -11,9 +11,9 @@ import {
   multi,
   score,
   clamp,
-} from "./model.js?v=coast-neon-1";
-import { World } from "./world.js?v=coast-neon-1";
-import { Sound } from "./audio.js";
+} from "./model.js?v=riverside-1";
+import { World } from "./world.js?v=riverside-1";
+import { Sound } from "./audio.js?v=river1";
 const $ = (id) => document.getElementById(id),
   number = (n) => n.toLocaleString("sv-SE"),
   key = "fp-skatepark-v1";
@@ -34,7 +34,7 @@ try {
 const num = (n, f = 0) => (Number.isFinite(n) && n >= 0 ? n : f);
 const s = {
   career: num(stored.career),
-  best: parks.map((_, i) => num(stored.best?.[i])),
+  best: parks.map((_, i) => i===3 && !stored.riverside ? 0 : num(stored.best?.[i])),
   music: clamp(num(stored.music, 0.45), 0, 1),
   fx: clamp(num(stored.fx, 0.72), 0, 1),
   quality: ["auto", "låg", "hög"].includes(stored.quality)
@@ -42,8 +42,10 @@ const s = {
     : "auto",
   deck: 0,
   shirt: 0,
-  park: parks[stored.park] ? stored.park : 0,
+  riverside: true,
+  park: (stored.park!==3 || stored.riverside) && parks[stored.park] ? stored.park : 0,
 };
+if (new URLSearchParams(location.search).get("bana")==="riverside") s.park=3;
 for (const [slot, items] of [
   ["deck", decks],
   ["shirt", shirts],
@@ -212,13 +214,14 @@ async function start() {
     play.textContent = "Spela ▶";
   }
   p = rider();
+  if(s.park===3){p.x=-13;p.z=25;p.safe=[-13,25];}
   $("menu").hidden = true;
   $("ride").hidden = false;
   mode = "play";
   clearKeys();
   resumeAudio();
   flash(
-    !$("touch").hidden
+    s.park===3 ? "Ta fart rakt fram för att åka runt loopen!" : !$("touch").hidden
       ? "Styr med vänster spak. Svep med högerspaken för att hoppa åt det hållet och göra ett trick!"
       : "Håll W för fart. Hoppa med mellanslag och tryck Z för en kickflip!",
     6,
@@ -279,6 +282,7 @@ function openPanel(id) {
       ["Hopp och rotation", 0, 10],
       ["Grind och slide", 10, 15],
       ["Manualer", 15, 17],
+      ["Riverside", 17, 18],
     ])
       html +=
         "<h3>" +

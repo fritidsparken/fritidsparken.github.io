@@ -1,3 +1,4 @@
+import { riverside, loopPoint, loopRadius } from "./riverside/layout.js";
 export const parks = [
   {
     name: "Soliga skateparken",
@@ -121,6 +122,7 @@ export const parks = [
     ],
   },
 ];
+parks.push(riverside);
 export const halfWidth = 56,
   halfDepth = 52;
 export const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
@@ -129,9 +131,16 @@ export function surface(shape, x, z) {
   const [kind, cx, cz, w, d, h] = shape,
     u = (2 * (x - cx)) / w,
     v = (2 * (z - cz)) / d;
+  if(kind==="mega" && v < -.86 && v > -1.14) {
+    return h * edge(u) * clamp((1.14+v)*45,0,1);
+  }
   if (Math.abs(u) >= 1 || Math.abs(v) >= 1) return 0;
   const r = Math.hypot(u, v);
   switch (kind) {
+    case "mega": {
+      const t=clamp((.86-v)/1.72,0,1);
+      return h*(1-Math.sqrt(Math.max(0,1-t*t)))*edge(u)*clamp((1+v)*9,0,1);
+    }
     case "bowl":
       return r >= 1 ? 0 : h * (0.5 + 0.5 * Math.cos(Math.PI * r));
     case "half":
@@ -148,8 +157,13 @@ export function surface(shape, x, z) {
       return h * Math.min(1, (1 - Math.max(Math.abs(v), Math.abs(u))) * 1.55);
   }
 }
+// Elevated pavilion terrace and its approaches share the rendered collision surface.
+function terrace(x,z) {
+ const side=clamp((12-Math.abs(x+36))/.7,0,1);
+ return 3.35*side*clamp((9.8-Math.abs(z+30))/.7,0,1);
+}
 export const height = (park, x, z) =>
-  park.sampleHeight ? park.sampleHeight(x, z) : park.shapes.reduce((sum, s) => sum + surface(s, x, z), 0);
+  park.sampleHeight ? park.sampleHeight(x, z) : park.shapes.reduce((sum,s)=>sum+surface(s,x,z),park===riverside?terrace(x,z):0);
 export const tricks = [
   ["Ollie", 50, "Hopp"],
   ["Nollie", 75, "Broms + hopp"],
@@ -168,6 +182,7 @@ export const tricks = [
   ["Lipslide", 250, "Håll C vid räcket"],
   ["Manual", 100, "Håll X på marken"],
   ["Nose manual", 150, "Håll C på marken"],
+  ["Loop", 500, "Åk rakt in med fart i Riverside"],
   ["360", 300, "Håll svängen ett helt varv i luften"],
 ];
 export function rider() {
@@ -179,6 +194,7 @@ export function rider() {
     speed: 0,
     vy: 0,
     air: false,
+    loop: null,
     spin: 0,
     spinCount: 0,
     swipe: null,
@@ -233,7 +249,7 @@ export function reset(p, park) {
   });
 }
 export function act(p, k, key, emit) {
-  if (p.recover > 0) return;
+  if (p.recover > 0 || p.loop) return;
   if (key === "jump" && (!p.air || p.rail)) {
     if (p.rail) p.ignoredRail = p.rail.r;
     p.rail = null;
@@ -279,7 +295,7 @@ export function swipeMove(x, up, full) {
   return sector === 4 && full ? 7 : swipeMoves[sector][1];
 }
 export function swipeJump(p, id, x, up, emit) {
-  if (p.recover > 0 || (p.air && !p.rail)) return;
+  if (p.loop || p.recover > 0 || (p.air && !p.rail)) return;
   act(p, { brake: id === 1 }, "jump", emit);
   const len = Math.hypot(x, up);
   if (!id || !len) return;
@@ -371,6 +387,15 @@ function catchRail(p, k, park, emit, previousY) {
   }
 }
 export function tick(p, k, park, dt, emit) {
+  if (p.loop) {
+    const g=p.loop;
+    const speed=Math.max(5.8, Math.sqrt(Math.max(0,g.entry*g.entry-6*p.y)));
+    g.a+=g.sign*dt*speed/Math.hypot(loopRadius,8*(1-Math.cos(g.a))/(2*Math.PI));
+    const done=g.a<=0 || g.a>=2*Math.PI;
+    const pt=loopPoint(clamp(g.a,0,2*Math.PI));Object.assign(p,pt);
+    if(done){p.loop=null;p.y=0;p.speed=g.entry;p.settle=.3;p.grace=.52;add(p,17,emit);}
+    return;
+  }
   if (p.recover > 0) {
     p.recover -= dt;
     return;
@@ -479,6 +504,13 @@ export function tick(p, k, park, dt, emit) {
     if (p.speed > 3 && p.squat === 0) {
       emit("bump");
       p.squat = 0.4;
+    }
+  }
+  if (park===riverside && !p.air && !p.rail && p.speed>=3 && Math.abs(Math.cos(p.dir))>.74) {
+    const sign=Math.sign(Math.cos(p.dir)), entryX=sign>0?-13:-5;
+    if(Math.abs(p.x-entryX)<1.7 && (2-p.z)*sign>=0 && (2-p.z)*sign<p.speed*dt+.001){
+      p.loop={a:sign>0?0:Math.PI*2,sign,entry:Math.max(7,p.speed)};
+      p.dir=sign>0?0:Math.PI;p.spin=0;p.manual=null;p.slope=0;return;
     }
   }
   const floor = height(park, p.x, p.z);
