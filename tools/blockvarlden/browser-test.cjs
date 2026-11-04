@@ -38,6 +38,7 @@ async function test([name,type,device]){
   const recipe=page.getByRole('button',{name:'Skapa',exact:true}).and(page.locator(':enabled')).first();
   await recipe.click();await page.getByRole('button',{name:'Stäng'}).click();
   await page.getByRole('button',{name:'Pausa'}).click();await page.getByRole('button',{name:'Till startmenyn'}).click();
+  await page.locator('#home').waitFor({state:'visible'});
   await page.reload();await page.getByRole('button',{name:'Fortsätt'}).click();
   await page.locator('#stats').filter({hasText:'Mat'}).waitFor();
   assert.deepEqual(errors,[]);console.log(JSON.stringify({name,fps,renderer:'CI software graphics',flow:'pass'}));
