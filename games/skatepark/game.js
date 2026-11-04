@@ -11,8 +11,8 @@ import {
   multi,
   score,
   clamp,
-} from "./model.js?v=riverside-1";
-import { World } from "./world.js?v=riverside-1";
+} from "./model.js?v=evening-1";
+import { World } from "./world.js?v=evening-1";
 import { Sound } from "./audio.js?v=river1";
 const $ = (id) => document.getElementById(id),
   number = (n) => n.toLocaleString("sv-SE"),
@@ -76,7 +76,7 @@ function cards() {
         (s.park === i) +
         '"><img src="park-' +
         i +
-        '.webp" alt=""><div><small>0' +
+        '.webp?v=evening" alt=""><div><small>0' +
         (i + 1) +
         " / " +
         a.area +
@@ -87,7 +87,7 @@ function cards() {
         " p</span></div></button>",
     )
     .join("");
-  $("hero").style.backgroundImage = 'url("park-' + s.park + '.webp")';
+  $("hero").style.backgroundImage = 'url("park-' + s.park + '.webp?v=evening")';
 }
 function flash(t, seconds = 3) {
   $("message").textContent = t;
@@ -214,14 +214,14 @@ async function start() {
     play.textContent = "Spela ▶";
   }
   p = rider();
-  if(s.park===3){p.x=-13;p.z=25;p.safe=[-13,25];}
+  if(s.park===3){p.x=-70;p.z=65;p.dir=-Math.PI/2;p.safe=[-70,65];}
   $("menu").hidden = true;
   $("ride").hidden = false;
   mode = "play";
   clearKeys();
   resumeAudio();
   flash(
-    s.park===3 ? "Ta fart rakt fram för att åka runt loopen!" : !$("touch").hidden
+    s.park===3 ? "Följ vägen genom tre loopar. Håll fart över hoppen!" : !$("touch").hidden
       ? "Styr med vänster spak. Svep med högerspaken för att hoppa åt det hållet och göra ett trick!"
       : "Håll W för fart. Hoppa med mellanslag och tryck Z för en kickflip!",
     6,
@@ -283,6 +283,7 @@ function openPanel(id) {
       ["Grind och slide", 10, 15],
       ["Manualer", 15, 17],
       ["Riverside", 17, 18],
+      ["Volter och grabs",18,22],
     ])
       html +=
         "<h3>" +
@@ -415,6 +416,7 @@ const codes = {
   KeyD: "right",
   ArrowRight: "right",
   Space: "jump",
+  KeyF:"volt", KeyB:"backflip", KeyG:"grab", KeyV:"melon",
   KeyZ: "z",
   KeyX: "x",
   KeyC: "c",

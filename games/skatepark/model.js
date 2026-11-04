@@ -1,4 +1,4 @@
-import { riverside, loopPoint, loopRadius } from "./riverside/layout.js";
+import { riverside, road, loops, jumps, jumpHeight, loopPoint, tau } from "./riverside/layout.js?v=evening";
 export const parks = [
   {
     name: "Soliga skateparken",
@@ -163,7 +163,7 @@ function terrace(x,z) {
  return 3.35*side*clamp((9.8-Math.abs(z+30))/.7,0,1);
 }
 export const height = (park, x, z) =>
-  park.sampleHeight ? park.sampleHeight(x, z) : park.shapes.reduce((sum,s)=>sum+surface(s,x,z),park===riverside?terrace(x,z):0);
+  park.sampleHeight ? park.sampleHeight(x, z) : park.shapes.reduce((sum,s)=>sum+surface(s,x,z),park===riverside?terrace(x,z)+jumpHeight(x,z):0);
 export const tricks = [
   ["Ollie", 50, "Hopp"],
   ["Nollie", 75, "Broms + hopp"],
@@ -182,7 +182,11 @@ export const tricks = [
   ["Lipslide", 250, "Håll C vid räcket"],
   ["Manual", 100, "Håll X på marken"],
   ["Nose manual", 150, "Håll C på marken"],
-  ["Loop", 500, "Åk rakt in med fart i Riverside"],
+  ["Loop", 500, "Åk in längs pilen på vägen"],
+  ["Framåtvolt",350,"F i luften · Volt på pekskärm"],
+  ["Bakåtvolt",350,"B i luften · broms + Volt"],
+  ["Indy grab",200,"G i luften · Grab på pekskärm"],
+  ["Melon grab",225,"V i luften · vänster + Grab"],
   ["360", 300, "Håll svängen ett helt varv i luften"],
 ];
 export function rider() {
@@ -195,6 +199,7 @@ export function rider() {
     vy: 0,
     air: false,
     loop: null,
+    stunt: null,
     spin: 0,
     spinCount: 0,
     swipe: null,
@@ -264,7 +269,12 @@ export function act(p, k, key, emit) {
     emit("pop");
     return;
   }
-  if (!p.air || p.rail || p.flip || !["z", "x", "c"].includes(key)) return;
+  if (p.air && !p.flip && !p.stunt && ["volt","backflip","grab","melon"].includes(key)) {
+    const id=key==="volt"?(k.brake?19:18):key==="backflip"?19:key==="melon"||k.left?21:20;
+    p.stunt={id,t:0,duration:id<20?.61:.48};
+    return;
+  }
+  if (!p.air || p.rail || p.stunt || p.flip || !["z", "x", "c"].includes(key)) return;
   const id =
     key === "z"
       ? k.left
@@ -370,6 +380,7 @@ function catchRail(p, k, park, emit, previousY) {
           ? 13
           : 14;
     p.swipe = null;
+    p.stunt=null;
     p.rail = { r, t, len, sign: Math.sign(align), id, held: holding };
     p.slope = ((r.profile || railProfiles.get(r))[1] * p.rail.sign) / len;
     p.air = false;
@@ -389,11 +400,11 @@ function catchRail(p, k, park, emit, previousY) {
 export function tick(p, k, park, dt, emit) {
   if (p.loop) {
     const g=p.loop;
-    const speed=Math.max(5.8, Math.sqrt(Math.max(0,g.entry*g.entry-6*p.y)));
-    g.a+=g.sign*dt*speed/Math.hypot(loopRadius,8*(1-Math.cos(g.a))/(2*Math.PI));
-    const done=g.a<=0 || g.a>=2*Math.PI;
-    const pt=loopPoint(clamp(g.a,0,2*Math.PI));Object.assign(p,pt);
-    if(done){p.loop=null;p.y=0;p.speed=g.entry;p.settle=.3;p.grace=.52;add(p,17,emit);}
+    const speed=Math.max(6.6,Math.sqrt(Math.max(0,g.entry*g.entry-5*p.y)));
+    g.a+=g.sign*dt*speed/Math.hypot(g.track.r,g.track.drift*(1-Math.cos(g.a))/tau);
+    const done=g.a<=0 || g.a>=tau;
+    Object.assign(p,loopPoint(g.track,clamp(g.a,0,tau),g.lateral));
+    if(done){p.loop=null;p.speed=g.entry;p.settle=.3;p.grace=.52;p.rollingRise=0;add(p,17,emit);}
     return;
   }
   if (p.recover > 0) {
@@ -402,6 +413,10 @@ export function tick(p, k, park, dt, emit) {
   }
   p.settle = Math.max(0, p.settle - dt);
   p.squat = Math.max(0, p.squat - dt * 3);
+  if(p.stunt){
+    p.stunt.t+=dt;
+    if(p.stunt.t>=p.stunt.duration){add(p,p.stunt.id,emit);p.stunt=null;}
+  }
   if (p.flip) {
     p.flip.t += dt;
     if (p.flip.t >= p.flip.duration) {
@@ -489,6 +504,7 @@ export function tick(p, k, park, dt, emit) {
       add(p, park.sampleHeight && n % 2 === 0 ? 17 : p.spin > 0 ? 5 : 6, emit);
     }
   }
+  const prev={x:p.x,y:p.y,z:p.z};
   const nx = p.x + ((p.swipe?.vx || 0) - Math.sin(p.dir) * p.speed) * dt,
     nz = p.z + ((p.swipe?.vz || 0) - Math.cos(p.dir) * p.speed) * dt;
   if (p.swipe) {
@@ -497,8 +513,10 @@ export function tick(p, k, park, dt, emit) {
     p.swipe.vz *= drag;
   }
   const limitX = park.halfWidth || halfWidth, limitZ = park.halfDepth || halfDepth;
-  p.x = clamp(nx, 1 - limitX, limitX - 1);
-  p.z = clamp(nz, 1 - limitZ, limitZ - 1);
+  const avenue=park===riverside && nz>=50;
+  p.x = clamp(nx, avenue?road.xMin+1:1-limitX, avenue?road.xMax-1:limitX-1);
+  p.z = clamp(nz, park===riverside && Math.abs(p.x)>55?52:1-limitZ, park===riverside?road.zMax-1:limitZ-1);
+  if(park===riverside && Math.abs(prev.x)>55 && nz<52){p.x=prev.x;p.z=52;}
   if (nx !== p.x || nz !== p.z) {
     p.speed *= 0.88;
     if (p.speed > 3 && p.squat === 0) {
@@ -506,14 +524,60 @@ export function tick(p, k, park, dt, emit) {
       p.squat = 0.4;
     }
   }
-  if (park===riverside && !p.air && !p.rail && p.speed>=3 && Math.abs(Math.cos(p.dir))>.74) {
-    const sign=Math.sign(Math.cos(p.dir)), entryX=sign>0?-13:-5;
-    if(Math.abs(p.x-entryX)<1.7 && (2-p.z)*sign>=0 && (2-p.z)*sign<p.speed*dt+.001){
-      p.loop={a:sign>0?0:Math.PI*2,sign,entry:Math.max(7,p.speed)};
-      p.dir=sign>0?0:Math.PI;p.spin=0;p.manual=null;p.slope=0;return;
+  let woodFloor=0;
+  if(park===riverside && p.z>58){
+    // Boards can climb the sloping face, but cannot enter a jump through a vertical riser.
+    const rim=jumpHeight(p.x,p.z);
+    if(rim>jumpHeight(prev.x,prev.z)+.22 && prev.y<rim-.12){
+      p.x=prev.x;p.z=prev.z;p.speed=0;p.swipe=null;
+    }
+    const sign=-Math.sign(Math.sin(p.dir));
+    if(!p.air && !p.rail && p.speed>2 && Math.abs(Math.sin(p.dir))>.78){
+      for(const track of loops){
+        const entry=loopPoint(track,sign>0?0:tau),lateral=p.z-entry.z;
+        if((prev.x-track.x)*sign<=0 && (p.x-track.x)*sign>=0 && Math.abs(lateral)<=1.84){
+          p.loop={track,a:sign>0?0:tau,sign,lateral,entry:Math.max(8.5,p.speed)};
+          p.dir=-sign*Math.PI/2;p.stance=p.spin=0;p.manual=null;p.slope=0;
+          Object.assign(p,loopPoint(track,p.loop.a,lateral));return;
+        }
+      }
+    }
+    // Test the swept board and body against the same helical ribbon as the mesh.
+    for(const l of loops){
+      if(Math.abs(p.x-l.x)>l.r+.8)continue;
+      // At a fixed X there can be two different wooden surfaces overhead.
+      // Only the one approached from above may become a landing surface.
+      const dx=p.x-l.x;
+      for(const top of [false,true]){
+        const r=top?l.r+.24:l.r;
+        if(Math.abs(dx)>=r)continue;
+        const offset=Math.sqrt(r*r-dx*dx)*(top?1:-1),y=.035+l.r+offset;
+        const a=(Math.atan2(dx,-offset)+tau)%tau;
+        if(a<.42||a>tau-.42||Math.abs(p.z-loopPoint(l,a).z)>2.05)continue;
+        if(prev.y>=y-.015 && p.vy<=0)woodFloor=Math.max(woodFloor,y);
+      }
+      for(const dy of [.12,.72,1.3]){
+        const sx=p.x-l.x,sy=l.r+.035-(p.y+(p.air?p.vy*dt:0)+dy);
+        const angle=(Math.atan2(sx,sy)+tau)%tau;
+        if(angle<.42||angle>tau-.42)continue;
+        const radius=Math.hypot(sx,sy),old=Math.hypot(prev.x-l.x,l.r+.035-prev.y-dy);
+        if(Math.abs(p.z-loopPoint(l,angle).z)>2.24 || Math.min(old,radius)>l.r+.32 || Math.max(old,radius)<l.r-.1)continue;
+        p.x=prev.x;p.z=prev.z;p.speed=0;p.swipe=null;
+        if(p.vy>0)p.vy=0;
+        break;
+      }
+    }
+    if(!p.air && p.speed>3){
+      for(const j of jumps){
+        if(Math.abs(p.z-j.z)>2.65)continue;
+        const lip=j.x-sign*j.gap/2;
+        if((prev.x-lip)*sign<0 && (p.x-lip)*sign>=0){
+          p.air=true;p.y=j.h;p.vy=5.2;p.spin=p.spinCount=0;p.manual=null;
+        }
+      }
     }
   }
-  const floor = height(park, p.x, p.z);
+  const floor = Math.max(woodFloor||-Infinity,height(park, p.x, p.z));
   const rise = (floor - ground) / dt;
   if (
     !p.air &&
@@ -537,7 +601,8 @@ export function tick(p, k, park, dt, emit) {
     if (p.rail) return;
     if (p.y <= floor && p.vy <= Math.max(0, rise)) {
       const mis = Math.abs(Math.sin(p.spin));
-      const unfinished = p.flip && p.flip.t / p.flip.duration < 0.57;
+      const unfinished = (p.flip && p.flip.t / p.flip.duration < 0.57) || (p.stunt?.id<20 && p.stunt.t/p.stunt.duration<.75);
+      p.stunt=null;
       p.y = floor;
       p.air = false;
       // After a 180 the rider rolls switch; the velocity and chase camera keep their heading.
@@ -588,8 +653,8 @@ export function tick(p, k, park, dt, emit) {
     }
     if (
       Math.abs(floor) < 0.02 &&
-      Math.abs(p.x) < halfWidth - 3 &&
-      Math.abs(p.z) < halfDepth - 3
+      ((Math.abs(p.x)<halfWidth-3 && Math.abs(p.z)<halfDepth-3) ||
+        (park===riverside && p.z>54 && p.z<80 && Math.abs(p.x)<78 && loops.every(l=>Math.abs(l.x-p.x)>l.r+1)))
     )
       p.safe = [p.x, p.z];
   }

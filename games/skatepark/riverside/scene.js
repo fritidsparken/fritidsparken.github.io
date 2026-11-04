@@ -1,6 +1,7 @@
+import {buildAvenue} from "./avenue.js";
 import {GLTFLoader} from "../kaj/vendor/GLTFLoader.js";
-import {riverside} from "./layout.js";
-import {height, railPoint} from "../model.js?v=riverside-1";
+import {riverside} from "./layout.js?v=evening";
+import {height, railPoint} from "../model.js?v=evening-1";
 const T=window.THREE;
 function placard(scene,word,x,y,z,w,h,graffiti=false){
  const c=document.createElement('canvas');c.width=768;c.height=256;const g=c.getContext('2d');
@@ -13,7 +14,7 @@ function placard(scene,word,x,y,z,w,h,graffiti=false){
 export async function buildRiverside(scene,floor,low){
  const loader=new GLTFLoader(),tex=new T.TextureLoader();
  const shared=new URL('../../../assets/skatepark/shared/',import.meta.url);
- const [arch,map,grass,...trees]=await Promise.all([loader.loadAsync(new URL('architecture.glb',import.meta.url).href),tex.loadAsync(new URL('paving.webp',import.meta.url).href),tex.loadAsync(new URL('../../downhill/art/grass.webp',import.meta.url).href),...['maple','linden','elm'].map(name=>loader.loadAsync(new URL('trees/'+name+(low?'-distance':'-lod')+'.glb',shared).href))]);
+ const [arch,map,grass,...trees]=await Promise.all([loader.loadAsync(new URL('pavilion.glb',import.meta.url).href),tex.loadAsync(new URL('evening-paving.webp',import.meta.url).href),tex.loadAsync(new URL('../../downhill/art/grass.webp',import.meta.url).href),...['maple','linden','elm'].map(name=>loader.loadAsync(new URL('trees/'+name+(low?'-distance':'-lod')+'.glb',shared).href))]);
  arch.scene.traverse(m=>{if(m.isMesh)m.castShadow=m.receiveShadow=true;});scene.add(arch.scene);
  map.colorSpace=T.SRGBColorSpace;map.repeat.set(5/112,-5/104);map.offset.set(.5,.5);map.anisotropy=low?2:8;floor.material.map.dispose();floor.material.map=map;floor.material.vertexColors=false;floor.material.needsUpdate=true;
  grass.wrapS=grass.wrapT=T.RepeatWrapping;grass.repeat.set(32,26);grass.colorSpace=T.SRGBColorSpace;
@@ -26,9 +27,7 @@ export async function buildRiverside(scene,floor,low){
  // Meadow shoulders, river promenade and the marked road at the entrance.
  box(0x94a767,-75,-.37,0,38,.65,140);box(0x9aa968,0,-.37,-72,160,.65,40);box(0x91a664,62,-.37,0,12,.65,107);
  box(0x488a9b,90,-1.28,-10,52,.5,158);box(0xbfb6a9,59,-.05,0,3.5,.12,108);
- box(0xb5afa6,0,-.22,56,138,.4,8);box(0x50535b,0,-.29,66,160,.5,12);
- for(let x=-74;x<76;x+=9)box(0xe3bd75,x,-.026,66,4,.015,.12);
- for(let x=-17;x<-6;x+=1.25)box(0xe8e3cc,x,-.022,64,.65,.012,7.5);
+ buildAvenue(scene,box,bar,low);
  for(let n=0;n<320;n++){const z=rand()*110-55,x=65+rand()*4+Math.sin(z*.11)*1.15,size=.35+rand()*.96;put(stone,[0xabaa95,0x8e9290,0xb8b29c][n%3],x,-.5+rand()*.16,z,size,size*.76,size*1.1,rand(),rand(),0);}
  for(let n=0;n<95;n++)box(0x86b5b5,70+rand()*31,-1.018,rand()*119-60,1+rand()*4,.014,.06);
  // Across the river: elevated bridge spans, piers, skyline and layered mountain ridges.
@@ -40,7 +39,8 @@ export async function buildRiverside(scene,floor,low){
  for(let n=0;n<34;n++){
    const x=-82+n*5.2,z=-105-rand()*11,h=4+rand()*11;
    box([0x9eafba,0xb1b9be,0xc8b6a1,0x819aa6][n%4],x,h*.5-1,z,3+rand()*2,h,4);
-   for(let y=2;y<h-1;y+=1.25)box(0x728797,x,y,z+2.02,2.7,.28,.045);
+   for(let y=2;y<h-1;y+=1.25)for(let k=-1;k<=1;k++)
+     box(rand()>.45?0xf0c384:0x5b7188,x+k*.92,y,z+2.02,.62,.36,.045);
  }
  for(let n=0;n<4;n++){
    const v=[],idx=[],colors=[];let peak=(t)=>12+6*Math.sin(t*.075+n)+3*Math.cos(t*.29)+1.6*Math.cos(t*1.17);
@@ -55,7 +55,7 @@ export async function buildRiverside(scene,floor,low){
    box(0x3c594a,x,.67,z,.90,1.34,.85);box(0x294334,x,1.39,z,.94,.12,.9);
    box(0x394346,x+.05,1.15,z+.43,.56,.22,.04);
  }
- for(const r of riverside.rails){const a=railPoint(riverside,r,0),b=railPoint(riverside,r,1);bar(a,b,.13,0x4a5558);for(const t of [.06,.5,.94]){const v=railPoint(riverside,r,t);bar([v[0],height(riverside,v[0],v[2])-.02,v[2]],v,.09,0x566165);}}
+ for(const r of riverside.rails){const a=railPoint(riverside,r,0),b=railPoint(riverside,r,1);bar(a,b,.13,0x4a5558);for(const t of Array.from({length:Math.max(3,Math.ceil(Math.hypot(r[2]-r[0],r[3]-r[1])/4))},(_,n)=>n/(Math.max(3,Math.ceil(Math.hypot(r[2]-r[0],r[3]-r[1])/4))-1))){const v=railPoint(riverside,r,t);bar([v[0],height(riverside,v[0],v[2])-.02,v[2]],v,.09,0x566165);}}
  for(const [x,z,w,d] of [[-28,26,11,2],[-34,6,8,2],[35,34,12,2],[42,17,2,13],[-18,-10,8,2],[12,-10,9,2],[9,46,12,3],[-43,32,5,3]]){
  box(0xafaaa0,x,.31,z,w,.62,d);box(0x6c654d,x,.64,z,w-.28,.08,d-.25);
  for(let n=0;n<Math.ceil(w*d*2);n++){const px=x+(rand()-.5)*(w-.65),pz=z+(rand()-.5)*(d-.5),h=.17+rand()*.43;put(stone,[0x688343,0x758840,0x50704a][n%3],px,.77,pz,h,h*.9,h);if(n%3===0)put(stone,[0xa779ab,0xe8c366][n%2],px,.85+h*.7,pz,.115,.13,.105);}

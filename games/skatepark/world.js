@@ -6,7 +6,7 @@ import {
   clamp,
   halfWidth,
   halfDepth,
-} from "./model.js?v=riverside-1";
+} from "./model.js?v=evening-1";
 const T = window.THREE,
   v = (x, y, z) => new T.Vector3(x, y, z);
 const sphere = new T.SphereGeometry(1, 16, 12),
@@ -412,7 +412,7 @@ export class World {
     const park = parks[i];
     this.park = park;
     this.scene = new T.Scene();
-    const sky = new T.TextureLoader().load("vista-" + i + ".webp");
+    const sky = new T.TextureLoader().load(i===3?"riverside/night-sky.webp":"vista-" + i + ".webp");
     sky.mapping = T.EquirectangularReflectionMapping;
     sky.colorSpace = T.SRGBColorSpace;
     this.scene.background = sky;
@@ -441,17 +441,23 @@ export class World {
     sun.shadow.bias = -0.001;
     this.scene.add(sun);
     this.sun = sun;
+    if(i===3){
+      const fill=this.scene.children.find(o=>o.isHemisphereLight);
+      fill.color.setHex(0xa9badb);fill.groundColor.setHex(0x746575);fill.intensity=.62;
+      sun.color.setHex(0xbacafa);sun.intensity=.61;sun.position.set(-48,71,-32);
+      this.scene.fog.color.setHex(0x28324a);
+    }
     const floor = i===3 ? plaza(park,this.scene) : environment(this.scene, park, i);
     this.quality(q);
     {
       const [{ loadSunnyRider }, { finishSunnyPark }] = await Promise.all([
-        import("./sunny-rider.js?v=river1"),
-        import("./sunny-visuals.js?v=riverside-1"),
+        import("./sunny-rider.js?v=evening-1"),
+        import("./sunny-visuals.js?v=evening-1"),
       ]);
       const results = await Promise.allSettled([
         loadSunnyRider(this.scene, !this.renderer.shadowMap.enabled,
           shirt === 0x187e75 ? null : shirt, deck === 0xe4a963 ? null : deck),
-        i===3 ? import("./riverside/scene.js").then(m=>m.buildRiverside(this.scene,floor,!this.renderer.shadowMap.enabled)) : finishSunnyPark(this.scene, floor, this.sun, q, i),
+        i===3 ? import("./riverside/scene.js?v=evening-1").then(m=>m.buildRiverside(this.scene,floor,!this.renderer.shadowMap.enabled)) : finishSunnyPark(this.scene, floor, this.sun, q, i),
       ]);
       this.sunnyRider = results[0].value;
       const failure = results.find(result => result.status === "rejected");
@@ -498,6 +504,7 @@ export class World {
   }
   draw(p, k, dt) {
     this.sunnyRider.update(p, k, dt, this.snap);
+    this.scene.userData.lightAvenue?.(p.x,p.z);
     const ground = height(this.park, p.x, p.z);
     this.blob.position.set(p.x, ground + 0.027, p.z);
     this.blob.material.opacity = clamp(1 - (p.y - ground) * 0.16, 0.22, 1);
@@ -505,16 +512,16 @@ export class World {
     const sx = Math.sin(p.dir),
       cz = Math.cos(p.dir);
     this.want.set(
-      clamp(p.x + sx * dist + 0.95 * cz, 0.6 - halfWidth, halfWidth - 0.6),
+      clamp(p.x + sx * dist + 0.95 * cz, this.scene.userData.lightAvenue && p.z>52?-83:0.6-halfWidth,this.scene.userData.lightAvenue && p.z>52?83:halfWidth-.6),
       p.y + 2.75 + p.speed * 0.055,
-      clamp(p.z + cz * dist - 0.95 * sx, 0.6 - halfDepth, halfDepth - 0.6),
+      clamp(p.z + cz * dist - 0.95 * sx, 0.6 - halfDepth, this.scene.userData.lightAvenue?85:halfDepth-.6),
     );
     this.want.y = Math.max(
       this.want.y,
       height(this.park, this.want.x, this.want.z) + 1.45,
     );
     this.target.set(p.x - sx * 2.35, p.y + 1.05, p.z - cz * 2.35);
-    if(p.loop){this.want.set(p.x+11,6.7+p.y*.28,p.z+9);this.target.set(p.x,p.y+.8,p.z);}
+    if(p.loop){this.want.set(p.x-4*p.loop.sign,5.6+p.y*.37,p.z+12);this.target.set(p.x,p.y+.8,p.z);}
     const smooth = this.snap ? 1 : 1 - Math.exp(-8 * dt);
     this.camera.position.lerp(this.want, smooth);
     this.focus.lerp(this.target, smooth);
