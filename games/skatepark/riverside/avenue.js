@@ -24,11 +24,7 @@ export function buildAvenue(scene,box,bar,low){
      ribbon(160,(u,s)=>loopPoint(l,u*tau,side*laneHalf,(s+1)*.12),edge);
      ribbon(160,(u,s)=>loopPoint(l,u*tau,side*(laneHalf+.008),.105+s*.025),glow);
    }
-   for(const a of [1.05,1.8,2.5,3.8,4.6,5.23])for(const s of [-1,1]){
-     const p=loopPoint(l,a,s*(laneHalf+.12),.24);
-     bar([p.x,.035,p.z+s*.65],[p.x,p.y,p.z],.13,0x465a60);
-     box(0x747777,p.x,.09,p.z+s*.65,.53,.18,.53);
-   }
+
  }
  for(const j of jumps)for(const dir of [-1,1]){
    ribbon(1,(t,s)=>({x:j.x+dir*(j.gap/2+(1-t)*5.5),y:j.h*t+.004,z:j.z+s*2.65}),wood,4);

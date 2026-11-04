@@ -68,12 +68,18 @@ export async function loadSunnyRider(scene, low, shirt, deck) {
   const group=new T.Group(), pivot=new T.Group();
   group.name="Stadsgårdskajens åkare";
   pivot.position.y=.10;
-  group.add(pivot);
+  // Keep the chase heading and slope separate from rotation about the rider’s hips.
+  const somersault=new T.Group(), equipment=new T.Group();
+  somersault.position.y=.76;
+  equipment.position.y=-.76;
+  group.add(somersault);
+  somersault.add(equipment);
+  equipment.add(pivot);
   scene.add(group);
   // Attach each model as it arrives so cleanup also owns partial loads.
   const result=await Promise.allSettled([
     loader.loadAsync(new URL("characters/kaj-rider"+suffix,assets).href).then(r => {
-      group.add(r.scene);
+      equipment.add(r.scene);
       prepareMesh(r.scene,shirt,true);
       return r;
     }),
@@ -129,10 +135,11 @@ export async function loadSunnyRider(scene, low, shirt, deck) {
         back.set(track.r*Math.cos(a),track.r*Math.sin(a),track.drift*(1-Math.cos(a))/(2*Math.PI)).normalize().multiplyScalar(-sign);
         right.crossVectors(up,back).normalize();group.quaternion.setFromRotationMatrix(basis.makeBasis(right,up,back));
       }
+      somersault.rotation.x=0;
       const stunt=p.stunt;
       if(stunt){
         const u=Math.min(1,stunt.t/stunt.duration),w=Math.sin(Math.PI*u);
-        if(stunt.id<20)group.rotation.x+=(stunt.id===18?-1:1)*Math.PI*2*u*u*(3-2*u);
+        if(stunt.id<20)somersault.rotation.x=(stunt.id===18?-1:1)*Math.PI*2*u*u*(3-2*u);
         else{
           // Bring the board up, fold both knees and bring the grabbing hand to its edge.
           const side=stunt.id===20?"R":"L",edge=side==="R"?.115:-.115;

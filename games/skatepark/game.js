@@ -11,8 +11,8 @@ import {
   multi,
   score,
   clamp,
-} from "./model.js?v=evening-1";
-import { World } from "./world.js?v=evening-1";
+} from "./model.js?v=ramp-2";
+import { World } from "./world.js?v=ramp-2";
 import { Sound } from "./audio.js?v=river1";
 const $ = (id) => document.getElementById(id),
   number = (n) => n.toLocaleString("sv-SE"),

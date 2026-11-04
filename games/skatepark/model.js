@@ -199,6 +199,8 @@ export function rider() {
     vy: 0,
     air: false,
     loop: null,
+    transition: null,
+    justPopped: false,
     stunt: null,
     spin: 0,
     spinCount: 0,
@@ -264,6 +266,7 @@ export function act(p, k, key, emit) {
     p.spinCount = 0;
     p.vy = 7.8 + clamp(p.slope || 0, 0, 1) * p.speed * 0.45;
     p.y += 0.06;
+    p.justPopped = true;
     p.nollie = !!k.brake;
     add(p, k.brake ? 1 : 0, emit);
     emit("pop");
@@ -504,9 +507,43 @@ export function tick(p, k, park, dt, emit) {
       add(p, park.sampleHeight && n % 2 === 0 ? 17 : p.spin > 0 ? 5 : 6, emit);
     }
   }
+  // The coping redirects momentum upwards. On descent the board rolls back
+  // into the same transition, including when the player pops before the lip.
+  if ((!p.air || p.justPopped) && !p.transition && p.speed>1) {
+    for (const [kind,cx,cz,w,d] of park.shapes) {
+      if (!["quarter","half","mega"].includes(kind)) continue;
+      const across=kind==="half", axis=across?p.x:p.z, center=across?cx:cz;
+      const side=across?Math.sign(axis-center):kind==="mega"?-1:1;
+      const size=across?w:d, lip=kind==="mega"?.85:.79;
+      const along=2*(axis-center)*side/size;
+      const heading=across?dx:dz, cross=across?p.z-cz:p.x-cx, width=across?d:w;
+      if (heading*side<.32 || Math.abs(cross)>=width*.49 || along>lip+.045) continue;
+      if (p.justPopped ? along<(across?.12:-.72) : along+2*heading*side*p.speed*dt/size<lip) continue;
+      const launch=Math.max(p.vy,8.2+.32*p.speed);
+      const outward=Math.max(0,(lip*size/2-(axis-center)*side));
+      p.transition={across,side,cx,cz,w,d,time:0,flight:2*launch/17.5,
+        start:axis,excursion:Math.min(outward,1.1),dir:p.dir,
+        turn:Math.atan2(Math.sin((across?-p.dir:Math.PI-p.dir)-p.dir),Math.cos((across?-p.dir:Math.PI-p.dir)-p.dir))};
+      p.vy=launch;p.air=true;p.manual=null;
+      break;
+    }
+  }
+  p.justPopped=false;
   const prev={x:p.x,y:p.y,z:p.z};
-  const nx = p.x + ((p.swipe?.vx || 0) - Math.sin(p.dir) * p.speed) * dt,
+  let nx = p.x + ((p.swipe?.vx || 0) - Math.sin(p.dir) * p.speed) * dt,
     nz = p.z + ((p.swipe?.vz || 0) - Math.cos(p.dir) * p.speed) * dt;
+  if (p.transition) {
+    const tr=p.transition;
+    tr.time+=dt;
+    const u=tr.time/tr.flight;
+    const arc=4*u*(1-u)*tr.excursion-.85*u*u;
+    const normal=tr.start+tr.side*arc;
+    const tangent=(tr.across?dz:dx)*p.speed*dt;
+    if(tr.across){nx=normal;nz=clamp(p.z+tangent,tr.cz-tr.d*.48,tr.cz+tr.d*.48);}
+    else{nz=normal;nx=clamp(p.x+tangent,tr.cx-tr.w*.48,tr.cx+tr.w*.48);}
+    const t=clamp((u-.26)/.6,0,1);
+    p.dir=tr.dir+tr.turn*t*t*(3-2*t);
+  }
   if (p.swipe) {
     const drag = Math.exp(-2.8 * dt);
     p.swipe.vx *= drag;
@@ -597,12 +634,13 @@ export function tick(p, k, park, dt, emit) {
     const previousY = p.y;
     p.vy -= 17.5 * dt;
     p.y += p.vy * dt;
-    catchRail(p, k, park, emit, previousY);
+    if (!p.transition) catchRail(p, k, park, emit, previousY);
     if (p.rail) return;
     if (p.y <= floor && p.vy <= Math.max(0, rise)) {
       const mis = Math.abs(Math.sin(p.spin));
       const unfinished = (p.flip && p.flip.t / p.flip.duration < 0.57) || (p.stunt?.id<20 && p.stunt.t/p.stunt.duration<.75);
       p.stunt=null;
+      p.transition=null;
       p.y = floor;
       p.air = false;
       // After a 180 the rider rolls switch; the velocity and chase camera keep their heading.
