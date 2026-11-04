@@ -1,12 +1,12 @@
-/* Painter landscape v6. Direct inline important styles bypass older painter CSS. */
+/* Painter landscape v8. Direct inline important styles bypass older painter CSS. */
 (() => {
   const rules = [
-    ["dialog", "display:grid;width:100%;height:100%;max-width:100%;max-height:100%;box-sizing:border-box;grid-template-columns:minmax(260px,41%) minmax(0,1fr);grid-template-rows:34px auto minmax(0,1fr) 6px;gap:4px 8px;padding:6px;overflow:hidden;border-radius:12px"],
+    ["dialog", "display:grid;width:100%;height:100%;max-width:100%;max-height:100%;box-sizing:border-box;grid-template-columns:minmax(242px,34%) minmax(0,1fr);grid-template-rows:34px auto minmax(0,1fr) 6px;gap:4px 8px;padding:6px;overflow:hidden;border-radius:12px"],
     ["head","grid-column:1/-1;grid-row:1;min-width:0;min-height:0;max-height:34px;display:flex;align-items:center;gap:6px"],
     ["headTitle","padding-top:0;min-width:0"],
     ["headSubtitle","display:none"],
     ["navigation","position:static;left:auto;top:auto;transform:none;display:flex;margin-left:auto;margin-right:auto;gap:4px"],
-    ["tools","grid-column:1;grid-row:2/4;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(5,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);grid-auto-flow:row;align-content:stretch;align-items:stretch;gap:3px;width:100%;height:100%;max-height:none;min-height:0;min-width:0;overflow:visible;padding:0;margin:0;box-sizing:border-box"],
+    ["tools","grid-column:1;grid-row:2/4;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(5,clamp(32px,8.5dvh,42px));grid-auto-rows:clamp(32px,8.5dvh,42px);grid-auto-flow:row;align-content:start;align-items:stretch;gap:4px;width:100%;height:100%;max-height:none;min-height:0;min-width:0;overflow:visible;padding:0;margin:0;box-sizing:border-box"],
     ["palette","grid-column:2;grid-row:2;display:flex;flex-wrap:wrap;align-items:center;align-content:center;justify-content:flex-start;gap:3px;width:100%;height:auto;max-height:none;min-height:0;min-width:0;overflow:visible;margin:0;padding:2px;box-sizing:border-box"],
     ["stage","grid-column:2;grid-row:3;min-width:0;min-height:0;width:100%;height:100%;box-sizing:border-box"],
     ["progress","grid-column:1/-1;grid-row:4;height:6px;margin:0"],
@@ -61,7 +61,7 @@
     if (dialog === lastDialog && active.size) return;
     restore();
     lastDialog = dialog;
-    dialog.setAttribute("data-fp-layout","landscape-v7");
+    dialog.setAttribute("data-fp-layout","landscape-v8");
     set(backdrop,backdropRule);
     for (const [key,rule] of rules) set(dialog.querySelector(selectors[key]) || (key==="dialog" ? dialog : null),rule);
     dialog.querySelectorAll(".fp-paint-tools button,.fp-paint-tools select").forEach(el=>set(el,childrenRule));
@@ -75,7 +75,7 @@
       if (!indicator) {
         indicator = document.createElement("small");
         indicator.className = "fp-layout-indicator";
-        indicator.textContent = " · v7";
+        indicator.textContent = " · v8";
         indicator.style.cssText = "font-size:10px;color:#6a8071;font-weight:500;vertical-align:middle";
         header.append(indicator);
       }
