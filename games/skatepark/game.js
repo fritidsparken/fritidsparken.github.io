@@ -109,6 +109,51 @@ function event(type, val) {
   }
 }
 const stick = createRideStick(document.querySelector(".ride-stick"));
+const jumpBase = $("jumpStick");
+const jumpStick = createRideStick(jumpBase);
+const touchLayout = matchMedia("(pointer: coarse) and (hover: none) and (any-hover: none)");
+let jumpPointer = null, jumpStarted = false, keyboardUsed = false;
+function updateControls() {
+  const hide = !touchLayout.matches || keyboardUsed;
+  if (hide && !$("touch").hidden) clearKeys();
+  $("touch").hidden = hide;
+}
+touchLayout.addEventListener("change", () => {
+  keyboardUsed = false;
+  updateControls();
+});
+updateControls();
+window.addEventListener("pointerdown", e => {
+  if (e.pointerType === "touch" && touchLayout.matches && keyboardUsed) {
+    keyboardUsed = false;
+    updateControls();
+  }
+}, true);
+function triggerJump() {
+  if (mode === "play" && !jumpStarted) {
+    jumpStarted = true;
+    act(p, rideKeys(), "jump", event);
+  }
+}
+jumpBase.addEventListener("pointerdown", e => {
+  if (!jumpBase.hasPointerCapture(e.pointerId)) return;
+  jumpPointer = e.pointerId;
+  jumpStarted = false;
+  if (jumpStick.y > .25) triggerJump();
+});
+jumpBase.addEventListener("pointermove", e => {
+  if (e.pointerId === jumpPointer && jumpStick.y > .25) triggerJump();
+});
+jumpBase.addEventListener("pointerup", e => {
+  if (e.pointerId !== jumpPointer) return;
+  triggerJump();
+  jumpPointer = null;
+});
+for (const type of ["pointercancel", "lostpointercapture"]) {
+  jumpBase.addEventListener(type, e => {
+    if (e.pointerId === jumpPointer) jumpPointer = null;
+  });
+}
 function rideKeys() {
   return {
     ...keys,
@@ -119,6 +164,8 @@ function rideKeys() {
   };
 }
 function clearKeys() {
+  jumpPointer = null;
+  jumpStick.reset();
   stick.reset();
   sources.clear();
   for (const k of Object.keys(keys)) keys[k] = false;
@@ -188,8 +235,8 @@ async function start() {
   clearKeys();
   resumeAudio();
   flash(
-    matchMedia("(pointer:coarse)").matches
-      ? "Spak uppåt: fart. Nedåt: broms. Tryck Hopp och sedan Z!"
+    !$("touch").hidden
+      ? "Styr med vänster spak. Dra högerspaken uppåt eller tryck på Hopp!"
       : "Håll W för fart. Hoppa med mellanslag och tryck Z för en kickflip!",
     6,
   );
@@ -245,7 +292,7 @@ function openPanel(id) {
       button("home", "Byt park eller utrustning");
   if (id === "guide") {
     html =
-      "<small>SKATE CLUB / HANDBOKEN</small><h2>Trickguide</h2><p>W / ↑ ger fart, S / ↓ bromsar. Styr med A/D eller ←/→. Hoppa med mellanslag. R återställer och Esc pausar. På mobilen styr du med spaken. Dra uppåt för fart och nedåt för broms.</p><p>Hoppa mot ett räcke i åkriktningen. Landa längs räcket för automatisk 50-50. Håll X för boardslide eller C för lipslide. Hoppa av när du vill eller glid till slutet. Håll en manual efter landningen för att fortsätta serien. Släpp för att räkna poängen.</p>";
+      "<small>SKATE CLUB / HANDBOKEN</small><h2>Trickguide</h2><p>W / ↑ ger fart, S / ↓ bromsar. Styr med A/D eller ←/→. Hoppa med mellanslag. R återställer och Esc pausar. På mobilen styr du med vänster spak. Dra uppåt för fart och nedåt för broms. Dra högerspaken uppåt eller tryck på den för att hoppa.</p><p>Hoppa mot ett räcke i åkriktningen. Landa längs räcket för automatisk 50-50. Håll X för boardslide eller C för lipslide. Hoppa av när du vill eller glid till slutet. Håll en manual efter landningen för att fortsätta serien. Släpp för att räkna poängen.</p>";
     for (const [title, a, b] of [
       ["Hopp och rotation", 0, 10],
       ["Grind och slide", 10, 15],
@@ -396,6 +443,10 @@ const codes = {
   KeyC: "c",
 };
 window.addEventListener("keydown", (e) => {
+  if (codes[e.code] && !keyboardUsed) {
+    keyboardUsed = true;
+    updateControls();
+  }
   if (mode !== "play") return;
   if (e.code === "Escape") {
     e.preventDefault();
