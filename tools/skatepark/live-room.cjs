@@ -17,16 +17,16 @@ const fs=require('node:fs'),path=require('node:path');
    await page.goto(origin+'/games/skatepark/');
    return {page,errors,received};
   }
-  const a=await player();await a.page.locator('[data-park="0"]').click();await a.page.getByText('Spela tillsammans',{exact:true}).click();await a.page.getByText('Skapa rum',{exact:true}).click();
+  const a=await player();await a.page.locator('[data-park="3"]').click();await a.page.getByText('Spela tillsammans',{exact:true}).click();await a.page.getByText('Skapa rum',{exact:true}).click();
   await a.page.locator('#room-code').waitFor({timeout:90000});
   const code=(await a.page.locator('#room-code').innerText()).split(' ')[1];
-  const b=await player();await b.page.getByText('Spela tillsammans',{exact:true}).click();await b.page.getByLabel('Rumskod').fill(code);await b.page.getByText('Gå med',{exact:true}).click();
+  const b=await player();await b.page.locator('[data-park="0"]').click();await b.page.getByText('Spela tillsammans',{exact:true}).click();await b.page.getByLabel('Rumskod').fill(code);await b.page.getByText('Gå med',{exact:true}).click();
   await b.page.locator('#room-code').filter({hasText:'2/8'}).waitFor({timeout:90000});
   await a.page.bringToFront();if(await a.page.locator('#dialog').isVisible())await a.page.locator('#back').click();
   await a.page.keyboard.down('w');await a.page.waitForTimeout(2500);await a.page.keyboard.press('Space');await a.page.waitForTimeout(1400);await a.page.keyboard.up('w');
   const poses=b.received.filter(m=>m.kind==='ride').map(m=>m.pose);
   assert.ok(new Set(poses.map(p=>p[0]+','+p[2])).size>1,'remote rider moved');
-  assert.equal(b.received.find(m=>m.kind==='room').park,0);
+  assert.equal(b.received.find(m=>m.kind==='room').park,3);
   assert.deepEqual([...a.errors,...b.errors],[]);
   console.log('Both skaters joined the host park through the menu and shared movement.');
  }finally{await browser.close()}

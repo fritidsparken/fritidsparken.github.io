@@ -1,4 +1,4 @@
-import {road,loops,jumps,loopPoint,tau,laneHalf,lamps as originalLamps,riverside} from './layout.js?v=evening';
+import {endRamps,endRampHeight,road,loops,jumps,loopPoint,tau,laneHalf,lamps as originalLamps,riverside} from './layout.js?v=railends1';
 const T=window.THREE;
 function plankTexture(){
  const c=document.createElement('canvas');c.width=512;c.height=256;const g=c.getContext('2d');
@@ -33,6 +33,15 @@ export function buildAvenue(scene,box,bar,low){
      ribbon(160,(u,s)=>loopPoint(l,u*tau,side*(laneHalf+.008),.105+s*.025),glow);
    }
 
+ }
+ for(const [,cx,cz,w,d,h] of endRamps){
+   const side=Math.sign(cx),length=w*.41,lip=cx+side*length;
+   const point=(u,s)=>({x:cx+side*length*u,y:endRampHeight(u,h)+.004,z:cz+s*d/2});
+   ribbon(48,point,wood,4);
+   for(const edgeSide of [-1,1])ribbon(48,(u,s)=>({...point(u,edgeSide),y:s>0?endRampHeight(u,h):0}),edge);
+   bar([lip,h,cz-d/2],[lip,h,cz+d/2],.10,0x586572);
+   const deck=w/2-length;
+   box(0x97714b,lip+side*deck/2,h/2,cz,deck,h,d);
  }
  for(const j of jumps)for(const dir of [-1,1]){
    ribbon(1,(t,s)=>({x:j.x+dir*(j.gap/2+(1-t)*5.5),y:j.h*t+.004,z:j.z+s*2.65}),wood,4);

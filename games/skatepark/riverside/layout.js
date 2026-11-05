@@ -30,9 +30,18 @@ export function jumpHeight(x,z){
   }
   return 0;
 }
-for(const z of [road.innerRail,road.outerRail])riverside.rails.push([-74,z,74,z,.58]);
+// A flat runout separates the end of each grind from the transition.
+export const endRamps=[];
+export function endRampHeight(t,h){return h*(1-Math.sqrt(Math.max(0,1-t*t)))}
+for(const z of [road.innerRail,road.outerRail]){
+ riverside.rails.push([-70,z,70,z,.58]);
+ for(const side of [-1,1]){
+  const shape=['return',side*73,z,16,7,2.75];
+  endRamps.push(shape);riverside.shapes.push(shape);
+ }
+}
 export const lamps=[];
-for(const z of [59,78])for(let x=-78;x<=78;x+=13)lamps.push([x,z+(z===59?-1:1),6.8]);
+for(const z of [59,78])for(let x=-65;x<=65;x+=13)lamps.push([x,z+(z===59?-1:1),6.8]);
 for(const z of [-44,-19,4,28,47])for(const x of [-49,-22,5,42]){
  if(riverside.shapes.some(([,cx,cz,w,d])=>Math.abs(x-cx)<w/2+.9&&Math.abs(z-cz)<d/2+.9))continue;
  lamps.push([x,z,6.1]);

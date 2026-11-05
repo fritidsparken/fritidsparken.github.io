@@ -1,4 +1,4 @@
-import { riverside, road, loops, jumps, jumpHeight, loopPoint, tau } from "./riverside/layout.js?v=evening";
+import { riverside, road, endRampHeight, loops, jumps, jumpHeight, loopPoint, tau } from "./riverside/layout.js?v=railends1";
 export const parks = [
   {
     name: "Soliga skateparken",
@@ -131,6 +131,10 @@ export function surface(shape, x, z) {
   const [kind, cx, cz, w, d, h] = shape,
     u = (2 * (x - cx)) / w,
     v = (2 * (z - cz)) / d;
+  if(kind==="return"){
+    const t=u*Math.sign(cx);
+    return Math.abs(v)<=1&&t>=0&&t<=1?endRampHeight(Math.min(1,t/.82),h):0;
+  }
   if(kind==="mega" && v < -.86 && v > -1.14) {
     return h * edge(u) * clamp((1.14+v)*45,0,1);
   }
@@ -259,7 +263,11 @@ export function act(p, k, key, emit) {
   if (p.recover > 0 || p.loop) return;
   if (key === "jump" && (!p.air || p.rail)) {
     const fromRail=!!p.rail;
-    if (fromRail) p.ignoredRail=null;
+    if (fromRail){
+      const side=(k.right||0)-(k.left||0);
+      p.ignoredRail=side?p.rail.r:null;
+      if(side)p.swipe={vx:5*side*Math.cos(p.dir),vz:-5*side*Math.sin(p.dir),spin:0};
+    }
     p.rail = null;
     p.manual = null;
     p.air = true;
@@ -317,15 +325,15 @@ export function swipeMove(x, up, full) {
   const sector = (Math.round(Math.atan2(x, up) / (Math.PI / 4)) + 8) % 8;
   return sector === 4 && full ? 7 : swipeMoves[sector][1];
 }
-export function swipeJump(p, id, x, up, emit) {
+export function swipeJump(p, id, x, up, emit, controls={}) {
   if (p.loop || p.recover > 0 || (p.air && !p.rail)) return;
   const fromRail=!!p.rail;
-  act(p, { brake: id === 1 }, "jump", emit);
+  act(p, { brake: id === 1, right:fromRail&&Math.abs(x)>.25?x:turn(controls) }, "jump", emit);
   const len = Math.hypot(x, up);
   if (!id || !len) return;
   // Add a short impulse in the camera's travel frame without turning the camera
   // or replacing the rider's forward speed. It dies away during the flight.
-  const scale = fromRail ? 0 : 3.2 / len;
+  const scale = (fromRail ? 5 : 3.2) / len;
   p.swipe = {
     vx: scale * (x * Math.cos(p.dir) - up * Math.sin(p.dir)),
     vz: scale * (-x * Math.sin(p.dir) - up * Math.cos(p.dir)),
@@ -483,6 +491,7 @@ export function tick(p, k, park, dt, emit) {
       0,
       13,
     );
+    if(park===riverside&&p.speed<.1&&p.slope>.12&&Math.abs(p.x)>73&&p.z>52){p.dir+=Math.PI;p.speed=.5}
     if (k.go) {
       p.kick += dt * (5 + p.speed * 0.13);
       if (
@@ -517,9 +526,9 @@ export function tick(p, k, park, dt, emit) {
   // into the same transition, including when the player pops before the lip.
   if ((!p.air || p.justPopped) && !p.transition && p.speed>1) {
     for (const [kind,cx,cz,w,d] of park.shapes) {
-      if (!["quarter","half","mega"].includes(kind)) continue;
-      const across=kind==="half", axis=across?p.x:p.z, center=across?cx:cz;
-      const side=across?Math.sign(axis-center):kind==="mega"?-1:1;
+      if (!["quarter","half","mega","return"].includes(kind)) continue;
+      const across=kind==="half"||kind==="return", axis=across?p.x:p.z, center=across?cx:cz;
+      const side=kind==="return"?Math.sign(cx):across?Math.sign(axis-center):kind==="mega"?-1:1;
       const size=across?w:d, lip=kind==="mega"?.85:.79;
       const along=2*(axis-center)*side/size;
       const heading=across?dx:dz, cross=across?p.z-cz:p.x-cx, width=across?d:w;

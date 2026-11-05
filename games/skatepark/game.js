@@ -11,8 +11,8 @@ import {
   multi,
   score,
   clamp,
-} from "./model.js?v=rail-3";
-import { World } from "./world.js?v=park-lights-1";
+} from "./model.js?v=railends1";
+import { World } from "./world.js?v=railends1";
 import { Sound } from "./audio.js?v=river1";
 const $ = (id) => document.getElementById(id),
   number = (n) => n.toLocaleString("sv-SE"),
@@ -154,7 +154,7 @@ function readJumpGesture(e, release) {
   $("jumpPreview").textContent = tricks[id][0];
   if (full || release) {
     gesture.fired = true;
-    swipeJump(p, id, x, up, event);
+    swipeJump(p, id, x, up, event, rideKeys());
   }
 }
 function clearJumpGesture() {

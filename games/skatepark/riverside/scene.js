@@ -1,7 +1,7 @@
-import {buildAvenue} from "./avenue.js?v=park-lights-1";
+import {buildAvenue} from "./avenue.js?v=railends1";
 import {GLTFLoader} from "../kaj/vendor/GLTFLoader.js";
-import {riverside} from "./layout.js?v=evening";
-import {height, railPoint} from "../model.js?v=rail-3";
+import {riverside} from "./layout.js?v=railends1";
+import {height, railPoint} from "../model.js?v=railends1";
 const T=window.THREE;
 function placard(scene,word,x,y,z,w,h,graffiti=false){
  const c=document.createElement('canvas');c.width=768;c.height=256;const g=c.getContext('2d');
@@ -25,11 +25,11 @@ export async function buildRiverside(scene,floor,low){
  function bar(a,b,diam,c){const u=new T.Vector3(...a),v=new T.Vector3(...b),delta=v.clone().sub(u),q=new T.Quaternion().setFromUnitVectors(new T.Vector3(0,1,0),delta.clone().normalize()),e=new T.Euler().setFromQuaternion(q);put(pole,c,...u.lerp(v,.5).toArray(),diam,delta.length(),diam,e.x,e.y,e.z);}
  const box=(...a)=>put(cube,...a);
  // Meadow shoulders, river promenade and the marked road at the entrance.
- box(0x94a767,-75,-.37,0,38,.65,140);box(0x9aa968,0,-.37,-72,160,.65,40);box(0x91a664,62,-.37,0,12,.65,107);
- box(0x488a9b,90,-1.28,-10,52,.5,158);box(0xbfb6a9,59,-.05,0,3.5,.12,108);
+ box(0x94a767,-75,-.37,-9.25,38,.65,121.5);box(0x9aa968,0,-.37,-72,160,.65,40);box(0x91a664,62,-.37,-.75,12,.65,105.5);
+ box(0x488a9b,90,-1.28,-19,52,.5,140);box(0xbfb6a9,59,-.05,-1,3.5,.12,106);
  buildAvenue(scene,box,bar,low);
- for(let n=0;n<320;n++){const z=rand()*110-55,x=65+rand()*4+Math.sin(z*.11)*1.15,size=.35+rand()*.96;put(stone,[0xabaa95,0x8e9290,0xb8b29c][n%3],x,-.5+rand()*.16,z,size,size*.76,size*1.1,rand(),rand(),0);}
- for(let n=0;n<95;n++)box(0x86b5b5,70+rand()*31,-1.018,rand()*119-60,1+rand()*4,.014,.06);
+ for(let n=0;n<320;n++){const z=rand()*103-55,x=65+rand()*4+Math.sin(z*.11)*1.15,size=.35+rand()*.96;put(stone,[0xabaa95,0x8e9290,0xb8b29c][n%3],x,-.5+rand()*.16,z,size,size*.76,size*1.1,rand(),rand(),0);}
+ for(let n=0;n<95;n++)box(0x86b5b5,70+rand()*31,-1.018,rand()*110-60,1+rand()*4,.014,.06);
  // Across the river: elevated bridge spans, piers, skyline and layered mountain ridges.
  for(let n=0;n<10;n++){
    const x=39+n*9,z=-65-n*.6;
