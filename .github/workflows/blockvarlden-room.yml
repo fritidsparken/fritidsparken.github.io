@@ -5,13 +5,23 @@ on:
     paths:
       - '.github/workflows/blockvarlden-room.yml'
       - 'tools/blockvarlden/live-room.cjs'
+      - 'wrangler.jsonc'
 permissions:
   contents: read
 jobs:
   multiplayer:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 7
     steps:
       - uses: actions/checkout@v4
       - run: npm install --prefix "$RUNNER_TEMP/room" playwright@1.55.0
+      - name: Wait for the multiplayer server deployment
+        run: |
+          for attempt in {1..24}; do
+            status=$(curl --max-time 8 -s -o /dev/null -w '%{http_code}' -H 'Origin: https://fritidsparken.se' https://fritidsparken-github-io.th8kdfmyr7.workers.dev/create) || true
+            echo "Worker HTTP status $status"
+            if [ "$status" = 426 ]; then exit 0; fi
+            sleep 5
+          done
+          exit 1
       - run: NODE_PATH="$RUNNER_TEMP/room/node_modules" node tools/blockvarlden/live-room.cjs
