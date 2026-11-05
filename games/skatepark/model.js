@@ -1,4 +1,4 @@
-import {solkajen,bowlRadius} from './solkajen/layout.js';
+import {solkajen,bowlRadius} from './solkajen/layout.js?v=guld1';
 import { riverside, road, endRampHeight, loops, jumps, jumpHeight, loopPoint, tau } from "./riverside/layout.js?v=railends1";
 export const parks = [
   {
@@ -526,7 +526,7 @@ export function tick(p, k, park, dt, emit) {
   }
   // The coping redirects momentum upwards. On descent the board rolls back
   // into the same transition, including when the player pops before the lip.
-  if ((!p.air || p.justPopped) && !p.transition && p.speed>1) {
+  if (!p.transition && p.speed>1 && (!p.air || p.justPopped || park===solkajen)) {
     for (const [kind,cx,cz,w,d] of park.shapes) {
       if (!["quarter","half","mega","return"].includes(kind)) continue;
       const across=kind==="half"||kind==="return", axis=across?p.x:p.z, center=across?cx:cz;
@@ -534,8 +534,13 @@ export function tick(p, k, park, dt, emit) {
       const size=across?w:d, lip=kind==="mega"?.85:.79;
       const along=2*(axis-center)*side/size;
       const heading=across?dx:dz, cross=across?p.z-cz:p.x-cx, width=across?d:w;
-      if (heading*side<.32 || Math.abs(cross)>=width*.49 || along>lip+.045) continue;
-      if (p.justPopped ? along<(across?.12:-.72) : along+2*heading*side*p.speed*dt/size<lip) continue;
+      const guarded=park===solkajen && kind==="mega";
+      if (p.air && !p.justPopped && !guarded) continue;
+      const nearCoping=guarded && along>.60 && along<=1.14 && Math.abs(cross)<width*.50 && heading*side>0;
+      if (!nearCoping) {
+        if (heading*side<.32 || Math.abs(cross)>=width*.49 || along>lip+.045) continue;
+        if (p.justPopped ? along<(across?.12:-.72) : along+2*heading*side*p.speed*dt/size<lip) continue;
+      }
       const launch=Math.max(p.vy,8.2+.32*p.speed);
       const outward=Math.max(0,(lip*size/2-(axis-center)*side));
       p.transition={across,side,cx,cz,w,d,time:0,flight:2*launch/17.5,

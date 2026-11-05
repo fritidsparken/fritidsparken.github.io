@@ -6,7 +6,7 @@ import {
   clamp,
   halfWidth,
   halfDepth,
-} from "./model.js?v=solkajen1";
+} from "./model.js?v=solkajen-guld1";
 const T = window.THREE,
   v = (x, y, z) => new T.Vector3(x, y, z);
 const sphere = new T.SphereGeometry(1, 16, 12),
@@ -412,7 +412,19 @@ export class World {
     const park = parks[i];
     this.park = park;
     this.scene = new T.Scene();
-    const sky = new T.TextureLoader().load(i===3?"riverside/night-sky.webp":"vista-" + (i===4?0:i) + ".webp");
+    const sky = new T.TextureLoader().load(i===3?"riverside/night-sky.webp":"vista-" + (i===4?0:i) + ".webp", texture=>{
+      if(i!==4)return;
+      const image=texture.image, canvas=document.createElement("canvas");
+      canvas.width=image.width;canvas.height=image.height;
+      const ctx=canvas.getContext("2d");
+      ctx.drawImage(image,0,0);
+      const glow=ctx.createLinearGradient(0,0,0,canvas.height*.66);
+      glow.addColorStop(0,"rgba(111,101,172,.32)");
+      glow.addColorStop(.68,"rgba(251,163,112,.55)");
+      glow.addColorStop(1,"rgba(255,207,142,.3)");
+      ctx.fillStyle=glow;ctx.fillRect(0,0,canvas.width,canvas.height);
+      texture.image=canvas;texture.needsUpdate=true;
+    });
     sky.mapping = T.EquirectangularReflectionMapping;
     sky.colorSpace = T.SRGBColorSpace;
     this.scene.background = sky;
@@ -441,13 +453,25 @@ export class World {
     sun.shadow.bias = -0.001;
     this.scene.add(sun);
     this.sun = sun;
+    if(i===4){
+      sun.position.set(-86,34,-48);
+      sun.color.setHex(0xffc086);
+      sun.intensity=2.35;
+      const fill=this.scene.children.find(o=>o.isHemisphereLight);
+      fill.color.setHex(0xffead3);
+      fill.groundColor.setHex(0xad9296);
+      this.scene.fog.color.setHex(0xf2c6a9);
+      this.scene.fog.density=.009;
+
+    }
     if(i===3){
       const fill=this.scene.children.find(o=>o.isHemisphereLight);
       fill.color.setHex(0xa9badb);fill.groundColor.setHex(0x746575);fill.intensity=.85;
       sun.color.setHex(0xbacafa);sun.intensity=.75;sun.position.set(-48,71,-32);
       this.scene.fog.color.setHex(0x28324a);
     }
-    const floor = i>=3 ? plaza(park,this.scene) : environment(this.scene, park, i);
+    const floor = i===4 ? new T.Mesh(new T.BufferGeometry(),mat(0xffffff,{map:noise()})) : i===3 ? plaza(park,this.scene) : environment(this.scene, park, i);
+    if(i===4){floor.receiveShadow=true;this.scene.add(floor)}
     this.quality(q);
     {
       const [{ loadSunnyRider }, { finishSunnyPark }] = await Promise.all([
@@ -457,7 +481,7 @@ export class World {
       const results = await Promise.allSettled([
         loadSunnyRider(this.scene, !this.renderer.shadowMap.enabled,
           shirt === 0x187e75 ? null : shirt, deck === 0xe4a963 ? null : deck),
-        i===4 ? import("./solkajen/scene.js").then(m=>m.buildSolkajen(this.scene,floor,!this.renderer.shadowMap.enabled)) : i===3 ? import("./riverside/scene.js?v=rampljus1").then(m=>m.buildRiverside(this.scene,floor,!this.renderer.shadowMap.enabled)) : finishSunnyPark(this.scene, floor, this.sun, q, i),
+        i===4 ? import("./solkajen/scene.js?v=guld1").then(m=>m.buildSolkajen(this.scene,floor,!this.renderer.shadowMap.enabled)) : i===3 ? import("./riverside/scene.js?v=rampljus1").then(m=>m.buildRiverside(this.scene,floor,!this.renderer.shadowMap.enabled)) : finishSunnyPark(this.scene, floor, this.sun, q, i),
       ]);
       this.sunnyRider = results[0].value;
       const failure = results.find(result => result.status === "rejected");

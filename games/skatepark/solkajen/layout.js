@@ -1,6 +1,6 @@
 // South is the entrance. The café overlooks the street line from the west.
 export const solkajen={
- name:'Solkajen',area:'RIVERSIDE · DAG',desc:'Solvarm betong, graffitiloop och en hög träramp.',sky:0xbddbed,floor:0xd8d3cb,ink:0xafaaa8,rail:0xb54a30,
+ name:'Solkajen',area:'RIVERSIDE · KVÄLL',desc:'Solvarm betong, graffitiloop och en hög träramp.',sky:0xbddbed,floor:0xd8d3cb,ink:0xafaaa8,rail:0xb54a30,
  loops:[{x:-19,z:-29,r:4.4,drift:3.6}],
  shapes:[
  ['kidney',31,17,36,28,-4.6],['bowl',8,-30,23,18,-3.3],['bowl',-3,-33,14,14,-2],
@@ -15,3 +15,24 @@ export const solkajen={
 export function bowlRadius(u,v){
  return Math.hypot(u,v+.2*Math.cos(u*Math.PI*1.3)*(1-v*v));
 }
+
+// Rounded corners connect the four straights into one continuous grind.
+const rimPoints = [];
+for (const [cx, cz, start] of [[47,43,0],[-47,43,90],[-47,-43,180],[47,-43,270]]) {
+  for (let step=0; step<=8; step++) {
+    const angle=(start+90*step/8)*Math.PI/180;
+    rimPoints.push([cx+6*Math.cos(angle),cz+6*Math.sin(angle)]);
+  }
+}
+const perimeter=rimPoints.map(([x,z],i)=>{
+  const end=rimPoints[(i+1)%rimPoints.length];
+  const rail=[x,z,...end,.66];
+  rail.profile=[.66,0];
+  rail.line='solkajen-perimeter';
+  return rail;
+});
+perimeter.forEach((rail,i)=>{
+  rail.next=perimeter[(i+1)%perimeter.length];
+  rail.prev=perimeter[(i+perimeter.length-1)%perimeter.length];
+});
+solkajen.rails.push(...perimeter);

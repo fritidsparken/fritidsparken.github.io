@@ -17,7 +17,11 @@ const surfaces=shapes.map(s=>{
  zs.sort((a,b)=>a-b);
  return {kind,x,z,w,d,xs,zs,ys:zs.map(b=>xs.map(a=>surface(s,a,b)))};
 });
-console.log(JSON.stringify({surfaces,loop:park.loops[0],rails:park.rails.map(r=>[railPoint(park,r,0),railPoint(park,r,1)])}));
+const grid=Array.from({length:209},(_,j)=>Array.from({length:225},(_,i)=>{
+ const x=i*.5-56,z=j*.5-52;
+ return park.shapes.filter(s=>s[5]<0).reduce((y,s)=>y+surface(s,x,z),0);
+}));
+console.log(JSON.stringify({grid,surfaces,loop:park.loops[0],rails:park.rails.map(r=>[railPoint(park,r,0),railPoint(park,r,1)])}));
 """
 data=json.loads(subprocess.check_output(['node','--input-type=module','-e',sample],cwd=root))
 bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
@@ -69,7 +73,9 @@ for i in range(112):
  for side in (-1,1):face([loop(a,side,0),loop(a,side,.22),loop(b,side,.22),loop(b,side,0)],'aqua')
 for a,b in data['rails']:
  a,b=Vector(a),Vector(b);rod(a,b,.075,'red')
- for t in (.06,.5,.94):
+ span=(b-a).length
+ supports=max(1,math.ceil(span/3.5))
+ for t in [(k+.5)/supports for k in range(supports)]:
   p=a.lerp(b,t);rod((p.x,0,p.z),p,.045,'metal')
 flush('Graffitiloop och grindrails')
 # Floodlight masts and textile pennants around the outer deck.
@@ -92,6 +98,9 @@ for side in (-1,1):rod((47+side*.85,.85,-32),(47+side*.85,12.65,-46.6),.06,'meta
 # Outdoor café furniture, umbrellas and tables by the clubhouse.
 for n,(x,z) in enumerate([(-48,-12),(-51,-4),(-48,5),(-51,13)]):
  rod((x,0,z),(x,3.1,z),.055,'metal');box(x,.88,z,2.8,.13,1.15,'board')
+ for dx in (-1,1):
+  for dz in (-.34,.34):box(x+dx,.43,z+dz,.12,.86,.12,'metal')
+ box(x,.045,z,.7,.09,.7,'stone')
  for side in (-1,1):
   box(x,.49,z+side*.95,2.8,.12,.4,'board2')
   for dx in (-.95,.95):rod((x+dx,.04,z+side*1.05),(x+dx,.87,z+side*.33),.05,'metal')
@@ -119,5 +128,15 @@ for bx,bz in [(51,26),(51,38),(48,45),(-49,32),(-51,22),(-47,-36),(-36,-42),(16,
   face([(x-.15,0,z),(x+.12,0,z+.05),(x+.25,h,z-.18)],'leaf')
   if i%4==0:rod((x,h*.45,z),(x+.09,h,z),.047,'violet',5)
 flush('Bågbron och strandrabatter')
-out=root/'games/skatepark/solkajen/park.glb'
+# Shared vertices keep the carved bowl transitions smooth.
+grid=data['grid']
+cols=len(grid[0])
+points=[pt((i*.5-56,y,j*.5-52)) for j,row in enumerate(grid) for i,y in enumerate(row)]
+cells=[(a,a+cols,a+cols+1,a+1) for j in range(len(grid)-1) for i in range(cols-1) for a in [j*cols+i]]
+mesh=bpy.data.meshes.new('Bowlar och betongplatta')
+mesh.from_pydata(points,[],cells)
+mesh.materials.append(mats['concrete'])
+for poly in mesh.polygons:poly.use_smooth=True
+bpy.context.collection.objects.link(bpy.data.objects.new('SolkajenPlaza',mesh))
+out=root/'games/skatepark/solkajen/park.glb' 
 bpy.ops.export_scene.gltf(filepath=str(out),export_format='GLB',export_texcoords=False,export_normals=True)

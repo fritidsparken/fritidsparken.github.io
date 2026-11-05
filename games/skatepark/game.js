@@ -11,9 +11,9 @@ import {
   multi,
   score,
   clamp,
-} from "./model.js?v=solkajen1";
-import { World } from "./world.js?v=solkajen1";
-import { Sound } from "./audio.js?v=solkajen1";
+} from "./model.js?v=solkajen-guld1";
+import { World } from "./world.js?v=solkajen-guld1";
+import { Sound } from "./audio.js?v=solkajen-guld1";
 const $ = (id) => document.getElementById(id),
   number = (n) => n.toLocaleString("sv-SE"),
   key = "fp-skatepark-v1";

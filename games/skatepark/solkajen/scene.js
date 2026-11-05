@@ -36,11 +36,19 @@ function paving(low){
 export async function buildSolkajen(scene,floor,low){
  const loader=new GLTFLoader(),asset=name=>new URL(name,import.meta.url).href;
  const [course,club,...trees]=await Promise.all([
-  loader.loadAsync(asset('park.glb')),loader.loadAsync(asset('../riverside/pavilion.glb')),
+  loader.loadAsync(asset('park.glb?v=guld1')),loader.loadAsync(asset('../riverside/pavilion.glb')),
   ...['maple','linden','elm'].map(n=>loader.loadAsync(asset('../../../assets/skatepark/shared/trees/'+n+(low?'-distance':'-lod')+'.glb')))
  ]);
+ const plaza=course.scene.getObjectByName('SolkajenPlaza');
+ course.scene.updateMatrixWorld(true);
+ plaza.geometry.applyMatrix4(plaza.matrixWorld);
+ plaza.removeFromParent();
+ floor.geometry.dispose();
+ floor.geometry=plaza.geometry;
+ floor.geometry.setAttribute('uv',new T.BufferAttribute(new Float32Array(plaza.geometry.attributes.position.count*2),2));
  // The clubhouse was authored at its Riverside coordinates.
- club.scene.position.set(-16,0,7);
+ const bounds=new T.Box3().setFromObject(club.scene);
+ club.scene.position.set(-56-bounds.max.x,-bounds.min.y-.025,7);
  for(const obj of [club.scene,course.scene]){obj.traverse(m=>{if(m.isMesh){m.castShadow=true;m.receiveShadow=true}});scene.add(obj)}
  floor.material.map.dispose();floor.material.map=paving(low);floor.material.vertexColors=false;floor.material.color.setHex(0xffffff);floor.material.needsUpdate=true;
  const pos=floor.geometry.attributes.position,uv=floor.geometry.attributes.uv;
