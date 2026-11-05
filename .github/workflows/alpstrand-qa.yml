@@ -1,22 +1,29 @@
-name: Alpstrand browser verification
+name: Verify published Alpstrand on Fritidsparken.se
 on:
   push:
     branches: [verify-alpstrand-20261105]
 permissions:
   contents: read
 jobs:
-  webgl:
+  published-game:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
       - run: npm install --prefix "$RUNNER_TEMP/alp-browser" playwright@1.55.0
-      - name: Start game and test
+      - name: Check public files and play the production game
+        env:
+          SKATE_URL: https://fritidsparken.se/games/skatepark/
         run: |
-          python -m http.server 8173 --bind 127.0.0.1 >/tmp/alp-http.log 2>&1 &
+          curl --fail --retry 3 -Ls https://fritidsparken.se/ >/tmp/fritidsparken.html
+          for file in assets/skatepark/models/alpstrand.glb games/skatepark/game.js games/skatepark/model.js games/skatepark/index.html games/skatepark/park-5.webp; do
+            curl --fail --retry 3 -Ls "https://fritidsparken.se/$file" >/tmp/skate-check
+            cmp "/tmp/skate-check" "$file"
+            echo "Verified: $file"
+          done
           NODE_PATH="$RUNNER_TEMP/alp-browser/node_modules" CHROME="$(which google-chrome)" node tools/skatepark/alpstrand-browser.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: alpstrand-browser-evidence
+          name: alpstrand-live-evidence
           path: skate-qa
