@@ -563,7 +563,20 @@ export function tick(p, k, park, dt, emit) {
       p.transition={across,side,cx,cz,w,d,time:0,flight:2*launch/17.5,
         centerline:center,size,lip,start:axis,excursion:Math.min(outward,1.1),dir:p.dir,
         turn:Math.atan2(Math.sin((across?-p.dir:Math.PI-p.dir)-p.dir),Math.cos((across?-p.dir:Math.PI-p.dir)-p.dir))};
-      p.vy=launch;p.air=true;p.manual=null;
+      p.vy=launch;
+      if(park===solkajen && kind==="mega"){
+        const other=park.shapes.find(shape=>shape[0]==="mega" && shape[1]!==cx);
+        const toward=Math.sign(other[1]-cx);
+        if(turn(k)*toward>.15 || dx*toward>.18){
+          const [,tx,tz,tw,td]=other;
+          const endX=tx-toward*tw*.16, endZ=tz-td*.33;
+          const duration=clamp(Math.hypot(endX-p.x,endZ-p.z)/10,1.25,2.2);
+          p.transition.flight=duration;
+          p.transition.transfer={x:p.x,z:p.z,endX,endZ};
+          p.vy=(height(park,endX,endZ)-p.y)/duration+8.75*duration;
+        }
+      }
+      p.air=true;p.manual=null;
       break;
     }
   }
@@ -580,6 +593,12 @@ export function tick(p, k, park, dt, emit) {
     const tangent=(tr.across?dz:dx)*p.speed*dt;
     if(tr.across){nx=normal;nz=clamp(p.z+tangent,tr.cz-tr.d*.48,tr.cz+tr.d*.48);}
     else{nz=normal;nx=clamp(p.x+tangent,tr.cx-tr.w*.48,tr.cx+tr.w*.48);}
+    if(tr.transfer){
+      const path=tr.transfer, progress=clamp(u,0,1);
+      const eased=progress*progress*(3-2*progress);
+      nx=path.x+(path.endX-path.x)*eased;
+      nz=path.z+(path.endZ-path.z)*eased;
+    }
     const t=clamp((u-.26)/.6,0,1);
     p.dir=tr.dir+tr.turn*t*t*(3-2*t);
   }
