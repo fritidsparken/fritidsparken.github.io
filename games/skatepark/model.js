@@ -1,3 +1,4 @@
+import {solkajen,bowlRadius} from './solkajen/layout.js';
 import { riverside, road, endRampHeight, loops, jumps, jumpHeight, loopPoint, tau } from "./riverside/layout.js?v=railends1";
 export const parks = [
   {
@@ -122,7 +123,7 @@ export const parks = [
     ],
   },
 ];
-parks.push(riverside);
+parks.push(riverside,solkajen);
 export const halfWidth = 56,
   halfDepth = 52;
 export const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
@@ -145,6 +146,7 @@ export function surface(shape, x, z) {
       const t=clamp((.86-v)/1.72,0,1);
       return h*(1-Math.sqrt(Math.max(0,1-t*t)))*edge(u)*clamp((1+v)*9,0,1);
     }
+    case "kidney": {const radius=bowlRadius(u,v);return radius<1?h*(.5+.5*Math.cos(Math.PI*radius)):0}
     case "bowl":
       return r >= 1 ? 0 : h * (0.5 + 0.5 * Math.cos(Math.PI * r));
     case "half":
@@ -577,15 +579,16 @@ export function tick(p, k, park, dt, emit) {
     }
   }
   let woodFloor=0;
-  if(park===riverside && p.z>58){
+  if((park===riverside && p.z>58)||park.loops){
+    const tracks=park.loops||loops;
     // Boards can climb the sloping face, but cannot enter a jump through a vertical riser.
-    const rim=jumpHeight(p.x,p.z);
+    const rim=park===riverside?jumpHeight(p.x,p.z):0;
     if(rim>jumpHeight(prev.x,prev.z)+.22 && prev.y<rim-.12){
       p.x=prev.x;p.z=prev.z;p.speed=0;p.swipe=null;
     }
     const sign=-Math.sign(Math.sin(p.dir));
     if(!p.air && !p.rail && p.speed>2 && Math.abs(Math.sin(p.dir))>.78){
-      for(const track of loops){
+      for(const track of tracks){
         const entry=loopPoint(track,sign>0?0:tau),lateral=p.z-entry.z;
         if((prev.x-track.x)*sign<=0 && (p.x-track.x)*sign>=0 && Math.abs(lateral)<=1.84){
           p.loop={track,a:sign>0?0:tau,sign,lateral,entry:Math.max(8.5,p.speed)};
@@ -595,7 +598,7 @@ export function tick(p, k, park, dt, emit) {
       }
     }
     // Test the swept board and body against the same helical ribbon as the mesh.
-    for(const l of loops){
+    for(const l of tracks){
       if(Math.abs(p.x-l.x)>l.r+.8)continue;
       // At a fixed X there can be two different wooden surfaces overhead.
       // Only the one approached from above may become a landing surface.
@@ -620,7 +623,7 @@ export function tick(p, k, park, dt, emit) {
       }
     }
     if(!p.air && p.speed>3){
-      for(const j of jumps){
+      for(const j of park===riverside?jumps:[]){
         if(Math.abs(p.z-j.z)>2.65)continue;
         const lip=j.x-sign*j.gap/2;
         if((prev.x-lip)*sign<0 && (p.x-lip)*sign>=0){

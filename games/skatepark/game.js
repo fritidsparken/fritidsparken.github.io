@@ -11,8 +11,8 @@ import {
   multi,
   score,
   clamp,
-} from "./model.js?v=railends1";
-import { World } from "./world.js?v=rampljus1";
+} from "./model.js?v=solkajen1";
+import { World } from "./world.js?v=solkajen1";
 import { Sound } from "./audio.js?v=river1";
 const $ = (id) => document.getElementById(id),
   number = (n) => n.toLocaleString("sv-SE"),
@@ -43,9 +43,10 @@ const s = {
   deck: 0,
   shirt: 0,
   riverside: true,
-  park: (stored.park!==3 || stored.riverside) && parks[stored.park] ? stored.park : 3,
+  park: (stored.park!==3 || stored.riverside) && parks[stored.park] ? stored.park : 4,
 };
 if (new URLSearchParams(location.search).get("bana")==="riverside") s.park=3;
+if (new URLSearchParams(location.search).get("bana")==="solkajen") s.park=4;
 for (const [slot, items] of [
   ["deck", decks],
   ["shirt", shirts],
@@ -68,7 +69,7 @@ const keys = {},
   sources = new Map(),
   dialog = $("dialog");
 function cards() {
-  $("parks").innerHTML = [3, 0, 1, 2]
+  $("parks").innerHTML = [4, 3, 0, 1, 2]
     .map(
       (i, position) => {
         const a = parks[i];
@@ -230,6 +231,7 @@ async function start() {
   }
   p = rider();
   if(s.park===3){p.x=-70;p.z=65;p.dir=-Math.PI/2;p.safe=[-70,65];}
+  if(s.park===4){p.x=-16;p.z=40;p.dir=.05;p.safe=[-16,40];}
   $("menu").hidden = true;
   $("ride").hidden = false;
   mode = "play";

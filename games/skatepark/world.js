@@ -6,7 +6,7 @@ import {
   clamp,
   halfWidth,
   halfDepth,
-} from "./model.js?v=railends1";
+} from "./model.js?v=solkajen1";
 const T = window.THREE,
   v = (x, y, z) => new T.Vector3(x, y, z);
 const sphere = new T.SphereGeometry(1, 16, 12),
@@ -65,7 +65,7 @@ function plaza(park, scene) {
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i),
       z = pos.getZ(i),
-      y = height(park, x, z);
+      y = park===parks[4] ? Math.min(0,height(park,x,z)) : height(park, x, z);
     pos.setY(i, y);
     uv.setXY(i, x / 5, z / 5);
     color.copy(plain);
@@ -412,7 +412,7 @@ export class World {
     const park = parks[i];
     this.park = park;
     this.scene = new T.Scene();
-    const sky = new T.TextureLoader().load(i===3?"riverside/night-sky.webp":"vista-" + i + ".webp");
+    const sky = new T.TextureLoader().load(i===3?"riverside/night-sky.webp":"vista-" + (i===4?0:i) + ".webp");
     sky.mapping = T.EquirectangularReflectionMapping;
     sky.colorSpace = T.SRGBColorSpace;
     this.scene.background = sky;
@@ -447,7 +447,7 @@ export class World {
       sun.color.setHex(0xbacafa);sun.intensity=.75;sun.position.set(-48,71,-32);
       this.scene.fog.color.setHex(0x28324a);
     }
-    const floor = i===3 ? plaza(park,this.scene) : environment(this.scene, park, i);
+    const floor = i>=3 ? plaza(park,this.scene) : environment(this.scene, park, i);
     this.quality(q);
     {
       const [{ loadSunnyRider }, { finishSunnyPark }] = await Promise.all([
@@ -457,7 +457,7 @@ export class World {
       const results = await Promise.allSettled([
         loadSunnyRider(this.scene, !this.renderer.shadowMap.enabled,
           shirt === 0x187e75 ? null : shirt, deck === 0xe4a963 ? null : deck),
-        i===3 ? import("./riverside/scene.js?v=rampljus1").then(m=>m.buildRiverside(this.scene,floor,!this.renderer.shadowMap.enabled)) : finishSunnyPark(this.scene, floor, this.sun, q, i),
+        i===4 ? import("./solkajen/scene.js").then(m=>m.buildSolkajen(this.scene,floor,!this.renderer.shadowMap.enabled)) : i===3 ? import("./riverside/scene.js?v=rampljus1").then(m=>m.buildRiverside(this.scene,floor,!this.renderer.shadowMap.enabled)) : finishSunnyPark(this.scene, floor, this.sun, q, i),
       ]);
       this.sunnyRider = results[0].value;
       const failure = results.find(result => result.status === "rejected");
