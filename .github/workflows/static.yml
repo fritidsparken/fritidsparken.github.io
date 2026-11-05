@@ -34,7 +34,7 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Release the timed-out Pages deployment
-        if: github.event.before == 'efd003bdb77226c8205f683739ff2161cbdb8cc1'
+        if: github.event.before == '91e37ac80245148d125727d7f040641751cc12f5'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -42,13 +42,13 @@ jobs:
           status=$(gh api "$endpoint" --jq .status)
           echo "Previous deployment status = $status"
           case "$status" in
-            queued|pending|updating_pages|syncing_files|deploying|deployment_in_progress)
+            queued|pending|deployment_cancelled|updating_pages|syncing_files|deploying|deployment_in_progress)
               gh api --method POST "$endpoint/cancel"
               for attempt in {1..12}; do
                 sleep 5
                 status=$(gh api "$endpoint" --jq .status)
                 echo "Previous deployment status = $status"
-                case "$status" in canceled|cancelled|succeed|failed|deployment_failed) break;; esac
+                case "$status" in deployment_cancelled|canceled|cancelled|succeed|failed|deployment_failed) break;; esac
               done
               ;;
           esac
