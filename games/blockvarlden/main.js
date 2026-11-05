@@ -12,11 +12,12 @@ import {createLandscape} from './entities/landscape.js';
 import {createActors,withFaunaFood,faunaFood} from './entities/actors.js';
 import {createAudio} from './audio/sound.js';
 import {consumables,durability} from './inventory/recipes.js';
-import {panels} from './ui/panels.js?v=2';
+import {panels} from './ui/panels.js?v=rum1';
 import * as db from './persistence/worlds.js';
 const $=id=>document.getElementById(id),base='../../assets/blockvarlden/',T=window.THREE;
 const settings={quality:1,sense:1,fov:72,outfit:'skog',music:.45,effects:.7,ambience:.45};
 try{Object.assign(settings,JSON.parse(localStorage.getItem('blockvarlden-options-v2')||'{}'))}catch{}
+let roomSession=null;
 let reg,kit,atlas,catalog=[],defs={},lookup={},renderer,scene,camera,sky,world,land,fixtures,actors,meta,ui,input,highlight,lamps=[],root,ray,glints;
 let suspended=true,waiting=false,homeBusy=false,selected=0,pending=new Map(),removed=new Set(),queue=Promise.resolve(),elapsed=0,lastSave=0,lastStep=0,actionTime=0,actionName='',mineHeld=false,mineKey='',mineTime=0,hit,lastHit=0,lastPanel=0,weather='clear',weatherStep=-1;
 const pickups=new Map(), lampChecks=new Map();
@@ -66,9 +67,9 @@ function suspend(){suspended=true;input?.clear();document.exitPointerLock?.();au
 function checkpoint(){if(meta)save().catch(()=>toast('Kunde inte spara. Kontrollera ledigt utrymme.'))}
 function resume(){if(!meta)return;suspended=false;graphics.resetSamples();audio.start();checkpoint()}
 async function refreshHome(){const worlds=await db.list();$('continue').disabled=!worlds.length}
-function save(){if(!meta)return Promise.resolve();meta.fly=player.fly;meta.position=(fixtures?.standingPosition(player)||player.seatEntry||player.p).toArray();meta.yaw=player.yaw;meta.pitch=player.pitch;meta.removed=[...removed];const m=structuredClone(meta),batch=pending;pending=new Map();const job=queue.catch(()=>{}).then(()=>db.save(m,[...batch.values()]));queue=job.catch(e=>{if(meta?.id===m.id)for(const [k,v] of batch)if(!pending.has(k))pending.set(k,v);throw e});queue.catch(()=>{});return queue}
+function save(){if(!meta||roomSession)return Promise.resolve();meta.fly=player.fly;meta.position=(fixtures?.standingPosition(player)||player.seatEntry||player.p).toArray();meta.yaw=player.yaw;meta.pitch=player.pitch;meta.removed=[...removed];const m=structuredClone(meta),batch=pending;pending=new Map();const job=queue.catch(()=>{}).then(()=>db.save(m,[...batch.values()]));queue=job.catch(e=>{if(meta?.id===m.id)for(const [k,v] of batch)if(!pending.has(k))pending.set(k,v);throw e});queue.catch(()=>{});return queue}
 function cleanup(){if(!world)return;for(const [rec,obj] of pickups)removeDrop(rec,obj);world.dispose();land.dispose();actors.dispose();scene.remove(root);for(const light of lamps)scene.remove(light);lamps=[];root=null;world=null;meta=null;highlight.visible=false}
-async function home(){suspend();await save();cleanup();$('loading').hidden=true;$('hud').hidden=true;$('home').hidden=false;await refreshHome()}
+async function home(){suspend();await save();roomSession?.close();roomSession=null;if($('room-info'))$('room-info').hidden=true;cleanup();$('loading').hidden=true;$('hud').hidden=true;$('home').hidden=false;await refreshHome()}
 function setupRenderer(){if(renderer)return;try{renderer=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'})}catch{throw Error('WebGL kunde inte starta. Aktivera grafikacceleration i webbläsaren och öppna spelet igen.')};graphics=adaptiveGraphics(renderer);document.body.prepend(renderer.domElement);scene=new T.Scene();camera=new T.PerspectiveCamera(settings.fov,1,.045,240);camera.rotation.order='YXZ';scene.add(camera);sky=createSky(scene);ray=new T.Raycaster();highlight=new T.LineSegments(new T.EdgesGeometry(new T.BoxGeometry(1.012,1.012,1.012)),new T.LineBasicMaterial({color:0xffe6a1}));highlight.visible=false;scene.add(highlight);
  glints=new T.Points(new T.BufferGeometry(),new T.PointsMaterial({size:.09,color:0xe2b880}));glints.visible=false;scene.add(glints);
  input=controls(renderer.domElement,{active,pack:()=>ui.pack(),pause:()=>ui.pause(),camera:()=>{player.third=!player.third},fly:()=>{if(meta.mode==='creative')player.fly=!player.fly},slot,cycle:step=>slot((selected+step+9)%9),pickBlock:()=>{findHit();if(!hit)return;const id=hit.kind==='prop'?hit.obj.userData.record.id:hit.id;if(!lookup[id]||(meta.mode==='survival'&&!meta.bag[id]))return;const i=meta.slots.indexOf(id);if(i>=0)slot(i);else{meta.slots[selected]=id;slot(selected)}},drop:dropItem,turn:(x,y)=>{player.yaw-=x*.0029*settings.sense;player.pitch=Math.max(-1.48,Math.min(1.48,player.pitch-y*.0029*settings.sense))},mine:on=>{mineHeld=on;if(on){findHit();mining(0)}else{mineKey='';mineTime=0}},build:use});
@@ -78,7 +79,7 @@ async function start(m,edits){if(homeBusy)return;homeBusy=true;try{await ready;s
  m.drops??=[];for(const record of m.drops)showDrop(record);for(const record of m.props)attach(record);land=createLandscape({scene,kit,world,seed:world.seed,legacy:m.legacy,removed});fixtures=createFixtureInteractions({world,root,land});actors=createActors({scene,state:m.fauna??={removed:[],pets:{}},blockAt:(x,y,z)=>world.at(x,y,z),isSolid:id=>!!defs[id]?.collision,ground:(x,z)=>world.surface(x,z),seed:world.seed,waterLevel:21,biome:(x,z)=>world.info(x,z).biome});waiting=true;$('loading').hidden=false;suspended=false;weatherStep=-1;lastSave=elapsed;world.update(pos[0],pos[2],radius());$('home').hidden=true;$('hud').hidden=false;$('region').textContent='Förbereder landskapet…';bar();await save();audio.start()}finally{homeBusy=false}}
 function attach(record){const obj=kit.create(record.id);obj.position.fromArray(record.p);obj.rotation.y=(record.rot||0)+(record.open?Math.PI/2:0);obj.userData.record=record;root.add(obj);if(['lantern','torch'].includes(record.id))refreshLights();return obj}
 function refreshLights(){if(!player||!root)return;const sources=root.children.filter(o=>o.userData.record&&['lantern','torch'].includes(o.userData.record.id)).sort((a,b)=>a.position.distanceToSquared(player.p)-b.position.distanceToSquared(player.p)).slice(0,settings.quality?3:1);for(let i=0;i<sources.length;i++){if(!lamps[i]){lamps[i]=new T.PointLight(0xffb962,2.5,8);scene.add(lamps[i])}lamps[i].position.copy(sources[i].position);lamps[i].position.y+=.7}for(let i=sources.length;i<lamps.length;i++)scene.remove(lamps[i]);lamps.length=sources.length}
-function edit(cell,id){if(world.set(...cell,id)){pending.set(cell.join(','),[...cell,id]);const [x,y,z]=cell;
+function edit(cell,id){if(roomSession){roomSession.edit([...cell,id]);return true}if(world.set(...cell,id)){pending.set(cell.join(','),[...cell,id]);const [x,y,z]=cell;
  if(lampBlock(id))lampChecks.set(cell.join(','),cell);
  if(lampBlock(world.at(x,y+1,z)))lampChecks.set([x,y+1,z].join(','),[x,y+1,z]);return true}}
 function checkLampBlocks(){
@@ -97,7 +98,7 @@ function findHit(){if(!world||!player)return;const o=player.p.clone();o.y+=fixtu
 }
 function effects(pos,color){const arr=new Float32Array(18*3);for(let i=0;i<arr.length;i+=3){arr[i]=(Math.random()-.5)*.8;arr[i+1]=Math.random()*.7;arr[i+2]=(Math.random()-.5)*.8}glints.geometry.dispose();glints.geometry=new T.BufferGeometry();glints.geometry.setAttribute('position',new T.BufferAttribute(arr,3));glints.position.copy(pos);glints.material.color.set(color||'#baa882');glints.visible=true;glints.userData.until=elapsed+.3}
 function animateAct(a){actionName=a;actionTime=elapsed+.44}
-function mining(dt){if(!active()||!hit||!mineHeld)return;const id=meta.slots[selected],tool=durability[id]&&meta.bag[id]>0?id:null;if(hit.key!==mineKey){mineTime=0;mineKey=hit.key;audio.effect('dig',defs[hit.id]?.sound)}
+function mining(dt){if(!active()||!hit||!mineHeld)return;const id=meta.slots[selected],tool=durability[id]&&meta.bag[id]>0?id:null;if(roomSession&&hit.kind!=='block')return;if(hit.key!==mineKey){mineTime=0;mineKey=hit.key;audio.effect('dig',defs[hit.id]?.sound)}
  if(hit.kind==='animal'){
    const result=actors.attack(hit.key);if(!result)return;
    animateAct('use');audio.effect('dig');toast(result.message);
@@ -124,7 +125,7 @@ function use(){if(!active()||performance.now()-lastBuild<360)return;findHit();co
    if(result.ok){lastBuild=performance.now();if(s)add(id,-1);bar();checkpoint()}return;
  }
  if(hit?.kind==='prop'){const rec=hit.obj.userData.record;if(rec.id==='chair'){toast(fixtures.mount(player,hit.obj)?'Du sitter. Hoppa eller gå för att resa dig.':'Gå närmare stolen och lämna plats bredvid den.');return}if(rec.id==='chest')return ui.chest(rec);if(rec.id==='door'){rec.open=!rec.open;hit.obj.rotation.y=rec.rot+(rec.open?Math.PI/2:0);return}if(rec.id==='bed')return ui.bed(()=>{meta.time=.28;meta.life=10;toast('Det är morgon');checkpoint()});if(rec.id==='planter'){if(!rec.crop){rec.crop=Date.now();toast('Sått! Kom tillbaka om en minut.')}else if(Date.now()-rec.crop>60000){add('bread',2);rec.crop=0;toast('Skördat! Två bröd i ryggsäcken.');bar()}else toast('Det växer fortfarande');return}}
- if(hit?.kind==='block'){const k=hit.cell.join(',');
+ if(roomSession&&!defs[id])return toast('Välj ett byggblock');if(!roomSession&&hit?.kind==='block'){const k=hit.cell.join(',');
  if(hit.id===137){meta.containers??={};if(!meta.containers[k]){const h=world.info(hit.cell[0],hit.cell[2]).height;const natural=!world.edits.get(Math.floor(hit.cell[0]/16)+','+Math.floor(hit.cell[2]/16))?.has(k)&&hit.cell[1]<h-4;meta.containers[k]={items:natural?{79:2,82:1,bread:1}:{}}}return ui.chest(meta.containers[k])}
  if(hit.id===138){meta.crops??={};if(!meta.crops[k]){meta.crops[k]=Date.now();toast('Sått! Skörda om en minut.')}else if(Date.now()-meta.crops[k]>60000){add('bread',2);delete meta.crops[k];bar();toast('Två bröd i ryggsäcken')}else toast('Grödan växer');return}}
  if(s&&!(meta.bag[id]>0)){toast('Samla eller tillverka '+name(id));return}if(id==='rod'){let water=false;const dir=new T.Vector3();camera.getWorldDirection(dir);for(let i=.25;i<8;i+=.25){const q=player.p.clone();q.y+=eye;q.addScaledVector(dir,i);const t=world.at(q.x,q.y,q.z);if(t===25){water=true;break}if(t)break}if(!water)return toast('Sikta mot vatten för att meta');if(elapsed-fishAt<3)return toast('Vänta tills flötet dyker');fishAt=elapsed;audio.effect('splash');animateAct('use');if(s){meta.food=Math.min(10,meta.food+2);meta.wear.rod=(meta.wear.rod??durability.rod)-1;if(meta.wear.rod<=0){add('rod',-1);delete meta.wear.rod}}toast('Napp! Fisken ger två matpoäng.');bar();return}
@@ -135,9 +136,9 @@ function use(){if(!active()||performance.now()-lastBuild<360)return;findHit();co
  if(defs[id]){if(lampBlock(+id)&&!world.solid(p[0],p[1]-1,p[2]))return toast('Lampan behöver stöd under sig');if(!edit(p,+id))return}else{if(durability[id])return toast('Håll Gräv för att använda verktyget');const record={id,p:[p[0]+.5,p[1],p[2]+.5],rot:Math.round(player.yaw/(Math.PI/2))*Math.PI/2};if(id==='door'&&(p[1]>=79||world.at(p[0],p[1]+1,p[2])!==0))return toast('Dörren behöver två fria block på höjden');
  if(id==='lantern'){const ground=fixtures.locateLantern(record,player);if(!ground)return toast('Lyktan behöver ett ledigt underlag');record.p=ground}
  if(meta.props.some(o=>o.p.every((v,i)=>v===record.p[i])))return;meta.props.push(record);attach(record)}lastBuild=performance.now();if(s)add(id,-1);audio.effect('place',defs[id]?.sound);animateAct('build');bar()}
-function switchMode(){meta.mode=meta.mode==='survival'?'creative':'survival';player.fly=false;bar();toast(meta.mode==='creative'?'Kreativt läge':'Överlevnadsläge')}
+function switchMode(){if(roomSession)return toast('Rummet har kreativt läge');meta.mode=meta.mode==='survival'?'creative':'survival';player.fly=false;bar();toast(meta.mode==='creative'?'Kreativt läge':'Överlevnadsläge')}
 function damage(n){if(meta.mode!=='survival'||meta.difficulty==='Lätt')return;meta.life-=n;audio.effect('hurt');animateAct('hurt');if(meta.life<=0){player.p.fromArray(spawn(world));player.v=0;meta.life=meta.food=10;waiting=true;toast('Du vaknar vid din startplats')}}
-function frame(now){requestAnimationFrame(frame);const ms=now-(frame.last||now),dt=Math.min(.1,ms/1000);frame.last=now;if(!world||suspended)return;if(!waiting)graphics.sample(ms,now);elapsed+=Math.min(.5,ms/1000);const p=player.p;world.update(p.x,p.z,radius());if(world.error){$('loading').hidden=true;suspend();toast(world.error);ui.pause();return}if(waiting){for(const dx of [-16,0,16])for(const dz of [-16,0,16])if(world.at(p.x+dx,0,p.z+dz)===null)return;$('loading').hidden=true;while(occupied(world,p)&&p.y<80)p.y+=.25;waiting=false}
+function frame(now){requestAnimationFrame(frame);const ms=now-(frame.last||now),dt=Math.min(.1,ms/1000);frame.last=now;if(!world||suspended)return;if(!waiting)graphics.sample(ms,now);elapsed+=Math.min(.5,ms/1000);const p=player.p;world.update(p.x,p.z,radius());roomSession?.frame(dt,p,player.yaw);if(world.error){$('loading').hidden=true;suspend();toast(world.error);ui.pause();return}if(waiting){for(const dx of [-16,0,16])for(const dz of [-16,0,16])if(world.at(p.x+dx,0,p.z+dz)===null)return;$('loading').hidden=true;while(occupied(world,p)&&p.y<80)p.y+=.25;waiting=false}
  updateDrops(dt);const keys=input.read(dt);if(player.seat&&(keys.f||keys.r||keys.up))fixtures.dismount(player);if(!player.seat)move(player,world,dt,keys,meta.mode,speed=>{if(speed>14)damage(Math.ceil((speed-14)/4))},p=>fixtures.collides(p),p=>stepHeight(root,p));
  camera.rotation.set(player.pitch,player.yaw,0);camera.position.copy(p);camera.position.y+=fixtures.seatEye(player);const eyePos=camera.position.clone();
  if(player.third){const back=new T.Vector3(0,0,1).applyQuaternion(camera.quaternion);for(let r=.12;r<=3.8;r+=.12){const test=eyePos.clone().addScaledVector(back,r);if(world.solid(test.x,test.y,test.z)||fixtures.collides(test,.06,.1))break;camera.position.copy(test)}}
@@ -153,6 +154,38 @@ function frame(now){requestAnimationFrame(frame);const ms=now-(frame.last||now),
  });refreshLights();$('region').textContent=biomes[info.biome]+' · '+(night?'Natt':'Dag');$('stats').textContent=meta.mode==='creative'?'Kreativt'+(player.fly?' · Flygläge':''):'♥ '+Math.ceil(meta.life)+'/10  ·  Mat '+Math.ceil(meta.food)+'/10';audio.setScene({biome:biomes[info.biome],weather,night,creative:meta.mode==='creative',underwater:sub,underground:under});if(meta.food<=0||world.at(p.x,p.y+.25,p.z)===26)damage(.5);if(meta.food>8)meta.life=Math.min(10,meta.life+.025)}
  if(elapsed-lastSave>8){lastSave=elapsed;save().catch(()=>toast('Kunde inte spara. Kontrollera ledigt utrymme.'))}renderer.render(scene,camera)}
 const ready=Promise.all([fetch(base+'blocks/registry.json').then(r=>r.json()),loadProps(T).then(withFaunaFood),new T.TextureLoader().loadAsync(base+'blocks/atlas.png'),fetch(base+'props/manifest.json').then(r=>r.json())]).then(([r,k,a,props])=>{reg=r;kit=k;atlas=a;atlas.colorSpace=T.SRGBColorSpace;atlas.magFilter=T.NearestFilter;atlas.minFilter=T.NearestFilter;atlas.generateMipmaps=false;catalog=[...reg.blocks,faunaFood,...props.assets.map(p=>p.id==='door'?{...p,name:'Trädörr'}:p)];lookup=Object.fromEntries(catalog.map(v=>[v.id,v]));defs=Object.fromEntries(reg.blocks.map(v=>[v.id,v]))});
-ui=panels({fullscreen:bindFullscreen($('fullscreen'),toast),start,save,home,refreshHome,suspend,resume,toast,defs:()=>defs,propIds:()=>kit.ids,settings,configure,meta:()=>meta,name,icon,checkpoint,slotIndex:()=>selected,setSlot:slot,bagChanged:bar,catalog:()=>catalog,sound:n=>audio.effect(n),pick:id=>{meta.slots[selected]=id;bar()},nearBench,switchMode,blueprint:op=>{findHit();if(hit?.kind!=='block')return 'Sikta på ett block först.';return op==='mark'?clip.mark(hit.cell):clip.paste(hit.prev)},craft:r=>{if(meta.mode==='survival'){if(r.station&&!nearBench()||Object.entries(r.needs).some(([k,n])=>(meta.bag[k]||0)<n))return;for(const [k,n] of Object.entries(r.needs))add(k,-n)}add(r.out,r.count);audio.effect('craft');bar()}});
+ui=panels({shared:()=>!!roomSession,fullscreen:bindFullscreen($('fullscreen'),toast),start,save,home,refreshHome,suspend,resume,toast,defs:()=>defs,propIds:()=>kit.ids,settings,configure,meta:()=>meta,name,icon,checkpoint,slotIndex:()=>selected,setSlot:slot,bagChanged:bar,catalog:()=>roomSession?reg.blocks:catalog,sound:n=>audio.effect(n),pick:id=>{meta.slots[selected]=id;bar()},nearBench,switchMode,blueprint:op=>{if(roomSession)return 'Bygg ett block i taget i rummet.';findHit();if(hit?.kind!=='block')return 'Sikta på ett block först.';return op==='mark'?clip.mark(hit.cell):clip.paste(hit.prev)},craft:r=>{if(meta.mode==='survival'){if(r.station&&!nearBench()||Object.entries(r.needs).some(([k,n])=>(meta.bag[k]||0)<n))return;for(const [k,n] of Object.entries(r.needs))add(k,-n)}add(r.out,r.count);audio.effect('craft');bar()}});
 addEventListener('resize',resize);addEventListener('pagehide',()=>save().catch(()=>{}));document.addEventListener('visibilitychange',()=>{if(document.hidden&&meta){save().catch(()=>{});if(active())ui.pause()}});
 ready.then(async()=>{try{await db.migrate()}catch{toast('En äldre sparfil kunde inte importeras')}await refreshHome();if($('play-fullscreen'))$('play-fullscreen').disabled=false}).catch(e=>toast('Kunde inte läsa speldata: '+e.message));
+
+async function enableRooms(){
+ const open=$('together');
+ if(!open)return;
+ const {server}=await fetch('./network/config.json',{cache:'no-store'}).then(r=>r.json());
+ if(!server)return;
+ open.hidden=false;
+ open.onclick=()=>ui.lobby(async code=>{
+  const {connect}=await import('./network/client.js');
+  await connect(server,code,{
+   scene:()=>scene,
+   async start(code,edits,session){
+    const m=db.fresh('Rum '+code,'creative',code,'Lätt');m.quiet=true;roomSession=session;
+    try{await start(m,edits);ui.close()}catch(e){session.close();roomSession=null;throw e}
+   },
+   edit(cell){
+    if(world.set(...cell))return;
+    world.record(...cell);
+    const dirty=new Set();world.markNeighbors(cell[0],cell[2],dirty);
+    for(const k of dirty)world.revs.set(k,(world.revs.get(k)||0)+1);
+   },
+   status(code,owner,locked){
+    const b=$('room-info');b.hidden=false;b.disabled=!owner;
+    b.textContent='Rum '+code+(owner?(locked?' · Lås upp':' · Lås rum'):'');
+    b.onclick=()=>roomSession?.lock();
+    try{localStorage.setItem('bv-last-room',code)}catch{}
+   },
+   async lost(){await home();ui.close();toast('Anslutningen bröts. Gå med igen med samma rumskod.')}
+  });
+ });
+}
+enableRooms().catch(()=>{});

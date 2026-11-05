@@ -9,7 +9,7 @@ export function panels(api){
  d.addEventListener('keydown',e=>{if(e.code==='KeyE'&&current==='pack'&&!e.repeat&&!e.target.closest('input,textarea,select')){e.preventDefault();e.stopPropagation();close()}});
  function show(key,title){current=key;$('dialog-status').textContent='';api.suspend();c.replaceChildren(el('h2',title));if(!d.open)d.showModal();}
  function close(){if(d.open)d.close();current='';api.resume()}
- $('close').onclick=close;d.oncancel=e=>{e.preventDefault();close()};
+ $('close').onclick=close;d.oncancel=e=>{e.preventDefault();if(!$('close').disabled)close()};
  function field(name,node){const label=el('label',name);label.append(node);return label}
  function select(values,initial){const n=el('select');for(const [v,text] of values){const o=el('option',text);o.value=v;n.append(o)}n.value=initial;return n}
  function create(){show('create','Skapa en värld');const name=el('input'),seed=el('input');name.value='Min blockvärld';name.maxLength=64;seed.placeholder='Slumpa ett världsfrö';const mode=select([['creative','Kreativt · bygg fritt'],['survival','Överlevnad · samla och skapa']],'creative'),difficulty=select(['Lätt','Normal','Utmanande'].map(t=>[t,t]),'Lätt');
@@ -18,7 +18,7 @@ export function panels(api){
  const input=el('input');input.type='file';input.accept='.json,application/json';input.onchange=run(async()=>{if(!input.files[0])return;if(input.files[0].size>32e6)throw Error('Filen är för stor');const v=JSON.parse(await input.files[0].text()),m=db.validateImport(v,api.defs(),api.propIds());await db.save(m,v.edits);await worlds();api.refreshHome()});c.append(field('Importera en exporterad värld',input))}
  function settings(){show('settings','Inställningar');const s=api.settings;const stick=select([['auto','Automatiskt · touch på mobil'],['on','Visa skärmjoystick även för mus'] ],s.screenStick?'on':'auto');
  stick.onchange=()=>{s.screenStick=stick.value==='on';api.configure()};c.append(field('Skärmjoystick',stick));
- if(api.meta()){const animals=select([['on','Med djur och varelser'],['off','Utan djur och fiender']],api.meta().quiet?'off':'on');animals.onchange=()=>{api.meta().quiet=animals.value==='off';api.checkpoint()};c.append(field('Djurliv i den här världen',animals))}
+ if(api.meta()&&!api.shared()){const animals=select([['on','Med djur och varelser'],['off','Utan djur och fiender']],api.meta().quiet?'off':'on');animals.onchange=()=>{api.meta().quiet=animals.value==='off';api.checkpoint()};c.append(field('Djurliv i den här världen',animals))}
  const q=select(['LOW','MEDIUM','HIGH','ULTRA'].map((v,i)=>[i,v]),s.quality);q.onchange=()=>{s.quality=+q.value;api.configure()};c.append(field('Grafik',q));
  const outfit=select([['skog','Skogsgrön'],['hav','Havsblå'],['lingon','Lingonröd'],['lavendel','Lavendel']],s.outfit);outfit.onchange=()=>{s.outfit=outfit.value;api.configure()};c.append(field('Jackans färg i tredjeperson',outfit));
  for(const [k,name,min,max,step] of [['fov','Synfält',55,100,1],['sense','Kamerakänslighet',.4,2,.1],['music','Musik',0,1,.05],['effects','Effekter',0,1,.05],['ambience','Omgivning',0,1,.05]]){const n=el('input');n.type='range';Object.assign(n,{min,max,step,value:s[k]});n.oninput=()=>{s[k]=+n.value;api.configure()};c.append(field(name,n))}}
@@ -50,8 +50,8 @@ export function panels(api){
   const library=btn(creative?'Alla material':'Mina föremål',()=>{tab='library';pack()});
   const craft=btn('Tillverka',()=>{tab='craft';pack()});
   library.setAttribute('aria-pressed',String(tab==='library'));craft.setAttribute('aria-pressed',String(tab==='craft'));
-  tabs.append(library,craft);
-  if(creative){
+  tabs.append(library);if(!api.shared())tabs.append(craft);
+  if(creative&&!api.shared()){
    const actions=select([['','Byggverktyg…'],['mark','Markera hörn'],['paste','Klistra in bygge']],'');
    actions.setAttribute('aria-label','Byggverktyg');
    actions.onchange=()=>{if(actions.value){const result=api.blueprint(actions.value);close();api.toast(result)}};
@@ -142,5 +142,16 @@ export function panels(api){
   const row=el('div');row.className='row';
   row.append(btn('Sov till morgonen',()=>{row.replaceChildren(el('p','Du somnar …'));setTimeout(()=>{if(current==='bed'&&row.isConnected){onWake();close()}},1400)}),btn('Gör det till dag direkt',()=>{onWake();close()}),btn('Avbryt',close));c.append(row);
  }
- return {close,pause,pack,chest,bed,isOpen:()=>d.open}
+ function lobby(join){
+  show('room','Spela tillsammans');
+  const code=el('input');code.maxLength=8;code.value=localStorage.getItem('bv-last-room')||'';
+  const group=el('fieldset'),row=el('div');row.className='row';
+  const enter=async value=>{
+   group.disabled=true;$('close').disabled=true;
+   try{await join(value)}catch(e){api.toast(e.message)}finally{group.disabled=false;$('close').disabled=false}
+  };
+  row.append(btn('Skapa rum',()=>enter('')),btn('Gå med',()=>{const value=code.value.trim().toUpperCase();if(/^[A-HJ-NP-Z2-9]{8}$/.test(value))enter(value);else api.toast('Ange rumskodens åtta tecken.')}));
+  group.append(field('Rumskod',code),row);c.append(el('p','Bygg med upp till åtta spelare. Dela koden med dina kompisar.'),group);
+ }
+ return {lobby,close,pause,pack,chest,bed,isOpen:()=>d.open}
 }
