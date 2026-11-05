@@ -1,3 +1,5 @@
+import {skateRoute} from './skate-room.mjs';
+export {SkateRoom} from './skate-room.mjs';
 const origins=new Set(['https://fritidsparken.se','https://www.fritidsparken.se']);
 const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 export default {
@@ -5,6 +7,7 @@ export default {
   if(!origins.has(request.headers.get('Origin')))return new Response('Forbidden',{status:403});
   if(request.headers.get('Upgrade')?.toLowerCase()!=='websocket')return new Response('WebSocket required',{status:426});
   const path=new URL(request.url).pathname;
+  if(path.startsWith('/skate/'))return skateRoute(new URL(request.url),env);
   const create=path==='/create';
   const code=create?Array.from(crypto.getRandomValues(new Uint8Array(8)),b=>alphabet[b%32]).join(''):path.slice(1);
   if(!/^[A-HJ-NP-Z2-9]{8}$/.test(code))return new Response('Unknown room',{status:404});

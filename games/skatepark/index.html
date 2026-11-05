@@ -36,7 +36,7 @@
           <div id="parks"></div>
           <div class="actions">
             <button class="primary" id="play">Spela &nbsp; ▶</button
-            ><button data-panel="guide">Trickguide</button
+            ><button id="together">Spela tillsammans</button><button data-panel="guide">Trickguide</button
             ><button data-panel="kit">Min utrustning</button
             ><button data-panel="settings">Inställningar</button>
           </div>
@@ -50,7 +50,7 @@
         <div><small>REKORD</small><strong id="best">0</strong></div>
       </div>
       <button id="pause" aria-label="Pausa">Ⅱ</button>
-      <div id="message"></div>
+      <output id="room-code" hidden style="position:absolute;top:4.5rem;left:1rem;color:white;background:#142326dc;padding:.3rem .6rem;border-radius:.4rem"></output><div id="message"></div>
       <div id="touch" hidden>
         <div class="ride-stick" role="group" aria-label="Styrspak. Dra uppåt för fart och nedåt för broms."><span></span></div>
         <div class="pad tricks">
@@ -66,6 +66,6 @@
     </dialog>
     <script src="../ride-stick.js?v=1"></script>
     <script src="../../js/vendor/three.min.js"></script>
-    <script type="module" src="./game.js?v=park-lights-1"></script>
+    <script type="module" src="./game.js?v=skaterum1"></script>
   </body>
 </html>

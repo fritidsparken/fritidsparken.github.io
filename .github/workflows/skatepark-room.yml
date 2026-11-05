@@ -1,0 +1,20 @@
+name: Skatepark multiplayer
+on:
+  workflow_dispatch:
+  push:
+    paths: ['games/skatepark/**','tools/skatepark/**','tools/blockvarlden/server/skate-room.mjs','.github/workflows/skatepark-room.yml']
+jobs:
+  ride:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm install --prefix "$RUNNER_TEMP/skate" playwright@1.55.0
+      - name: Test two skaters with the live server
+        run: |
+          for attempt in {1..30}; do
+            status=$(curl -s --max-time 5 -o /dev/null -w '%{http_code}' -H 'Origin: https://fritidsparken.se' -H 'Connection: Upgrade' -H 'Upgrade: websocket' -H 'Sec-WebSocket-Version: 13' -H 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==' 'https://fritidsparken-github-io.th8kdfmyr7.workers.dev/skate/AAAAAAAA') || true
+            if [ "$status" = 409 ]; then break; fi
+            sleep 5
+          done
+          NODE_PATH="$RUNNER_TEMP/skate/node_modules" node tools/skatepark/live-room.cjs

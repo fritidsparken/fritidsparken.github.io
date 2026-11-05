@@ -56,6 +56,7 @@ function save() {
     localStorage.setItem(key, JSON.stringify(s));
   } catch {}
 }
+let session=null;
 let world,
   sound,
   p,
@@ -264,6 +265,7 @@ function resume() {
   resumeAudio();
 }
 function home() {
+  session?.close();session=null;$('room-code').hidden=true;
   dialog.close();
   clearKeys();
   mode = "home";
@@ -381,6 +383,7 @@ function openPanel(id) {
   dialog.scrollTop = 0;
 }
 function back() {
+  if(panel==='lobby'&&mode==='home'){session?.close();session=null}
   if (mode === "paused") {
     if (panel === "pause") resume();
     else openPanel("pause");
@@ -482,6 +485,7 @@ function frame(now) {
   const controls = rideKeys();
   for (let i = 0; i < steps; i++)
     tick(p, controls, parks[s.park], dt / steps, event);
+  session?.frame(p,controls,dt,now);
   world.draw(p, controls, dt);
   sound?.roll(p, s.park);
   $("total").textContent = number(p.total);
@@ -498,3 +502,25 @@ function frame(now) {
 }
 cards();
 requestAnimationFrame(frame);
+
+$('together').onclick=()=>{
+ panel='lobby';$('back').textContent='Tillbaka';
+ $('dialogBody').innerHTML='<h2>Spela tillsammans</h2><p>Skapa ett rum på vald bana eller gå med hos en kompis. Upp till åtta åkare.</p><button id="host">Skapa rum</button><p><label>Rumskod <input id="invite" maxlength="8" autocapitalize="characters" autocomplete="off"></label></p><button id="join">Gå med</button><p id="room-error" role="status"></p>';
+ dialog.showModal();
+ async function enter(host){
+  const code=host?'':$('invite').value.trim().toUpperCase();
+  if(!host&&!/^[A-HJ-NP-Z2-9]{8}$/.test(code)){$('room-error').textContent='Ange rumskodens åtta tecken.';return}
+  $('host').disabled=$('join').disabled=true;$('room-error').textContent='Ansluter …';
+  try{
+   const {openSession}=await import('./multiplayer.js');
+   if(!dialog.open||panel!=='lobby')return;
+   session=openSession(code,s.park,{
+    async start(park){dialog.close();s.park=park;cards();await start();if(mode!=='play')throw Error();return world.scene},
+    status(room,count){const label=$('room-code');label.hidden=false;label.textContent='Rum '+room+' · '+count+'/8'},
+    lost(room){session=null;$('room-code').hidden=true;if(mode==='play'||mode==='paused'){flash('Anslutningen bröts. Du kan fortsätta åka själv.');return}
+     if(dialog.open){$('room-error').textContent='Kunde inte ansluta. Kontrollera koden eller prova ett nytt rum.';$('host').disabled=$('join').disabled=false}else if(room)$('error').textContent='Kunde inte öppna parken.'}
+   });
+  }catch{$('room-error').textContent='Kunde inte ansluta.';$('host').disabled=$('join').disabled=false}
+ }
+ $('host').onclick=()=>enter(true);$('join').onclick=()=>enter(false);
+};
