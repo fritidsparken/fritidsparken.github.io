@@ -3,7 +3,7 @@ export function skateRoute(url,env){
  const creating=url.pathname==='/skate/create';
  const code=creating?Array.from(crypto.getRandomValues(new Uint8Array(8)),n=>alphabet[n%32]).join(''):url.pathname.slice(7);
  const park=url.searchParams.get('park');
- if(!/^[A-HJ-NP-Z2-9]{8}$/.test(code)||creating&&!/^[0-3]$/.test(park))return new Response('Ogiltigt rum',{status:404});
+ if(!/^[A-HJ-NP-Z2-9]{8}$/.test(code)||creating&&!/^[0-4]$/.test(park))return new Response('Ogiltigt rum',{status:404});
  return env.SKATE.get(env.SKATE.idFromName(code)).fetch('https://room/'+code+(creating?'?park='+park:''),{headers:{Upgrade:'websocket'}});
 }
 export class SkateRoom{
