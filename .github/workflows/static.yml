@@ -43,4 +43,5 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v5
         with:
+          timeout: 1800000
           artifact_name: github-pages-${{ github.run_attempt }}
