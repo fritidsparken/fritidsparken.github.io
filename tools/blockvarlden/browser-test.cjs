@@ -57,4 +57,11 @@ async function test([name,type,device]){
   assert.deepEqual(errors,[]);console.log(JSON.stringify({name,fps,renderer:native?'hosted runner':'CI software graphics',flow:'pass'}));
  }catch(e){await page.screenshot({path:out+'/'+name+'-failure.png'}).catch(()=>{});console.error(name,errors,await page.locator('body').innerText().catch(()=>''));throw e}finally{await browser.close()}
 }
-(async()=>{let failed=false;for(const r of runs)try{await test(r)}catch(e){failed=true;console.error(e)}if(failed)process.exitCode=1})();
+async function waitForServer(){
+ for(let i=0;i<45;i++){
+  try{const r=await fetch('http://127.0.0.1:8124/games/blockvarlden/');if(r.ok)return}catch{}
+  await new Promise(resolve=>setTimeout(resolve,1000));
+ }
+ throw Error('The static test server did not start on port 8124');
+}
+(async()=>{await waitForServer();let failed=false;for(const r of runs)try{await test(r)}catch(e){failed=true;console.error(e)}if(failed)process.exitCode=1})();

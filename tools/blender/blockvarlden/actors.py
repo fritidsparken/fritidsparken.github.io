@@ -163,18 +163,49 @@ def animal(key,props):
     if key not in AQUATIC and key not in ('skifferbagge','lyktmott','hona'):
         for side in (-1,1):
             long=key=='kanin'; point=key in ('rav','varg','mosslynx','hast','kanin')
-            ex=side*head*.36; ez=hz+head*(.68 if long else .39)
+            ex=side*head*.36; ez=hz+head*(.78 if long else .48)
             p('head',(ex,hy+.035,ez),(head*.3,head*.26,head*(.89 if long else .45)),main,
               lean=(side*head*.16,head*.06),taper=.37 if point else .83)
             p('head',(ex,hy-.006,ez),(head*.16,head*.14,head*(.62 if long else .24)),accent,taper=.45)
-    if key in ('hona','lyktmott','fisk','rimfena'): 
-        p('head',(0,hy-head*.4,hz),(head*.54,head*.52,head*.28),accent,taper=.55)
+    # Match muzzles to species. The darker nose on canids is a single pad.
+    snout=hy-.04
+    if key in ('hona','lyktmott','fisk','rimfena'):
+        p('head',(0,hy-head*.36,hz),(head*.49,head*.61,head*.24),accent,taper=.47)
+    elif key in ('rav','varg','mosslynx','bjorn','kanin','far'):
+        length=.88 if key in ('rav','varg') else .40 if key in ('kanin','mosslynx') else .60
+        width=.53 if key in ('rav','varg','bjorn') else .57
+        p('head',(0,snout-head*(.28+length*.28),hz-head*.13),
+          (head*width,head*length,head*.36),cream,lean=(0,head*.12),taper=.8,bevel=.23)
+        p('head',(0,snout-head*(.28+length*.74),hz-head*.08),
+          (head*(.16 if key=='kanin' else .27),head*.14,head*.135),
+          'b77d76' if key=='kanin' else '423c3a',taper=1.12)
+        for side in (-1,1):
+            p('head',(side*head*.29,snout-head*.31,hz-head*.12),
+              (head*.28,head*.26,head*.28),cream,taper=.74)
+    elif key=='hast':
+        p('head',(0,snout-head*.43,hz-head*.21),(head*.68,head*.81,head*.52),main,
+          lean=(0,head*.22),taper=.86)
+        p('head',(0,snout-head*.73,hz-head*.29),(head*.57,head*.34,head*.32),'695248',taper=.96)
+        p('head',(0,snout-head*.38,hz+head*.04),(head*.14,head*.13,head*.46),cream,
+          lean=(0,head*.09),taper=1.35)
     else:
-        p('head',(0,hy-head*.41,hz-head*.14),(head*.72,head*.64,head*.43),cream)
-        for side in (-1,1):p('head',(side*head*.16,hy-head*.71,hz-head*.1),(head*.09,head*.09,head*.08),accent)
+        p('head',(0,snout-head*.40,hz-head*.14),(head*.68,head*.56,head*.39),
+          'c77e78' if key=='gris' else cream,bevel=.19)
+        for side in (-1,1):
+            p('head',(side*head*.165,snout-head*.663,hz-head*.115),
+              (head*.09,head*.045,head*.113),accent)
     for side in (-1,1):
-        p('head',(side*head*.39,hy-head*.27,hz+head*.09),(head*.14,head*.15,head*.14),'2c343c')
-        p('head',(side*head*.41,hy-head*.32,hz+head*.115),(head*.055,head*.055,head*.055),'f8eedb')
+        # Frontal three-quarter sockets are visible from both front and side.
+        if key in AQUATIC:
+            ex=side*w*.47;ey=-l*.35;ez=leg+h*.65
+            p('head',(ex,ey,ez),(w*.20,head*.26,head*.25),'e2ce9b')
+            p('head',(ex+side*w*.066,ey,ez),(w*.12,head*.19,head*.19),'293536')
+            p('head',(ex+side*w*.11,ey-head*.025,ez+head*.035),(w*.04,head*.07,head*.07),'fff7cf')
+        else:
+            ex=side*head*.385;ey=snout-head*.366;ez=hz+head*.13
+            p('head',(ex,ey,ez),(head*.155,head*.15,head*.165),'392f2f',rotation=side*.38)
+            p('head',(ex+side*head*.014,ey-head*.064,ez+head*.031),
+              (head*.060,head*.047,head*.056),'fff4d9')
     if key=='hona':p('head',(0,hy,hz+head*.42),(head*.22,head*.8,head*.55),'b74837',taper=.62)
     if key in ('mosslynx','korallvandrare','skifferbagge'):
         for j in range(4):
