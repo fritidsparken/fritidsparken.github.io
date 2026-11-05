@@ -35,9 +35,14 @@ async function test([name,type,device]){
   await page.screenshot({path:out+'/'+name+'.png'});
   if(device.hasTouch){const bounds=await page.locator('#stick,#actions,#bar').evaluateAll(nodes=>nodes.map(n=>{const r=n.getBoundingClientRect();return r.width>0&&r.left>=0&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1}));assert.ok(bounds.every(Boolean),'Touch controls within viewport')}
   await page.getByRole('button',{name:'Ryggsäck'}).click();
+  const slots=page.locator('.pack-slots button');
+  assert.equal(await slots.count(),9);await slots.nth(8).click();
+  assert.ok(await page.locator('#panel').evaluate(e=>e.scrollHeight<=e.clientHeight+1),'Outer backpack stays fixed');
+  assert.ok(await page.locator('.pack-list').evaluate(e=>e.scrollHeight>e.clientHeight),'Inventory scrolls independently');
   await page.getByPlaceholder('Sök block eller föremål').fill('Tegel');
   assert.ok(await page.locator('.item').count()>0);
   await page.locator('.item').first().click();
+  assert.ok(await page.locator('#bar button').nth(8).evaluate(e=>e.classList.contains('active')));
   await page.getByRole('button',{name:'Pausa'}).click();
   await page.getByRole('button',{name:'Byt spelläge'}).click();
   await page.locator('#stats').filter({hasText:'Mat'}).waitFor();

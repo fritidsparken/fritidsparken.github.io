@@ -5,8 +5,8 @@ const COMPONENTS = {5121: Uint8Array, 5123: Uint16Array, 5125: Uint32Array, 5126
 const SIZES = {SCALAR: 1, VEC2: 2, VEC3: 3, VEC4: 4};
 const ATTRIBUTES = {POSITION:'position', NORMAL:'normal', TEXCOORD_0:'uv', COLOR_0:'color'};
 
-export async function loadProps(THREE = globalThis.THREE) {
-  const response = await fetch(KIT_URL);
+export async function loadProps(THREE = globalThis.THREE, url = KIT_URL) {
+  const response = await fetch(url);
   if (!response.ok) throw new Error('Kunde inte läsa modellbiblioteket (' + response.status + ')');
   const buffer = await response.arrayBuffer();
   const header = new DataView(buffer);

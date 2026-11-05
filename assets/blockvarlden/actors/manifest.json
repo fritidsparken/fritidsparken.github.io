@@ -18,7 +18,7 @@
         "flee",
         "swim"
       ],
-      "sha256": "bc73fb5fb1dc40b5a2b0fd00b204a79e78a8ca47149edd796ed5f25098146b5e"
+      "sha256": "30e09cda3d13b4d45caf2bc7cfcfbf80f0132939c5ea66763a2bf3dcdc4586a0"
     },
     {
       "id": "far",
@@ -35,7 +35,7 @@
         "flee",
         "swim"
       ],
-      "sha256": "d7a5e4b3a56cc6ac507cd68d2784fad0ca45a6f3fa8a65efaa1009c76d84daac"
+      "sha256": "28e870f7f39b9fa782512926fda146ff6f19fb9baf340dcf039da9132131b364"
     },
     {
       "id": "gris",
@@ -52,7 +52,7 @@
         "flee",
         "swim"
       ],
-      "sha256": "a2893fbf480f5a174734683b8f9dec5d8d7c1db07e516c32da97c15b0422a763"
+      "sha256": "70b44b822ba5cc37907c47cf24e7baf72e11869c0486968faa607c08390665d8"
     },
     {
       "id": "hona",
@@ -69,7 +69,7 @@
         "flee",
         "swim"
       ],
-      "sha256": "dae39760370a412307cc0ae320b5df5db4abf785bf2626b455d2ce64c0210587"
+      "sha256": "8069a882c492051b04c909d0752e2e0e253d573db9b092714a05d368b3c0d67a"
     },
     {
       "id": "hast",
@@ -86,7 +86,7 @@
         "flee",
         "swim"
       ],
-      "sha256": "187002f81a42fbfa05db32e882e44f4d6859641537eb3f7f8e2e409ea20a6157"
+      "sha256": "e5c0c234e4b4adf2c7e228519a49099e3c5b5a84ea0ca545009f2a622eb7a6ff"
     },
     {
       "id": "kanin",
@@ -103,7 +103,7 @@
         "flee",
         "swim"
       ],
-      "sha256": "d141b13307ce90f399ff6e703d5c3fc47541a25b539acf2b3c3ea471747808cc"
+      "sha256": "a16779f61724403d355ecb04ce3433f0e14c530c19bc852f5699888a00aaf361"
     },
     {
       "id": "rav",
@@ -120,7 +120,7 @@
         "flee",
         "swim"
       ],
-      "sha256": "63c468cf4a99107ab21cee9f0fcaab25a5723befbd4b7c87069840b70e9c4d1f"
+      "sha256": "7ef76cd91ab946ff1275f7eeaeed92a614f2f092ee4e35446d929caecec3b321"
     },
     {
       "id": "varg",
@@ -137,7 +137,7 @@
         "flee",
         "swim"
       ],
-      "sha256": "208a9abe56f331d8ab623adf25b65211ac1d83bd6e0e98ecf788ad73fda200bb"
+      "sha256": "ef7e18621be4473342f244b18e0ebf871b7f14437950c5db40b7bd855ba9e70a"
     },
     {
       "id": "bjorn",
@@ -154,7 +154,7 @@
         "flee",
         "swim"
       ],
-      "sha256": "2366b2efdc9f66c3779f7b06071184af48791c5368a7e7d27f7935509e08356f"
+      "sha256": "1c554af6b0becf0127bfa2e624930dbabf86c8198dc86478f86c260c7b7e793f"
     },
     {
       "id": "fisk",
@@ -171,7 +171,7 @@
         "flee",
         "swim"
       ],
-      "sha256": "ceece76fea7d7107868500194056c12be5fc7673560332bb9bd344311c45f190"
+      "sha256": "f8cb171217fa72a0b87b3fb3fe6f54200020fb4002954fd565fdacadd99bf51b"
     },
     {
       "id": "lyktmott",
@@ -188,7 +188,7 @@
         "flee",
         "swim"
       ],
-      "sha256": "ade6454c0b5a24618b93b67a60e0818656c44fddd3ec506b20a16ff841bd9dc3"
+      "sha256": "7cca12bd573bbe30a610805672d76ec9aebde5f00d2f443b114f4d85518e37bc"
     },
     {
       "id": "mosslynx",
@@ -205,7 +205,7 @@
         "flee",
         "swim"
       ],
-      "sha256": "a74e551d77b057f1efbdca2d8205a10b6f1a5eeec10128e6d37f813d9e5735e5"
+      "sha256": "c36a921262b69cb7c962d29059acd2b7386de013d26c992bce890c0219f9cff8"
     },
     {
       "id": "skifferbagge",
@@ -222,7 +222,7 @@
         "flee",
         "swim"
       ],
-      "sha256": "38f48bae753b61196b268770968ee391ce1c3706b61656f86f12396d2e8eb8b4"
+      "sha256": "e9ad8bbe441b6f7ecf50fe7c4a447ef2c865d5a9db1376fa906ec5792dba6bb7"
     },
     {
       "id": "korallvandrare",
@@ -239,7 +239,7 @@
         "flee",
         "swim"
       ],
-      "sha256": "2d12be8d12700b81e753ae778727b582b3abccafb59145ac9c44350b50701cf3"
+      "sha256": "98f7187500fb3239dcda30d2a47a3dfa1bc900316262dc62f7a77793d7bf7ec8"
     },
     {
       "id": "rimfena",
@@ -256,7 +256,7 @@
         "flee",
         "swim"
       ],
-      "sha256": "b95c71e734d6f0b63f87726b0d5e1844b092bccd1e35a02af0e2f26f35967b07"
+      "sha256": "e37d309da7502d67d012e541f1be446be684f50b2277c10f6ae1a3b62d23eecb"
     },
     {
       "id": "stigfinnare",

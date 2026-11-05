@@ -1,3 +1,4 @@
+import {isTree, trunkHit} from '../engine/trunks.js';
 import {hash, seedNumber} from '../world/terrain.js';
 
 const RANGE = 45;
@@ -24,6 +25,7 @@ export function createLandscape({scene, kit, world, seed, legacy = false, remove
   const dummy = new THREE.Object3D();
   const templates = new Map();
   const batches = [];
+  const trunks = new Map();
   let lastCheck = -Infinity, signature = '', lastX = 0, lastZ = 0;
   function clear() {
     for (const mesh of batches) {
@@ -32,6 +34,7 @@ export function createLandscape({scene, kit, world, seed, legacy = false, remove
       mesh.dispose?.();
     }
     batches.length = 0;
+    trunks.clear();
   }
   function rebuild(x, z) {
     const groups = new Map();
@@ -57,6 +60,9 @@ export function createLandscape({scene, kit, world, seed, legacy = false, remove
     }
     clear();
     for (const [id, instances] of groups) {
+      if (isTree(id)) for (const tree of instances) {
+        trunks.set(Math.floor(tree.x/CELL)+','+Math.floor(tree.z/CELL), tree);
+      }
       if (!templates.has(id)) templates.set(id,kit.create(id));
       for (const part of templates.get(id).children) {
         const mesh = new THREE.InstancedMesh(part.geometry, part.material, instances.length);
@@ -99,6 +105,16 @@ export function createLandscape({scene, kit, world, seed, legacy = false, remove
   return {
     update,
     refresh() { update(lastX,lastZ,true); },
+    collides(p, pad=.28, height=1.73) {
+      // Each generation cell contains at most one tree. Include the neighbouring cells
+      // so a trunk on a cell boundary cannot be entered from the adjacent cell.
+      const cx=Math.floor(p.x/CELL), cz=Math.floor(p.z/CELL);
+      for (let x=cx-1; x<=cx+1; x++) for (let z=cz-1; z<=cz+1; z++) {
+        const tree=trunks.get(x+','+z);
+        if (tree && trunkHit(tree.id,tree.x+.5,tree.y,tree.z+.5,tree.angle,tree.scale,p,pad,height)) return true;
+      }
+      return false;
+    },
     harvest(raycaster,maxDistance) {
       const hit = raycaster.intersectObjects(batches,false)[0];
       if (!hit || hit.distance>maxDistance) return null;

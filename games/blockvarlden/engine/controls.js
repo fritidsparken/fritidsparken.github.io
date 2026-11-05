@@ -1,10 +1,13 @@
+import {gamepadInput} from './gamepad.js';
 export function controls(canvas, api) {
   const $ = id => document.getElementById(id);
   const stick = window.createRideStick($('stick'));
   const keys = new Set(), touches = new Map();
   let look = null, lastX, lastY, lastJump = -Infinity, lastForward = -Infinity, running = false;
 
+  const pad=gamepadInput({...api,jump});
   function clear() {
+    pad.reset();
     keys.clear(); touches.clear(); stick.reset(); look = null; running = false;
     lastJump = lastForward = -Infinity; api.mine(false);
   }
@@ -38,7 +41,7 @@ export function controls(canvas, api) {
   }, {passive:false});
   canvas.onpointerdown = e => {
     if (!api.active()) return;
-    if (e.pointerType === 'mouse') {
+    if (e.pointerType === 'mouse' && !document.body.classList.contains('screen-stick')) {
       if (document.pointerLockElement !== canvas) {canvas.requestPointerLock?.()?.catch?.(()=>{});return;}
       if (e.button === 0) api.mine(true);
       if (e.button === 1) { e.preventDefault(); api.pickBlock(); }
@@ -75,10 +78,10 @@ export function controls(canvas, api) {
   }
   $('build').onclick=api.build; $('pack').onclick=api.pack; $('pause').onclick=api.pause; $('cam').onclick=api.camera;
   const has=(...codes)=>codes.some(k=>keys.has(k));
-  return {clear,read:()=>({
-    f:stick.y+has('KeyW','ArrowUp')-has('KeyS','ArrowDown'),
-    r:stick.x+has('KeyD','ArrowRight')-has('KeyA','ArrowLeft'),
-    up:keys.has('Space')||touches.has('jump'),down:has('ShiftLeft','ShiftRight')||touches.has('down'),
-    sprint:running||has('ControlLeft','ControlRight')||stick.y>.91
-  })};
+  return {clear,read:(dt=0)=>{const g=pad.read(dt);return {
+    f:(g.f||0)+stick.y+has('KeyW','ArrowUp')-has('KeyS','ArrowDown'),
+    r:(g.r||0)+stick.x+has('KeyD','ArrowRight')-has('KeyA','ArrowLeft'),
+    up:g.up||keys.has('Space')||touches.has('jump'),down:g.down||has('ShiftLeft','ShiftRight')||touches.has('down'),
+    sprint:g.sprint||running||has('ControlLeft','ControlRight')||stick.y>.91
+  }}};
 }

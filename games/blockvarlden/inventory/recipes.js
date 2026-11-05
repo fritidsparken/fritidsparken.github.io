@@ -32,7 +32,7 @@ export const recipes = [
   hand('slab', 4, {13: 2}),
   hand('chest', 1, {31: 5}),
   hand(137, 1, {31: 5}),
-  bench('door', 1, {31: 3, 32: 1}),
+  hand('door', 1, {31: 3}),
   bench('window', 2, {31: 1, 106: 2}),
   bench('table', 1, {31: 3, 32: 1}),
   bench('chair', 1, {31: 2, 32: 1}),

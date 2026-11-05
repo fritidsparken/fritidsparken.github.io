@@ -1,3 +1,4 @@
+import {sanitizeFauna} from '../entities/actors.js';
 const db=new Promise((resolve,reject)=>{const req=indexedDB.open('blockvarlden-expedition',1);req.onupgradeneeded=()=>{const d=req.result;d.createObjectStore('worlds',{keyPath:'id'});d.createObjectStore('edits',{keyPath:['world','key']}).createIndex('world','world')};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)});
 const result=req=>new Promise((ok,no)=>{req.onsuccess=()=>ok(req.result);req.onerror=()=>no(req.error)});
 async function write(fn){const d=await db;return new Promise((ok,no)=>{const tx=d.transaction(['worlds','edits'],'readwrite');tx.oncomplete=ok;tx.onabort=()=>no(tx.error||Error('Skrivningen avbröts'));fn(tx.objectStore('worlds'),tx.objectStore('edits'))})}
@@ -13,7 +14,7 @@ export function validateImport(v,defs,props){if(v?.version!==2||!v.world||!Array
  const m=fresh(s.name,s.mode,s.seed,['Lätt','Normal','Utmanande'].includes(s.difficulty)?s.difficulty:'Lätt'),point=p=>Array.isArray(p)&&p.length===3&&p.every(n=>Number.isFinite(n)&&Math.abs(n)<1e7);
  const validId=k=>Object.hasOwn(defs,k)||props.includes(k);
  const counts=obj=>Object.fromEntries(Object.entries(obj||{}).filter(([k,n])=>validId(k)&&Number.isSafeInteger(n)&&n>=0));
- m.fly=s.fly===true;
+ m.fly=s.fly===true;m.quiet=s.quiet===true;m.fauna=sanitizeFauna(s.fauna);
  m.drops=Array.isArray(s.drops)?s.drops.filter(r=>r&&validId(r.id)&&point(r.p)&&Number.isInteger(r.count)&&r.count>0&&r.count<=64).map(r=>({id:r.id,count:r.count,p:r.p,ready:0})):[];
  if(point(s.position))m.position=s.position;
  for(const k of ['yaw','pitch'])if(Number.isFinite(s[k]))m[k]=s[k];

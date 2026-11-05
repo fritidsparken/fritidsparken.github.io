@@ -86,6 +86,35 @@ class Sculpt:
         mod=ob.modifiers.new('Skelett','ARMATURE'); mod.object=rig
         return rig
 
+def build_tail(s, key, w, l, h, leg, main, cream, accent):
+    p=s.part; root=leg+h*.65
+    if key in ('hast','ko','gris','far','bjorn','kanin','hona'):
+        if key=='hast':
+            p('tail',(0,l*.5,root-.16),(w*.32,.23,.54),accent,lean=(0,-.17))
+            p('tail',(0,l*.57,root-.44),(w*.26,.18,.37),accent,taper=1.25,lean=(0,-.07))
+        elif key=='ko':
+            p('tail',(0,l*.495,root-.20),(.054,.07,.49),main,lean=(0,-.06))
+            p('tail',(0,l*.53,root-.47),(.11,.13,.21),accent,taper=.62)
+        elif key=='hona':
+            for sign in [-1,0,1]:
+                p('tail',(sign*w*.17,l*.46,root+.08),(.071,.13,.29),accent,
+                  lean=(sign*.045,.13),taper=.48)
+        else:
+            p('tail',(0,l*.49,root),(w*.25,l*.21,h*.28),cream if key=='kanin' else main)
+    elif key in AQUATIC:
+        p('tail',(0,l*.53,root),(.07,l*.29,h*.4),main)
+        for sign in (-1,1):
+            p('tail',(0,l*.65,root+sign*h*.20),(.055,l*.29,h*.54),accent,
+              lean=(0,sign*l*.19),taper=.68 if sign==1 else 1.3)
+        p('body',(0,.03,leg+h*1.02),(.045,l*.45,h*.5),accent,lean=(0,.075),taper=.24)
+    elif key in ('rav','varg','mosslynx'):
+        for j in range(3):
+            size=[.36,.41,.28][j]
+            p('tail',(0,l*(.49+j*.16),root-h*(.05+.12*j)),
+              (w*size,l*.36,h*size),cream if j==2 and key=='rav' else main,
+              lean=(0,-l*.12),taper=.83)
+    else:p('tail',(0,l*.48,root),(w*.24,l*.26,h*.32),accent)
+
 def animal(key,props):
     name,w,l,h,leg,head,main,cream,accent=props
     s=Sculpt(); s.bone('body',(0,0,leg+h*.5))
@@ -93,7 +122,32 @@ def animal(key,props):
     hy=-l*.48
     s.bone('head',(0,hy,headz),'body'); s.bone('tail',(0,l*.45,leg+h*.65),'body')
     p=s.part
-    p('body',(0,0,leg+h*.5),(w,l,h),main,taper=.94)
+    # A tapered barrel, separate breast and haunches give each gait a visible shoulder.
+    p('body',(0,0,leg+h*.50),(w*.95,l*.94,h*.91),main,taper=.88,bevel=.24)
+    p('body',(0,-l*.22,leg+h*.53),(w*.94,l*.47,h*.99),main,taper=.86,bevel=.21)
+    p('body',(0,l*.24,leg+h*.52),(w,l*.51,h*.94),main,taper=.88,bevel=.24)
+    if key in ('fisk','rimfena'):
+        for j in range(3):
+            for side in (-1,1):
+                p('body',(side*w*.43,(j-1)*l*.18,leg+h*.59),
+                  (w*.13,l*.055,h*.40),accent,lean=(0,l*.065))
+    if key=='hast':
+        for j in range(5):
+            p('head',(0,hy+.18-j*.055,headz+.09+j*.065),(.13,.14,.19),accent,lean=(0,-.055))
+    if key in ('varg','rav','mosslynx'):
+        p('body',(0,-l*.32,leg+h*.57),(w*.86,l*.33,h*.88),cream,taper=1.17,bevel=.21)
+    if key=='far':
+        for side in (-1,1):
+            for j in range(4):
+                p('body',(side*w*.39,(j-1.48)*l*.19,leg+h*(.58+.04*(j%2))),
+                  (w*.28,l*.31,h*.66),main,taper=.82,bevel=.24)
+    if key=='lyktmott':
+        for side in (-1,1):
+            p('head',(side*head*.34,hy-head*.18,headz+head*.65),
+              (.023,.023,head*.8),cream,lean=(side*.065,-.05))
+    if key=='skifferbagge':
+        for side in (-1,1):
+            p('body',(side*w*.19,l*.09,leg+h*.76),(w*.53,l*.9,h*.61),main,taper=.83,bevel=.21)
     p('body',(0,-l*.21,leg+h*.19),(w*.83,l*.49,h*.36),cream)
     if key=='hast': p('head',(0,hy+.06,headz),(w*.58,.41,.65),main,lean=(0,-.17))
     hz=headz+(head*.48 if key=='hast' else 0)
@@ -106,7 +160,7 @@ def animal(key,props):
     if key in ('far','bjorn'):
         for x in (-.25,0,.25):
             for y in (-.25,.18):p('body',(x*w,y*l,leg+h*.84),(w*.46,l*.45,h*.36),main)
-    if key not in AQUATIC and key not in ('skifferbagge','lyktmott'):
+    if key not in AQUATIC and key not in ('skifferbagge','lyktmott','hona'):
         for side in (-1,1):
             long=key=='kanin'; point=key in ('rav','varg','mosslynx','hast','kanin')
             ex=side*head*.36; ez=hz+head*(.68 if long else .39)
@@ -134,20 +188,39 @@ def animal(key,props):
             if wing:p(b,(side*w*1.15,l*.02,leg+h*.61),(w*.33,l*.25,h*.22),cream)
     if key not in AQUATIC:
         for side in (-1,1):
-            ys=[-.29,.31] if key!='hona' else [.03]
+            ys=[-.30,.28]
+            if key=='hona':ys=[.04]
+            if key in ('skifferbagge','lyktmott'):ys=[-.24,.02,.28]
             for idx,yf in enumerate(ys):
-                b=f'leg{side}_{idx}'; x=side*w*.32; y=yf*l
-                s.bone(b,(x,y,leg+.08),'body'); thick=w*(.23 if key!='hona' else .14)
-                p(b,(x,y,leg*.55),(thick,thick*1.14,leg*1.1),main)
-                p(b,(x,y-thick*.19,leg*.14),(thick*1.12,thick*(2 if key=='kanin' else 1.4),max(.055,leg*.28)),accent)
-    tailz=leg+h*.59; long=key in ('varg','rav','mosslynx','hast')
-    if key in AQUATIC:
-        p('tail',(0,l*.54,tailz),(.066,l*.43,h*.96),accent,taper=.74)
-        p('body',(0,.03,leg+h*1.03),(.048,l*.4,h*.45),accent,lean=(0,.05),taper=.5)
-    else:
-        size=(w*(.39 if long else .24),l*(.65 if long else .26),h*(.43 if long else .32))
-        p('tail',(0,l*(.70 if long else .49),tailz),size,accent)
-        if key=='rav':p('tail',(0,l*.94,tailz),(w*.32,l*.24,h*.38),cream,taper=.66)
+                # Slight fore-aft offsets give the resting animal a balanced, relaxed stance.
+                b=f'leg{side}_{idx}'; x=side*w*.32
+                y=(yf+.024*side*(1 if idx==0 else -1))*l
+                s.bone(b,(x,y,leg+.09),'body')
+                if key=='hona':
+                    p(b,(x,y,leg*.48),(.037,.045,leg*.97),accent)
+                    for toe in [-1,0,1]:
+                        p(b,(x+toe*.023,y-.026,leg*.055),(.025,.092,.019),accent,rotation=toe*.37)
+                    continue
+                if key in ('skifferbagge','lyktmott'):
+                    x=side*w*.48
+                    p(b,(x,y,leg*.65),(.038,.04,leg*.72),accent,lean=(-side*w*.29,-.035))
+                    p(b,(side*w*.61,y+.015,leg*.24),(.034,.04,leg*.48),main,lean=(side*.035,-.025))
+                    continue
+                broad=key in ('bjorn','kanin','varg','rav','mosslynx')
+                hoof=key in ('ko','hast','gris','far','korallvandrare')
+                thick=w*(.235 if broad else .198)
+                haunch=(1.48 if idx==1 else 1.25)
+                if key=='kanin' and idx==1:haunch=1.95
+                p(b,(x,y,leg*.84),(thick*1.24,thick*haunch,leg*.72),
+                  main,lean=(0,leg*(.18 if idx else -.09)),taper=1.27,bevel=.21)
+                knee=y-leg*(.06 if idx else -.015)
+                p(b,(x,knee,leg*.40),(thick*.78,thick*.88,leg*.54),main,
+                  lean=(0,-leg*(.12 if idx else .032)),taper=1.12)
+                hoof_h=max(.032,leg*(.18 if hoof else .13))
+                long=2.15 if key=='kanin' and idx else 1.55 if broad else 1.23
+                p(b,(x,knee-thick*.13,hoof_h*.50),(thick*.98,thick*long,hoof_h),
+                  accent,taper=.83,bevel=.16)
+    build_tail(s,key,w,l,h,leg,main,cream,accent)
     return s
 
 def player(props):
@@ -190,17 +263,21 @@ def animate(rig,key):
                     if key in AQUATIC:y=wave*.09
                 elif n=='head':
                     x=wave*(.09 if gait else .046)
-                    if action=='eat':x=-.38-alt*.19
+                    if action=='eat':x=.27+alt*.13
                     if action=='rest':x=-.13
-                    z=wave*.058
+                    if key=='stigfinnare':z=wave*.058
+                    else:y=wave*.058
                 elif n.startswith('leg') or n.startswith('arm'):
                     side= -1 if '-' in n else 1
                     if gait:x=wave*side*(-1 if n.endswith('_1') or n.startswith('arm') else 1)*(.6 if action in ('run','flee','climb') else .36)
                     if action in ('dig','chop','build','use') and n=='arm1':x=-.65+wave*.56
                     if action in ('jump','land','hurt'):x=side*alt*.16
                 elif n.startswith('wing'):y=wave*(.42 if key=='lyktmott' else .2)*(-1 if '-' in n else 1)
-                elif n=='tail':z=wave*(.37 if gait else .17)
-                b.rotation_mode='XYZ'; b.rotation_euler=(x,y,z); b.location=(0,0,rise)
+                elif n=='tail':y=wave*(.37 if gait else .17)
+                # Blender bone-local Y points skyward. Limit lift so at least one hoof remains planted.
+                animal_rise=0 if action in ('idle','eat','rest') else -.014*abs(wave)
+                b.rotation_mode='XYZ'; b.rotation_euler=(x,y,z)
+                b.location=(0,0,rise) if key=='stigfinnare' else (0,animal_rise if n=='body' else 0,0)
                 if n=='body': b.keyframe_insert(data_path='location',frame=1+i*6)
                 b.keyframe_insert(data_path='rotation_euler',frame=1+i*6)
         for curve in act.fcurves:
@@ -228,3 +305,22 @@ for key,props in SPECIES.items():
         for prim in mesh['primitives']: assert {'JOINTS_0','COLOR_0','TEXCOORD_0','WEIGHTS_0'}<=prim['attributes'].keys(),prim['attributes']
     manifest.append(dict(id=key,name=props[0],file=path.name,kind='player' if key=='stigfinnare' else 'animal' if list(SPECIES).index(key)<10 else 'creature',aquatic=key in AQUATIC,animations=actions,sha256=hashlib.sha256(data).hexdigest()))
 (OUT/'manifest.json').write_text(json.dumps(dict(blender=bpy.app.version_string,license='CC0-1.0',author='Fritidsparken – original procedural sculptures and animations',actors=manifest),ensure_ascii=False,indent=2)+'\n')
+
+# A portable ration: seasoned meat strips folded in a leaf sleeve with a paper band.
+bpy.ops.wm.read_factory_settings(use_empty=True)
+food=Sculpt();food.bone('parcel',(0,0,0))
+for i in range(3):
+    x=(i-1)*.075
+    food.part('parcel',(x,0,.084),(.099,.315-i*.008,.11),'9e4b38',
+              lean=(.01,.014),rotation=(i-1)*.06,bevel=.22)
+    food.part('parcel',(x+.008,-.10,.137),(.055,.039,.013),'d89968',rotation=(i-1)*.06)
+food.part('parcel',(0,.045,.042),(.277,.177,.061),'557854',bevel=.18)
+for side in [-1,1]:
+    food.part('parcel',(side*.122,.048,.087),(.035,.17,.092),'70925a',lean=(-side*.024,0))
+food.part('parcel',(0,.064,.142),(.248,.096,.03),'7d995e',bevel=.19)
+food.part('parcel',(0,.039,.155),(.256,.043,.017),'d9bf86')
+rig=food.model('proviant');meal=next(obj for obj in bpy.context.scene.objects if obj.type=='MESH')
+meal.name='viltmat';meal.modifiers.clear();meal.vertex_groups.clear();meal.parent=None
+bpy.data.objects.remove(rig,do_unlink=True)
+bpy.ops.export_scene.gltf(filepath=str(OUT/'viltmat.glb'),export_format='GLB',export_yup=True,
+    export_animations=False,export_cameras=False,export_lights=False)

@@ -33,6 +33,10 @@ export function generate(cx,cz,seed,ids,legacy,edits){
   for(let y=0;y<=Math.max(h,sea);y++){
    let id=y>h?ids.water:y===h?top:y>=h-2?([6,22].includes(top)?top:b===8?17:2):rockAt(y);
    if(y>1&&y<h-2){const cave=Math.sin(phase+y*.142)+Math.cos(arch-y*.159)+.72*Math.sin(wx*.062+wz*.09+y*.24);if(cave>1.57)id=y<5?ids.lava:y<9?ids.water:0;else if(hash(wx+y*29,wz-y*7,seed)>.975)id=76+Math.floor(hash(wx-y,wz+y,seed+13)*(y<18?12:5));}
+   // Sparse geothermal seeps hang from dry cave ceilings. The fluid solver
+   // grows their falls only while the surrounding chunks are loaded.
+   if(id===0&&y>=9&&y<h-3&&hash(wx,wz,seed+701)>.990&&
+      Math.sin(phase+(y+1)*.142)+Math.cos(arch-(y+1)*.159)+.72*Math.sin(wx*.062+wz*.09+(y+1)*.24)<=1.57)id=ids.lava;
    if(rx<=5&&rz<=5&&h>level+5&&y>=level&&y<=level+4){
     if(y===level||y===level+4||((rx===5||rz===5)&&rx+rz>5))id=y===level&&rx===0&&rz===0?142:93;
     else id=y===level+1&&rx===1&&rz===1?137:0;
