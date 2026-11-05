@@ -457,7 +457,7 @@ export class World {
       const results = await Promise.allSettled([
         loadSunnyRider(this.scene, !this.renderer.shadowMap.enabled,
           shirt === 0x187e75 ? null : shirt, deck === 0xe4a963 ? null : deck),
-        i===3 ? import("./riverside/scene.js?v=railends1").then(m=>m.buildRiverside(this.scene,floor,!this.renderer.shadowMap.enabled)) : finishSunnyPark(this.scene, floor, this.sun, q, i),
+        i===3 ? import("./riverside/scene.js?v=roadbed1").then(m=>m.buildRiverside(this.scene,floor,!this.renderer.shadowMap.enabled)) : finishSunnyPark(this.scene, floor, this.sun, q, i),
       ]);
       this.sunnyRider = results[0].value;
       const failure = results.find(result => result.status === "rejected");

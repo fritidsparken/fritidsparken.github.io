@@ -58,7 +58,22 @@ export function buildAvenue(scene,box,bar,low){
    const grad=g.createRadialGradient(px(x),pz(z),0,px(x),pz(z),78);grad.addColorStop(0,'#f7b66299');grad.addColorStop(.46,'#eda75b55');grad.addColorStop(1,'#deb97400');g.fillStyle=grad;g.fillRect(px(x)-78,pz(z)-78,156,156);
  }
  const t=new T.CanvasTexture(roadMap);t.colorSpace=T.SRGBColorSpace;t.anisotropy=6;
- const asphalt=new T.Mesh(new T.PlaneGeometry(164,30),new T.MeshStandardMaterial({map:t,roughness:.73}));asphalt.rotation.x=-Math.PI/2;asphalt.position.set(0,-.008,67);asphalt.receiveShadow=true;scene.add(asphalt);
+ // Carry the approach beneath the plaza and close the exposed banks down to the lawn.
+ const left=road.xMin-1,right=road.xMax+1,startZ=road.zMin-3,far=road.zMax+1;
+ const top=-.008,bottom=-5.3;
+ const geometry=new T.BoxGeometry(right-left,top-bottom,far-startZ);
+ // Keep the markings aligned with the rails while extending the asphalt at the edges.
+ const uv=geometry.attributes.uv,pos=geometry.attributes.position;
+ for(let i=0;i<pos.count;i++)if(geometry.attributes.normal.getY(i)>.99){
+   const x=pos.getX(i)+(left+right)/2,z=pos.getZ(i)+(startZ+far)/2;
+   uv.setXY(i,(x-road.xMin)/(road.xMax-road.xMin),(road.zMax-z)/(road.zMax-road.zMin));
+ }
+ const bank=new T.MeshStandardMaterial({color:0x555254,roughness:.98});
+ const surface=new T.MeshStandardMaterial({map:t,roughness:.73});
+ const asphalt=new T.Mesh(geometry,[bank,bank,surface,bank,bank,bank]);
+ asphalt.name='Loopvägens vägbank';
+ asphalt.position.set((left+right)/2,(top+bottom)/2,(startZ+far)/2);
+ asphalt.receiveShadow=true;scene.add(asphalt);
  // Warm light also spills from the lookout pavilion.
  for(const x of [-43,-36,-29]){
    box(0xc1a577,x,7.05,-30,.07,1.8,.07);
