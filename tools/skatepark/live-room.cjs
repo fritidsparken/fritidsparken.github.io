@@ -21,7 +21,7 @@ const fs=require('node:fs'),path=require('node:path');
   const a=await player();await a.page.locator('[data-park="4"]').click();await a.page.getByText('Spela tillsammans',{exact:true}).click();await a.page.getByText('Skapa rum',{exact:true}).click();
   await a.page.locator('#room-code').waitFor({timeout:90000});
   const code=(await a.page.locator('#room-code').innerText()).split(' ')[1];
-  const b=await player();await b.page.locator('[data-park="0"]').click();await b.page.getByText('Spela tillsammans',{exact:true}).click();await b.page.getByLabel('Rumskod').fill(code);await b.page.getByText('Gå med',{exact:true}).click();
+  const b=await player();await b.page.locator('[data-park="3"]').click();await b.page.getByText('Spela tillsammans',{exact:true}).click();await b.page.getByLabel('Rumskod').fill(code);await b.page.getByText('Gå med',{exact:true}).click();
   await b.page.locator('#room-code').filter({hasText:'2/8'}).waitFor({timeout:90000});
   await a.page.bringToFront();if(await a.page.locator('#dialog').isVisible())await a.page.locator('#back').click();
   await a.page.keyboard.down('w');

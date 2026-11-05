@@ -43,7 +43,7 @@ const s = {
   deck: 0,
   shirt: 0,
   riverside: true,
-  park: (stored.park!==3 || stored.riverside) && parks[stored.park] ? stored.park : 4,
+  park: [3,4].includes(stored.park) && (stored.park!==3 || stored.riverside) ? stored.park : 4,
 };
 if (new URLSearchParams(location.search).get("bana")==="riverside") s.park=3;
 if (new URLSearchParams(location.search).get("bana")==="solkajen") s.park=4;
@@ -69,7 +69,7 @@ const keys = {},
   sources = new Map(),
   dialog = $("dialog");
 function cards() {
-  $("parks").innerHTML = [4, 3, 0, 1, 2]
+  $("parks").innerHTML = [4, 3]
     .map(
       (i, position) => {
         const a = parks[i];
@@ -517,7 +517,7 @@ $('together').onclick=()=>{
    const {openSession}=await import('./multiplayer.js');
    if(!dialog.open||panel!=='lobby')return;
    session=openSession(code,s.park,{
-    async start(park){dialog.close();s.park=park;cards();await start();if(mode!=='play')throw Error();return world.scene},
+    async start(park){if(![3,4].includes(park))throw Error("Banan har tagits bort");dialog.close();s.park=park;cards();await start();if(mode!=='play')throw Error();return world.scene},
     status(room,count){const label=$('room-code');label.hidden=false;label.textContent='Rum '+room+' · '+count+'/8'},
     lost(room){session=null;$('room-code').hidden=true;if(mode==='play'||mode==='paused'){flash('Anslutningen bröts. Du kan fortsätta åka själv.');return}
      if(dialog.open){$('room-error').textContent='Kunde inte ansluta. Kontrollera koden eller prova ett nytt rum.';$('host').disabled=$('join').disabled=false}else if(room)$('error').textContent='Kunde inte öppna parken.'}
