@@ -1,7 +1,7 @@
 // South is the entrance. The café overlooks the street line from the west.
 export const solkajen={
- name:'Solkajen',area:'RIVERSIDE · KVÄLL',desc:'Solvarm betong, graffitiloop och en hög träramp.',sky:0xbddbed,floor:0xd8d3cb,ink:0xafaaa8,rail:0xb54a30,
- loops:[{x:-19,z:-29,r:4.4,drift:3.6}],
+ name:'Amber Heights',area:'RIVERSIDE · KVÄLL',desc:'Solvarm betong, graffitiloop och en hög träramp.',sky:0xbddbed,floor:0xd8d3cb,ink:0xafaaa8,rail:0xb54a30,
+ loops:[{x:-19,z:-29,r:2.55,drift:4.4}],
  shapes:[
  ['kidney',31,17,36,28,-4.6],['bowl',8,-30,23,18,-3.3],['bowl',-3,-33,14,14,-2],
  ['mega',36,-32,19,27,12],['mega',22,-32,9,20,6.2],

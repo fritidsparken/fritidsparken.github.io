@@ -1,6 +1,6 @@
 // Coordinates in metres: entrance to the south, river to the east.
 export const riverside = {
- name:"Riverside Skatepark", area:"RIVERSIDE", desc:"Kvällsåkning med tre vägloopar, gap och långa rails.",sky:0x27314a,floor:0xe3d5bf,ink:0x807665,rail:0x42545c,
+ name:"Midnight Rush", area:"RIVERSIDE", desc:"Kvällsåkning med tre vägloopar, gap och långa rails.",sky:0x27314a,floor:0xe3d5bf,ink:0x807665,rail:0x42545c,
  shapes:[
  ["bowl",18,20,37,27,-4.4],["bowl",-4,8,24,21,-3.2],["bowl",22,-2,37,24,-3.6],["bowl",37,5,19,20,-2.9],
  ["steps",-15,35,18,14,1.65],["manual",-26,35,2,13,1.3],["manual",-4,35,2,13,1.5],

@@ -65,7 +65,7 @@ def loop(a,side,extra):
  return (l['x']+r*sin(a),.035+l['r']-r*cos(a),l['z']+l['drift']*(a-sin(a))/(2*pi)+side*2.05)
 for i in range(112):
  a,b=i*2*pi/112,(i+1)*2*pi/112
- face([loop(a,-1,0),loop(b,-1,0),loop(b,1,0),loop(a,1,0)],'board' if i%4 else 'board2')
+ face([loop(a,-1,0),loop(b,-1,0),loop(b,1,0),loop(a,1,0)],'concrete')
  for j in range(12):
   u,v=-1+j/6,-1+(j+1)/6
   col=['aqua','dark','pink','white','yellow','violet'][int((i/4+3*sin(j*.68+i*.12)+j*.6)%6)]

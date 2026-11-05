@@ -6,7 +6,7 @@ import {
   clamp,
   halfWidth,
   halfDepth,
-} from "./model.js?v=solkajen-guld1";
+} from "./model.js?v=amber2";
 const T = window.THREE,
   v = (x, y, z) => new T.Vector3(x, y, z);
 const sphere = new T.SphereGeometry(1, 16, 12),
@@ -456,8 +456,10 @@ export class World {
     if(i===4){
       sun.position.set(-86,34,-48);
       sun.color.setHex(0xffc086);
-      sun.intensity=2.35;
+      sun.intensity=1.78;
       const fill=this.scene.children.find(o=>o.isHemisphereLight);
+      fill.intensity=1.12;
+      this.scene.backgroundIntensity=.78;
       fill.color.setHex(0xffead3);
       fill.groundColor.setHex(0xad9296);
       this.scene.fog.color.setHex(0xf2c6a9);
@@ -475,13 +477,13 @@ export class World {
     this.quality(q);
     {
       const [{ loadSunnyRider }, { finishSunnyPark }] = await Promise.all([
-        import("./sunny-rider.js?v=rail-3"),
+        import("./sunny-rider.js?v=amber2"),
         import("./sunny-visuals.js?v=evening-1"),
       ]);
       const results = await Promise.allSettled([
         loadSunnyRider(this.scene, !this.renderer.shadowMap.enabled,
           shirt === 0x187e75 ? null : shirt, deck === 0xe4a963 ? null : deck),
-        i===4 ? import("./solkajen/scene.js?v=guld1").then(m=>m.buildSolkajen(this.scene,floor,!this.renderer.shadowMap.enabled)) : i===3 ? import("./riverside/scene.js?v=rampljus1").then(m=>m.buildRiverside(this.scene,floor,!this.renderer.shadowMap.enabled)) : finishSunnyPark(this.scene, floor, this.sun, q, i),
+        i===4 ? import("./solkajen/scene.js?v=amber2").then(m=>m.buildSolkajen(this.scene,floor,!this.renderer.shadowMap.enabled)) : i===3 ? import("./riverside/scene.js?v=amber2").then(m=>m.buildRiverside(this.scene,floor,!this.renderer.shadowMap.enabled)) : finishSunnyPark(this.scene, floor, this.sun, q, i),
       ]);
       this.sunnyRider = results[0].value;
       const failure = results.find(result => result.status === "rejected");

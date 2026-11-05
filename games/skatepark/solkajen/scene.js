@@ -36,7 +36,7 @@ function paving(low){
 export async function buildSolkajen(scene,floor,low){
  const loader=new GLTFLoader(),asset=name=>new URL(name,import.meta.url).href;
  const [course,club,...trees]=await Promise.all([
-  loader.loadAsync(asset('park.glb?v=guld1')),loader.loadAsync(asset('../riverside/pavilion.glb')),
+  loader.loadAsync(asset('park.glb?v=amber2')),loader.loadAsync(asset('../riverside/pavilion.glb')),
   ...['maple','linden','elm'].map(n=>loader.loadAsync(asset('../../../assets/skatepark/shared/trees/'+n+(low?'-distance':'-lod')+'.glb')))
  ]);
  const plaza=course.scene.getObjectByName('SolkajenPlaza');

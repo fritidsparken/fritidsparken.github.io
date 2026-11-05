@@ -11,9 +11,9 @@ import {
   multi,
   score,
   clamp,
-} from "./model.js?v=solkajen-guld1";
-import { World } from "./world.js?v=solkajen-guld1";
-import { Sound } from "./audio.js?v=solkajen-guld1";
+} from "./model.js?v=amber2";
+import { World } from "./world.js?v=amber2";
+import { Sound } from "./audio.js?v=amber2";
 const $ = (id) => document.getElementById(id),
   number = (n) => n.toLocaleString("sv-SE"),
   key = "fp-skatepark-v1";
@@ -45,8 +45,9 @@ const s = {
   riverside: true,
   park: [3,4].includes(stored.park) && (stored.park!==3 || stored.riverside) ? stored.park : 4,
 };
-if (new URLSearchParams(location.search).get("bana")==="riverside") s.park=3;
-if (new URLSearchParams(location.search).get("bana")==="solkajen") s.park=4;
+const requestedPark=new URLSearchParams(location.search).get("bana");
+if (["riverside","midnight-rush"].includes(requestedPark)) s.park=3;
+if (["solkajen","amber-heights"].includes(requestedPark)) s.park=4;
 for (const [slot, items] of [
   ["deck", decks],
   ["shirt", shirts],
@@ -514,7 +515,7 @@ $('together').onclick=()=>{
   if(!host&&!/^[A-HJ-NP-Z2-9]{8}$/.test(code)){$('room-error').textContent='Ange rumskodens åtta tecken.';return}
   $('host').disabled=$('join').disabled=true;$('room-error').textContent='Ansluter …';
   try{
-   const {openSession}=await import('./multiplayer.js');
+   const {openSession}=await import('./multiplayer.js?v=amber2');
    if(!dialog.open||panel!=='lobby')return;
    session=openSession(code,s.park,{
     async start(park){if(![3,4].includes(park))throw Error("Banan har tagits bort");dialog.close();s.park=park;cards();await start();if(mode!=='play')throw Error();return world.scene},

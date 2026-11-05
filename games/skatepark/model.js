@@ -1,5 +1,5 @@
-import {solkajen,bowlRadius} from './solkajen/layout.js?v=guld1';
-import { riverside, road, endRampHeight, loops, jumps, jumpHeight, loopPoint, tau } from "./riverside/layout.js?v=railends1";
+import {solkajen,bowlRadius} from './solkajen/layout.js?v=amber2';
+import { riverside, road, endRampHeight, loops, jumps, jumpHeight, loopPoint, tau } from "./riverside/layout.js?v=amber2";
 export const parks = [
   {
     name: "Soliga skateparken",
@@ -471,6 +471,17 @@ export function tick(p, k, park, dt, emit) {
     }
     return;
   }
+  if(park===solkajen && !p.air && (p.speed>.1 || k.go)){
+    const track=park.loops[0], offset=track.x-p.x;
+    const sign=Math.sign(offset);
+    const entryZ=track.z+(sign<0?track.drift:0);
+    const movingToward=-Math.sin(p.dir)*sign;
+    if(sign && Math.abs(offset)<track.r+2 && Math.abs(p.z-entryZ)<2.7 && movingToward>-.05){
+      p.dir=-sign*Math.PI/2;
+      p.z+=clamp(entryZ-p.z,-dt*5,dt*5);
+      p.speed=Math.max(4,p.speed);
+    }
+  }
   const dx = -Math.sin(p.dir),
     dz = -Math.cos(p.dir),
     ground = height(park, p.x, p.z);
@@ -526,7 +537,7 @@ export function tick(p, k, park, dt, emit) {
   }
   // The coping redirects momentum upwards. On descent the board rolls back
   // into the same transition, including when the player pops before the lip.
-  if (!p.transition && p.speed>1 && (!p.air || p.justPopped || park===solkajen)) {
+  if (!p.transition && (p.speed>.05 || k.go) && (!p.air || p.justPopped || park===solkajen)) {
     for (const [kind,cx,cz,w,d] of park.shapes) {
       if (!["quarter","half","mega","return"].includes(kind)) continue;
       const across=kind==="half"||kind==="return", axis=across?p.x:p.z, center=across?cx:cz;
@@ -534,10 +545,16 @@ export function tick(p, k, park, dt, emit) {
       const size=across?w:d, lip=kind==="mega"?.85:.79;
       const along=2*(axis-center)*side/size;
       const heading=across?dx:dz, cross=across?p.z-cz:p.x-cx, width=across?d:w;
-      const guarded=park===solkajen && kind==="mega";
-      if (p.air && !p.justPopped && !guarded) continue;
-      const nearCoping=guarded && along>.60 && along<=1.14 && Math.abs(cross)<width*.50 && heading*side>0;
-      if (!nearCoping) {
+      if(kind==="mega"){
+        if(along < -.86 || along > 1.13 || Math.abs(cross)>=width*.50 || heading*side<.25)continue;
+        if(along < lip){
+          if(p.justPopped){p.air=false;p.vy=0;p.y=ground}
+          if(!p.air && !k.brake)p.speed=Math.max(p.speed,5.4);
+          continue;
+        }
+        p.y=Math.max(p.y,ground);
+      } else {
+        if (p.air && !p.justPopped) continue;
         if (heading*side<.32 || Math.abs(cross)>=width*.49 || along>lip+.045) continue;
         if (p.justPopped ? along<(across?.12:-.72) : along+2*heading*side*p.speed*dt/size<lip) continue;
       }
@@ -604,6 +621,7 @@ export function tick(p, k, park, dt, emit) {
     }
     // Test the swept board and body against the same helical ribbon as the mesh.
     for(const l of tracks){
+      if(park===solkajen && !p.air)continue;
       if(Math.abs(p.x-l.x)>l.r+.8)continue;
       // At a fixed X there can be two different wooden surfaces overhead.
       // Only the one approached from above may become a landing surface.

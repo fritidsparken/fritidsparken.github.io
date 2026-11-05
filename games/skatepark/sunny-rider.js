@@ -123,8 +123,8 @@ export async function loadSunnyRider(scene, low, shirt, deck) {
       group.position.set(p.x,p.y,p.z);
       group.rotation.order="YXZ";
       const slide=p.rail?.id===13 ? Math.PI/2 : p.rail?.id===14 ? -Math.PI/2 : 0;
-      group.rotation.y=blendAngle(group.rotation.y,p.dir+p.stance+p.spin+slide,t);
-      const slope=Math.atan(p.slope||0)*Math.cos(p.stance);
+      group.rotation.y=blendAngle(group.rotation.y,p.dir+p.spin+slide,t);
+      const slope=Math.atan(p.slope||0);
       const pitch=p.air?T.MathUtils.clamp(p.vy*.032,-.22,.23):slope;
       const manual=p.rail?.id===11?.19:p.rail?.id===12?-.19:p.manual===15?.14:p.manual===16?-.15:0;
       group.rotation.x=p.loop ? p.loop.a*p.loop.sign : blendAngle(group.rotation.x,pitch+manual,t);

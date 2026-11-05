@@ -1,4 +1,4 @@
-import {loadSunnyRider} from './sunny-rider.js?v=rail-3';
+import {loadSunnyRider} from './sunny-rider.js?v=amber2';
 const server='wss://fritidsparken-github-io.th8kdfmyr7.workers.dev/skate/';
 const colors=[0x59aacc,0xff9944,0x995ed3,0x39ac79];
 function packet(p,k){
