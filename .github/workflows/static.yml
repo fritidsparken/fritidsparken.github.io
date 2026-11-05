@@ -12,6 +12,7 @@ on:
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
+  deployments: write
   pages: write
   id-token: write
 
@@ -33,6 +34,12 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      - name: Inspect the interrupted Pages deployment
+        if: github.event.before == '41c5c1e964fbab509cf08303f7f7bf62d4055bcf'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/deployments?sha=90e3547155e89421c6c8d70fdbfb484eec4f8055&per_page=100" --jq '.[] | {id,sha,environment,created_at}'
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
