@@ -6,7 +6,7 @@ const fs=require('node:fs'),path=require('node:path');
  try{
   const origin='https://fritidsparken.se';
   async function player(){
-   const page=await browser.newPage({viewport:{width:900,height:600}});
+   const page=await browser.newPage({viewport:{width:640,height:400}});
    const errors=[],received=[];page.on('pageerror',e=>errors.push(e.message));
    page.on('websocket',ws=>ws.on('framereceived',f=>received.push(JSON.parse(f.payload))));
    await page.route(origin+'/**',async r=>{
@@ -14,6 +14,7 @@ const fs=require('node:fs'),path=require('node:path');
     const local=path.join(process.cwd(),decodeURIComponent(file));
     if(fs.existsSync(local))return r.fulfill({path:local});return r.abort();
    });
+   await page.addInitScript(()=>localStorage.setItem('fp-skatepark-v1',JSON.stringify({quality:'låg'})));
    await page.goto(origin+'/games/skatepark/');
    return {page,errors,received};
   }
@@ -23,8 +24,11 @@ const fs=require('node:fs'),path=require('node:path');
   const b=await player();await b.page.locator('[data-park="0"]').click();await b.page.getByText('Spela tillsammans',{exact:true}).click();await b.page.getByLabel('Rumskod').fill(code);await b.page.getByText('Gå med',{exact:true}).click();
   await b.page.locator('#room-code').filter({hasText:'2/8'}).waitFor({timeout:90000});
   await a.page.bringToFront();if(await a.page.locator('#dialog').isVisible())await a.page.locator('#back').click();
-  await a.page.keyboard.down('w');await a.page.waitForTimeout(2500);await a.page.keyboard.press('Space');await a.page.waitForTimeout(1400);await a.page.keyboard.up('w');
+  await a.page.keyboard.down('w');
+  for(let i=0;i<60;i++){const rides=b.received.filter(m=>m.kind==='ride');if(rides.length>1&&rides.some(m=>m.pose[0]!==rides[0].pose[0]||m.pose[2]!==rides[0].pose[2]))break;await a.page.waitForTimeout(500)}
+  await a.page.keyboard.press('Space');await a.page.waitForTimeout(1400);await a.page.keyboard.up('w');
   const poses=b.received.filter(m=>m.kind==='ride').map(m=>m.pose);
+  console.log('Received poses',poses.length,'errors',a.errors,b.errors,'host modal',await a.page.locator('#dialog').isVisible());
   assert.ok(new Set(poses.map(p=>p[0]+','+p[2])).size>1,'remote rider moved');
   assert.equal(b.received.find(m=>m.kind==='room').park,3);
   assert.deepEqual([...a.errors,...b.errors],[]);

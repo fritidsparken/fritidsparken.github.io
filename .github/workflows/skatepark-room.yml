@@ -13,7 +13,7 @@ jobs:
       - name: Test two skaters with the live server
         run: |
           for attempt in {1..30}; do
-            status=$(curl -s --max-time 5 -o /dev/null -w '%{http_code}' -H 'Origin: https://fritidsparken.se' -H 'Connection: Upgrade' -H 'Upgrade: websocket' -H 'Sec-WebSocket-Version: 13' -H 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==' 'https://fritidsparken-github-io.th8kdfmyr7.workers.dev/skate/AAAAAAAA') || true
+            status=$(curl --http1.1 -s --max-time 5 -o /dev/null -w '%{http_code}' -H 'Origin: https://fritidsparken.se' -H 'Connection: Upgrade' -H 'Upgrade: websocket' -H 'Sec-WebSocket-Version: 13' -H 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==' 'https://fritidsparken-github-io.th8kdfmyr7.workers.dev/skate/AAAAAAAA') || true
             if [ "$status" = 409 ]; then break; fi
             sleep 5
           done
