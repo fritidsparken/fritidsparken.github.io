@@ -22,13 +22,13 @@ export function panels(api){
  const q=select(['LOW','MEDIUM','HIGH','ULTRA'].map((v,i)=>[i,v]),s.quality);q.onchange=()=>{s.quality=+q.value;api.configure()};c.append(field('Grafik',q));
  const outfit=select([['skog','Skogsgrön'],['hav','Havsblå'],['lingon','Lingonröd'],['lavendel','Lavendel']],s.outfit);outfit.onchange=()=>{s.outfit=outfit.value;api.configure()};c.append(field('Jackans färg i tredjeperson',outfit));
  for(const [k,name,min,max,step] of [['fov','Synfält',55,100,1],['sense','Kamerakänslighet',.4,2,.1],['music','Musik',0,1,.05],['effects','Effekter',0,1,.05],['ambience','Omgivning',0,1,.05]]){const n=el('input');n.type='range';Object.assign(n,{min,max,step,value:s[k]});n.oninput=()=>{s[k]=+n.value;api.configure()};c.append(field(name,n))}}
- function pause(){if(!api.meta())return;show('pause','Expeditionen är pausad');const row=el('div');row.className='row';row.append(btn('Fortsätt',close),btn('Helskärm',api.fullscreen),btn('Spara',run(async()=>{await api.save();api.toast('Världen sparad')})),btn('Inställningar',settings),btn('Byt spelläge',()=>{api.switchMode();close()}),btn('Till startmenyn',run(async()=>{await api.home();close()})));c.append(row,el('p','WASD för att gå, Ctrl för att springa och mellanslag för att hoppa. Håll vänster musknapp för att gräva. Högerklicka för att bygga eller använda ett föremål. Shift smyger och håller dig kvar vid kanter. Dubbeltryck mellanslag för att flyga i kreativt läge. E öppnar och stänger ryggsäcken. Mushjulet eller 1–9 väljer plats, mittenklick plockar block, Q släpper ett föremål och F5 byter kamera. På mobil går du med vänster joystick och siktar genom att svepa. För spaken helt framåt för att springa. Dubbeltryck Hopp för att flyga.'))}
+ function pause(){if(!api.meta())return;show('pause','Expeditionen är pausad');const row=el('div');row.className='row';row.append(btn('Fortsätt',close),btn('Helskärm',()=>{api.fullscreen();close()}),btn('Spara',run(async()=>{await api.save();api.toast('Världen sparad')})),btn('Inställningar',settings),btn('Byt spelläge',()=>{api.switchMode();close()}),btn('Till startmenyn',run(async()=>{await api.home();close()})));c.append(row,el('p','WASD för att gå, Ctrl för att springa och mellanslag för att hoppa. Håll vänster musknapp för att gräva. Högerklicka för att bygga eller använda ett föremål. Shift smyger och håller dig kvar vid kanter. Dubbeltryck mellanslag för att flyga i kreativt läge. E öppnar och stänger ryggsäcken. Mushjulet eller 1–9 väljer plats, mittenklick plockar block, Q släpper ett föremål och F5 byter kamera. På mobil går du med vänster joystick och siktar genom att svepa. För spaken helt framåt för att springa. Dubbeltryck Hopp för att flyga.'))}
  function pack(){
   const opening=current!=='pack';
   show('pack','Ryggsäcken');
   if(opening){tab='library';api.sound('inventory')}
   const m=api.meta(),creative=m.mode==='creative',catalog=api.catalog();
-  const display=id=>id==='door'&&!/dörr/i.test(api.name(id))?'Dörr · '+api.name(id):api.name(id);
+  const display=api.name;
   const frame=el('section');frame.className='pack-frame';c.append(frame);
   const tabs=el('div');tabs.className='pack-tabs';
   const slots=el('div');slots.className='pack-slots';slots.setAttribute('role','group');slots.setAttribute('aria-label','Välj snabbvalsplats');
@@ -63,7 +63,6 @@ export function panels(api){
   const match=id=>display(id).toLocaleLowerCase('sv').includes(search.value.trim().toLocaleLowerCase('sv'));
   if(tab==='craft'){
    list.classList.add('recipe-list');
-   const doorButton=btn('Dörr',()=>{search.value='dörr';draw()});tools.append(doorButton);
    function draw(){
     list.replaceChildren();const benchNearby=creative||api.nearBench();
     for(const recipe of recipes.filter(r=>match(r.out))){
@@ -80,10 +79,7 @@ export function panels(api){
   }
   const categories=select([['','Alla kategorier'],...Array.from(new Set(catalog.map(v=>v.category))).map(k=>[k,k])],'');
   categories.setAttribute('aria-label','Kategori');tools.append(categories);
-  const doorButton=btn('Dörr',()=>{
-   if(!creative&&!m.bag.door){tab='craft';pack();const search=c.querySelector('input[type=search]');search.value='dörr';search.dispatchEvent(new Event('input'));return}
-   categories.value='';search.value='dörr';draw();
-  });tools.append(doorButton);
+
   list.classList.add('items');
   function draw(){
    list.replaceChildren();
@@ -128,6 +124,18 @@ export function panels(api){
   search.oninput=draw;draw();
  }
  for(const b of document.querySelectorAll('[data-open]'))b.onclick=run(({create,worlds,settings})[b.dataset.open]);
+ const quick=$('play-fullscreen');
+ if(quick)quick.onclick=run(async()=>{
+  if(quick.disabled)return;
+  quick.disabled=true;
+  try{
+   api.fullscreen();
+   const latest=(await db.list())[0];
+   const m=latest||db.fresh('Min blockvärld','creative','','Lätt');
+   await api.start(m,latest?await db.readEdits(m.id):[]);
+   close();
+  }finally{quick.disabled=false}
+ });
  $('continue').onclick=run(async()=>{const m=(await db.list())[0];if(m){await api.start(m,await db.readEdits(m.id));close()}});
  function bed(onWake){
   show('bed','Vila i sängen');

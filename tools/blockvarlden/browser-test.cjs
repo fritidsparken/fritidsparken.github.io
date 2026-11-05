@@ -39,6 +39,8 @@ async function test([name,type,device]){
   assert.equal(await slots.count(),9);await slots.nth(8).click();
   assert.ok(await page.locator('#panel').evaluate(e=>e.scrollHeight<=e.clientHeight+1),'Outer backpack stays fixed');
   assert.ok(await page.locator('.pack-list').evaluate(e=>e.scrollHeight>e.clientHeight),'Inventory scrolls independently');
+  assert.equal(await page.getByRole('button',{name:'Dörr',exact:true}).count(),0);
+  assert.equal(await page.locator('.pack-list .item').filter({hasText:'Trädörr'}).count(),1);
   await page.getByPlaceholder('Sök block eller föremål').fill('Tegel');
   assert.ok(await page.locator('.item').count()>0);
   await page.locator('.item').first().click();
@@ -52,7 +54,17 @@ async function test([name,type,device]){
   await recipe.click();await page.getByRole('button',{name:'Stäng'}).click();
   await page.getByRole('button',{name:'Pausa'}).click();await page.getByRole('button',{name:'Till startmenyn'}).click();
   await page.locator('#home').waitFor({state:'visible'});
-  await page.reload();await page.getByRole('button',{name:'Fortsätt'}).click();
+  await page.reload();
+  if(!device.hasTouch){
+   await page.getByRole('button',{name:'Spela i helskärm'}).click();
+   await page.waitForFunction(()=>!!document.fullscreenElement);
+   await page.locator('#stats').filter({hasText:'Mat'}).waitFor();
+   await page.getByRole('button',{name:'Avsluta helskärm'}).click();
+   await page.waitForFunction(()=>!document.fullscreenElement);
+   await page.getByRole('button',{name:'Pausa'}).click();
+   await page.getByRole('dialog').getByRole('button',{name:'Helskärm',exact:true}).click();
+   await page.waitForFunction(()=>!!document.fullscreenElement&&!document.querySelector('#panel').open);
+  }else await page.getByRole('button',{name:'Fortsätt'}).click();
   await page.locator('#stats').filter({hasText:'Mat'}).waitFor();
   assert.deepEqual(errors,[]);console.log(JSON.stringify({name,fps,renderer:native?'hosted runner':'CI software graphics',flow:'pass'}));
  }catch(e){await page.screenshot({path:out+'/'+name+'-failure.png'}).catch(()=>{});console.error(name,errors,await page.locator('body').innerText().catch(()=>''));throw e}finally{await browser.close()}
