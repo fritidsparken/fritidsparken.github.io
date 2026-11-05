@@ -1,0 +1,17 @@
+name: Blockvärlden live room
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/blockvarlden-room.yml'
+      - 'tools/blockvarlden/live-room.cjs'
+permissions:
+  contents: read
+jobs:
+  multiplayer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm install --prefix "$RUNNER_TEMP/room" playwright@1.55.0
+      - run: NODE_PATH="$RUNNER_TEMP/room/node_modules" node tools/blockvarlden/live-room.cjs
