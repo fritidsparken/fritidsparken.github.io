@@ -238,7 +238,7 @@ async function start() {
   clearKeys();
   resumeAudio();
   flash(
-    s.park===3 ? "Följ vägen genom tre loopar. Håll fart över hoppen!" : !$("touch").hidden
+    s.park===4 ? "Bowlen ligger till höger. Åk förbi trappan för att nå loopen!" : s.park===3 ? "Följ vägen genom tre loopar. Håll fart över hoppen!" : !$("touch").hidden
       ? "Styr med vänster spak. Svep med högerspaken för att hoppa åt det hållet och göra ett trick!"
       : "Håll W för fart. Hoppa med mellanslag och tryck Z för en kickflip!",
     6,
