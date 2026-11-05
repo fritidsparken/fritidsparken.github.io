@@ -314,7 +314,7 @@ def vert(name,x,y,width,run,height,tower=False,angle=0):
                     legs.append(((xx,yy,zz),(xx,yy,zz+1)))
         blocks("Steel_grated_stair_treads",stepParts,"DarkSteel")
         tubes("Tower_stair_stringers_and_handrails",legs,.065,"DarkSteel")
-    
+
     # Pivot at the back lip so both drops present their plywood profile and
     # decorated side to the reference viewpoint.
     if angle:

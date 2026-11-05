@@ -36,7 +36,7 @@ function railSegments(path, name) {
 }
 
 export function indexCourse(root, THREE) {
-  const cells = new Map();
+  const cells = new Map(), walls = new Map();
   const rails = [];
   const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
   let triangleCount = 0;
@@ -47,7 +47,7 @@ export function indexCourse(root, THREE) {
     }
     if (!object.isMesh) return;
     let owner = object;
-    while (owner && !owner.name.startsWith('RIDE_')) owner = owner.parent;
+    while (owner && !/^(RIDE_|Cladding_)/.test(owner.name)) owner = owner.parent;
     if (!owner) return;
     const {index, attributes} = object.geometry;
     const pos = attributes.position;
@@ -59,7 +59,21 @@ export function indexCourse(root, THREE) {
       vertex(a, i); vertex(b, i + 1); vertex(c, i + 2);
       const bx = b.x - a.x, bz = b.z - a.z, cx = c.x - a.x, cz = c.z - a.z;
       const det = bx * cz - cx * bz;
-      if (Math.abs(det) < .000001) continue;
+      const by=b.y-a.y, cy=c.y-a.y;
+      const nx=by*cz-bz*cy, nz=bx*cy-by*cx;
+      if (Math.abs(det) < .003*Math.hypot(nx,nz) && Math.hypot(nx,nz)>.00002) {
+        // Capsule probes collide with the actual faces of portal and obstacle
+        // sides. A hole in the mesh is also a hole in this collision index.
+        const wall=[a.clone(),b.clone(),c.clone()];
+        for (let u=cell(Math.min(a.x,b.x,c.x)); u<=cell(Math.max(a.x,b.x,c.x)); u++) {
+          for (let v=cell(Math.min(a.z,b.z,c.z)); v<=cell(Math.max(a.z,b.z,c.z)); v++) {
+            const id=key(u,v);
+            if (!walls.has(id)) walls.set(id,[]);
+            walls.get(id).push(wall);
+          }
+        }
+      }
+      if (!owner.name.startsWith('RIDE_') || Math.abs(det) < .000001) continue;
       // Retain only the upper side of solids. RIDE meshes with vertical side faces
       // cannot accidentally lift a board onto an overhead deck.
       if (det > 0) continue;
@@ -100,7 +114,30 @@ export function indexCourse(root, THREE) {
     }
     face.samples=samples;
   }
-  return {sampleHeight, rails, triangleCount};
+  const origin=new THREE.Vector3(), dir=new THREE.Vector3(), hit=new THREE.Vector3();
+  const ray=new THREE.Ray();
+  function blocksMovement(x,y,z,nx,ny,nz) {
+    dir.set(nx-x,ny-y,nz-z);
+    const length=dir.length();
+    if (length<1e-6) return false;
+    dir.multiplyScalar(1/length);
+    for(let u=cell(Math.min(x,nx));u<=cell(Math.max(x,nx));u++) {
+      for(let v=cell(Math.min(z,nz));v<=cell(Math.max(z,nz));v++) {
+        const bin=walls.get(key(u,v));
+        if (!bin) continue;
+        for(const rise of [.3,.95,1.45]) {
+          origin.set(x,y+rise,z);
+          ray.set(origin,dir);
+          for(const triangle of bin) {
+            if (!ray.intersectTriangle(triangle[0],triangle[1],triangle[2],false,hit)) continue;
+            if (origin.distanceToSquared(hit)<=length*length+1e-8) return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+  return {sampleHeight, blocksMovement, rails, triangleCount};
 }
 
 // Authored Blender transition lips and approach directions. Keep speed measured along the curved surface:

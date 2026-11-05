@@ -127,6 +127,136 @@ def oak_model():
         templates.append(parts)
     return templates
 
+def alpine_range(layer):
+    """Shared grid normals and a baked, slope-aware alpine albedo with snow in gullies."""
+    import numpy as np
+    from PIL import Image
+    import tempfile
+
+    seed=53573+31*layer
+    rng=np.random.default_rng(seed)
+    lattice=rng.uniform(-1,1,(257,257))
+    def value_noise(x,y):
+        ax=np.floor(x).astype(int);ay=np.floor(y).astype(int)
+        fx=x-ax;fy=y-ay
+        fx=fx*fx*(3-2*fx);fy=fy*fy*(3-2*fy)
+        a=lattice[ay%256,ax%256];b=lattice[ay%256,(ax+1)%256]
+        c=lattice[(ay+1)%256,ax%256];d=lattice[(ay+1)%256,(ax+1)%256]
+        return (a+(b-a)*fx)*(1-fy)+(c+(d-c)*fx)*fy
+    def height(x,y):
+        ridge=278+layer*69+8*np.sin(x*.023+layer)+5*value_noise(x*.026,layer+np.zeros_like(x))
+        relief=8+4*np.sin(x*.018+layer*.91)+2.6*np.cos(x*.049+layer)+8.5/(1+np.exp(-(x-9)/33))
+        # Interlocking long ridges create broad shoulders with asymmetrical summit faces.
+        for center,prominence,west,east in [(-141,10,34,46),(-30,6,47,22),(61,11,42,53),(139,13,62,27),(184,8,15,44),(259,11,39,26)]:
+            xx=x-center-layer*(18+4*np.sin(center))
+            spread=np.where(xx<0,west,east)
+            relief+=prominence*np.exp(-(xx/spread)**2*1.6)
+        relief+=3.7*value_noise(x*.046+layer*9,np.full_like(x,7.37)) + 2.15*value_noise(x*.145,np.full_like(x,4.81+layer))
+        d=abs(y-ridge)
+        band=np.exp(-(d/(23+layer*5))**1.19)
+        warp=2.3*value_noise(x*.09,y*.075)+1.2*value_noise(x*.23,y*.21)
+        gullies=abs(value_noise((x+warp)*.115+y*.018,y*.032))
+        strata=value_noise(x*.052,y*.059)*2.7+value_noise(x*.149+11,y*.137)*1.05
+        return -.92+band*(relief+strata+4.4*gullies)-3.85*gullies*np.exp(-((d-10)/13)**2)
+    x0,x1=-380,380;y0,y1=209+layer*69,315+layer*69
+    # Texture resolution independent from the silhouette mesh; all runtime variation is a single JPEG.
+    tx,ty=2048,384
+    uu,vv=np.meshgrid((np.arange(tx)+.5)/tx,(np.arange(ty)+.5)/ty)
+    x=x0+(x1-x0)*uu;y=y0+(y1-y0)*vv
+    z=height(x,y); sx=(height(x+.4,y)-height(x-.4,y))/.8;sy=(height(x,y+.4)-height(x,y-.4))/.8
+    slope=np.sqrt(sx*sx+sy*sy)
+    broad=value_noise(x*.10,y*.09);mid=value_noise(x*.25+14,y*.23)
+    grit=value_noise(x*.56,y*.49)+.30*value_noise(x*1.25+26,y*.84)
+    streak=abs(value_noise(x*.4+5.1*np.sin(y*.17)+broad,y*.075))
+    # Rock through talus and alpine meadow. Snow remains in high, sheltered gullies and north-facing shelves.
+    meadow=np.clip((16.5-z)/7.0+(.63-slope)*.48+.27*broad,0,1)
+    rock=np.array([116,133,143])+((broad*5+mid*5+grit*3-streak*10)[...,None])
+    green=np.array([83,112,106])+((broad*8+mid*5+grit*3)[...,None])
+    colour=rock*(1-meadow[...,None])+green*meadow[...,None]
+    snowline=20.8+1.55*np.sin(x*.027)+1.45*broad+2.85*streak
+    snowcov=np.clip((z-snowline)*.54+(.83-slope)*2.56+mid*.79+grit*.39,0,1)
+    white=np.array([207,218,222])+(mid*3+grit*1.6)[...,None]
+    colour=colour*(1-snowcov[...,None])+white*snowcov[...,None]
+    mist=.13+.14*layer
+    colour=colour*(1-mist)+np.array([159,183,200])*mist
+    with tempfile.TemporaryDirectory() as tmp:
+        filename=Path(tmp)/('Alpine range %s • baked strata.jpg'%layer)
+        Image.fromarray(np.flipud(colour).clip(0,255).astype('uint8')).save(filename,quality=88)
+        pic=bpy.data.images.load(str(filename));pic.pack()
+    material=mat('Alpine • aerial perspective '+str(layer),(.38,.43,.48),.98)
+    node=material.node_tree.nodes.new('ShaderNodeTexImage');node.image=pic
+    material.node_tree.links.new(node.outputs['Color'],material.node_tree.nodes.get('Principled BSDF').inputs['Base Color'])
+    nx,ny=343,35
+    u,v=np.meshgrid(np.linspace(0,1,nx),np.linspace(0,1,ny))
+    xx=x0+u*(x1-x0); yy=y0+v*(y1-y0);zz=height(xx,yy)
+    vertices=np.stack((xx,yy,zz),axis=2).reshape(-1,3).tolist()
+    faces=[(i,i+1,i+1+nx,i+nx) for j in range(ny-1) for i in range(j*nx,(j+1)*nx-1)]
+    mesh=bpy.data.meshes.new('Alpine ridgeline '+str(layer));mesh.from_pydata(vertices,[],faces);mesh.materials.append(material)
+    mesh.polygons.foreach_set('use_smooth',np.ones(len(faces),dtype=bool))
+    uv=mesh.uv_layers.new();vtx=np.empty(len(mesh.loops),dtype=np.int32); mesh.loops.foreach_get('vertex_index',vtx)
+    uv.data.foreach_set('uv',np.column_stack((u.ravel()[vtx],v.ravel()[vtx])).astype('f').ravel())
+    ob=bpy.data.objects.new(mesh.name,mesh);bpy.context.collection.objects.link(ob)
+    return ob
+
+def shoreline_woodland(batches,rng):
+    """Irregular wooded shoreline with clumped rounded crowns and gaps around buildings."""
+    woods=[]
+    for name,col in [('willow',(.119,.202,.129)),('beech',(.139,.206,.112)),('alder',(.105,.164,.117)),('birch',(.17,.218,.131))]:
+        b=Batch('Far woodland • '+name,mat('Hazy '+name,col))
+        batches.append(b);woods.append(b)
+    def crown(b,x,y,z,rx,ry,rz):
+        rings=5;sides=7;start=len(b.v)
+        for k in range(rings):
+            lat=-math.pi/2+(k+.14)*math.pi/(rings-1+.28)
+            for i in range(sides):
+                az=i*math.tau/sides+.13*math.sin(k)
+                uneven=rng.uniform(.88,1.12)
+                b.v.append((x+rx*math.cos(lat)*math.cos(az)*uneven,y+ry*math.cos(lat)*math.sin(az)*uneven,z+rz*math.sin(lat)*uneven))
+        for k in range(rings-1):
+            for i in range(sides):
+                a=start+k*sides+i;j=start+k*sides+(i+1)%sides;b.f.append((a,j,j+sides,a+sides))
+        b.f.append(tuple(start+(rings-1)*sides+i for i in range(sides)))
+    for group in range(112):
+        x=rng.uniform(-280,280);y=rng.uniform(220,230)
+        radius=rng.uniform(2.1,6.4); h=rng.uniform(1.25,3.8)
+        if x>40 and rng.random()<.38:continue
+        for i in range(rng.randrange(3,10)):
+            xx=x+rng.uniform(-radius,radius);yy=y+rng.uniform(-2,2)
+            hh=h*rng.uniform(.71,1.29);r=hh*rng.uniform(.49,.83)
+            crown(rng.choice(woods),xx,yy,hh*.48-.32,r,r*.83,hh*.57)
+    return woods
+
+def lake_surface():
+    """Tiling micro-wave normal and colour textures authored for this lake."""
+    import numpy as np
+    from PIL import Image
+    import tempfile
+    matl=mat('Lake • alpine wavelets',(.024,.20,.31),.25,.25)
+    size=512
+    u,v=np.meshgrid(np.arange(size,dtype=float)/size*math.tau,np.arange(size,dtype=float)/size*math.tau)
+    elongated=np.sin(2*u+5*v)+.5*np.sin(-4*u+9*v)+.32*np.sin(3*u-13*v)
+    crests=np.sin(u+36*v+.88*elongated)+.65*np.sin(4*u-49*v+1.1*elongated)+.25*np.sin(7*u+83*v+np.cos(3*u-5*v))
+    slope_x=(np.roll(crests,1,axis=1)-np.roll(crests,-1,axis=1))*.18
+    slope_y=(np.roll(crests,1,axis=0)-np.roll(crests,-1,axis=0))*.25
+    normal=np.stack((slope_x,slope_y,np.ones_like(u)),axis=-1)
+    normal/=np.linalg.norm(normal,axis=-1,keepdims=True)
+    diffuse=np.array([42,121,150])+(1.8*elongated+3.4*crests)[...,None]
+    nodes=matl.node_tree.nodes; links=matl.node_tree.links;bsdf=nodes.get('Principled BSDF')
+    with tempfile.TemporaryDirectory() as td:
+        for label,pixels in [('wind colour',diffuse),('wave normal',(normal*.5+.5)*255)]:
+            f=Path(td)/('Lakeside '+label+'.png');Image.fromarray(np.flipud(pixels).clip(0,255).astype('uint8')).save(f)
+            tex=nodes.new('ShaderNodeTexImage');tex.image=bpy.data.images.load(str(f))
+            if label=='wave normal':
+                tex.image.colorspace_settings.name='Non-Color'
+                n=nodes.new('ShaderNodeNormalMap'); n.inputs['Strength'].default_value=.36
+                links.new(tex.outputs['Color'],n.inputs['Color']);links.new(n.outputs[0],bsdf.inputs['Normal'])
+            else:links.new(tex.outputs['Color'],bsdf.inputs['Base Color'])
+            tex.image.pack()
+    b=Batch('Alpine lake • open water',matl)
+    b.poly((-325,60,-1.44),(325,60,-1.44),(325,226,-1.44),(-325,226,-1.44))
+    ob=b.finish();uv=ob.data.uv_layers.new()
+    for li,co in zip(ob.data.polygons[0].loop_indices,((0,0),(28,0),(28,9),(0,9))):uv.data[li].uv=co
+
 def build():
     rng=random.Random(27191)
     batches=[]
@@ -152,41 +282,15 @@ def build():
     for x in (-51.2,51.2):walk.box(x,0,-.18,3.2,88,.14)
     walk.box(0,46.8,-.18,105,3.5,.14)
     earth.box(0,65.6,-1.55,230,6,.55)
-    water=batch('Lake • alpine blue water',(.025,.205,.32),.25,.28)
-    water.box(0,143,-1.52,620,166,.08)
-    wave=batch('Lake • wind driven glints',(.156,.386,.47),.36,.18)
-    for i in range(1050):
-        x=rng.uniform(-185,185);y=rng.uniform(64,220);s=rng.uniform(.12,1.3)
-        wave.poly((x-s,y,-1.433),(x,y-.024,-1.433),(x+s*1.4,y+.01,-1.433),(x+.12,y+.036,-1.433))
-    # Two mountain ranges, ridged and broken by saddles. Snow collects in irregular high cirques.
-    stone=[batch('Alpine slate '+str(k),c) for k,c in enumerate([
-        (.235,.308,.365),(.278,.366,.427),(.33,.413,.47),(.402,.483,.53)])]
-    snow=[batch('Alpine snow '+str(k),c) for k,c in enumerate([(.71,.80,.845),(.865,.91,.92)])]
-    def mountain(x,y,layer):
-        ridgey=278+layer*75+11*math.sin(x*.026+layer)
-        band=math.exp(-((y-ridgey)/(29+layer*8))**2)
-        peaks=8+3*math.sin(.019*x+layer)+6*abs(math.sin(.014*x+1.2+layer))+min(20,max(0,(x-7)*.15))
-        peaks+=11*max(0,math.cos((x-121)*.034+layer*.41))**8
-        k=noise.fractal(Vector((x*.054,y*.068,layer+2)),1.05,2,4)*5.6
-        return max(-1.2,band*(peaks+k)+k*.24-2)
-    for layer in (1,0):
-        dx=3.2;dy=4; start=224+layer*69
-        for ix in range(-118,118):
-            x=ix*dx
-            for j in range(21):
-                y=start+j*dy
-                q=[(a,b,mountain(a,b,layer)) for a,b in ((x,y),(x+dx,y),(x+dx,y+dy),(x,y+dy))]
-                for ids in ((0,1,2),(0,2,3)):
-                    pts=[q[k] for k in ids]; height=sum(p[2] for p in pts)/3
-                    n=noise.noise_vector(Vector((x*.15,y*.09,layer+.26))).z
-                    facet=pts[1][2]-pts[0][2]
-                    m=snow[int(facet<1)] if height>22+4*math.sin(x*.033+layer)+n*3+max(0,facet*1.2) else stone[min(3,max(0,round(1.2+layer+.44*facet+n)))]
-                    m.poly(*pts)
-    grassdark.box(0,228,-1.54,520,10,1.3)
-    forest=[batch('Pine forest '+str(i),c) for i,c in enumerate([(.06,.13,.093),(.097,.184,.116),(.13,.216,.143)])]
-    for i in range(1520):
-        x=rng.uniform(-240,240);y=rng.uniform(218,236);h=rng.uniform(2.4,6.8)
-        forest[i%3].pipe((x,y,-.37),(x,y,h),h*.23,.035,5)
+    lake_surface()
+    for layer in (1,0):alpine_range(layer)
+    for x in range(-325,325,4):
+        def far_bank(xx):
+            return 207+1.7*math.sin(xx*.057)+.9*math.sin(xx*.23)
+        a=far_bank(x);b=far_bank(x+4)
+        grassdark.poly((x,a,-1.48),(x+4,b,-1.48),(x+4,b+3,-.42),(x,a+3,-.42))
+        grassdark.poly((x,a+3,-.42),(x+4,b+3,-.42),(x+4,237,-.38),(x,237,-.38))
+    far_woods=shoreline_woodland(batches,random.Random(53121))
     # Existing Fritidsparken models have editable originals and embedded pigments.
     elm=load_asset('trees/elm-lod.glb'); bench=load_asset('street-furniture/harbour-bench.glb')
     tenement=load_asset('buildings/rose-tenement-distance.glb')
@@ -260,4 +364,7 @@ def build():
     for s in (-1,1):
         zinc.poly((x-3.85,y,3.76),(x-3.85,y+s*2.2,2.99),(x+3.85,y+s*2.2,2.99),(x+3.85,y,3.76))
         fascia.box(x,y+s*2.18,2.90,7.7,.12,.12)
-    for b in batches:b.finish()
+    for b in batches:
+        ob=b.finish()
+        if ob and b in far_woods:
+            for poly in ob.data.polygons:poly.use_smooth=True

@@ -473,6 +473,7 @@ export class World {
     if (i === 5) {
       this.scene.fog = new T.Fog(0xc7def0, 110, 900);
       sun.position.set(-42,43,26);
+      sun.shadow.normalBias=.065;
       sun.color.setHex(0xfff1de);
       sun.intensity=2.05;
       const fill=this.scene.children.find(o=>o.isHemisphereLight);

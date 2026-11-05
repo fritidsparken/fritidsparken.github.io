@@ -12,9 +12,9 @@ const fs = require('node:fs');
   fs.mkdirSync(output, { recursive: true });
   const base = process.env.SKATE_URL || 'http://127.0.0.1:8173/games/skatepark/';
   try {
-    for (const [park, touch] of [[5,false],[5,true],[4,false],[3,false]]) {
+    for (const [park, touch, quality] of [[5,false,"hög"],[5,true,"låg"],[5,false,"medel"],[4,false],[3,false]]) {
       const page = await browser.newPage({ viewport: touch ? {width:812,height:375} : {width:1024,height:576}, hasTouch: touch, isMobile:touch });
-      const errors = [], resources = [], label = park + (touch ? '-touch' : '-keys');
+      const errors = [], resources = [], label = park + (touch ? '-touch' : '-keys') + (quality==='medel' ? '-medium' : '');
       page.on('pageerror', e => errors.push(String(e)));
       page.on('console', m => { if (m.type()==='error') console.error(label,m.text()); });
       page.on('response', r => { if (r.status() >=400) errors.push(r.status()+' '+r.url()); else resources.push(r.url()); });
@@ -23,6 +23,11 @@ const fs = require('node:fs');
       assert.equal(await page.locator('#parks button').first().getAttribute('data-park'),'5');
       await page.locator('[data-park="'+park+'"]').click();
       if(park===5 && !touch) await page.screenshot({path:output+'/menu.png'});
+      if(quality) {
+        await page.locator('[data-panel="settings"]').click();
+        await page.locator('[data-setting="quality"]').selectOption({label:quality});
+        await page.locator('#back').click();
+      }
       await page.locator('#play').click();
       await page.locator('#ride').waitFor({state:'visible',timeout:90000});
       if (park===5) assert(resources.some(u=>u.includes('/models/alpstrand.glb')));
@@ -30,6 +35,15 @@ const fs = require('node:fs');
       await page.screenshot({path:output+'/'+label+'-start.png'});
       if (touch) {
         const stick=page.locator('#jumpStick');
+        const center = await page.getByRole('group',{name:/Styrspak/}).boundingBox();
+        if(center) {
+          const cdp=await page.context().newCDPSession(page);
+          const x=center.x+center.width/2, y=center.y+center.height/2;
+          await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});
+          await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x,y:y-center.height*.35}]});
+          await page.waitForTimeout(650);
+          await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+        }
         await stick.tap();
         assert(await page.locator('#touch').isVisible());
       } else {

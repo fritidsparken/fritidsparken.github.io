@@ -18,7 +18,9 @@ export async function buildAlpstrand(scene, renderer, quality) {
   model.traverse(node => {
     if (!node.isMesh) return;
     node.receiveShadow = true;
-    node.castShadow = true;
+    // The level slab receives shadows. Its coplanar triangles should never
+    // shadow one another across the wide plaza.
+    node.castShadow = !/RIDE_Expansion_joint_plaza|Lake_.*water|Lake_.*glints/.test(node.name);
     if (node.isInstancedMesh) node.computeBoundingSphere();
     for (const material of [].concat(node.material)) materials.add(material);
     // These fittings are sub-pixel at skating distance. Keep all rails,

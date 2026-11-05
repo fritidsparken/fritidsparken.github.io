@@ -28,6 +28,8 @@ const h = alpstrand.sampleHeight;
 assert(h(0,23) < -3 && h(10,29) > -.4, 'Connected lagoon and raised island');
 assert(h(16,-16) < -1.5 && h(-19,-22) < -1, 'Smaller basins');
 assert(h(46.5,-7.7,6) < 4 && h(46.5,-7.7) > 8, 'Separate sill and roof at portal');
+assert(alpstrand.blocksMovement(46,4.4,-4,47.5,4.4,-4),'Solid back of portal wall');
+assert(!alpstrand.blocksMovement(46,4.4,-7.7,47.5,4.4,-7.7),'Pass through the actual arch opening');
 assert(Math.abs(h(-21,15)) < .01, 'Spawn on flat concrete');
 
 for (const [name,x,z,angle,run,lip] of [

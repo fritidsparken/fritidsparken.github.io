@@ -41,15 +41,15 @@ def setup(sky_file=None):
         link(mix.outputs[0],nodes.get('World Output').inputs['Surface'])
     bpy.ops.object.light_add(type='SUN',location=(-42,-26,43))
     sun=bpy.context.object
-    sun.name='Sol • sydost'
+    sun.name='Sol • sydväst'
     sun.rotation_euler=(-sun.location).to_track_quat('-Z','Y').to_euler()
     sun.data.energy=3.6
     sun.data.angle=math.radians(1.15)
     sun.data.color=(1,0.94,0.84)
-    bpy.ops.object.camera_add(location=(-7.5,-68,21))
+    bpy.ops.object.camera_add(location=(-7.5,-71,23))
     camera=bpy.context.object
     camera.name='Referenskamera • södra läktaren'
-    camera.rotation_euler=(Vector((0,0,0))-camera.location).to_track_quat('-Z','Y').to_euler()
+    camera.rotation_euler=(Vector((1,-3,0))-camera.location).to_track_quat('-Z','Y').to_euler()
     camera.data.lens=25.0
     camera.data.clip_end=1800
     scene.camera=camera

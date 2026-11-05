@@ -6,9 +6,9 @@
     {
       "collection": "Alpstrand • lakeside landscape",
       "dimensions_m": [
-        755.2,
-        445.0,
-        44.52
+        760.0,
+        452.0,
+        37.59
       ],
       "origin_m": [
         0.0,
@@ -16,12 +16,9 @@
         0.0
       ],
       "nodes": [
-        "Alpine slate 0",
-        "Alpine slate 1",
-        "Alpine slate 2",
-        "Alpine slate 3",
-        "Alpine snow 0",
-        "Alpine snow 1",
+        "Alpine lake • open water",
+        "Alpine ridgeline 0",
+        "Alpine ridgeline 1",
         "Aluminium luminaires",
         "Competition flags • alpine insignia",
         "Competition flags • violet",
@@ -49,12 +46,14 @@
         "Distant lakeside houses.021",
         "Distant lakeside houses.022",
         "Distant wooded shoreline",
+        "Far woodland • alder",
+        "Far woodland • beech",
+        "Far woodland • birch",
+        "Far woodland • willow",
         "Floodlight reflectors",
         "Galvanised barrier mesh",
         "Lake district • blue grey windows",
         "Lake district • pale limestone",
-        "Lake • alpine blue water",
-        "Lake • wind driven glints",
         "Lakeshore oak • Oak limbs 0",
         "Lakeshore oak • Oak limbs 0.001",
         "Lakeshore oak • Oak limbs 0.002",
@@ -62,15 +61,13 @@
         "Lakeshore oak • Oak limbs 0.004",
         "Lakeshore oak • Oak limbs 0.005",
         "Lakeshore oak • Oak limbs 0.006",
-        "Lakeshore oak • Oak limbs 0.007",
-        "Lakeshore oak • Oak limbs 0.008",
-        "Lakeshore oak • Oak limbs 0.009",
-        "Lakeshore oak • Oak limbs 0.010",
         "Lakeshore oak • Oak limbs 1",
         "Lakeshore oak • Oak limbs 1.001",
         "Lakeshore oak • Oak limbs 1.002",
         "Lakeshore oak • Oak limbs 1.003",
         "Lakeshore oak • Oak limbs 1.004",
+        "Lakeshore oak • Oak limbs 1.005",
+        "Lakeshore oak • Oak limbs 1.006",
         "Lakeshore oak • Oak limbs 2",
         "Lakeshore oak • Oak limbs 2.001",
         "Lakeshore oak • Oak limbs 2.002",
@@ -79,6 +76,8 @@
         "Lakeshore oak • Oak limbs 2.005",
         "Lakeshore oak • Oak limbs 2.006",
         "Lakeshore oak • Oak limbs 2.007",
+        "Lakeshore oak • Oak limbs 2.008",
+        "Lakeshore oak • Oak limbs 2.009",
         "Lakeshore oak • Oak shoots 0",
         "Lakeshore oak • Oak shoots 0.001",
         "Lakeshore oak • Oak shoots 0.002",
@@ -86,15 +85,13 @@
         "Lakeshore oak • Oak shoots 0.004",
         "Lakeshore oak • Oak shoots 0.005",
         "Lakeshore oak • Oak shoots 0.006",
-        "Lakeshore oak • Oak shoots 0.007",
-        "Lakeshore oak • Oak shoots 0.008",
-        "Lakeshore oak • Oak shoots 0.009",
-        "Lakeshore oak • Oak shoots 0.010",
         "Lakeshore oak • Oak shoots 1",
         "Lakeshore oak • Oak shoots 1.001",
         "Lakeshore oak • Oak shoots 1.002",
         "Lakeshore oak • Oak shoots 1.003",
         "Lakeshore oak • Oak shoots 1.004",
+        "Lakeshore oak • Oak shoots 1.005",
+        "Lakeshore oak • Oak shoots 1.006",
         "Lakeshore oak • Oak shoots 2",
         "Lakeshore oak • Oak shoots 2.001",
         "Lakeshore oak • Oak shoots 2.002",
@@ -103,6 +100,8 @@
         "Lakeshore oak • Oak shoots 2.005",
         "Lakeshore oak • Oak shoots 2.006",
         "Lakeshore oak • Oak shoots 2.007",
+        "Lakeshore oak • Oak shoots 2.008",
+        "Lakeshore oak • Oak shoots 2.009",
         "Lakeside promenade • aggregate",
         "Lamp masts and fence frames",
         "Natural gravel shoreline",
@@ -202,9 +201,6 @@
         "Perimeter elm.019",
         "Perimeter elm.020",
         "Perimeter elm.021",
-        "Pine forest 0",
-        "Pine forest 1",
-        "Pine forest 2",
         "Shared harbour bench",
         "Shared harbour bench.001",
         "Shared harbour bench.002",
@@ -213,12 +209,8 @@
         "Shared harbour bench.005"
       ],
       "materials": [
-        "Alpine slate 0",
-        "Alpine slate 1",
-        "Alpine slate 2",
-        "Alpine slate 3",
-        "Alpine snow 0",
-        "Alpine snow 1",
+        "Alpine • aerial perspective 0",
+        "Alpine • aerial perspective 1",
         "Aluminium luminaires",
         "Competition flags • alpine insignia",
         "Competition flags • violet",
@@ -227,10 +219,13 @@
         "Galvanised barrier mesh",
         "Hand-painted pigments",
         "Hand-painted pigments.001",
+        "Hazy alder",
+        "Hazy beech",
+        "Hazy birch",
+        "Hazy willow",
         "Lake district • blue grey windows",
         "Lake district • pale limestone",
-        "Lake • alpine blue water",
-        "Lake • wind driven glints",
+        "Lake • alpine wavelets",
         "Lakeside promenade • aggregate",
         "Lamp masts and fence frames",
         "Natural gravel shoreline",
@@ -240,11 +235,10 @@
         "Pavilion fascia and cedar posts",
         "Pavilion roof and ridge capping",
         "Pedunculate oak • photographed branch",
-        "Pine forest 0",
-        "Pine forest 1",
-        "Pine forest 2",
         "Summer canopy · painted leaves and branches"
-      ]
+      ],
+      "glb": "../../models/alpstrand/alpstrand-lakeside-landscape.glb",
+      "blend": "../../blender/alpstrand/alpstrand-lakeside-landscape.blend"
     },
     {
       "collection": "Chevron spine",
@@ -266,7 +260,9 @@
       "materials": [
         "Highland_Chevrons",
         "Highland_Concrete"
-      ]
+      ],
+      "glb": "../../models/alpstrand/chevron-spine.glb",
+      "blend": "../../blender/alpstrand/chevron-spine.blend"
     },
     {
       "collection": "Circular portal wall",
@@ -290,7 +286,9 @@
         "Highland_Concrete",
         "Highland_DarkSteel",
         "Highland_Sunset"
-      ]
+      ],
+      "glb": "../../models/alpstrand/circular-portal-wall.glb",
+      "blend": "../../blender/alpstrand/circular-portal-wall.blend"
     },
     {
       "collection": "Concrete planting islands",
@@ -358,7 +356,9 @@
         "Street | loam",
         "Street | petal",
         "Street | purple"
-      ]
+      ],
+      "glb": "../../models/alpstrand/concrete-planting-islands.glb",
+      "blend": "../../blender/alpstrand/concrete-planting-islands.blend"
     },
     {
       "collection": "Grand stair and return bank",
@@ -396,7 +396,9 @@
         "Street | edge",
         "Street | navy",
         "Street | zinc"
-      ]
+      ],
+      "glb": "../../models/alpstrand/grand-stair-and-return-bank.glb",
+      "blend": "../../blender/alpstrand/grand-stair-and-return-bank.blend"
     },
     {
       "collection": "Great_lagoon",
@@ -422,7 +424,9 @@
         "Highland_BowlWall",
         "Highland_Concrete",
         "Highland_Orange"
-      ]
+      ],
+      "glb": "../../models/alpstrand/great-lagoon.glb",
+      "blend": "../../blender/alpstrand/great-lagoon.blend"
     },
     {
       "collection": "Joined plaza and basin cut-outs",
@@ -441,7 +445,9 @@
       ],
       "materials": [
         "Highland_Plaza"
-      ]
+      ],
+      "glb": "../../models/alpstrand/joined-plaza-and-basin-cut-outs.glb",
+      "blend": "../../blender/alpstrand/joined-plaza-and-basin-cut-outs.blend"
     },
     {
       "collection": "Kraken quarter",
@@ -465,7 +471,9 @@
         "Highland_Concrete",
         "Highland_DarkSteel",
         "Highland_Octopus"
-      ]
+      ],
+      "glb": "../../models/alpstrand/kraken-quarter.glb",
+      "blend": "../../blender/alpstrand/kraken-quarter.blend"
     },
     {
       "collection": "Long orange transfer",
@@ -499,7 +507,9 @@
         "Street | navy",
         "Street | ocher",
         "Street | zinc"
-      ]
+      ],
+      "glb": "../../models/alpstrand/long-orange-transfer.glb",
+      "blend": "../../blender/alpstrand/long-orange-transfer.blend"
     },
     {
       "collection": "Low west quarter",
@@ -522,7 +532,9 @@
         "Highland_BlueSteel",
         "Highland_Concrete",
         "Highland_DarkSteel"
-      ]
+      ],
+      "glb": "../../models/alpstrand/low-west-quarter.glb",
+      "blend": "../../blender/alpstrand/low-west-quarter.blend"
     },
     {
       "collection": "North_pocket",
@@ -548,7 +560,9 @@
         "Highland_BowlWall",
         "Highland_Concrete",
         "Highland_Orange"
-      ]
+      ],
+      "glb": "../../models/alpstrand/north-pocket.glb",
+      "blend": "../../blender/alpstrand/north-pocket.blend"
     },
     {
       "collection": "Painted_channel",
@@ -574,7 +588,9 @@
         "Highland_BowlWall",
         "Highland_Concrete",
         "Highland_Orange"
-      ]
+      ],
+      "glb": "../../models/alpstrand/painted-channel.glb",
+      "blend": "../../blender/alpstrand/painted-channel.blend"
     },
     {
       "collection": "Rear line | banks & kickers",
@@ -613,7 +629,9 @@
         "Street | navy",
         "Street | ocher",
         "Street | zinc"
-      ]
+      ],
+      "glb": "../../models/alpstrand/rear-line-banks-kickers.glb",
+      "blend": "../../blender/alpstrand/rear-line-banks-kickers.blend"
     },
     {
       "collection": "Street lines | manual pads and rails",
@@ -685,7 +703,9 @@
         "Street | ocean",
         "Street | ocher",
         "Street | zinc"
-      ]
+      ],
+      "glb": "../../models/alpstrand/street-lines-manual-pads-and-rails.glb",
+      "blend": "../../blender/alpstrand/street-lines-manual-pads-and-rails.blend"
     },
     {
       "collection": "Summit drop and stair tower",
@@ -717,7 +737,9 @@
         "Highland_DarkSteel",
         "Highland_Mountains",
         "Highland_Plywood"
-      ]
+      ],
+      "glb": "../../models/alpstrand/summit-drop-and-stair-tower.glb",
+      "blend": "../../blender/alpstrand/summit-drop-and-stair-tower.blend"
     },
     {
       "collection": "Twin hip funbox",
@@ -751,7 +773,9 @@
         "Street | navy",
         "Street | ocher",
         "Street | zinc"
-      ]
+      ],
+      "glb": "../../models/alpstrand/twin-hip-funbox.glb",
+      "blend": "../../blender/alpstrand/twin-hip-funbox.blend"
     },
     {
       "collection": "Volcanic island",
@@ -775,7 +799,9 @@
         "Highland_BlueSteel",
         "Highland_Concrete",
         "Highland_Orange"
-      ]
+      ],
+      "glb": "../../models/alpstrand/volcanic-island.glb",
+      "blend": "../../blender/alpstrand/volcanic-island.blend"
     },
     {
       "collection": "West timber vert",
@@ -805,7 +831,9 @@
         "Highland_DarkSteel",
         "Highland_Mountains",
         "Highland_Plywood"
-      ]
+      ],
+      "glb": "../../models/alpstrand/west-timber-vert.glb",
+      "blend": "../../blender/alpstrand/west-timber-vert.blend"
     }
   ]
 }

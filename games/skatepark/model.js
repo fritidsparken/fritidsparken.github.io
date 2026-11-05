@@ -638,6 +638,11 @@ export function tick(p, k, park, dt, emit) {
       p.squat = 0.4;
     }
   }
+  if (park === alpstrand && !p.transition && !vert &&
+      park.blocksMovement(prev.x,prev.y,prev.z,p.x,p.y+(p.air ? p.vy*dt : 0),p.z)) {
+    p.x=prev.x; p.z=prev.z;
+    p.speed=0; p.swipe=null;
+  }
   let woodFloor=0;
   if((park===riverside && p.z>58)||park.loops){
     const tracks=park.loops||loops;
