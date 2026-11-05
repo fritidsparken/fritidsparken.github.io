@@ -1,0 +1,22 @@
+name: Alpstrand browser verification
+on:
+  push:
+    branches: [verify-alpstrand-20261105]
+permissions:
+  contents: read
+jobs:
+  webgl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm install --prefix "$RUNNER_TEMP/alp-browser" playwright@1.55.0
+      - name: Start game and test
+        run: |
+          python -m http.server 8173 --bind 127.0.0.1 >/tmp/alp-http.log 2>&1 &
+          NODE_PATH="$RUNNER_TEMP/alp-browser/node_modules" CHROME="$(which google-chrome)" node tools/skatepark/alpstrand-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: alpstrand-browser-evidence
+          path: skate-qa

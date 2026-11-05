@@ -11,9 +11,9 @@ import {
   multi,
   score,
   clamp,
-} from "./model.js?v=amber2";
-import { World } from "./world.js?v=amber2";
-import { Sound } from "./audio.js?v=amber2";
+} from "./model.js?v=alpstrand1";
+import { World } from "./world.js?v=alpstrand1";
+import { Sound } from "./audio.js?v=alpstrand1";
 const $ = (id) => document.getElementById(id),
   number = (n) => n.toLocaleString("sv-SE"),
   key = "fp-skatepark-v1";
@@ -37,17 +37,18 @@ const s = {
   best: parks.map((_, i) => i===3 && !stored.riverside ? 0 : num(stored.best?.[i])),
   music: clamp(num(stored.music, 0.45), 0, 1),
   fx: clamp(num(stored.fx, 0.72), 0, 1),
-  quality: ["auto", "låg", "hög"].includes(stored.quality)
+  quality: ["auto", "låg", "medel", "hög"].includes(stored.quality)
     ? stored.quality
     : "auto",
   deck: 0,
   shirt: 0,
   riverside: true,
-  park: [3,4].includes(stored.park) && (stored.park!==3 || stored.riverside) ? stored.park : 4,
+  park: [3,4,5].includes(stored.park) && (stored.park!==3 || stored.riverside) ? stored.park : 5,
 };
 const requestedPark=new URLSearchParams(location.search).get("bana");
 if (["riverside","midnight-rush"].includes(requestedPark)) s.park=3;
 if (["solkajen","amber-heights"].includes(requestedPark)) s.park=4;
+if (requestedPark === "alpstrand") s.park = 5;
 for (const [slot, items] of [
   ["deck", decks],
   ["shirt", shirts],
@@ -70,7 +71,7 @@ const keys = {},
   sources = new Map(),
   dialog = $("dialog");
 function cards() {
-  $("parks").innerHTML = [4, 3]
+  $("parks").innerHTML = [5, 4, 3]
     .map(
       (i, position) => {
         const a = parks[i];
@@ -233,13 +234,14 @@ async function start() {
   p = rider();
   if(s.park===3){p.x=-70;p.z=65;p.dir=-Math.PI/2;p.safe=[-70,65];}
   if(s.park===4){p.x=-16;p.z=40;p.dir=.05;p.safe=[-16,40];}
+  if (s.park === 5) Object.assign(p, {x:-21, z:15, y:parks[5].sampleHeight(-21,15), dir:-.35, safe:[-21,15]});
   $("menu").hidden = true;
   $("ride").hidden = false;
   mode = "play";
   clearKeys();
   resumeAudio();
   flash(
-    s.park===4 ? "Bowlen ligger till höger. Åk förbi trappan för att nå loopen!" : s.park===3 ? "Följ vägen genom tre loopar. Håll fart över hoppen!" : !$("touch").hidden
+    s.park===5 ? "Åk mot träramperna vid sjön eller sväng ner i bowlen." : s.park===4 ? "Bowlen ligger till höger. Åk förbi trappan för att nå loopen!" : s.park===3 ? "Följ vägen genom tre loopar. Håll fart över hoppen!" : !$("touch").hidden
       ? "Styr med vänster spak. Svep med högerspaken för att hoppa åt det hållet och göra ett trick!"
       : "Håll W för fart. Hoppa med mellanslag och tryck Z för en kickflip!",
     6,
@@ -338,7 +340,7 @@ function openPanel(id) {
         )
         .join("") +
       '<label>Grafikkvalitet<select data-setting="quality">' +
-      ["auto", "låg", "hög"]
+      ["auto", "låg", "medel", "hög"]
         .map(
           (t) =>
             "<option " +
@@ -518,7 +520,7 @@ $('together').onclick=()=>{
    const {openSession}=await import('./multiplayer.js?v=amber2');
    if(!dialog.open||panel!=='lobby')return;
    session=openSession(code,s.park,{
-    async start(park){if(![3,4].includes(park))throw Error("Banan har tagits bort");dialog.close();s.park=park;cards();await start();if(mode!=='play')throw Error();return world.scene},
+    async start(park){if(![3,4,5].includes(park))throw Error("Banan har tagits bort");dialog.close();s.park=park;cards();await start();if(mode!=='play')throw Error();return world.scene},
     status(room,count){const label=$('room-code');label.hidden=false;label.textContent='Rum '+room+' · '+count+'/8'},
     lost(room){session=null;$('room-code').hidden=true;if(mode==='play'||mode==='paused'){flash('Anslutningen bröts. Du kan fortsätta åka själv.');return}
      if(dialog.open){$('room-error').textContent='Kunde inte ansluta. Kontrollera koden eller prova ett nytt rum.';$('host').disabled=$('join').disabled=false}else if(room)$('error').textContent='Kunde inte öppna parken.'}
