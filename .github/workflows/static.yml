@@ -35,11 +35,16 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Inspect the interrupted Pages deployment
-        if: github.event.before == '41c5c1e964fbab509cf08303f7f7bf62d4055bcf'
+        if: github.event.before == '6502823fe1007d6685196c353b2f8ccd9fe04ef4'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh api "repos/$GITHUB_REPOSITORY/deployments?sha=90e3547155e89421c6c8d70fdbfb484eec4f8055&per_page=100" --jq '.[] | {id,sha,environment,created_at}'
+          endpoint="repos/$GITHUB_REPOSITORY/deployments/7582277671"
+          deployment=$(gh api "$endpoint" --jq '[.sha,.environment] | join(" ")')
+          test "$deployment" = "90e3547155e89421c6c8d70fdbfb484eec4f8055 github-pages"
+          gh api "repos/$GITHUB_REPOSITORY/pages/deployments/90e3547155e89421c6c8d70fdbfb484eec4f8055" --jq .status | grep -x deployment_cancelled
+          gh api --method POST "$endpoint/statuses" -f state=inactive
+          gh api --method DELETE "$endpoint"
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
