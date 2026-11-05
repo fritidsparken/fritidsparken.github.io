@@ -33,25 +33,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
-      - name: Release the timed-out Pages deployment
-        if: github.event.before == '91e37ac80245148d125727d7f040641751cc12f5'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          endpoint="repos/$GITHUB_REPOSITORY/pages/deployments/90e3547155e89421c6c8d70fdbfb484eec4f8055"
-          status=$(gh api "$endpoint" --jq .status)
-          echo "Previous deployment status = $status"
-          case "$status" in
-            queued|pending|deployment_cancelled|updating_pages|syncing_files|deploying|deployment_in_progress)
-              gh api --method POST "$endpoint/cancel"
-              for attempt in {1..12}; do
-                sleep 5
-                status=$(gh api "$endpoint" --jq .status)
-                echo "Previous deployment status = $status"
-                case "$status" in deployment_cancelled|canceled|cancelled|succeed|failed|deployment_failed) break;; esac
-              done
-              ;;
-          esac
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
