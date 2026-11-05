@@ -1,0 +1,839 @@
+{
+  "native": "../../blender/alpstrand/Alpstrand.blend",
+  "web": "../../models/alpstrand.glb",
+  "units": "metres",
+  "modules": [
+    {
+      "collection": "Alpstrand • lakeside landscape",
+      "dimensions_m": [
+        760.0,
+        452.0,
+        37.59
+      ],
+      "origin_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "nodes": [
+        "Alpine lake • open water",
+        "Alpine ridgeline 0",
+        "Alpine ridgeline 1",
+        "Aluminium luminaires",
+        "Competition flags • alpine insignia",
+        "Competition flags • violet",
+        "Distant lakeside houses",
+        "Distant lakeside houses.001",
+        "Distant lakeside houses.002",
+        "Distant lakeside houses.003",
+        "Distant lakeside houses.004",
+        "Distant lakeside houses.005",
+        "Distant lakeside houses.006",
+        "Distant lakeside houses.007",
+        "Distant lakeside houses.008",
+        "Distant lakeside houses.009",
+        "Distant lakeside houses.010",
+        "Distant lakeside houses.011",
+        "Distant lakeside houses.012",
+        "Distant lakeside houses.013",
+        "Distant lakeside houses.014",
+        "Distant lakeside houses.015",
+        "Distant lakeside houses.016",
+        "Distant lakeside houses.017",
+        "Distant lakeside houses.018",
+        "Distant lakeside houses.019",
+        "Distant lakeside houses.020",
+        "Distant lakeside houses.021",
+        "Distant lakeside houses.022",
+        "Distant wooded shoreline",
+        "Far woodland • alder",
+        "Far woodland • beech",
+        "Far woodland • birch",
+        "Far woodland • willow",
+        "Floodlight reflectors",
+        "Galvanised barrier mesh",
+        "Lake district • blue grey windows",
+        "Lake district • pale limestone",
+        "Lakeshore oak • Oak limbs 0",
+        "Lakeshore oak • Oak limbs 0.001",
+        "Lakeshore oak • Oak limbs 0.002",
+        "Lakeshore oak • Oak limbs 0.003",
+        "Lakeshore oak • Oak limbs 0.004",
+        "Lakeshore oak • Oak limbs 0.005",
+        "Lakeshore oak • Oak limbs 0.006",
+        "Lakeshore oak • Oak limbs 1",
+        "Lakeshore oak • Oak limbs 1.001",
+        "Lakeshore oak • Oak limbs 1.002",
+        "Lakeshore oak • Oak limbs 1.003",
+        "Lakeshore oak • Oak limbs 1.004",
+        "Lakeshore oak • Oak limbs 1.005",
+        "Lakeshore oak • Oak limbs 1.006",
+        "Lakeshore oak • Oak limbs 2",
+        "Lakeshore oak • Oak limbs 2.001",
+        "Lakeshore oak • Oak limbs 2.002",
+        "Lakeshore oak • Oak limbs 2.003",
+        "Lakeshore oak • Oak limbs 2.004",
+        "Lakeshore oak • Oak limbs 2.005",
+        "Lakeshore oak • Oak limbs 2.006",
+        "Lakeshore oak • Oak limbs 2.007",
+        "Lakeshore oak • Oak limbs 2.008",
+        "Lakeshore oak • Oak limbs 2.009",
+        "Lakeshore oak • Oak shoots 0",
+        "Lakeshore oak • Oak shoots 0.001",
+        "Lakeshore oak • Oak shoots 0.002",
+        "Lakeshore oak • Oak shoots 0.003",
+        "Lakeshore oak • Oak shoots 0.004",
+        "Lakeshore oak • Oak shoots 0.005",
+        "Lakeshore oak • Oak shoots 0.006",
+        "Lakeshore oak • Oak shoots 1",
+        "Lakeshore oak • Oak shoots 1.001",
+        "Lakeshore oak • Oak shoots 1.002",
+        "Lakeshore oak • Oak shoots 1.003",
+        "Lakeshore oak • Oak shoots 1.004",
+        "Lakeshore oak • Oak shoots 1.005",
+        "Lakeshore oak • Oak shoots 1.006",
+        "Lakeshore oak • Oak shoots 2",
+        "Lakeshore oak • Oak shoots 2.001",
+        "Lakeshore oak • Oak shoots 2.002",
+        "Lakeshore oak • Oak shoots 2.003",
+        "Lakeshore oak • Oak shoots 2.004",
+        "Lakeshore oak • Oak shoots 2.005",
+        "Lakeshore oak • Oak shoots 2.006",
+        "Lakeshore oak • Oak shoots 2.007",
+        "Lakeshore oak • Oak shoots 2.008",
+        "Lakeshore oak • Oak shoots 2.009",
+        "Lakeside promenade • aggregate",
+        "Lamp masts and fence frames",
+        "Natural gravel shoreline",
+        "Park turf • cut grass",
+        "Pavilion base and plinths",
+        "Pavilion fascia and cedar posts",
+        "Pavilion roof and ridge capping",
+        "Peninsula woodland",
+        "Peninsula woodland.001",
+        "Peninsula woodland.002",
+        "Peninsula woodland.003",
+        "Peninsula woodland.004",
+        "Peninsula woodland.005",
+        "Peninsula woodland.006",
+        "Peninsula woodland.007",
+        "Peninsula woodland.008",
+        "Peninsula woodland.009",
+        "Peninsula woodland.010",
+        "Peninsula woodland.011",
+        "Peninsula woodland.012",
+        "Peninsula woodland.013",
+        "Peninsula woodland.014",
+        "Peninsula woodland.015",
+        "Peninsula woodland.016",
+        "Peninsula woodland.017",
+        "Peninsula woodland.018",
+        "Peninsula woodland.019",
+        "Peninsula woodland.020",
+        "Peninsula woodland.021",
+        "Peninsula woodland.022",
+        "Peninsula woodland.023",
+        "Peninsula woodland.024",
+        "Peninsula woodland.025",
+        "Peninsula woodland.026",
+        "Peninsula woodland.027",
+        "Peninsula woodland.028",
+        "Peninsula woodland.029",
+        "Peninsula woodland.030",
+        "Peninsula woodland.031",
+        "Peninsula woodland.032",
+        "Peninsula woodland.033",
+        "Peninsula woodland.034",
+        "Peninsula woodland.035",
+        "Peninsula woodland.036",
+        "Peninsula woodland.037",
+        "Peninsula woodland.038",
+        "Peninsula woodland.039",
+        "Peninsula woodland.040",
+        "Peninsula woodland.041",
+        "Peninsula woodland.042",
+        "Peninsula woodland.043",
+        "Peninsula woodland.044",
+        "Peninsula woodland.045",
+        "Peninsula woodland.046",
+        "Peninsula woodland.047",
+        "Peninsula woodland.048",
+        "Peninsula woodland.049",
+        "Peninsula woodland.050",
+        "Peninsula woodland.051",
+        "Peninsula woodland.052",
+        "Peninsula woodland.053",
+        "Peninsula woodland.054",
+        "Peninsula woodland.055",
+        "Peninsula woodland.056",
+        "Peninsula woodland.057",
+        "Peninsula woodland.058",
+        "Peninsula woodland.059",
+        "Peninsula woodland.060",
+        "Peninsula woodland.061",
+        "Peninsula woodland.062",
+        "Peninsula woodland.063",
+        "Peninsula woodland.064",
+        "Peninsula woodland.065",
+        "Peninsula woodland.066",
+        "Peninsula woodland.067",
+        "Peninsula woodland.068",
+        "Peninsula woodland.069",
+        "Perimeter elm",
+        "Perimeter elm.001",
+        "Perimeter elm.002",
+        "Perimeter elm.003",
+        "Perimeter elm.004",
+        "Perimeter elm.005",
+        "Perimeter elm.006",
+        "Perimeter elm.007",
+        "Perimeter elm.008",
+        "Perimeter elm.009",
+        "Perimeter elm.010",
+        "Perimeter elm.011",
+        "Perimeter elm.012",
+        "Perimeter elm.013",
+        "Perimeter elm.014",
+        "Perimeter elm.015",
+        "Perimeter elm.016",
+        "Perimeter elm.017",
+        "Perimeter elm.018",
+        "Perimeter elm.019",
+        "Perimeter elm.020",
+        "Perimeter elm.021",
+        "Shared harbour bench",
+        "Shared harbour bench.001",
+        "Shared harbour bench.002",
+        "Shared harbour bench.003",
+        "Shared harbour bench.004",
+        "Shared harbour bench.005"
+      ],
+      "materials": [
+        "Alpine • aerial perspective 0",
+        "Alpine • aerial perspective 1",
+        "Aluminium luminaires",
+        "Competition flags • alpine insignia",
+        "Competition flags • violet",
+        "Distant wooded shoreline",
+        "Floodlight reflectors",
+        "Galvanised barrier mesh",
+        "Hand-painted pigments",
+        "Hand-painted pigments.001",
+        "Hazy alder",
+        "Hazy beech",
+        "Hazy birch",
+        "Hazy willow",
+        "Lake district • blue grey windows",
+        "Lake district • pale limestone",
+        "Lake • alpine wavelets",
+        "Lakeside promenade • aggregate",
+        "Lamp masts and fence frames",
+        "Natural gravel shoreline",
+        "Oak bark • branching limbs",
+        "Park turf • cut grass",
+        "Pavilion base and plinths",
+        "Pavilion fascia and cedar posts",
+        "Pavilion roof and ridge capping",
+        "Pedunculate oak • photographed branch",
+        "Summer canopy · painted leaves and branches"
+      ],
+      "glb": "../../models/alpstrand/alpstrand-lakeside-landscape.glb",
+      "blend": "../../blender/alpstrand/alpstrand-lakeside-landscape.blend"
+    },
+    {
+      "collection": "Chevron spine",
+      "dimensions_m": [
+        16.0,
+        12.0,
+        5.6
+      ],
+      "origin_m": [
+        14.5,
+        32.0,
+        0.0
+      ],
+      "nodes": [
+        "RIDE_Alpine_spine",
+        "Spine_chevron_inlay",
+        "Spine_chevron_inlay.001"
+      ],
+      "materials": [
+        "Highland_Chevrons",
+        "Highland_Concrete"
+      ],
+      "glb": "../../models/alpstrand/chevron-spine.glb",
+      "blend": "../../blender/alpstrand/chevron-spine.blend"
+    },
+    {
+      "collection": "Circular portal wall",
+      "dimensions_m": [
+        9.75,
+        16.48,
+        9.49
+      ],
+      "origin_m": [
+        46.4,
+        5.4,
+        0.0
+      ],
+      "nodes": [
+        "Guard_Portal_wall",
+        "Lip_Portal_wall",
+        "RIDE_Portal_wall"
+      ],
+      "materials": [
+        "Highland_BlueSteel",
+        "Highland_Concrete",
+        "Highland_DarkSteel",
+        "Highland_Sunset"
+      ],
+      "glb": "../../models/alpstrand/circular-portal-wall.glb",
+      "blend": "../../blender/alpstrand/circular-portal-wall.blend"
+    },
+    {
+      "collection": "Concrete planting islands",
+      "dimensions_m": [
+        73.39,
+        23.86,
+        1.24
+      ],
+      "origin_m": [
+        -2.549,
+        0.364,
+        -0.025
+      ],
+      "nodes": [
+        "Agastache soil",
+        "Agastache • ornamental grasses & perennials",
+        "Bowl island soil",
+        "Bowl island • ornamental grasses & perennials",
+        "Copper sedge soil",
+        "Copper sedge • ornamental grasses & perennials",
+        "East border soil",
+        "East border • ornamental grasses & perennials",
+        "Lake border soil",
+        "Lake border • ornamental grasses & perennials",
+        "RIDE_Agastache curb",
+        "RIDE_Agastache curb.001",
+        "RIDE_Agastache end cap",
+        "RIDE_Agastache end cap.001",
+        "RIDE_Bowl island curb",
+        "RIDE_Bowl island curb.001",
+        "RIDE_Bowl island end cap",
+        "RIDE_Bowl island end cap.001",
+        "RIDE_Copper sedge curb",
+        "RIDE_Copper sedge curb.001",
+        "RIDE_Copper sedge end cap",
+        "RIDE_Copper sedge end cap.001",
+        "RIDE_East border curb",
+        "RIDE_East border curb.001",
+        "RIDE_East border end cap",
+        "RIDE_East border end cap.001",
+        "RIDE_Lake border curb",
+        "RIDE_Lake border curb.001",
+        "RIDE_Lake border end cap",
+        "RIDE_Lake border end cap.001",
+        "RIDE_West border curb",
+        "RIDE_West border curb.001",
+        "RIDE_West border end cap",
+        "RIDE_West border end cap.001",
+        "RIDE_Wild lupine curb",
+        "RIDE_Wild lupine curb.001",
+        "RIDE_Wild lupine end cap",
+        "RIDE_Wild lupine end cap.001",
+        "West border soil",
+        "West border • ornamental grasses & perennials",
+        "Wild lupine soil",
+        "Wild lupine • ornamental grasses & perennials"
+      ],
+      "materials": [
+        "Street | cast",
+        "Street | edge",
+        "Street | gold",
+        "Street | leaf",
+        "Street | leaf dark",
+        "Street | leaf light",
+        "Street | loam",
+        "Street | petal",
+        "Street | purple"
+      ],
+      "glb": "../../models/alpstrand/concrete-planting-islands.glb",
+      "blend": "../../blender/alpstrand/concrete-planting-islands.blend"
+    },
+    {
+      "collection": "Grand stair and return bank",
+      "dimensions_m": [
+        13.11,
+        12.58,
+        2.47
+      ],
+      "origin_m": [
+        -18.493,
+        2.409,
+        -0.025
+      ],
+      "nodes": [
+        "GRIND_Tribune ledge -1",
+        "GRIND_Tribune ledge 1",
+        "GRIND_Tribune main descending handrail",
+        "RIDE_Tribune | cheek ledge",
+        "RIDE_Tribune | cheek ledge.001",
+        "RIDE_Tribune | eleven sawn concrete treads",
+        "RIDE_Tribune | return bank",
+        "Tribune ledge -1 • anchor plates",
+        "Tribune ledge -1 • polished crown",
+        "Tribune ledge -1 • welded uprights",
+        "Tribune ledge 1 • anchor plates",
+        "Tribune ledge 1 • polished crown",
+        "Tribune ledge 1 • welded uprights",
+        "Tribune main descending handrail • anchor plates",
+        "Tribune main descending handrail • polished crown",
+        "Tribune main descending handrail • welded uprights"
+      ],
+      "materials": [
+        "Street | aggregate",
+        "Street | cast",
+        "Street | edge",
+        "Street | navy",
+        "Street | zinc"
+      ],
+      "glb": "../../models/alpstrand/grand-stair-and-return-bank.glb",
+      "blend": "../../blender/alpstrand/grand-stair-and-return-bank.blend"
+    },
+    {
+      "collection": "Great_lagoon",
+      "dimensions_m": [
+        55.2,
+        28.61,
+        3.4
+      ],
+      "origin_m": [
+        4.0,
+        -25.0,
+        0.0
+      ],
+      "nodes": [
+        "DeckPaint_Great_lagoon0",
+        "DeckPaint_Great_lagoon1",
+        "DeckPaint_Great_lagoon2",
+        "GRIND_Coping_Great_lagoon",
+        "RIDE_Great_lagoon"
+      ],
+      "materials": [
+        "Highland_BlueSteel",
+        "Highland_BowlWall",
+        "Highland_Concrete",
+        "Highland_Orange"
+      ],
+      "glb": "../../models/alpstrand/great-lagoon.glb",
+      "blend": "../../blender/alpstrand/great-lagoon.blend"
+    },
+    {
+      "collection": "Joined plaza and basin cut-outs",
+      "dimensions_m": [
+        96.0,
+        86.0,
+        0.0
+      ],
+      "origin_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "nodes": [
+        "RIDE_Expansion_joint_plaza"
+      ],
+      "materials": [
+        "Highland_Plaza"
+      ],
+      "glb": "../../models/alpstrand/joined-plaza-and-basin-cut-outs.glb",
+      "blend": "../../blender/alpstrand/joined-plaza-and-basin-cut-outs.blend"
+    },
+    {
+      "collection": "Kraken quarter",
+      "dimensions_m": [
+        9.05,
+        17.28,
+        6.59
+      ],
+      "origin_m": [
+        -32.5,
+        -23.0,
+        0.0
+      ],
+      "nodes": [
+        "Guard_Kraken_quarter",
+        "Lip_Kraken_quarter",
+        "RIDE_Kraken_quarter"
+      ],
+      "materials": [
+        "Highland_BlueSteel",
+        "Highland_Concrete",
+        "Highland_DarkSteel",
+        "Highland_Octopus"
+      ],
+      "glb": "../../models/alpstrand/kraken-quarter.glb",
+      "blend": "../../blender/alpstrand/kraken-quarter.blend"
+    },
+    {
+      "collection": "Long orange transfer",
+      "dimensions_m": [
+        11.43,
+        7.78,
+        2.09
+      ],
+      "origin_m": [
+        -9.0,
+        -7.6,
+        -0.025
+      ],
+      "nodes": [
+        "Copper ribbon lip 3.3 • anchor plates",
+        "Copper ribbon lip 3.3 • polished crown",
+        "Copper ribbon lip 3.3 • welded uprights",
+        "Copper ribbon lip 7.8 • anchor plates",
+        "Copper ribbon lip 7.8 • polished crown",
+        "Copper ribbon lip 7.8 • welded uprights",
+        "Copper ribbon top rail • anchor plates",
+        "Copper ribbon top rail • polished crown",
+        "Copper ribbon top rail • welded uprights",
+        "GRIND_Copper ribbon lip 3.3",
+        "GRIND_Copper ribbon lip 7.8",
+        "GRIND_Copper ribbon top rail",
+        "RIDE_Copper ribbon"
+      ],
+      "materials": [
+        "Street | cast",
+        "Street | navy",
+        "Street | ocher",
+        "Street | zinc"
+      ],
+      "glb": "../../models/alpstrand/long-orange-transfer.glb",
+      "blend": "../../blender/alpstrand/long-orange-transfer.blend"
+    },
+    {
+      "collection": "Low west quarter",
+      "dimensions_m": [
+        7.55,
+        12.08,
+        4.59
+      ],
+      "origin_m": [
+        -47.0,
+        8.3,
+        0.0
+      ],
+      "nodes": [
+        "Guard_West_quarter",
+        "Lip_West_quarter",
+        "RIDE_West_quarter"
+      ],
+      "materials": [
+        "Highland_BlueSteel",
+        "Highland_Concrete",
+        "Highland_DarkSteel"
+      ],
+      "glb": "../../models/alpstrand/low-west-quarter.glb",
+      "blend": "../../blender/alpstrand/low-west-quarter.blend"
+    },
+    {
+      "collection": "North_pocket",
+      "dimensions_m": [
+        15.18,
+        6.0,
+        1.35
+      ],
+      "origin_m": [
+        -18.0,
+        21.4,
+        0.0
+      ],
+      "nodes": [
+        "DeckPaint_North_pocket0",
+        "DeckPaint_North_pocket1",
+        "DeckPaint_North_pocket2",
+        "GRIND_Coping_North_pocket",
+        "RIDE_North_pocket"
+      ],
+      "materials": [
+        "Highland_BlueSteel",
+        "Highland_BowlWall",
+        "Highland_Concrete",
+        "Highland_Orange"
+      ],
+      "glb": "../../models/alpstrand/north-pocket.glb",
+      "blend": "../../blender/alpstrand/north-pocket.blend"
+    },
+    {
+      "collection": "Painted_channel",
+      "dimensions_m": [
+        25.21,
+        10.39,
+        1.85
+      ],
+      "origin_m": [
+        13.0,
+        17.5,
+        0.0
+      ],
+      "nodes": [
+        "DeckPaint_Painted_channel0",
+        "DeckPaint_Painted_channel1",
+        "DeckPaint_Painted_channel2",
+        "GRIND_Coping_Painted_channel",
+        "RIDE_Painted_channel"
+      ],
+      "materials": [
+        "Highland_BlueSteel",
+        "Highland_BowlWall",
+        "Highland_Concrete",
+        "Highland_Orange"
+      ],
+      "glb": "../../models/alpstrand/painted-channel.glb",
+      "blend": "../../blender/alpstrand/painted-channel.blend"
+    },
+    {
+      "collection": "Rear line | banks & kickers",
+      "dimensions_m": [
+        30.45,
+        11.93,
+        0.95
+      ],
+      "origin_m": [
+        -15.973,
+        12.323,
+        -0.025
+      ],
+      "nodes": [
+        "GRIND_Planter hip lip 2.1",
+        "GRIND_Planter hip lip 3.9",
+        "GRIND_Railway wedge lip 1.8",
+        "GRIND_Railway wedge lip 4.2",
+        "Planter hip lip 2.1 • anchor plates",
+        "Planter hip lip 2.1 • polished crown",
+        "Planter hip lip 2.1 • welded uprights",
+        "Planter hip lip 3.9 • anchor plates",
+        "Planter hip lip 3.9 • polished crown",
+        "Planter hip lip 3.9 • welded uprights",
+        "RIDE_Planter hip",
+        "RIDE_Railway wedge",
+        "Railway wedge lip 1.8 • anchor plates",
+        "Railway wedge lip 1.8 • polished crown",
+        "Railway wedge lip 1.8 • welded uprights",
+        "Railway wedge lip 4.2 • anchor plates",
+        "Railway wedge lip 4.2 • polished crown",
+        "Railway wedge lip 4.2 • welded uprights"
+      ],
+      "materials": [
+        "Street | cast",
+        "Street | navy",
+        "Street | ocher",
+        "Street | zinc"
+      ],
+      "glb": "../../models/alpstrand/rear-line-banks-kickers.glb",
+      "blend": "../../blender/alpstrand/rear-line-banks-kickers.blend"
+    },
+    {
+      "collection": "Street lines | manual pads and rails",
+      "dimensions_m": [
+        63.74,
+        25.94,
+        0.82
+      ],
+      "origin_m": [
+        -9.25,
+        1.85,
+        -0.07
+      ],
+      "nodes": [
+        "East return rail • anchor plates",
+        "East return rail • polished crown",
+        "East return rail • welded uprights",
+        "East slab steel edge -0.55 • anchor plates",
+        "East slab steel edge -0.55 • polished crown",
+        "East slab steel edge -0.55 • welded uprights",
+        "East slab steel edge 0.55 • anchor plates",
+        "East slab steel edge 0.55 • polished crown",
+        "East slab steel edge 0.55 • welded uprights",
+        "East standalone • anchor plates",
+        "East standalone • polished crown",
+        "East standalone • welded uprights",
+        "Forecourt rail • anchor plates",
+        "Forecourt rail • polished crown",
+        "Forecourt rail • welded uprights",
+        "GRIND_East return rail",
+        "GRIND_East slab steel edge -0.55",
+        "GRIND_East slab steel edge 0.55",
+        "GRIND_East standalone",
+        "GRIND_Forecourt rail",
+        "GRIND_Manual island steel edge -0.825",
+        "GRIND_Manual island steel edge 0.825",
+        "GRIND_Rear flat bar",
+        "GRIND_Split ledge steel edge -0.6",
+        "GRIND_Split ledge steel edge 0.6",
+        "GRIND_West entry",
+        "Manual island steel edge -0.825 • anchor plates",
+        "Manual island steel edge -0.825 • polished crown",
+        "Manual island steel edge -0.825 • welded uprights",
+        "Manual island steel edge 0.825 • anchor plates",
+        "Manual island steel edge 0.825 • polished crown",
+        "Manual island steel edge 0.825 • welded uprights",
+        "RIDE_East slab",
+        "RIDE_Manual island",
+        "RIDE_Split ledge",
+        "Rear flat bar • anchor plates",
+        "Rear flat bar • polished crown",
+        "Rear flat bar • welded uprights",
+        "Split ledge steel edge -0.6 • anchor plates",
+        "Split ledge steel edge -0.6 • polished crown",
+        "Split ledge steel edge -0.6 • welded uprights",
+        "Split ledge steel edge 0.6 • anchor plates",
+        "Split ledge steel edge 0.6 • polished crown",
+        "Split ledge steel edge 0.6 • welded uprights",
+        "Split ledge • printed alpine skyline",
+        "West entry • anchor plates",
+        "West entry • polished crown",
+        "West entry • welded uprights"
+      ],
+      "materials": [
+        "Street | cast",
+        "Street | edge",
+        "Street | ivory",
+        "Street | navy",
+        "Street | ocean",
+        "Street | ocher",
+        "Street | zinc"
+      ],
+      "glb": "../../models/alpstrand/street-lines-manual-pads-and-rails.glb",
+      "blend": "../../blender/alpstrand/street-lines-manual-pads-and-rails.blend"
+    },
+    {
+      "collection": "Summit drop and stair tower",
+      "dimensions_m": [
+        27.05,
+        19.5,
+        16.19
+      ],
+      "origin_m": [
+        -6.0,
+        35.6,
+        0.0
+      ],
+      "nodes": [
+        "Cladding_Summit_drop",
+        "Cladding_Summit_drop.001",
+        "Guard_Summit_drop",
+        "Lattice_Summit_drop",
+        "Mountain_platform_fascia_Summit_drop",
+        "Mountain_platform_fascia_Summit_drop.001",
+        "RIDE_Summit_drop_deck",
+        "RIDE_Summit_drop_transition",
+        "SteelLip_Summit_drop",
+        "Steel_grated_stair_treads",
+        "Tower_stair_stringers_and_handrails"
+      ],
+      "materials": [
+        "Highland_BlueSteel",
+        "Highland_DarkSteel",
+        "Highland_Mountains",
+        "Highland_Plywood"
+      ],
+      "glb": "../../models/alpstrand/summit-drop-and-stair-tower.glb",
+      "blend": "../../blender/alpstrand/summit-drop-and-stair-tower.blend"
+    },
+    {
+      "collection": "Twin hip funbox",
+      "dimensions_m": [
+        10.13,
+        7.95,
+        1.99
+      ],
+      "origin_m": [
+        7.8,
+        0.1,
+        -0.025
+      ],
+      "nodes": [
+        "GRIND_Twin peak hip lip 3.2",
+        "GRIND_Twin peak hip lip 6.0",
+        "GRIND_Twin peak hip top rail",
+        "RIDE_Twin peak hip",
+        "Twin peak hip lip 3.2 • anchor plates",
+        "Twin peak hip lip 3.2 • polished crown",
+        "Twin peak hip lip 3.2 • welded uprights",
+        "Twin peak hip lip 6.0 • anchor plates",
+        "Twin peak hip lip 6.0 • polished crown",
+        "Twin peak hip lip 6.0 • welded uprights",
+        "Twin peak hip top rail • anchor plates",
+        "Twin peak hip top rail • polished crown",
+        "Twin peak hip top rail • welded uprights"
+      ],
+      "materials": [
+        "Street | cast",
+        "Street | navy",
+        "Street | ocher",
+        "Street | zinc"
+      ],
+      "glb": "../../models/alpstrand/twin-hip-funbox.glb",
+      "blend": "../../blender/alpstrand/twin-hip-funbox.blend"
+    },
+    {
+      "collection": "Volcanic island",
+      "dimensions_m": [
+        12.77,
+        9.3,
+        3.17
+      ],
+      "origin_m": [
+        10.0,
+        -29.0,
+        -3.3
+      ],
+      "nodes": [
+        "Island_painted_flames",
+        "Island_platform_rolled_lip",
+        "RIDE_Ember_island",
+        "RIDE_Island_cap"
+      ],
+      "materials": [
+        "Highland_BlueSteel",
+        "Highland_Concrete",
+        "Highland_Orange"
+      ],
+      "glb": "../../models/alpstrand/volcanic-island.glb",
+      "blend": "../../blender/alpstrand/volcanic-island.blend"
+    },
+    {
+      "collection": "West timber vert",
+      "dimensions_m": [
+        20.38,
+        20.45,
+        10.17
+      ],
+      "origin_m": [
+        -35.0,
+        35.7,
+        0.0
+      ],
+      "nodes": [
+        "Cladding_Timber_vert",
+        "Cladding_Timber_vert.001",
+        "Guard_Timber_vert",
+        "Lattice_Timber_vert",
+        "Mountain_platform_fascia_Timber_vert",
+        "Mountain_platform_fascia_Timber_vert.001",
+        "RIDE_Timber_vert_deck",
+        "RIDE_Timber_vert_transition",
+        "SteelLip_Timber_vert"
+      ],
+      "materials": [
+        "Highland_BlueSteel",
+        "Highland_DarkSteel",
+        "Highland_Mountains",
+        "Highland_Plywood"
+      ],
+      "glb": "../../models/alpstrand/west-timber-vert.glb",
+      "blend": "../../blender/alpstrand/west-timber-vert.blend"
+    }
+  ]
+}

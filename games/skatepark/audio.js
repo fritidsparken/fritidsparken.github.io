@@ -5,6 +5,7 @@ const ambientFiles = [
   "../minigolf/assets/audio/crickets.mp3",
   "../minigolf/assets/audio/birds.mp3",
   "./park-sound.mp3",
+  "../minigolf/assets/audio/birds.mp3",
 ];
 export class Sound {
   constructor() {

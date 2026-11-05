@@ -1,3 +1,4 @@
+import {alpstrand, vertStep, vertFlight, followBowl} from "./alpstrand/course.js";
 import {solkajen,bowlRadius} from './solkajen/layout.js?v=amber2';
 import { riverside, road, endRampHeight, loops, jumps, jumpHeight, loopPoint, tau } from "./riverside/layout.js?v=amber2";
 export const parks = [
@@ -123,7 +124,7 @@ export const parks = [
     ],
   },
 ];
-parks.push(riverside,solkajen);
+parks.push(riverside,solkajen,alpstrand);
 export const halfWidth = 56,
   halfDepth = 52;
 export const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
@@ -168,8 +169,8 @@ function terrace(x,z) {
  const side=clamp((12-Math.abs(x+36))/.7,0,1);
  return 3.35*side*clamp((9.8-Math.abs(z+30))/.7,0,1);
 }
-export const height = (park, x, z) =>
-  park.sampleHeight ? park.sampleHeight(x, z) : park.shapes.reduce((sum,s)=>sum+surface(s,x,z),park===riverside?terrace(x,z)+jumpHeight(x,z):0);
+export const height = (park, x, z, ceiling = Infinity) =>
+  park.sampleHeight ? park.sampleHeight(x, z, ceiling) : park.shapes.reduce((sum,s)=>sum+surface(s,x,z),park===riverside?terrace(x,z)+jumpHeight(x,z):0);
 export const tricks = [
   ["Ollie", 50, "Hopp"],
   ["Nollie", 75, "Broms + hopp"],
@@ -375,6 +376,8 @@ function catchRail(p, k, park, emit, previousY) {
   const holding = !!(k.z || k.x || k.c);
   if ((!holding && !p.air) || p.speed < 0.9 || (p.air && p.vy > 0.8)) return;
   for (const r of park.rails) {
+    if (park === alpstrand && (p.x < Math.min(r[0],r[2])-1 || p.x > Math.max(r[0],r[2])+1 ||
+        p.z < Math.min(r[1],r[3])-1 || p.z > Math.max(r[1],r[3])+1)) continue;
     if (r === p.ignoredRail || (r.line && r.line === p.ignoredRail?.line)) continue;
     const dx = r[2] - r[0],
       dz = r[3] - r[1],
@@ -484,8 +487,9 @@ export function tick(p, k, park, dt, emit) {
   }
   const dx = -Math.sin(p.dir),
     dz = -Math.cos(p.dir),
-    ground = height(park, p.x, p.z);
-  p.slope = (height(park, p.x + dx * 0.3, p.z + dz * 0.3) - ground) / 0.3;
+    ceiling = park === alpstrand ? p.y + 1.1 : Infinity,
+    ground = height(park, p.x, p.z, ceiling);
+  p.slope = (height(park, p.x + dx * 0.3, p.z + dz * 0.3, ceiling + .9) - ground) / 0.3;
   if (!p.air) {
     p.dir -= turn(k) * dt * (1.05 + 1.1 / (1 + p.speed * 0.17));
     const onWood = park.shapes.some(
@@ -493,17 +497,22 @@ export function tick(p, k, park, dt, emit) {
         shape[0] === "half" && Math.abs(surface(shape, p.x, p.z)) > 0.01,
     );
     const drag = onWood ? 0.48 : park === parks[1] ? 0.78 : 0.6;
+    const pump = park === alpstrand && ground < -.1 && p.slope < -.12 && k.go
+      ? Math.min(3, -p.slope*2.2) : 0;
     p.speed = clamp(
       p.speed +
         dt *
-          ((k.go || 0) * 6.9 -
+          ((k.go || 0) * 6.9 + pump -
             (k.brake || 0) * 13 -
             drag -
             p.speed * 0.085 -
-            p.slope * 8),
+            (park === alpstrand ? 6*p.slope/Math.hypot(1,p.slope) : p.slope*8)),
       0,
-      13,
+      park === alpstrand ? 22 : 13,
     );
+    if (park === alpstrand && p.speed < .15 && p.slope > .4 && !k.brake) {
+      p.dir += Math.PI; p.speed = .65;
+    }
     if(park===riverside&&p.speed<.1&&p.slope>.12&&Math.abs(p.x)>73&&p.z>52){p.dir+=Math.PI;p.speed=.5}
     if (k.go) {
       p.kick += dt * (5 + p.speed * 0.13);
@@ -532,7 +541,7 @@ export function tick(p, k, park, dt, emit) {
     const n = Math.floor((Math.abs(p.spin) + 0.1) / Math.PI);
     if (n > p.spinCount) {
       p.spinCount = n;
-      add(p, park.sampleHeight && n % 2 === 0 ? 17 : p.spin > 0 ? 5 : 6, emit);
+      add(p, park.sampleHeight && n % 2 === 0 ? (park === alpstrand ? 22 : 17) : p.spin > 0 ? 5 : 6, emit);
     }
   }
   // The coping redirects momentum upwards. On descent the board rolls back
@@ -584,7 +593,17 @@ export function tick(p, k, park, dt, emit) {
   const prev={x:p.x,y:p.y,z:p.z};
   let nx = p.x + ((p.swipe?.vx || 0) - Math.sin(p.dir) * p.speed) * dt,
     nz = p.z + ((p.swipe?.vz || 0) - Math.cos(p.dir) * p.speed) * dt;
-  if (p.transition) {
+  const vert = park === alpstrand && !p.air ? vertStep(p, dx, dz, dt, k.brake) : null;
+  if (vert) {
+    nx = vert.x; nz = vert.z;
+  } else if (park === alpstrand && !p.air) {
+    const wheels = followBowl(park,p.x,p.z,ground,nx,nz);
+    nx = wheels.x; nz = wheels.z;
+  }
+  if (p.transition?.face) {
+    const flight=vertFlight(p.transition,dt);
+    nx=flight.x; nz=flight.z; p.dir=flight.dir;
+  } else if (p.transition) {
     const tr=p.transition;
     tr.time+=dt;
     const u=tr.time/tr.flight;
@@ -618,6 +637,11 @@ export function tick(p, k, park, dt, emit) {
       emit("bump");
       p.squat = 0.4;
     }
+  }
+  if (park === alpstrand && !p.transition && !vert &&
+      park.blocksMovement(prev.x,prev.y,prev.z,p.x,p.y+(p.air ? p.vy*dt : 0),p.z)) {
+    p.x=prev.x; p.z=prev.z;
+    p.speed=0; p.swipe=null;
   }
   let woodFloor=0;
   if((park===riverside && p.z>58)||park.loops){
@@ -674,19 +698,24 @@ export function tick(p, k, park, dt, emit) {
       }
     }
   }
-  const floor = Math.max(woodFloor||-Infinity,height(park, p.x, p.z));
+  const floor = Math.max(woodFloor||-Infinity,height(park, p.x, p.z, ceiling));
   const rise = (floor - ground) / dt;
   if (
     !p.air &&
     p.settle === 0 &&
-    p.rollingRise > 2.4 &&
+    !vert && p.rollingRise > 2.4 &&
     p.speed > 4 &&
     rise < p.rollingRise * 0.52
   ) {
     p.air = true;
-    p.vy = Math.min(8, p.rollingRise);
+    p.vy = Math.min(park === alpstrand ? 11 : 8, p.rollingRise);
     p.spin = 0;
     p.spinCount = 0;
+    p.manual = null;
+  }
+  if (park === alpstrand && !p.air && floor < ground - .32 && !vert) {
+    p.air = true;
+    p.vy = Math.min(0, p.rollingRise);
     p.manual = null;
   }
   p.rollingRise = p.air ? 0 : rise;

@@ -6,7 +6,7 @@ import {
   clamp,
   halfWidth,
   halfDepth,
-} from "./model.js?v=amber2";
+} from "./model.js?v=alpstrand1";
 const T = window.THREE,
   v = (x, y, z) => new T.Vector3(x, y, z);
 const sphere = new T.SphereGeometry(1, 16, 12),
@@ -402,17 +402,21 @@ export class World {
         if (o.isInstancedMesh) o.dispose();
       });
       geometry.forEach((g) => g.dispose());
+      const alpineTextures = new Set();
       materials.forEach((m) => {
-        m.map?.dispose();
+        if (this.park === parks[5]) {
+          for (const value of Object.values(m)) if (value?.isTexture) alpineTextures.add(value);
+        } else m.map?.dispose();
         m.dispose();
       });
+      alpineTextures.forEach(texture => texture.dispose());
       this.sun.shadow.dispose();
       this.scene.background?.dispose();
     }
     const park = parks[i];
     this.park = park;
     this.scene = new T.Scene();
-    const sky = new T.TextureLoader().load(i===3?"riverside/night-sky.webp":"vista-" + (i===4?0:i) + ".webp", texture=>{
+    const sky = new T.TextureLoader().load(i===5 ? "../../assets/skatepark/environment/alpstrand/daylight.webp" : i===3?"riverside/night-sky.webp":"vista-" + (i===4?0:i) + ".webp", texture=>{
       if(i!==4)return;
       const image=texture.image, canvas=document.createElement("canvas");
       canvas.width=image.width;canvas.height=image.height;
@@ -466,13 +470,24 @@ export class World {
       this.scene.fog.density=.009;
 
     }
+    if (i === 5) {
+      this.scene.fog = new T.Fog(0xc7def0, 110, 900);
+      sun.position.set(-42,43,26);
+      sun.shadow.normalBias=.065;
+      sun.color.setHex(0xfff1de);
+      sun.intensity=2.05;
+      const fill=this.scene.children.find(o=>o.isHemisphereLight);
+      fill.color.setHex(0xd8ecff);
+      fill.groundColor.setHex(0x94897d);
+      fill.intensity=1.12;
+    }
     if(i===3){
       const fill=this.scene.children.find(o=>o.isHemisphereLight);
       fill.color.setHex(0xa9badb);fill.groundColor.setHex(0x746575);fill.intensity=.85;
       sun.color.setHex(0xbacafa);sun.intensity=.75;sun.position.set(-48,71,-32);
       this.scene.fog.color.setHex(0x28324a);
     }
-    const floor = i===4 ? new T.Mesh(new T.BufferGeometry(),mat(0xffffff,{map:noise()})) : i===3 ? plaza(park,this.scene) : environment(this.scene, park, i);
+    const floor = i===5 ? null : i===4 ? new T.Mesh(new T.BufferGeometry(),mat(0xffffff,{map:noise()})) : i===3 ? plaza(park,this.scene) : environment(this.scene, park, i);
     if(i===4){floor.receiveShadow=true;this.scene.add(floor)}
     this.quality(q);
     {
@@ -483,7 +498,7 @@ export class World {
       const results = await Promise.allSettled([
         loadSunnyRider(this.scene, !this.renderer.shadowMap.enabled,
           shirt === 0x187e75 ? null : shirt, deck === 0xe4a963 ? null : deck),
-        i===4 ? import("./solkajen/scene.js?v=amber2").then(m=>m.buildSolkajen(this.scene,floor,!this.renderer.shadowMap.enabled)) : i===3 ? import("./riverside/scene.js?v=amber2").then(m=>m.buildRiverside(this.scene,floor,!this.renderer.shadowMap.enabled)) : finishSunnyPark(this.scene, floor, this.sun, q, i),
+        i===5 ? import("./alpstrand/scene.js?v=alpstrand1").then(m=>m.buildAlpstrand(this.scene,this.renderer,q)) : i===4 ? import("./solkajen/scene.js?v=amber2").then(m=>m.buildSolkajen(this.scene,floor,!this.renderer.shadowMap.enabled)) : i===3 ? import("./riverside/scene.js?v=amber2").then(m=>m.buildRiverside(this.scene,floor,!this.renderer.shadowMap.enabled)) : finishSunnyPark(this.scene, floor, this.sun, q, i),
       ]);
       this.sunnyRider = results[0].value;
       const failure = results.find(result => result.status === "rejected");
@@ -519,7 +534,17 @@ export class World {
       Math.min(devicePixelRatio || 1, light ? 1 : 1.65),
     );
     this.renderer.shadowMap.enabled = !light;
-    this.camera.far = light ? 105 : 160;
+    this.camera.far = this.park === parks[5] ? 1400 : light ? 105 : 160;
+    if (this.park === parks[5]) {
+      this.scene.userData.setAlpstrandDetail?.(q, light);
+      const resolution = q === "hög" ? 2048 : 1024;
+      if(this.sun.shadow.mapSize.x !== resolution) {
+        this.sun.shadow.map?.dispose();
+        this.sun.shadow.map = null;
+        this.sun.shadow.mapSize.set(resolution,resolution);
+      }
+      this.renderer.setPixelRatio(Math.min(devicePixelRatio || 1,light ? 1 : q === "medel" ? 1.25 : 1.65));
+    }
     this.resize();
   }
   resize() {
@@ -531,7 +556,7 @@ export class World {
   draw(p, k, dt) {
     this.sunnyRider.update(p, k, dt, this.snap);
     this.scene.userData.lightAvenue?.(p.x,p.z);
-    const ground = height(this.park, p.x, p.z);
+    const ground = height(this.park, p.x, p.z, this.park === parks[5] ? p.y+.65 : Infinity);
     this.blob.position.set(p.x, ground + 0.027, p.z);
     this.blob.material.opacity = clamp(1 - (p.y - ground) * 0.16, 0.22, 1);
     if (this.snap) this.rampView=null;
@@ -543,6 +568,7 @@ export class World {
     if (view) {
       const tr=view.transition, axis=tr.across?p.x:p.z;
       const depth=(axis-tr.centerline)*tr.side/(tr.size*.5);
+      if (tr.face && !p.transition) view.returning=true;
       if (!p.transition && (depth<.32 || Math.abs((tr.across?p.z-tr.cz:p.x-tr.cx))>(tr.across?tr.d:tr.w)*.5)) view.returning=true;
       const extra=view.returning?0:2.2+Math.max(0,p.y-ground)*.65;
       view.zoom+=(extra-view.zoom)*(1-Math.exp(-4*dt));
@@ -553,6 +579,7 @@ export class World {
       }
       heading=view.yaw;zoom=view.zoom;
     }
+    if (this.park === parks[5] && !view) zoom = clamp((p.y-ground)*.52,0,6);
     const dist = zoom + (innerWidth < innerHeight ? 6.1 : 5.15) + p.speed * 0.075;
     const sx = Math.sin(heading),
       cz = Math.cos(heading);
@@ -574,7 +601,7 @@ export class World {
       this.camera.position.y,
       height(this.park, this.camera.position.x, this.camera.position.z) + 0.65,
     );
-    if(view) {
+    if(view || this.park === parks[5]) {
       // Clear the entire sightline, including the coping between camera and skater.
       const eye=this.camera.position;
       let safeY=eye.y;
@@ -586,6 +613,7 @@ export class World {
       eye.y=safeY;
     }
     this.camera.lookAt(this.focus);
+    this.scene.userData.updateAlpstrandDetail?.(this.camera.position);
     this.snap = false;
     this.renderer.render(this.scene, this.camera);
   }
