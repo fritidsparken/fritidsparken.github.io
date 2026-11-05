@@ -8,7 +8,30 @@ function plankTexture(){
  g.fillStyle='#493b32';g.fillRect(0,j*32,512,1);for(const x of [9,502]){g.fillRect(x,j*32+8,2,2);g.fillRect(x,j*32+24,2,2);}}
  const t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;t.wrapS=t.wrapT=T.RepeatWrapping;t.anisotropy=4;return t;
 }
+function lightBigQuarter(scene,box,bar){
+ const [,cx,cz,width,depth,height]=riverside.shapes.find(shape=>shape[0]==='mega');
+ const lipZ=cz-depth*.43, poleZ=lipZ-1, lampZ=lipZ+2.8, top=height+8;
+ const left=cx-width/2-1.2,right=cx+width/2+1.2,steel=0x48555a;
+ for(const x of [left,right]){
+   box(0x677477,x,.18,poleZ,.85,.36,.85);
+   bar([x,0,poleZ],[x,top,poleZ],.26,steel);
+   bar([x,top,poleZ],[x,top,lampZ],.18,steel);
+   bar([x,top-2,poleZ],[x,top,lampZ],.12,steel);
+ }
+ bar([left,top,lampZ],[right,top,lampZ],.22,steel);
+ const lensGeometry=new T.PlaneGeometry(1.25,.65);
+ const lensMaterial=new T.MeshBasicMaterial({color:0xffe9bf});
+ for(const x of [cx-width*.32,cx,cx+width*.32]){
+   box(steel,x,top-.23,lampZ,1.5,.38,.88);
+   const lens=new T.Mesh(lensGeometry,lensMaterial);
+   lens.rotation.x=Math.PI/2;lens.position.set(x,top-.43,lampZ);
+   const light=new T.SpotLight(0xffe9c5,72,32,.68,.48,1.35);
+   light.position.copy(lens.position);light.target.position.set(x,0,lampZ);
+   scene.add(lens,light,light.target);
+ }
+}
 export function buildAvenue(scene,box,bar,low){
+ lightBigQuarter(scene,box,bar);
  const lamps=originalLamps.slice();
  // Add lighting at open areas and along the park boundary, clear of obstacles and rails.
  for(const z of [-50,-38,-25,-12,1,14,27,40,50])for(const x of [-53,-40,-27,-14,0,14,28,41,53]){
