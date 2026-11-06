@@ -81,7 +81,7 @@ function paint(canvas){
    }
    tc.putImageData(frame,0,0);
    const x=LEFT+i*(PW+GAP);ctx.drawImage(tile,x+2,renderTop+2);
-   
+
    rounded(ctx,x,renderTop,PW,PH,17);
    if(missingNumbers.has(file)){
     const cx=x+44,cy=renderTop+43;ctx.beginPath();ctx.arc(cx,cy,34,0,Math.PI*2);
@@ -110,4 +110,104 @@ function mount(root){
 const observer=new MutationObserver(records=>records.forEach(rec=>rec.addedNodes.forEach(n=>{if(n.nodeType===1)mount(n)})));
 observer.observe(document.body,{childList:true,subtree:true});
 mount(document);
+})();
+
+// Pilot: only the cat dialog gets the paced, stroke-by-stroke lesson.
+(()=>{
+ const NS='http://www.w3.org/2000/svg';
+ const head='M72 122 C72 48 208 48 208 122 C208 190 72 190 72 122 Z';
+ const body='M106 177 C76 201 75 264 100 282 C119 295 162 295 180 282 C205 255 192 196 172 177 C154 161 124 161 106 177 Z';
+ const tail='M180 330 C232 330 252 303 241 265 C234 241 229 222 249 207 C211 201 201 234 211 266 C222 300 210 310 182 309';
+ const ears=['M77 97 Q61 61 66 25 Q94 34 117 66','M167 66 Q190 36 215 25 Q220 65 204 98','M79 78 L77 43 Q96 52 103 65','M181 66 Q195 50 205 43 L202 80'];
+ const outline='M76 98 Q66 114 70 133 L59 142 L72 142 L61 153 L78 151 Q92 169 113 173 L124 179 L132 175 L142 180 L153 175 Q185 174 204 154 L220 156 L209 145 L223 145 L209 133 Q211 111 203 98';
+ const feet=['M101 191 Q83 211 76 270 Q64 302 86 321','M177 192 Q196 215 203 276 Q212 302 190 320','M101 257 L113 320','M177 257 L165 320','M113 320 C74 305 68 343 107 341 C129 340 135 325 113 320 Z','M165 320 C139 311 137 340 165 341 C201 342 203 316 165 320 Z'];
+ const eyes=['M91 126 C89 97 119 96 121 123 C124 146 94 147 91 126 Z','M161 123 C163 96 193 97 191 126 C188 147 158 146 161 123 Z'];
+ const pupils=['M101 125 C99 107 116 106 116 124 C117 141 101 142 101 125 Z','M166 124 C166 106 183 107 181 125 C181 142 165 141 166 124 Z'];
+ const nose='M132 144 Q141 138 150 144 Q149 151 141 154 Q133 151 132 144 Z';
+ const chest='M105 179 L96 193 L105 190 L91 211 L105 205 L99 226 L111 219 L108 241 L122 231 L123 252 L136 241 L141 263 L149 242 L162 251 L161 230 L175 240 L171 217 L184 225 L177 204 L187 210 L177 190 L182 192 L171 178';
+ const whiskers=['M111 153 Q86 142 59 145','M111 159 L54 159','M110 164 L63 177','M172 153 Q197 142 224 145','M172 159 L229 159','M173 164 L220 177'];
+ const steps=[
+  {text:'Rita ett runt huvud, en oval kropp och lätta hjälplinjer.',paths:[head,body,'M141 57 L141 294','M68 122 L213 122'],guide:true},
+  {text:'Rita spetsiga öron, kinder, tassar och en böjd svans.',paths:[...ears,outline,...feet,tail]},
+  {text:'Rita ögon, nos, mun, morrhår och pälsen på bröstet.',paths:[...eyes,nose,'M141 154 L141 162 Q130 175 121 162','M141 162 Q152 175 161 162','M96 91 Q109 80 119 91','M162 91 Q173 80 186 91',...whiskers,chest,'M119 66 L127 62 L121 56 L136 62 L132 54 L149 63']},
+  {text:'Sudda hjälplinjerna och förstärk ögon och små detaljer.',paths:[...pupils,'M88 324 Q82 332 88 338','M99 322 Q93 332 99 340','M160 322 Q154 332 160 340','M174 322 Q168 332 174 340']},
+  {text:'Färglägg pälsen grå, bröstet vitt och öronen rosa.',colors:true}
+ ];
+ function element(name,attrs={}){const e=document.createElementNS(NS,name);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));return e}
+ function mountLesson(canvas){
+  const holder=canvas.closest('.draw-modal-guides');
+  if(!holder||holder.querySelector('.cat-lesson'))return;
+  holder.closest('.draw-modal').classList.add('cat-pilot');
+  if(!document.getElementById('cat-lesson-style')){
+   const style=document.createElement('style');style.id='cat-lesson-style';style.textContent=`
+.cat-pilot .draw-modal-guides{grid-column:1/-1!important;background:#182b21!important;padding:14px!important}.cat-pilot .draw-instructions{grid-column:1/-1!important;grid-row:auto!important;color:var(--ink)!important}.cat-pilot .draw-modal-title p{color:var(--muted)!important}.cat-lesson{margin:20px 0 0;color:#fff4e2}.cat-lesson h3{font-size:20px;margin:0 0 8px}.cat-lesson p{line-height:1.5}.cat-lesson-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;align-items:start}.cat-lesson-card{min-width:0;margin:0}.cat-lesson-board,.cat-lesson-wait{width:100%;aspect-ratio:372/498;border:2px solid #416b4e;border-radius:17px;background:radial-gradient(ellipse at top,#164b34,#082c1d);box-sizing:border-box}.cat-lesson-board{display:block}.cat-lesson-card figcaption{font-size:14px;margin-top:9px;line-height:1.45}.cat-lesson-wait{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:15px;padding:12px;text-align:center}.cat-lesson button{font:inherit;cursor:pointer;border-radius:12px;padding:12px;border:1px solid #709680;background:#f8ae55;color:#18231e;font-weight:750;min-height:44px;white-space:normal}.cat-lesson button:focus-visible{outline:3px solid white;outline-offset:4px}.cat-lesson-replay{margin-top:9px;background:#214e38!important;color:#fff4e2!important;width:100%;font-size:13px!important}.cat-lesson-status{min-height:1.5em;color:#f6d5a5}.cat-lesson [hidden]{display:none!important}@media(max-width:760px){.cat-lesson-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:380px){.cat-lesson-grid{grid-template-columns:1fr}}`;
+   document.head.append(style);
+  }
+  const section=document.createElement('section');section.className='cat-lesson';section.setAttribute('aria-label','Rita katten med animation');
+  section.innerHTML='<h3>Rita med mig – katten</h3><p>Följ pennan och rita på ditt papper. Nästa steg väntar tills du är klar.</p><div class="cat-lesson-grid"></div><p class="cat-lesson-status" role="status" aria-live="polite"></p>';
+  // The site's dialog backdrop delegates close clicks: keep lesson clicks inside it.
+  section.addEventListener('click',e=>e.stopPropagation());holder.append(section);
+  const grid=section.querySelector('.cat-lesson-grid'),status=section.querySelector('.cat-lesson-status');
+  let frame=0,playing=false,completed=-1,disposed=false;
+  const cleanup=new MutationObserver(()=>{if(!section.isConnected){disposed=true;cancelAnimationFrame(frame);cleanup.disconnect();}});
+  cleanup.observe(document.body,{childList:true,subtree:true});
+
+  function path(svg,d,attrs={}){const p=element('path',{d,fill:'none',stroke:'#f4ead3','stroke-width':2.3,'stroke-linecap':'round','stroke-linejoin':'round',...attrs});svg.append(p);return p}
+  function render(index,svg){
+   const active=[];
+   if(index>=4){
+    [[tail,'#8c8e91'],['M106 177 C83 211 82 242 76 270 Q64 302 86 321 L107 336 L165 336 L190 320 Q212 302 203 276 Q196 215 172 177 Z','#8c8e91'],[head,'#8c8e91'],['M77 97 L66 25 L117 66 Z','#8c8e91'],['M167 66 L215 25 L204 98 Z','#8c8e91'],['M79 78 L77 43 L103 65 Z','#eda79d'],['M181 66 L205 43 L202 80 Z','#eda79d'],[chest+' Z','#fff4db'],[feet[4],'#fff4db'],[feet[5],'#fff4db'],[nose,'#eda79d']].forEach(([d,fill])=>{const p=path(svg,d,{fill,stroke:'none',opacity:0});active.push({p,color:true})});
+   }
+   steps.slice(0,Math.min(index+1,4)).forEach((step,i)=>step.paths.forEach((d,j)=>{
+    if(index>=3&&i===0)return; // Remove construction lines before inking.
+    if(index>=3&&i===1&&j===4)path(svg,'M77 98 Q72 68 118 66 Q141 60 168 66 Q202 70 204 98');
+    const p=path(svg,d,{...(i===0?{opacity:.55,'stroke-width':1.5}:{}),...(i===3&&j<2?{fill:'#131b19'}:{})});
+    if(i===index)active.push({p});
+   }));
+   if(index>=3){path(svg,'M107 115 L109 115 M173 115 L175 115',{'stroke-width':6,stroke:'#fff'})}
+   return active;
+  }
+  function play(index,card,replay=false){
+   if(playing||disposed)return;playing=true;
+   section.querySelectorAll('.cat-lesson-replay').forEach(b=>b.disabled=true);
+   const next=grid.querySelector('.cat-lesson-wait');if(next)next.hidden=true;
+   card.innerHTML='';
+   const svg=element('svg',{viewBox:'0 0 280 375',class:'cat-lesson-board',role:'img','aria-label':'Katten, ritsteg '+(index+1)});card.append(svg);
+   const circle=element('circle',{cx:25,cy:25,r:19,fill:'#ff791e'}),num=element('text',{x:25,y:32,'text-anchor':'middle',fill:'#fff','font-size':23,'font-family':'system-ui','font-weight':700});num.textContent=index+1;svg.append(circle,num);
+   const active=render(index,svg);
+   active.forEach(a=>{if(!a.color){a.length=a.p.getTotalLength();a.p.style.strokeDasharray=a.length;a.p.style.strokeDashoffset=a.length;if(a.p.getAttribute('fill')!=='none'){a.fill=a.p.getAttribute('fill');a.p.setAttribute('fill','none')}}});
+   const pen=element('circle',{r:4,fill:'#ffbf63',stroke:'#fff','stroke-width':1});svg.append(pen);
+   const caption=document.createElement('figcaption');caption.textContent=(index+1)+'. '+steps[index].text;card.append(caption);
+   status.textContent='Steg '+(index+1)+' av 5 – följ pennan.';
+   let item=0,elapsed=0,last=0;
+   function tick(now){
+    if(disposed||!section.isConnected)return;
+    const dt=last?now-last:0;last=now;
+    if(!document.hidden)elapsed+=dt;
+    const a=active[item],duration=a.color?700:Math.max(650,Math.min(2800,a.length*9));
+    const progress=Math.min(1,elapsed/duration);
+    if(a.color){a.p.setAttribute('opacity',progress);pen.setAttribute('visibility','hidden')}
+    else{a.p.style.strokeDashoffset=a.length*(1-progress);const pt=a.p.getPointAtLength(a.length*progress);pen.setAttribute('cx',pt.x);pen.setAttribute('cy',pt.y)}
+    if(progress===1){if(a.fill)a.p.setAttribute('fill',a.fill);item++;elapsed=0}
+    if(item<active.length){frame=requestAnimationFrame(tick);return}
+    pen.remove();playing=false;completed=Math.max(completed,index);
+    const repeat=document.createElement('button');repeat.type='button';repeat.className='cat-lesson-replay';repeat.textContent='Visa steget igen';repeat.addEventListener('click',()=>play(index,card,true));card.append(repeat);
+    section.querySelectorAll('.cat-lesson-replay').forEach(b=>b.disabled=false);
+    if(next)next.hidden=false;
+    if(!replay&&index<4)addWait(index+1);
+    status.textContent=completed===4?'Alla fem steg är klara. Fint jobbat!':'Paus – rita färdigt i din egen takt. Tryck sedan på ”Okej, jag är klar”.';
+   }
+   frame=requestAnimationFrame(tick);
+  }
+  function addWait(index){
+   const slot=document.createElement('div');slot.className='cat-lesson-wait';
+   const label=document.createElement('span');label.textContent='Redo för steg '+(index+1)+'?';
+   const button=document.createElement('button');button.type='button';button.textContent='Okej, jag är klar';
+   button.addEventListener('click',()=>{if(playing)return;const card=document.createElement('figure');card.className='cat-lesson-card';slot.replaceWith(card);play(index,card);card.tabIndex=-1;card.focus({preventScroll:true});card.scrollIntoView({block:'nearest',behavior:'smooth'})});
+   slot.append(label,button);grid.append(slot);
+  }
+  const first=document.createElement('figure');first.className='cat-lesson-card';grid.append(first);play(0,first);
+ }
+ function scan(){document.querySelectorAll('.draw-modal-guides canvas[data-drawing-guide="katt"]').forEach(mountLesson)}
+ new MutationObserver(scan).observe(document.body,{childList:true,subtree:true});scan();
 })();
