@@ -1,3 +1,4 @@
+import {eggs} from '../entities/mutations.js';
 import * as db from '../persistence/worlds.js';
 import {recipes} from '../inventory/recipes.js';
 const $=id=>document.getElementById(id);
@@ -50,12 +51,38 @@ export function panels(api){
   const library=btn(creative?'Alla material':'Mina föremål',()=>{tab='library';pack()});
   const craft=btn('Tillverka',()=>{tab='craft';pack()});
   library.setAttribute('aria-pressed',String(tab==='library'));craft.setAttribute('aria-pressed',String(tab==='craft'));
-  tabs.append(library);if(!api.shared())tabs.append(craft);
+  tabs.append(library);if(!api.shared()){tabs.append(craft);const lab=btn('🥚 Varelselabb',()=>{tab='lab';pack()});lab.setAttribute('aria-pressed',String(tab==='lab'));tabs.append(lab)}
   if(creative&&!api.shared()){
    const actions=select([['','Byggverktyg…'],['mark','Markera hörn'],['paste','Klistra in bygge']],'');
    actions.setAttribute('aria-label','Byggverktyg');
    actions.onchange=()=>{if(actions.value){const result=api.blueprint(actions.value);close();api.toast(result)}};
    tabs.append(actions);
+  }
+  if(tab==='lab'){
+   hint.textContent='Kombinera ägg och kläck en helt galen följeslagare!';
+   const selection={},summary=el('strong'),status=el('p');status.setAttribute('role','status');
+   const available=eggs.filter(e=>creative||m.bag[e.id]>0);
+   const create=btn('Kläck varelse ✨',()=>{
+    try{const result=api.hatch(selection);status.textContent=result.message;if(result.ok){for(const id of Object.keys(selection))delete selection[id];draw()}}catch(e){status.textContent=e.message}
+   });create.className='gold';
+   const all=btn('Lägg ihop alla ägg',()=>{for(const e of available)selection[e.id]=creative?1:Math.min(999,m.bag[e.id]||0);draw()});
+   tools.append(all,btn('Töm blandningen',()=>{for(const id of Object.keys(selection))delete selection[id];draw()}));
+   const footer=el('div');footer.className='lab-footer';footer.append(summary,create,status);frame.append(footer);
+   function draw(){
+    list.replaceChildren();let total=0;
+    for(const e of available){
+     const owned=creative?999:m.bag[e.id]||0,n=selection[e.id]||0;total+=n;
+     const row=el('div');row.className='lab-egg';
+     const title=el('strong','🥚 '+e.name);title.append(el('small',creative?'Obegränsat i kreativt läge':owned+' i ryggsäcken'));
+     const minus=btn('−',()=>{selection[e.id]=Math.max(0,n-1);draw()}),plus=btn('+',()=>{selection[e.id]=n+1;draw()});
+     minus.setAttribute('aria-label','Ta bort '+e.name);plus.setAttribute('aria-label','Lägg till '+e.name);minus.disabled=!n;plus.disabled=n>=Math.min(999,owned);
+     row.append(title,minus,el('span',String(n)),plus);list.append(row);
+    }
+    summary.textContent=total+' ägg i blandningen';create.disabled=!total||m.quiet;all.disabled=!available.length;
+    if(!available.length)list.append(el('p','Inga ägg ännu! Varelser lämnar mat och ett ägg när de dör. Gå nära ägget för att samla upp det.'));
+    if(m.quiet)status.textContent='Slå på djurliv i Inställningar för att kläcka varelser.';
+   }
+   draw();return;
   }
   const search=el('input');search.type='search';search.placeholder=tab==='craft'?'Sök recept':'Sök block eller föremål';
   search.setAttribute('aria-label',search.placeholder);tools.append(search);

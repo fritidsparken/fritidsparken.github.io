@@ -1,3 +1,4 @@
+import {mutationModel,mutationTraits} from './mutations.js';
 import {loadProps} from './props.js';
 // Loader for the deliberately small rigged-GLB subset written by actors.py.
 // Mesh buffers, materials, and animation clips are shared between instances.
@@ -115,7 +116,7 @@ export async function withFaunaFood(kit) {
 }
 const speciesNames = {ko:'Ko',far:'Får',gris:'Gris',hona:'Höna',hast:'Häst',kanin:'Kanin',
   rav:'Räv',varg:'Varg',bjorn:'Björn',fisk:'Fisk',lyktmott:'Lyktmott',mosslynx:'Mosslo',
-  skifferbagge:'Skifferbagge',korallvandrare:'Korallvandrare',rimfena:'Rimfena'};
+  skifferbagge:'Skifferbagge',korallvandrare:'Korallvandrare',rimfena:'Rimfena',mutation:'Galning'};
 const validKey = key => /^-?\d{1,8},-?\d{1,8}$/.test(key);
 export function sanitizeFauna(value) {
   const removed = [...new Set((Array.isArray(value?.removed) ? value.removed : []).filter(k=>typeof k==='string' && validKey(k)))];
@@ -123,7 +124,7 @@ export function sanitizeFauna(value) {
   for(const [key,record] of Object.entries(value?.pets || {})) {
     if(!validKey(key)||dead.has(key)||!Object.hasOwn(speciesNames,record?.id))continue;
     if(![record.x,record.y,record.z].every(n=>Number.isFinite(n)&&Math.abs(n)<1e7))continue;
-    pets[key]={id:record.id,x:record.x,y:record.y,z:record.z};
+    pets[key]={id:record.id,x:record.x,y:record.y,z:record.z,...(record.id==='mutation'?{seed:record.seed>>>0}:{})};
   }
   return {removed,pets};
 }
@@ -151,24 +152,23 @@ export function createActors({scene, ground, seed = 0, waterLevel = -Infinity, b
     }
     return templates.get(id);
   }
-  function spawn(key, id, x, y, z, r, tamed = false) {
+  function spawn(key, id, x, y, z, r, tamed = false, mutationSeed = 0) {
     const entry = {key, id, x, y, z, yaw:r * Math.PI * 2, timer:1 + 2*r, state:'idle',
       decisions:0, r, tamed, velocity:0, health:2, nextHit:-Infinity};
     actors.set(key, entry);
-    template(id).then(asset => {
+    (id==='mutation'?Promise.resolve({instantiate:()=>mutationModel(mutationSeed)}):template(id)).then(asset => {
       if (disposed || actors.get(key) !== entry) return;
       entry.model = asset.instantiate();
       const root=entry.model.root;
       root.name=speciesNames[id];root.userData.faunaKey=key;
       root.scale.setScalar(.9 + r*.19);
       root.position.set(x,y,z);root.rotation.y=entry.yaw;
-      root.traverse(node=>{if(node.isSkinnedMesh){node.userData.faunaKey=key;entry.mesh=node;pickMeshes.push(node);}});
+      root.traverse(node=>{if(node.isMesh){node.userData.faunaKey=key;(entry.meshes??=[]).push(node);pickMeshes.push(node);}});
       scene.add(root);
     }).catch(error => {if (!disposed) console.warn('Blockvärlden: djurmodellen kunde inte laddas',error);});
   }
   function despawn(a) {
-    const i=pickMeshes.indexOf(a.mesh);
-    if(i!==-1)pickMeshes.splice(i,1);
+    for(const mesh of a.meshes||[]){const i=pickMeshes.indexOf(mesh);if(i!==-1)pickMeshes.splice(i,1);}
     a.model?.dispose();actors.delete(a.key);
   }
   // Find the support below this animal, not the roof of a tunnel above it.
@@ -192,7 +192,7 @@ export function createActors({scene, ground, seed = 0, waterLevel = -Infinity, b
     for(const [key,pet] of Object.entries(state.pets)){
       if(!actors.has(key)&&Math.hypot(p.x-pet.x,p.z-pet.z)<33&&Number.isFinite(ground(pet.x,pet.z))){
         const [cx,cz]=key.split(',').map(Number);
-        spawn(key,pet.id,pet.x,pet.y,pet.z,hash(cx,cz,seedHash),true);
+        spawn(key,pet.id,pet.x,pet.y,pet.z,hash(cx,cz,seedHash),true,pet.seed);
       }
     }
     const cell=17,cx=Math.floor(p.x/cell),cz=Math.floor(p.z/cell),candidates=[];
@@ -309,6 +309,23 @@ export function createActors({scene, ground, seed = 0, waterLevel = -Infinity, b
       }
       for(const a of actors.values())updateAnimal(a,dt,p);
     },
+    hatch(seed,p) {
+      if(quiet||disposed)return {ok:false,message:'Slå på djurliv i Inställningar först.'};
+      if(Object.keys(state.pets).length>=24)return {ok:false,message:'Du har redan 24 följeslagare i världen.'};
+      let spot;
+      for(const [dx,dz] of [[2,0],[-2,0],[0,2],[0,-2],[2,2],[-2,-2]]){
+        const x=p.x+dx,z=p.z+dz,y=ground(x,z);
+        if(!Number.isFinite(y)||y<waterLevel||Math.abs(y-p.y)>3)continue;
+        if(blockAt&&[.5,1.5,2.5].some(h=>isSolid(blockAt(x,y+h,z))))continue;
+        spot={x,y,z};break;
+      }
+      if(!spot)return {ok:false,message:'Gå till en öppen, torr plats innan du kläcker.'};
+      let n=1;while(state.pets['-99999999,'+n]||removed.has('-99999999,'+n))n++;
+      const key='-99999999,'+n;
+      state.pets[key]={id:'mutation',...spot,seed:seed>>>0};
+      spawn(key,'mutation',spot.x,spot.y,spot.z,.5,true,seed);
+      return {ok:true,message:mutationTraits(seed).name+' är kläckt och följer dig!'};
+    },
     hit(raycaster,maxDistance=7) {
       if(quiet||disposed||!pickMeshes.length)return null;
       const hits=raycaster.intersectObjects(pickMeshes,false);
@@ -337,7 +354,7 @@ export function createActors({scene, ground, seed = 0, waterLevel = -Infinity, b
       removed.add(key);state.removed.push(key);delete state.pets[key];
       const drop={id:faunaFood.id,count:['ko','hast','bjorn'].includes(a.id)?2:1,p:[a.x,a.y+.2,a.z]};
       despawn(a);
-      return {message:speciesNames[a.id]+' lämnade viltproviant.',killed:true,drop};
+      return {message:speciesNames[a.id]+' lämnade mat och ett ägg!',killed:true,drop,egg:{id:'egg_'+a.id,count:1,p:[a.x+.4,a.y+.2,a.z]}};
     },
     dispose() {
       if(disposed)return;
