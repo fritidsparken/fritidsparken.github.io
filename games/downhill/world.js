@@ -1,7 +1,7 @@
 const T = THREE,
   V = (x = 0, y = 0, z = 0) => new T.Vector3(x, y, z);
 const themes = {
-  meadow: [0x90c8e0, 0x779447, 0xa28355, 0x345a39],
+  meadow: [0x84d4f4, 0x84bc32, 0xc68d47, 0x579f20],
   pine: [0x8dafbc, 0x566348, 0x796449, 0x264735],
   rock: [0xa6cce2, 0x787a70, 0x958979, 0x525d53],
   jungle: [0xb8d3bb, 0x5d7640, 0x786047, 0x285e3e],
@@ -208,6 +208,7 @@ function reflectionMap(horizon, night) {
   return t;
 }
 function world(scene, c) {
+  const quality = document.getElementById("quality")?.value || "medium";
   const r = rng(842 + c.id),
     [sky, land, dirt, tree] = themes[c.theme],
     night = c.night && !["sunset", "fog"].includes(c.theme),
@@ -231,19 +232,19 @@ function world(scene, c) {
   scene.background = horizon;
   scene.fog = new T.FogExp2(
     horizon,
-    c.theme === "fog" ? 0.019 : night ? 0.008 : 0.0045,
+    c.theme === "fog" ? 0.019 : night ? 0.008 : 0.0028,
   );
   const root = new T.Group();
   scene.add(root);
   const hemi = new T.HemisphereLight(
     night ? 0xbddeff : 0xfff5dc,
     night ? 0x62677e : 0x8a9072,
-    night ? 1.35 : 1.6,
+    night ? 1.35 : 1.35,
   );
   root.add(hemi);
   const sun = new T.DirectionalLight(
     night ? 0xc0d8ff : 0xffe0b0,
-    night ? 1.1 : 2.05,
+    night ? 1.1 : 2.3,
   );
   sun.castShadow = true;
   sun.shadow.mapSize.set(1024, 1024);
@@ -266,7 +267,7 @@ function world(scene, c) {
         low: { value: horizon },
         high: {
           value: new T.Color(
-            night ? 0x08132c : c.theme === "sunset" ? 0x645c87 : 0x4c92c5,
+            night ? 0x08132c : c.theme === "sunset" ? 0x645c87 : 0x279be6,
           ),
         },
         dark: { value: night ? 1 : 0 },
@@ -400,8 +401,15 @@ function world(scene, c) {
     basin.position.y = c.base(c.len) - 22;
     basin.castShadow = false;
   }
-  ribbon(false);
-  ribbon(true);
+  const landscape = ribbon(false), trail = ribbon(true);
+  if (!stone && !city && !snow) {
+    landscape.material.color.set(land);
+    landscape.material.map = texture("land", 91);
+    landscape.material.normalScale.set(.24, .24);
+    trail.material.color.set(0xe0a55f);
+    trail.material.map = texture("trail", 94);
+    trail.material.normalScale.set(.28, .28);
+  }
   // Batch scenery by material and geometry, including wheelside details, to bound draw calls.
   const batches = new Map(),
     dummy = new T.Object3D();
@@ -416,7 +424,29 @@ function world(scene, c) {
     z1: Math.max(...spine.map((p) => p[1])),
   };
   function item(key, g, m, x, y, z, sx, sy, sz, rx = 0, ry = 0, rz = 0, color) {
-    if (!batches.has(key)) batches.set(key, { g, m, items: [] });
+    // Replace visual primitives with Blender-authored families. Never alter course collision data.
+    if (["stem", "petal", "pollen"].includes(key) && c.theme !== "haunted") return;
+    let assetName;
+    if (key === "bark") return; // trunk is part of the complete Blender tree
+    if (key.startsWith("crown")) {
+      assetName = kind === "palm" ? "palm" : kind === "oak" ? "oak" : "spruce" + key.slice(-1);
+      const height = kind === "palm" ? 5.2 : kind === "oak" ? 5.2 : 6.5;
+      sx /= height; sy /= height; sz /= height;
+      if (snow) color = new T.Color(0xc4e4f4);
+    } else if (key.startsWith("massif")) assetName = "mountain" + key.slice(-1);
+    else if (["plank", "bank", "handrail"].includes(key)) assetName = "plank";
+    else if (["post", "trestle"].includes(key)) assetName = "post";
+    else if (["rock", "verge", "arch", "obstacle"].includes(key)) assetName = "rock";
+    else if (key.startsWith("asset:")) assetName = key.slice(6);
+    if (assetName) {
+      const asset = DownhillAssets.mesh(assetName);
+      if (!asset) throw new Error("Missing Blender scenery: " + assetName);
+      g = asset.geometry; m = asset.material;
+      if (!snow && !stone && assetName === "rock") color = undefined;
+    }
+    const routeS = -z;
+    const distant = key.startsWith("massif");
+    const batchKey = distant ? key : key + ":chunk:" + Math.floor(routeS/32);
     if (c.bend) {
       if (key.startsWith("massif")) {
         let angle = ry,
@@ -443,7 +473,8 @@ function world(scene, c) {
     dummy.rotation.set(rx, ry, rz);
     dummy.scale.set(sx, sy, sz);
     dummy.updateMatrix();
-    batches.get(key).items.push([dummy.matrix.clone(), color]);
+    if (!batches.has(batchKey)) batches.set(batchKey, { g, m, items: [], assetName, distant, s:Math.floor(routeS/32)*32+16 });
+    batches.get(batchKey).items.push([dummy.matrix.clone(), color]);
   }
   const box = new T.BoxGeometry(1, 1, 1),
     ell = new T.IcosahedronGeometry(1, 1),
@@ -501,6 +532,9 @@ function world(scene, c) {
       y = ridge(s, l),
       z = -s,
       sz = 0.7 + r() * 1.55;
+    if (forest && !snow && k % 3 === 0) {
+      item("asset:bush", null, null, x, y, z, sz, sz, sz, 0, r()*6, 0);
+    }
     if (city) {
       if (k % 4) continue;
       let height = 5 + r() * 22;
@@ -582,6 +616,10 @@ function world(scene, c) {
       l = (c.half(s) + 0.2 + r() * 3) * (r() < 0.5 ? -1 : 1),
       x = c.center(s) + l,
       y = ridge(s, l);
+    if (forest && !snow) {
+      item("asset:grass", null, null, x, y, -s, 1.6, 1.6, 1.6, 0, r()*6, 0);
+      if (k % 3 === 0) item("asset:flowers" + (k % 9 / 3 | 0), null, null, x, y, -s, 1.45, 1.45, 1.45, 0, r()*6, 0);
+    }
     item(
       "verge",
       ell,
@@ -707,13 +745,21 @@ function world(scene, c) {
     );
   }
   const water = standard(
-    c.theme === "lava" ? 0xff5422 : snow ? 0x8acbdf : 0x32939b,
+    c.theme === "lava" ? 0xff5422 : snow ? 0x8acbdf : 0x21c5d6,
     {
       roughness: 0.22,
       metalness: 0.32,
       emissive: c.theme === "lava" ? 0xca3010 : 0x00131b,
     },
   );
+  const waterTime = {value: 0};
+  water.onBeforeCompile = shader => {
+    shader.uniforms.flowTime = waterTime;
+    shader.vertexShader = 'uniform float flowTime; varying vec3 waterPosition;\n' + shader.vertexShader;
+    shader.vertexShader = shader.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nwaterPosition = position; transformed.y += .045*sin(position.x*2.1+flowTime*1.2)*cos(position.z*.7+flowTime);');
+    shader.fragmentShader = 'uniform float flowTime; varying vec3 waterPosition;\n' + shader.fragmentShader;
+    shader.fragmentShader = shader.fragmentShader.replace('#include <color_fragment>', '#include <color_fragment>\nfloat ripple=pow(max(0.,sin(waterPosition.x*2.+waterPosition.z*3.+flowTime*1.8)),28.); diffuseColor.rgb += ripple*.11;');
+  };
   if (wet) {
     let vs = [],
       ix = [],
@@ -746,7 +792,7 @@ function world(scene, c) {
           box,
           wood,
           x,
-          h + 0.1,
+          h + 0.02,
           -s,
           c.half(s) * 2,
           0.14,
@@ -986,7 +1032,7 @@ function world(scene, c) {
       0.12,
     );
   }
-  if (["jungle", "falls"].includes(c.theme))
+  if (["jungle", "falls", "meadow"].includes(c.theme))
     for (let s = 40; s < c.len; s += 68) {
       let x = c.center(s) + 18;
       for (let k = 0; k < 14; k++)
@@ -1078,15 +1124,18 @@ function world(scene, c) {
         0.04,
       );
   }
-  for (let { g, m, items } of batches.values()) {
+  const sceneryChunks = [];
+  for (let { g, m, items, assetName, distant, s } of batches.values()) {
     let o = new T.InstancedMesh(g, m, items.length);
     items.forEach(([matrix, color], i) => {
       o.setMatrixAt(i, matrix);
       if (color) o.setColorAt(i, color);
     });
-    o.castShadow = true;
+    o.castShadow = !distant;
     o.receiveShadow = true;
+    o.computeBoundingSphere();
     root.add(o);
+    if (!distant) sceneryChunks.push({mesh:o, s, high:g, low:DownhillAssets.mesh(assetName+"_lod")?.geometry});
   }
   // Moving dust, powder or embers stay local to the active rider.
   const dots = 64,
@@ -1135,10 +1184,19 @@ function world(scene, c) {
   }
   const head = new T.SpotLight(0xffedc9, night ? 4.3 : 0, 44, 0.52, 0.5, 0.65);
   root.add(head, head.target);
+  const wildlife = storyWildlife(root, c, ridge, wet, forest);
   return {
     night,
     ridge,
-    update(x, y, s, cam) {
+    update(x, y, s, cam, elapsed = 1/60) {
+      waterTime.value += Math.min(elapsed, .1);
+      wildlife.update(s, waterTime.value);
+      for (const chunk of sceneryChunks) {
+        const distance=Math.abs(s-chunk.s), range=quality==='low'?55:quality==='high'?150:105;
+        chunk.mesh.visible=distance<range;
+        chunk.mesh.geometry=chunk.low && distance>(quality==='high'?70:quality==='medium'?36:0)?chunk.low:chunk.high;
+        chunk.mesh.castShadow=quality!=='low' && distance<40;
+      }
       let [wx, wz] = c.place(x, s),
         [tx, tz] = c.place(c.center(s + 12), s + 12);
       let travel = Math.abs(s - lastS);
@@ -1167,4 +1225,62 @@ function world(scene, c) {
       head.target.position.set(tx, c.base(s + 12), tz);
     },
   };
+}
+
+// Small, deterministic idle/hop/fly states. Animals stay outside the playable ribbon.
+function storyWildlife(root, c, ridge, wet, forest) {
+  const actors = [], lib = DownhillAssets.get('wildlife'), random = rng(1700+c.id);
+  const quality = document.getElementById('quality')?.value || 'medium';
+  const spacing = quality === 'low' ? 65 : quality === 'high' ? 24 : 38;
+  function add(name, s, side, scale) {
+    const prototype = lib.getObjectByName(name);
+    if (!prototype) throw new Error('Missing wildlife: '+name);
+    const object = prototype.clone(true), l = side * (c.half(s)+2.1+random()*1.2);
+    const [x,z] = c.place(c.center(s)+l,s);
+    object.position.set(x,ridge(s,l),z); object.scale.setScalar(scale);
+    object.rotation.y = -c.turn(s) + (side<0 ? -1.1 : 1.1);
+    if (name === 'bird' || name === 'butterfly') object.position.y += name === 'bird' ? 3.6 : .7;
+    root.add(object);
+    const wings = [];
+    object.traverse(n => { if (/wing_[LR]$/.test(n.name)) wings.push(n); });
+    actors.push({object,name,s,origin:object.position.clone(),phase:random()*6.28,wings});
+  }
+  if (forest && !['snow','aurora','haunted'].includes(c.theme)) {
+    for(let s=9;s<c.len;s+=spacing) {
+      add(Math.floor(s/spacing)%2 ? 'squirrel':'rabbit',s,-1,.8+random()*.3);
+      add(Math.floor(s/spacing)%2 ? 'bird':'butterfly',s+5,-1,1);
+      if(wet && Math.floor(s/spacing)%3===0) {
+        const proto=lib.getObjectByName('otter').clone(true);
+        const [x,z]=c.place(c.center(s)+17,s);
+        proto.position.set(x,c.base(s)-7.2,z); proto.scale.setScalar(1.3);root.add(proto);
+        actors.push({object:proto,name:'otter',s,origin:proto.position.clone(),phase:random()*6,wings:[]});
+      }
+    }
+  }
+  // Puffy clouds are real Blender meshes, not camera-facing painted cards.
+  if(!c.night) {
+    const cloud=DownhillAssets.mesh('cloud');
+    const instances=new T.InstancedMesh(cloud.geometry,cloud.material,18), d=new T.Object3D();
+    for(let i=0;i<18;i++) {
+      const s=i*c.len/15, [x,z]=c.place(c.center(s)+(random()-.5)*180,s);
+      d.position.set(x,c.base(s)+55+random()*30,z);d.scale.set(7+random()*5,5,5);d.updateMatrix();instances.setMatrixAt(i,d.matrix);
+    }
+    instances.castShadow=false;root.add(instances);
+  }
+  return { update(s,time) {
+    for(const a of actors) {
+      const near=Math.abs(a.s-s)<(quality==='low'?38:75);a.object.visible=near;if(!near)continue;
+      const t=time+a.phase;
+      a.object.position.copy(a.origin);
+      if(a.name==='rabbit') {
+        // Rest four seconds, then one small in-place hop. Ground anchor never drifts.
+        const phase=t%5;a.object.position.y+=phase>4?Math.sin((phase-4)*Math.PI)*.26:0;
+      } else if(a.name==='bird'||a.name==='butterfly') {
+        a.object.position.y+=Math.sin(t*2)*.18;
+        a.object.position.x+=Math.sin(t*.7)*.35;
+        a.wings.forEach((w,i)=>w.rotation.z=Math.sin(t*(a.name==='bird'?7:12))*.65*(i?-1:1));
+      } else if(a.name==='otter') a.object.position.y+=Math.sin(t*2)*.07;
+      else a.object.rotation.z=Math.sin(t*1.5)*.025;
+    }
+  }};
 }
