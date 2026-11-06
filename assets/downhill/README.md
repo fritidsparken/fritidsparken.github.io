@@ -8,4 +8,6 @@ Created with Blender 4.3.2 from the supplied Downhill art brief. Original genera
 - `blender/*.blend`: editable source scenes.
 - `../../tools/blender/downhill/*.py`: reproducible source generators, run from Blender background CLI.
 
+Revision MTB Challenge 2: wider knobby tires, broader rider, forward-only face, more saturated scenery palette. Runtime uses full RGB/sRGB rendering, not an indexed or reduced-color palette.
+
 Runtime collision is supplied by existing course geometry; detailed scenery never becomes the physics mesh. Sources are authored for this project; the supplied image guides palette/forms and is not shipped as game geometry. Visual/WebGL acceptance remains pending; see docs/downhill-skill-usage.md.

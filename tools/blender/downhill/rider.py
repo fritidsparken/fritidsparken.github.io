@@ -50,12 +50,12 @@ def join_children(parent):
   bpy.ops.object.transform_apply(location=True,rotation=True,scale=True)
 root=empty('RiderAsset')
 frame=empty('Frame',parent=root)
-rear=(0,.395,.65); front=(0,.395,-.72); seat=(0,1.02,.22); axle=(0,.42,0); neck=(0,1.0,-.48)
+rear=(0,.425,.65); front=(0,.425,-.72); seat=(0,1.02,.22); axle=(0,.42,0); neck=(0,1.0,-.48)
 for s in [-1,1]:
- bar('Chainstay',(s*.095,.395,.65),axle,.031,orange,frame)
- bar('Seatstay',(s*.095,.395,.65),seat,.026,orange,frame)
- bar('Fork',(s*.095,.395,-.72),(s*.095,.74,-.61),.035,navy,frame)
- bar('Stanchion',(s*.095,.72,-.61),(s*.095,1.0,-.48),.025,silver,frame)
+ bar('Chainstay',(s*.145,.425,.65),axle,.031,orange,frame)
+ bar('Seatstay',(s*.145,.425,.65),seat,.026,orange,frame)
+ bar('Fork',(s*.155,.425,-.72),(s*.155,.74,-.61),.035,navy,frame)
+ bar('Stanchion',(s*.155,.72,-.61),(s*.155,1.0,-.48),.025,silver,frame)
 bar('Downtube',axle,neck,.061,orange,frame); bar('Seattube',axle,seat,.046,orange,frame); bar('TopTube',neck,seat,.05,orange,frame)
 bar('Seatpost',seat,(0,1.14,.25),.026,silver,frame)
 ball('Saddle',(0,1.15,.25),(.14,.05,.20),navy,frame)
@@ -65,9 +65,9 @@ for i in range(8):
  ring('Spring',(0,.59+i*.021,.11+i*.01),.042,.009,gold,frame)
 bar('Damper',(0,.55,.10),(0,.84,.24),.022,silver,frame)
 ball('Bottle',(0,.74,-.06),(.046,.14,.05),blue,frame)
-for sy in [-1,1]: bar('Chain',(.11,.42+sy*.105,0),(.11,.395+sy*.065,.65),.008,silver,frame)
+for sy in [-1,1]: bar('Chain',(.11,.42+sy*.105,0),(.13,.425+sy*.065,.65),.008,silver,frame)
 ring('Chainring',(.115,.42,0),.105,.012,silver,frame)
-ring('Cassette',(.115,.395,.65),.065,.014,silver,frame)
+ring('Cassette',(.13,.425,.65),.065,.014,silver,frame)
 # Brake cable follows a curved spline.
 curve=bpy.data.curves.new('BrakeCable','CURVE');curve.dimensions='3D';curve.bevel_depth=.008;curve.bevel_resolution=2
 sp=curve.splines.new('BEZIER');sp.bezier_points.add(3)
@@ -80,32 +80,34 @@ for s in [-1,1]:
  bar('Grip',(s*.25,0,0),(s*.37,0,0),.037,navy,handle)
  bar('BrakeLever',(s*.26,-.035,-.055),(s*.34,-.035,-.06),.011,silver,handle)
 for label,hub in [('RearWheel',rear),('FrontWheel',front)]:
- w=empty(label,hub,root);ring('Tire',(0,0,0),.335,.059,black,w);ring('Rim',(0,0,0),.293,.017,orange,w)
- ring('BrakeDisc',(.065,0,0),.112,.014,silver,w);bar('Hub',(-.07,0,0),(.07,0,0),.032,silver,w)
+ w=empty(label,hub,root);ring('Tire',(0,0,0),.322,.09,black,w);ring('Rim',(0,0,0),.267,.023,orange,w)
+ ring('BrakeDisc',(.065,0,0),.112,.014,silver,w);bar('Hub',(-.155,0,0),(.155,0,0),.032,silver,w)
  for i in range(20):
-  a=i*math.tau/20;bar('Spoke',((i%2*2-1)*.045,0,0),(0,math.cos(a)*.29,math.sin(a)*.29),.004,silver,w,8)
+  a=i*math.tau/20;bar('Spoke',((i%2*2-1)*.045,0,0),(0,math.cos(a)*.267,math.sin(a)*.267),.004,silver,w,8)
  for i in range(40):
   a=i*math.tau/40
-  for s in [-1,1]:
-   o=box('Tread',(s*.028,math.cos(a)*.387,math.sin(a)*.387),(.043,.022,.038),black,w,.005);o.rotation_euler.x=-a
+  for s in [-1,0,1]:
+   # Broad central lugs and offset shoulder knobs on the thicker MTB carcass.
+   radius=.411 if s==0 else .395
+   o=box('Tread',(s*.063,math.cos(a)*radius,math.sin(a)*radius),(.055,.029,.047),black,w,.007);o.rotation_euler.x=-a
  join_children(w)
 for s in [-1,1]:
  cr=empty('CrankL' if s<0 else 'CrankR',(0,.42,0),root)
- bar('Crank',(s*.11,0,0),(s*.15,.15,0),.017,silver,cr)
- box('Pedal',(s*.17,.15,0),(.13,.028,.105),navy,cr,.008);join_children(cr)
+ bar('Crank',(s*.11,0,0),(s*.18,.15,0),.017,silver,cr)
+ box('Pedal',(s*.20,.15,0),(.13,.028,.105),navy,cr,.008);join_children(cr)
 body=empty('Body',parent=root)
-ball('Shorts',(0,1.28,.20),(.255,.20,.22),blue,body)
-ball('Jersey',(0,1.56,.055),(.295,.33,.21),orange,body)
+ball('Shorts',(0,1.28,.20),(.32,.20,.27),blue,body)
+ball('Jersey',(0,1.56,.055),(.369,.33,.26),orange,body)
 # Seams and shoulder panels.
 for s in [-1,1]:
- ball('Sleeve',(s*.255,1.64,-.025),(.105,.14,.14),blue,body)
- bar('PackStrap',(s*.19,1.79,.02),(s*.21,1.34,.23),.032,navy,body)
-ball('Pack',(0,1.57,.275),(.245,.28,.125),blue,body)
-box('PackPocket',(0,1.48,.38),(.30,.15,.07),navy,body,.045)
-bar('PackZip',(-.14,1.59,.397),(.14,1.59,.397),.009,gold,body)
+ ball('Sleeve',(s*.31,1.64,-.025),(.13,.15,.17),blue,body)
+ bar('PackStrap',(s*.23,1.79,.04),(s*.26,1.34,.28),.032,navy,body)
+ball('Pack',(0,1.57,.31),(.275,.28,.14),blue,body)
+box('PackPocket',(0,1.48,.425),(.34,.15,.07),navy,body,.045)
+bar('PackZip',(-.14,1.59,.445),(.14,1.59,.445),.009,gold,body)
 # Star extruded in backpack plane, rounded bevel.
 verts=[]
-for depth in [.395,.425]:
+for depth in [.445,.475]:
  for i in range(10):
   a=math.pi/2+i*math.pi/5;r=.139 if i%2==0 else .064;verts.append(co((math.cos(a)*r,1.67+math.sin(a)*r,depth)))
 faces=[tuple(range(9,-1,-1)),tuple(range(10,20))]+[(i,(i+1)%10,(i+1)%10+10,i+10) for i in range(10)]
@@ -114,39 +116,34 @@ ball('Neck',(0,1.80,-.09),(.11,.13,.11),skin,body)
 ball('Face',(0,1.995,-.15),(.29,.295,.27),skin,body,24,16)
 for s in [-1,1]:
  ball('Ear',(s*.283,1.975,-.12),(.062,.095,.065),skin,body)
- ball('EyeWhite',(s*.10,2.045,-.393),(.068,.085,.028),white,body)
- ball('Eye',(s*.10,2.045,-.416),(.033,.049,.015),pupil,body)
- ball('EyeGlint',(s*.10-.01,2.067,-.429),(.011,.014,.007),white,body)
+ ball('EyeWhite',(s*.10,2.015,-.393),(.068,.077,.028),white,body)
+ ball('Eye',(s*.10,2.015,-.416),(.033,.049,.015),pupil,body)
+ ball('EyeGlint',(s*.10-.01,2.037,-.429),(.011,.014,.007),white,body)
 ball('Nose',(0,1.99,-.427),(.05,.052,.046),skin,body)
 ball('Smile',(0,1.915,-.394),(.061,.025,.017),hair,body)
 # Curled brown fringe at rear silhouette under helmet.
-for i in range(11):
- a=i*math.tau/11;ball('HairCurl',(math.cos(a)*.255,1.92,-.13+math.sin(a)*.23),(.09,.12,.078),hair,body)
-ball('Helmet',(0,2.155,-.145),(.345,.275,.32),orange,body,24,16)
-ball('HelmetRim',(0,2.055,-.15),(.349,.067,.325),orange,body,24,10)
-# Friendly cartoon graphics on rear of helmet, visible from follow camera.
-for s in [-1,1]:
- ball('HelmetEyeWhite',(s*.12,2.19,.14),(.061,.083,.018),white,body)
- ball('HelmetEye',(s*.12,2.19,.157),(.032,.048,.009),pupil,body)
- ball('HelmetShine',(s*.12-.01,2.21,.165),(.011,.015,.005),white,body)
-ball('HelmetNose',(0,2.105,.178),(.027,.022,.012),hair,body)
+for i in range(9):
+ a=i*math.pi/8;ball('HairCurl',(math.cos(a)*.255,1.92,-.13+math.sin(a)*.23),(.09,.12,.078),hair,body)
+ball('Helmet',(0,2.20,-.145),(.345,.25,.32),orange,body,24,16)
+ball('HelmetRim',(0,2.10,-.15),(.349,.05,.325),orange,body,24,10)
+# Plain orange rear shell: all facial features face forward (-Z in game space).
 for s in [-1,1]:
  bar('ChinStrap',(s*.26,2.03,-.13),(s*.16,1.83,-.17),.015,navy,body)
  ball('HelmetVent',(s*.19,2.34,-.12),(.026,.014,.075),navy,body)
 # Normalized articulated limb segments (length 1 along +Y), runtime IK positions them.
 for s in ['L','R']:
- for name,rad,m in [('Thigh',.105,blue),('Shin',.079,skin),('UpperArm',.08,orange),('Forearm',.065,skin)]:
+ for name,rad,m in [('Thigh',.131,blue),('Shin',.099,skin),('UpperArm',.10,orange),('Forearm',.081,skin)]:
   part=empty(name+s,parent=root);ball(name,(0,0,0),(rad,.55,rad),m,part)
   if name=='Thigh':ball('Cuff',(0,-.30,0),(rad*1.05,.12,rad*1.05),navy,part)
   join_children(part)
  shoe=empty('Shoe'+s,parent=root)
- box('Sole',(0,-.035,-.035),(.15,.055,.29),white,shoe,.024)
- ball('ShoeUpper',(0,.018,-.04),(.08,.073,.14),blue,shoe)
- ball('Heel',(0,.035,.067),(.072,.07,.06),orange,shoe)
+ box('Sole',(0,-.035,-.035),(.18,.065,.31),white,shoe,.024)
+ ball('ShoeUpper',(0,.018,-.04),(.096,.085,.15),blue,shoe)
+ ball('Heel',(0,.035,.067),(.086,.08,.07),orange,shoe)
  for z in [-.04,-.075,-.11]:bar('Laces',(-.045,.077,z),(.045,.077,z),.007,white,shoe,8)
  join_children(shoe)
- hand=empty('Hand'+s,parent=root);ball('Glove',(0,0,0),(.078,.065,.081),blue,hand);ball('Thumb',(.048,-.025,-.025),(.035,.035,.049),blue,hand);join_children(hand)
- knee=empty('Knee'+s,parent=root);ball('Knee',(0,0,0),(.09,.095,.095),skin,knee);join_children(knee)
+ hand=empty('Hand'+s,parent=root);ball('Glove',(0,0,0),(.094,.078,.097),blue,hand);ball('Thumb',(.048,-.025,-.025),(.035,.035,.049),blue,hand);join_children(hand)
+ knee=empty('Knee'+s,parent=root);ball('Knee',(0,0,0),(.112,.115,.115),skin,knee);join_children(knee)
 for group in [frame,handle,body]: join_children(group)
 # Bake a real pedal cycle on articulation pivots. Runtime samples the same phase and
 # adds landing/trick offsets; named clip is also reusable in Blender/AnimationMixer.
@@ -155,9 +152,9 @@ for f in range(1,26):
  phase=(f-1)/24*math.tau
  for i,s in enumerate(['L','R']):
   p=phase+(0 if i else math.pi);sign=-1 if i==0 else 1
-  hip=Vector((sign*.145,1.3,.19));foot=Vector((sign*.17,.42+.15*math.sin(p),.15*math.cos(p)))
+  hip=Vector((sign*.18,1.3,.19));foot=Vector((sign*.20,.42+.15*math.sin(p),.15*math.cos(p)))
   knee=hip.lerp(foot,.5);knee.z-=.28
-  shoulder=Vector((sign*.25,1.68,-.03));hand=Vector((sign*.31,1.23,-.52));elbow=shoulder.lerp(hand,.5);elbow.x+=sign*.09;elbow.z+=.10
+  shoulder=Vector((sign*.31,1.68,-.03));hand=Vector((sign*.34,1.23,-.52));elbow=shoulder.lerp(hand,.5);elbow.x+=sign*.09;elbow.z+=.10
   for name,a,b in [('Thigh',hip,knee),('Shin',knee,foot),('UpperArm',shoulder,elbow),('Forearm',elbow,hand)]:
    o=bpy.data.objects[name+s];o.location=co((a+b)/2);o.rotation_mode='QUATERNION';o.rotation_quaternion=(co(b)-co(a)).to_track_quat('Z','Y');o.scale=(1,1,(b-a).length)
    o.keyframe_insert('location',frame=f);o.keyframe_insert('rotation_quaternion',frame=f);o.keyframe_insert('scale',frame=f)
@@ -170,7 +167,7 @@ for o in bpy.data.objects:
 # Export model without rendering helpers.
 out=ROOT/'assets/downhill/characters/rider.glb';out.parent.mkdir(parents=True,exist_ok=True)
 bpy.context.preferences.filepaths.save_version=0
-bpy.ops.wm.save_as_mainfile(filepath=str(ROOT/'assets/downhill/blender/rider.blend'))
+bpy.ops.wm.save_as_mainfile(filepath=str(ROOT/'assets/downhill/blender/rider.blend'),compress=True)
 bpy.ops.export_scene.gltf(filepath=str(out),export_format='GLB',export_animations=True,export_animation_mode='SCENE',export_frame_range=True,export_force_sampling=True,export_yup=True)
 # Combine Blender's per-object action exports into one reusable phase-aligned clip.
 import json, struct
@@ -189,5 +186,6 @@ world=bpy.data.worlds.new('Studio') if not bpy.data.worlds else bpy.data.worlds[
 for name,p,power,size in [('Key',(-3,-4,6),600,5),('Rim',(3,2,5),350,4)]:
  bpy.ops.object.light_add(type='AREA',location=p);o=bpy.context.object;o.name=name;o.data.energy=power;o.data.shape='DISK';o.data.size=size;o.rotation_euler=(Vector((0,0,1.2))-o.location).to_track_quat('-Z','Y').to_euler()
 bpy.ops.object.camera_add(location=(3.2,-5.6,3));cam=bpy.context.object;cam.rotation_euler=(Vector((0,0,1.25))-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.type='ORTHO';cam.data.ortho_scale=3.3;scene.camera=cam
-scene.render.engine='CYCLES';scene.cycles.samples=24;scene.cycles.use_denoising=False;scene.render.resolution_x=800;scene.render.resolution_y=800;scene.render.resolution_percentage=100;scene.render.filepath='/workspace/scratch/afd828002ad9/rider-preview.png';bpy.ops.render.render(write_still=True)
+scene.render.engine='CYCLES';scene.cycles.samples=24;scene.cycles.use_denoising=False;scene.render.resolution_x=800;scene.render.resolution_y=800;scene.render.resolution_percentage=100;scene.render.filepath=str(ROOT.parent/'rider-preview.png');bpy.ops.render.render(write_still=True)
+cam.location=(3.2,5.6,2.9);cam.rotation_euler=(Vector((0,0,1.25))-cam.location).to_track_quat('-Z','Y').to_euler();scene.render.filepath=str(ROOT.parent/'rider-front-preview.png');bpy.ops.render.render(write_still=True)
 print('RIDER_EXPORT',out, 'bytes',out.stat().st_size)

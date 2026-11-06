@@ -93,12 +93,12 @@ function preview() {
     "  ·  " +
     (c.night ? "Kväll / natt" : "Dag");
   $("number").textContent =
-    "LED " + String(c.id + 1).padStart(2, "0") + " / 20";
+    "LED " + String(c.index + 1).padStart(2, "0") + " / " + layouts.length;
   $("credit").textContent =
     "BANREFERENS  /  " + String(c.id + 1).padStart(2, "0");
   document.querySelector(".cover").style.backgroundImage =
     "url(ref/" + (c.id + 1) + ".webp)";
-  let best = record[c.id + "-" + $("mode").selectedIndex];
+  let best = record[saveKey(c, $("mode").selectedIndex)];
   $("modeHint").textContent =
     modes[$("mode").selectedIndex] +
     (best
@@ -138,6 +138,8 @@ if (document.documentElement.requestFullscreen) {
   };
   $("hud").insertBefore(button, $("pause"));
 }
+// Legacy short-route records stay intact; their times/ghosts are not comparable.
+function saveKey(track, mode) { return "long-v2:" + track.id + "-" + mode; }
 function fmt(t) {
   return Math.floor(t / 60) + ":" + (t % 60).toFixed(1).padStart(4, "0");
 }
@@ -159,7 +161,7 @@ function dialog(title, msg, buttons) {
 $("help").onclick = () =>
   dialog(
     "Så spelar du",
-    "Trampa med ↑ eller W. Bromsa med ↓ eller S. Styr med ← → eller A och D. På mobilen styr du med spaken. Dra uppåt för fart och nedåt för broms. Du kan hoppa och göra trick med andra tummen.\n\nHoppa med mellanslag. Ramper ger automatiska hopp. I luften gör T nästa trick. Med 1–7 väljer du trick direkt. Avsluta tricket innan hjulen tar mark.\n\nC byter kamera. Esc pausar. Vid en vurpa börjar du vid senaste kontrollpunkten.",
+    "Trampa med ↑ eller W. Bromsa med ↓ eller S. Styr med ← → eller A och D. På mobilen styr du med spaken. Dra uppåt för fart och nedåt för broms. Du kan hoppa och göra trick med andra tummen.\n\nHoppa med mellanslag. Ramper ger automatiska hopp. I luften gör T nästa trick. Med 1–7 väljer du trick direkt. Avsluta tricket innan hjulen tar mark. I luften behåller du riktningen från avstampet: vänster/höger finjusterar kursen och upp/ned justerar nosen. Bromsa inför skarpa svängar och sikta på landningen. Varierade trick ger mer poäng än upprepningar.\n\nC byter kamera. Esc pausar. Vid en vurpa börjar du vid senaste kontrollpunkten.",
     [["Tillbaka", () => {}]],
   );
 function toast(msg, d = 1.6) {
@@ -246,8 +248,8 @@ async function start() {
         powerPreference: "high-performance",
       });
       renderer.outputColorSpace = T.SRGBColorSpace;
-      renderer.toneMapping = T.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.05;
+      renderer.toneMapping = T.ReinhardToneMapping;
+      renderer.toneMappingExposure = 1.0;
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = T.PCFSoftShadowMap;
       $("viewport").append(renderer.domElement);
@@ -291,9 +293,11 @@ async function start() {
     mode: $("mode").selectedIndex,
     b: bikes[+$("bikes").value],
     pitch: 0,
+    airX: 0, airZ: 0, airVX: 0, airVZ: 0, airYaw: 0, airTilt: 0, airTime: 0,
+    trickCounts: {}, groundYaw: trailYaw(0),
   };
   footage = [];
-  const savedGhost = run.mode === 2 ? record[c.id + "-2"]?.ghost : null;
+  const savedGhost = run.mode === 2 ? record[saveKey(c, 2)]?.ghost : null;
   ghostData = Array.isArray(savedGhost) && savedGhost.every(p => Array.isArray(p) && p.length === 3 && p.every(Number.isFinite)) ? savedGhost : [];
   ghost = null;
   if (ghostData.length) {
@@ -326,7 +330,7 @@ async function start() {
   aim = V();
   resize();
   sound.init();
-  let best = record[c.id + "-" + run.mode];
+  let best = record[saveKey(c, run.mode)];
   $("raceGoal").textContent =
     run.mode === 0
       ? "Måltid " + fmt(c.target)
@@ -357,27 +361,45 @@ function resize() {
   cam.updateProjectionMatrix();
 }
 window.addEventListener("resize", resize);
-function jump(boost) {
+const GRAVITY = 22;
+const TRICK_SPECS = [
+  {duration: .24, points: 90}, {duration: .3, points: 125},
+  {duration: .32, points: 150}, {duration: .4, points: 190},
+  {duration: .57, points: 300}, {duration: .55, points: 300},
+  {duration: .5, points: 260},
+];
+function trailYaw(s) {
+  return -c.turn(s) - Math.atan((c.center(s + .25) - c.center(s - .25)) / .5);
+}
+function angleDifference(a, b) { return Math.atan2(Math.sin(a - b), Math.cos(a - b)); }
+function jump(boost, inheritSlope = true) {
   if (run.air || run.lock > 0) return;
-  run.air = true;
-  run.vy = boost;
-  run.airStart = run.s;
-  run.chain = 0;
-  run.combo = 0;
-  run.trick = null;
-  run.auto = false;
+  const q = run, yaw = trailYaw(q.s), sideAngle = c.turn(q.s);
+  [q.airX, q.airZ] = c.place(c.center(q.s) + q.l, q.s);
+  q.airVX = -Math.sin(yaw) * q.v + Math.cos(sideAngle) * q.side;
+  q.airVZ = -Math.cos(yaw) * q.v + Math.sin(sideAngle) * q.side;
+  q.airYaw = Math.hypot(q.airVX,q.airVZ) > .01 ? Math.atan2(-q.airVX, -q.airVZ) : yaw;
+  q.airTilt = 0;
+  q.airTime = 0;
+  q.air = true;
+  const metric = Math.hypot(1,(c.center(q.s+.25)-c.center(q.s-.25))/.5);
+  const approachSlope = (ground(q.s-.05,q.l)-ground(q.s-.55,q.l))/.5/metric;
+  // A bunny hop preserves the velocity down/up the trail instead of erasing it.
+  q.vy = clamp(boost + (inheritSlope ? q.v * approachSlope : 0), -6, 6.4);
+  q.airStart = q.s;
+  q.airDistance = 0;
+  q.chain = 0;
+  q.combo = 0;
+  q.trickCounts = {};
+  q.trick = null;
+  q.auto = false;
 }
 function trick(index) {
   if (!run.air || run.trick || run.lock > 0) return;
-  let i = index ?? run.next++ % 7;
-  run.trick = {
-    type: tricks[i],
-    duration: [0.33, 0.4, 0.38, 0.52, 0.68, 0.67, 0.64][i],
-    t: 0,
-    p: 0,
-    i,
-  };
-  toast(tricks[i], 0.7);
+  const i = index ?? run.next++ % tricks.length;
+  if (!Number.isInteger(i) || !TRICK_SPECS[i]) return;
+  run.trick = { type: tricks[i], duration: TRICK_SPECS[i].duration, t:0, p:0, i };
+  toast(tricks[i] + " · Landa rakt", .7);
 }
 function act(k, down, source) {
   if (state !== "ride") return;
@@ -476,11 +498,12 @@ document.addEventListener("visibilitychange", () => {
 window.addEventListener("blur", () => {
   if (state === "ride") pause();
 });
-function crash() {
+function crash(reason = "Utanför leden") {
   let q = run;
   q.s = q.checkpoint;
   q.l = q.side = 0;
   q.y = c.height(q.s);
+  q.groundYaw = trailYaw(q.s);
   q.air = false;
   q.trick = null;
   q.chain = 0;
@@ -493,14 +516,14 @@ function crash() {
   jumpBuffer = 0;
   previousRun = { ...q };
   cameraSnap = true;
-  toast("Upp igen! Kör från flaggan.", 1.6);
+  toast(reason + " · Upp igen från flaggan!", 2.1);
 }
 function finish() {
   state = "finish";
   clearInput();
   sound.quiet();
   let q = run,
-    key = c.id + "-" + q.mode,
+    key = saveKey(c, q.mode),
     old = record[key],
     win = q.mode === 1 ? !old || q.score > old.score : !old || q.t < old.time;
   if (q.mode !== 3 && win) {
@@ -528,7 +551,7 @@ function finish() {
     [
       "Nästa bana",
       () => {
-        $("tracks").value = (c.id + 1) % 20;
+        $("tracks").value = (c.index + 1) % layouts.length;
         start();
       },
     ],
@@ -557,7 +580,7 @@ function step(dt) {
           : c.surface;
   q.t += dt;
   if (jumpBuffer > 0 && !q.air && q.lock <= 0) {
-    jump(5.8 * q.b[5]);
+    jump(3.3 * Math.sqrt(q.b[5]));
     jumpBuffer = 0;
     toast("Bunny hop", 0.6);
   }
@@ -567,64 +590,56 @@ function step(dt) {
   let dx = (c.center(q.s + 0.4) - c.center(q.s - 0.4)) / 0.8,
     metric = Math.hypot(1, dx),
     slope = (ground(q.s + 0.25, q.l) - ground(q.s - 0.25, q.l)) / 0.5 / metric;
-  q.v = clamp(
-    q.v +
-      dt *
-        (2.1 +
-          ped * 5 -
-          slope * 10 -
-          br * 14 * b[4] -
-          q.v * q.v * (mat === "lera" ? 0.025 : 0.014)),
-    br ? 0 : 2.6,
-    26 * b[1],
-  );
-  let grip =
-      ({ jord: 1, grus: 0.82, lera: 0.65, snö: 0.72, is: 0.39, trä: 0.98 }[
-        mat
-      ] || 1) * b[2],
-    responsiveness = q.air ? 3.6 : 8 * grip;
-  const curvature =
-    (c.center(q.s + 1) - 2 * c.center(q.s) + c.center(q.s - 1)) / metric ** 3;
-  const drift = clamp(
-    (-(curvature + (c.turn(q.s + 0.5) - c.turn(q.s - 0.5)) / metric) *
-      q.v *
-      q.v *
-      0.22) /
-      (grip * b[3]),
-    -4.8,
-    4.8,
-  );
-  q.side = mix(
-    q.side,
-    steer * (3.1 + q.v * 0.16) * Math.min(1, q.v / 3) + drift,
-    1 - Math.exp(-dt * responsiveness),
-  );
-  q.l += q.side * dt;
-  let old = q.s;
-  q.s = Math.min(c.len, q.s + (dt * q.v) / metric);
+  let grip = ({jord:1, grus:.82, lera:.65, snö:.72, is:.39, trä:.98}[mat] || 1) * b[2];
+  const old = q.s;
+  if (q.air) {
+    // Momentum is world-space and independent of center()/turn(). Steering is a
+    // limited, deliberate air correction; there is no magnetic path-following.
+    q.airTime += dt;
+    q.airYaw -= steer * .42 * dt;
+    const speed = Math.hypot(q.airVX, q.airVZ) * Math.exp(-.06 * dt);
+    q.airVX = -Math.sin(q.airYaw) * speed;
+    q.airVZ = -Math.cos(q.airYaw) * speed;
+    q.airX += q.airVX * dt;
+    q.airZ += q.airVZ * dt;
+    q.airDistance += speed * dt;
+    const projected = c.project(q.airX, q.airZ, q.s + q.v * dt / metric);
+    q.s = projected.s;
+    q.l = projected.l;
+    q.v = speed;
+    q.airTilt = clamp(q.airTilt + (ped - br) * .85 * dt, -.45, .45);
+    q.lean = mix(q.lean, -steer * .22, 1 - Math.exp(-dt * 6));
+  } else {
+    q.v = clamp(q.v + dt * (1.5 + ped * 4.5 - slope * 10 - br * 15 * b[4]
+      - q.v * q.v * (mat === "lera" ? .028 : .018)), br ? 0 : 2.2, 22 * b[1]);
+    const curvature = (c.center(q.s + 1) - 2 * c.center(q.s) + c.center(q.s - 1)) / metric ** 3;
+    const drift = clamp(-(curvature + (c.turn(q.s + .5) - c.turn(q.s - .5)) / metric)
+      * q.v * q.v * .3 / (grip * b[3]), -6, 6);
+    q.side = mix(q.side, steer * (2.6 + q.v * .13) * Math.min(1,q.v/3) + drift,
+      1 - Math.exp(-dt * 7 * grip));
+    q.l += q.side * dt;
+    q.s = Math.min(c.len, q.s + dt * q.v / metric);
+    q.lean = mix(q.lean, -steer * .36, 1 - Math.exp(-dt * 6));
+    q.phase += ped ? q.v * .42 * dt : 0;
+    q.groundYaw = (q.groundYaw ?? trailYaw(q.s)) + angleDifference(trailYaw(q.s) - q.side * .04, q.groundYaw ?? trailYaw(q.s)) * (1 - Math.exp(-dt * 10));
+  }
   q.dist += q.v * dt;
-  q.lean = mix(q.lean, -steer * 0.32, 1 - Math.exp(-dt * 6));
-  q.phase += ped ? q.v * 0.42 * dt : 0;
   for (let e of c.events) {
     if (old < e.s && q.s >= e.s && !q.air && "gjr".includes(e.type)) {
-      jump((e.type === "g" ? 8.2 : 6.3) * b[5]);
+      // Measure the actual ramp climb over the last four metres. Takeoff energy
+      // depends on approach speed and ramp angle, with a hard child-friendly cap.
+      const rampGrade = Math.max(.08, (c.height(e.s - .05, q.l) - c.height(e.s - 4,q.l)) / 4);
+      const impulse = clamp(1.5 + q.v * rampGrade * .6 + (e.type === "g" ? 1 : 0), 2.4, 5.2);
+      jump(impulse * Math.sqrt(b[5]), false);
       q.auto = true;
     }
-    if (
-      old < e.s &&
-      q.s >= e.s &&
-      e.type === "o" &&
-      Math.abs(q.l + 0.8) < 0.74 &&
-      !q.air &&
-      q.v > 7
-    ) {
-      crash();
-      return;
+    if (old < e.s && q.s >= e.s && e.type === "o" && Math.abs(q.l + .8) < .74 && !q.air && q.v > 7) {
+      crash("Hinder på stigen – hoppa eller välj en annan linje"); return;
     }
   }
   let h = ground(q.s, q.l);
   if (q.air) {
-    q.vy -= 15 * dt;
+    q.vy -= GRAVITY * dt;
     q.y += q.vy * dt;
     if (q.trick) {
       let t = q.trick;
@@ -632,29 +647,40 @@ function step(dt) {
       t.p = Math.min(1, t.t / t.duration);
       if (t.p >= 1) {
         q.chain++;
-        q.combo =
-          (q.combo || 0) + [90, 120, 140, 180, 240, 240, 210][t.i] * q.chain;
+        const repeats = q.trickCounts[t.i] || 0;
+        q.trickCounts[t.i] = repeats + 1;
+        const variety = Object.keys(q.trickCounts).length;
+        q.combo += Math.round(TRICK_SPECS[t.i].points * (1 + (variety - 1) * .35) * Math.pow(.55,repeats));
         q.trick = null;
       }
     }
     if (q.vy < 0 && q.y <= h && !c.gap(q.s)) {
-      if (q.trick && q.trick.p > 0.16 && q.trick.p < 0.82) {
-        crash();
+      const landingEdge = Math.min(Math.abs(q.l) - c.half(q.s),
+        c.fork(q.s) > 0 ? Math.abs(q.l - c.fork(q.s)) - 1.5 : Infinity);
+      if (landingEdge > .65) { crash("Landningen hamnade utanför stigen"); return; }
+      const headingError = Math.abs(angleDifference(q.airYaw, trailYaw(q.s)));
+      const impact = Math.max(0, q.v * slope - q.vy);
+      const pitchError = Math.abs(q.pitch - Math.atan(slope));
+      if (q.trick || headingError > .65 || pitchError > .85 || impact > 17) {
+        crash(q.trick ? "Tricket var inte färdigt" : headingError > .65 ? "Landa i banans riktning" : pitchError > .85 ? "Räta upp cykeln före landningen" : "För hård landning – bromsa före hoppet");
         return;
       }
+      q.groundYaw = q.airYaw;
+      q.side *= .5;
+      q.v *= Math.max(.75, 1 - impact * .008 - headingError * .08);
       q.air = false;
       q.trick = null;
       q.y = h;
       q.compression = clamp(-q.vy / 8, 0.25, 1);
       sound.land(-q.vy);
       q.vy = 0;
-      let pts = Math.round((q.s - q.airStart) * 3 + (q.combo || 0) + 22);
+      let pts = Math.round(Math.min(q.airDistance, 20) * 2 + (q.combo || 0) + (headingError < .2 ? 30 : 10));
       q.score += pts;
       toast(
-        (q.chain ? "Kombination ×" + q.chain : "Fin landning") + "  +" + pts,
+        (q.chain ? "Kombination ×" + q.chain : headingError < .2 ? "Perfekt landning" : "Fin landning") + "  +" + pts,
       );
     } else if (q.y < h - 2.6) {
-      crash();
+      crash("Hoppet nådde inte landningen");
       return;
     }
   } else if (c.gap(q.s)) {
@@ -664,7 +690,7 @@ function step(dt) {
     Math.abs(q.l) - c.half(q.s),
     c.fork(q.s) > 0 ? Math.abs(q.l - c.fork(q.s)) - 1.5 : Infinity,
   );
-  if (edge > 0) {
+  if (edge > 0 && !q.air) {
     q.v = Math.max(2, q.v - 5 * dt);
     if (edge > 1.25 * b[3]) {
       crash();
@@ -677,7 +703,7 @@ function step(dt) {
     q.score += 40;
     toast("Kontrollpunkt  +40", 1);
   }
-  if (q.v > 15) {
+  if (q.v > 15 && !q.air) {
     q.clean += dt;
     if (q.clean > 2) {
       q.score += 10;
@@ -699,11 +725,11 @@ function step(dt) {
   }
   q.pitch = mix(
     q.pitch,
-    q.air ? clamp(q.vy * 0.038, -0.35, 0.4) : Math.atan(slope),
+    q.air ? clamp(q.vy * .025, -.3, .3) + q.airTilt : Math.atan(slope),
     1 - Math.exp(-dt * 8),
   );
   sound.tick(q.v, mat, br, ped, q.air);
-  if (q.s >= c.len) finish();
+  if (q.s >= c.len && !q.air) finish();
 }
 function renderRide(dt, snap = false) {
   snap = snap || cameraSnap;
@@ -713,6 +739,11 @@ function renderRide(dt, snap = false) {
     const alpha = clamp(acc / FIXED_STEP, 0, 1);
     for (const key of ["s", "l", "y", "side", "lean", "pitch", "dist", "phase", "compression"])
       q[key] = mix(previousRun[key], run[key], alpha);
+    if (q.air && previousRun.air) {
+      q.airX = mix(previousRun.airX, run.airX, alpha);
+      q.airZ = mix(previousRun.airZ, run.airZ, alpha);
+      q.airYaw = previousRun.airYaw + angleDifference(run.airYaw, previousRun.airYaw) * alpha;
+    }
     // Ground clamps prevent interpolation through a sharp ramp edge.
     if (!q.air) q.y = Math.max(q.y, ground(q.s, q.l));
   }
@@ -721,9 +752,10 @@ function renderRide(dt, snap = false) {
     s = q.s,
     dir = -Math.atan(c.center(s + 0.5) - c.center(s - 0.5)),
     a = snap ? 1 : 1 - Math.exp(-dt * 9);
-  let [wx, wz] = c.place(x, s);
-  mount.group.position.set(wx, y + 0.09, wz);
-  mount.group.rotation.y = dir - c.turn(s) - q.side * 0.04;
+  let [wx, wz] = q.air ? [q.airX, q.airZ] : c.place(x, s);
+  const surfaceOffset = c.feature(s)?.type === "b" ? .09 : .06;
+  mount.group.position.set(wx, y + surfaceOffset, wz);
+  mount.group.rotation.y = q.air ? q.airYaw : (q.groundYaw ?? dir - c.turn(s) - q.side * 0.04);
   mount.pose(
     q.dist,
     q.v,
@@ -745,6 +777,11 @@ function renderRide(dt, snap = false) {
     lead = view === 2 ? 9 : 4.8 + q.v * 0.12 + (q.air ? 2 : 0);
   let cameraPos = c.place(px, lag),
     look = c.place(c.center(s + lead) + q.l * 0.7, s + lead);
+  if (q.air) {
+    // Follow the takeoff heading so spins cannot rotate the camera or hide touchdown.
+    cameraPos = [wx + Math.sin(q.airYaw) * back, wz + Math.cos(q.airYaw) * back];
+    look = [wx - Math.sin(q.airYaw) * lead, wz - Math.cos(q.airYaw) * lead];
+  }
   cam.position.lerp(V(cameraPos[0], py, cameraPos[1]), a);
   aim.lerp(
     V(

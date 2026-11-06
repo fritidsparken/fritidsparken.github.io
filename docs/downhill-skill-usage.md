@@ -1,51 +1,45 @@
-# Downhill Blender redesign — development checkpoint, 2026-11-06
+# Downhill MTB Challenge 2 — 2026-11-06
 
-Not ready for main: real WebGL visual/play/performance/mobile validation remains blocked.
+This revision follows the user's requested thicker MTB tires, broader forward-facing rider, ten triple-length routes, harder tricks/landings and more vivid colors. It supersedes the initial 20-course Blender redesign. Real WebGL visual/mobile/performance verification remains limited by the provided browser's disabled renderer; CPU tests and Blender previews are not presented as GPU gameplay proof.
 
-## Preserved baseline
+## Models and art
 
-Source: 9af84e0cf98dc9c46943f5b2cc26775c009ef4cc. Twenty authored courses, eight bicycle options, four modes, seven tricks, checkpoints, route geometry, times and legacy `fp-downhill-v1` records remain. `courses.js` is unchanged. Three.js remains r160; the existing vendored GLTFLoader is reused.
+Original Blender 4.3.2 sources generate the cyclist/bicycle, scenery and wildlife GLBs. Rider tires have three rows of chunky tread, an enlarged .425m outer radius, and at least .16m width across every bicycle variant. Torso and limb cross sections are about 25% wider. Rear helmet decorative eyes are removed; the actual pupils are on the forward -Z face. Frame/fork clearance and wheel rotation match the new tires. Front and rear Blender renders are in this directory.
 
-## Implemented
+Scenery has more saturated greens, blues, flowers, warm dirt and turquoise water. The renderer uses sRGB output and Reinhard tone mapping. Color textures are tagged as sRGB. There is no indexed or reduced-color palette: the normal RGB output already supports 8 bits per RGB channel (16,777,216 combinations); this revision changes art direction, not an imaginary color-count switch.
 
-- Blender 4.3.2 generates original editable environment, cyclist/bicycle and wildlife libraries. Runtime uses three GLBs with shared geometry/material ownership. Procedural rigid articulation synchronizes wheels, pedals, steering, tricks and compression. A PedalCycle clip is also retained in the rider GLB.
-- Scenery replaces trees, rocks, bridge planks/posts and mountains across existing themes. Vegetation uses colored Blender geometry. Snow/night/canyon/city identities remain, though visual acceptance still needs review. Rabbit, squirrel, blue bird, otter and butterfly use nearby idle/hop/fly/bob behaviors without entering the trail.
-- Warm dirt, brighter meadow palette, turquoise animated water, clouds and meadow waterfall placement. Procedural terrain stays aligned to existing course functions. Bridge plank top is height +0.09, matching the riding offset.
-- Camera follows centrally with stable horizon, interpolated render pose, speed FOV and jump look-ahead. Jump buffering, stationary steering fix, stable landing and crash combo reset.
-- Low/Medium/High, separate music and effect controls, fullscreen and mobile safe-area sizing. Audio is synthesized by original project code, no external recordings introduced.
-- Vegetation uses 20% Blender decimation LODs, 32-metre scene chunks and distance visibility/shadow ranges. Actual FPS is not measured.
+## Ten longer routes
 
-## Game-development instructions applied
+Each route retains a stable original identity for artwork. `c.index` is now the menu position; `c.id` remains its legacy identity. Original layout data is retained in source. New records use `long-v2:` keys inside the same save object, preserving legacy times/ghosts without applying a short-route ghost to a different track.
 
-Read directly from https://github.com/gamedev-skills/awesome-gamedev-agent-skills ; no CLI installation claimed.
+| Route | Previous progress length | New progress length |
+| --- | ---: | ---: |
+| Gröna dalen | 256 m | 768 m |
+| Pine Forest | 315 m | 945 m |
+| Rocky Mountains | 380 m | 1,140 m |
+| Tropical Jungle | 369 m | 1,107 m |
+| Desert Canyon | 288 m | 864 m |
+| Alpine Snow | 350 m | 1,050 m |
+| Bike Park Extreme | 410 m | 1,230 m |
+| Waterfall Valley | 320 m | 960 m |
+| Neon Bike Park | 410 m | 1,230 m |
+| Northern Lights | 369 m | 1,107 m |
 
-| Instructions | Concrete application |
-| --- | --- |
-| router | Identified existing Three.js; retained release and architecture |
-| create-game-assets / three-d-pipeline | Reference palette, authored families, .blend sources, GLB export, pivots, named roots, vertex palette, LODs |
-| threejs-gltf-loading | Existing loader, asynchronous loading gate, named articulation, shared resources |
-| threejs-materials-lighting | PBR roughness, vertex colors, color-space handling and key/fill light changes |
-| physics-tuning | Existing fixed 90 Hz integration retained; render interpolation and landing tests |
-| input-systems | Jump buffer, repeat suppression, existing multi-touch joystick retained |
-| camera-systems | Centered smooth follow, stable horizon, FOV and landing look-ahead |
-| game-feel | Controlled compression, jump and landing feedback |
-| performance-optimization | Measured CPU geometry counts, then added LOD and chunks; no GPU claim |
-| game-ui-ux | Presets, independent audio buttons, fullscreen and small-screen controls |
-| audio-design | Independent synthesis buses and quiet bird ambience |
-| save-systems | Validated save reads, separate settings key, preserved legacy data |
-| game-ai | Simple bounded states, distance-based activation |
+Lengths are authored progress units, as used by the existing game; the curving world-space centerline is longer. Three sectors retain original control-point spacing, with mirrored/varied lateral paths and reordered obstacles. Each has three times the original events, slightly narrower paths and stronger speed-dependent drift.
 
-Behavior trees/utility AI are unnecessary for these few ambient states; no new framework introduced. Original route generation retained; procedural scenery is deterministic. New shader effect is a small standard-material water modification. Dedicated shader-programming/level-design/scene-setup skills and full art acceptance remain follow-up work, not claimed completed.
+## Flight and tricks
 
-## Verification performed
+Flight position and momentum are integrated in world space. Route projection only queries underlying terrain; it does not move or turn the airborne bicycle. The rider and camera use the takeoff heading with limited explicit input correction. Heading eases toward the road after landing. Airborne interpolation is used only across two airborne samples, preventing stale takeoff coordinates from pulling the rider toward the origin.
 
-- `node tests/downhill-mechanics.cjs`: all twenty tracks complete with test autopilot at simulated 30/60 render rates with identical results and no crashes; legacy save preservation, invalid saves, jump buffering/repeat, stable landings, stationary steering and combo reset. This is simulation coverage, not proof of human playability.
-- Same suite: 2,020 camera transform samples and independent WebAudio routing checks. Not a listening test.
-- `node tests/downhill-assets.cjs --quality=low`, medium (default), high: 60 actual scene constructions with real GLTFLoader/GLB imports; 960 articulated pose samples; finite buffers/bounds/transforms/instances; shared material ownership checked.
-- CPU geometry estimates before frustum culling/shadow passes: Low maximum about 0.60M triangles, Medium about 2.37M. These are not FPS measurements. Added chunk/LOD system after initial scenes measured up to 7.7M triangles.
-- Blender model preview renders inspected for cyclist and five animals. A CPU scene snapshot was rendered in Blender for composition checks; it does not represent final WebGL lighting, textures or shaders.
-- Browser: all model downloads/imports completed, quality and independent audio controls operated. Both baseline and modified game failed WebGLRenderer creation in the provided browser (`GL_RENDERER = Disabled`, `BindToCurrentSequence failed`). This is an environment limitation, not a passing gameplay test.
+Bunny-hop impulse is 3.3m/s before bike modifiers; gravity is 22m/s². A bunny hop preserves the approach vertical velocity from the ground slope, avoiding artificial extra airtime downhill. Measured neutral hops are about 0.289s: 2.86m at 10m/s and 5.73m at 20m/s on both flat ground and a −15% grade. Ramp impulse depends on speed and actual ramp grade, bounded before modifiers. Bicycle pitch, rather than the flight trajectory angle, controls landing orientation so a stationary hop remains stable. Trick difficulty, variation bonuses and repeat penalties replace automatic escalating score for repetitions. Points are banked only after a valid landing. Incomplete tricks, bad heading, bad bicycle pitch, excessive impact or leaving the route produce explicit feedback. Landings and tire offset match the riding surface.
 
-## Outstanding acceptance gates
+## Verification
 
-Real WebGL screenshots vs reference, full-course visual review, shaders and water appearance, mobile portrait/landscape touch play, hardware FPS/load/memory, audio listening, camera obstacle interaction and manual trick/landing tests. The reference match is not yet accepted. Not every remaining city/industrial decorative primitive has been rebuilt in Blender. Do not describe the entire masterprompt as complete. No main deployment or live-site verification performed.
+- `node tests/downhill-mechanics.cjs`: ten routes, fixed-step simulation at 30/60 render rates; world-space momentum/projection; short-hop duration/range; trick scoring and failure cases; legacy save preservation; airborne camera and first-takeoff rendering checks.
+- `node tests/downhill-assets.cjs --quality=low` (and medium/high): all ten scenes per quality, real project GLTFLoader and GLBs, finite geometry/bounds/matrices, tire/body dimensions, forward pupil positions, and 320 rider poses across eight bicycle variants per run.
+- Blender front/rear rider renders inspected.
+- Shared assets remain cached across courses; 32m scenery chunks, 20% vegetation LODs and bounded distance activation remain. No hardware FPS claim is made.
+
+## Instructions applied
+
+Read directly from `gamedev-skills/awesome-gamedev-agent-skills` (revision 19d93f97c9c1ea0f8b306e77aa81e0d3e352d3e9), without claiming CLI installation: router, create-game-assets/three-d-pipeline, threejs-gltf-loading, threejs-materials-lighting, physics-tuning, input-systems, camera-systems, game-feel, performance-optimization, game-ui-ux, audio-design, save-systems and game-ai. The existing Three.js r160 and vendored loader remain. No new third-party assets, audio recordings or dependencies are introduced.

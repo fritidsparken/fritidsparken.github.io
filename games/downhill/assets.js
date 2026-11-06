@@ -9,7 +9,7 @@ window.DownhillAssets = (() => {
       const loader = new GLTFLoader();
       const files = { environment: '../../assets/downhill/models/environment.glb', wildlife: '../../assets/downhill/models/wildlife.glb', rider: '../../assets/downhill/characters/rider.glb' };
       await Promise.all(Object.entries(files).map(async ([name, url]) => {
-        const gltf = await loader.loadAsync(url + '?v=storybook-1');
+        const gltf = await loader.loadAsync(url + '?v=mtb-challenge-2');
         gltf.scene.updateMatrixWorld(true);
         gltf.scene.traverse(node => {
           if (!node.isMesh) return;

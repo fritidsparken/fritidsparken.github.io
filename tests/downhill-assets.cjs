@@ -115,7 +115,7 @@ async function main() {
   for(const name of ['rabbit','squirrel','bird','butterfly','otter'])
     assert.ok(ctx.DownhillAssets.get('wildlife').getObjectByName(name),'Missing animal '+name);
   const rows=[];
-  for(let i=0;i<20;i++) {
+  for(let i=0;i<vm.runInContext('layouts.length',ctx);i++) {
     const c=ctx.course(i),scene=new ctx.THREE.Scene(),env=ctx.world(scene,c),camera=new ctx.THREE.PerspectiveCamera(63,16/9,.08,620);
     let maximum;
     // Start, mid-course and finish exercise curved-course placement, visibility
@@ -134,11 +134,28 @@ async function main() {
     gs.forEach(g=>g.dispose());ms.forEach(m=>m.dispose());scene.environment?.dispose();
   }
   const original=ctx.DownhillAssets.get('rider');
+  const eyeMesh=original.getObjectByName('Body_Pupils');
+  assert.ok(eyeMesh,'Forward-facing eye geometry exists');
+  const eyeBounds=new ctx.THREE.Box3().setFromObject(eyeMesh);
+  assert.ok(eyeBounds.max.z<-.35,'All pupil geometry must face forward (-Z), never the rear helmet');
+  const torsoBounds=new ctx.THREE.Box3().setFromObject(original.getObjectByName('Body_FramePaint'));
+  assert.ok(torsoBounds.max.x-torsoBounds.min.x>=.72,'Torso must retain the wider child proportions');
+  const calf=original.getObjectByName('ShinL_WarmSkin').geometry;
+  calf.computeBoundingBox();
+  assert.ok(calf.boundingBox.max.x-calf.boundingBox.min.x>=.19,'Calves must retain thicker proportions');
   const sharedFrame=original.getObjectByName('Frame');
   const originalColors=[];sharedFrame.traverse(o=>{if(o.isMesh)originalColors.push(...[].concat(o.material).map(m=>m.color.getHex()));});
   let poses=0;
   for(let bike=0;bike<8;bike++) {
     const scene=new ctx.THREE.Scene(),r=ctx.rider(scene,bike,'#ef3366');
+    for(const name of ['RearWheel','FrontWheel']) {
+      const wheel=r.group.getObjectByName(name),tire=r.group.getObjectByName(name+'_Rubber');
+      tire.geometry.computeBoundingBox();
+      const b=tire.geometry.boundingBox, width=(b.max.x-b.min.x)*wheel.scale.x;
+      assert.ok(width>=.16,'Every MTB variant must have tires at least 16 cm wide in stylized game scale');
+      assert.ok(b.max.y-b.min.y>=.82,'MTB tire diameter must match the enlarged wheel radius');
+    }
+
     for(const type of ['','Whip','Tabletop','Barspin','Superman','Backflip','Frontflip','360 spin'])
       for(const p of [0,.25,.5,.75,1]){
         r.pose(p*13,16,.3,.2,.5,p*Math.PI*2,{p,type},true);checkScene(scene);poses++;
@@ -148,7 +165,7 @@ async function main() {
   assert.deepEqual(after,originalColors,'Bike recoloring must not mutate shared source');
   if(process.argv.some(a=>a==='--snapshot'||a.startsWith('--snapshot=')))snapshot();
   console.table(rows);
-  console.log(`PASS (${quality.value}): 20 courses, ${checked.size} unique geometries, ${poses} rider poses across 8 bike variants; finite bounds, transforms and instances; shared cache unmodified.`);
+  console.log(`PASS (${quality.value}): ${rows.length} courses, ${checked.size} unique geometries, ${poses} rider poses across 8 bike variants; finite bounds, transforms and instances; shared cache unmodified.`);
   console.log('Draw calls/triangles are visible-parent upper bounds before camera frustum culling, excluding shadow passes. No GPU timing claim.');
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});

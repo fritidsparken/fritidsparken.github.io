@@ -1,5 +1,5 @@
 // Authored control points, grade changes and trail furniture in order from start to finish.
-const layouts = [
+const originalLayouts = [
   [
     "Gröna dalen",
     "Ängsstig",
@@ -201,6 +201,9 @@ const layouts = [
     "w g j f g w g",
   ],
 ];
+// Ten curated routes retain their original ids for artwork and save provenance.
+const routeIds = [0, 1, 2, 3, 4, 5, 7, 8, 11, 15];
+const layouts = routeIds.map(id => originalLayouts[id]);
 const bikes = [
   ["Trail Rider", 1, 1, 1, 1, 1],
   ["Downhill Pro", 1.04, 1.12, 1.2, 1.12, 0.96],
@@ -230,15 +233,32 @@ function spline(points, u) {
       (-a + 3 * b - 3 * c + d) * t * t * t)
   );
 }
-function course(id) {
-  const [name, tag, theme, surface, width, x, y, sequence] = layouts[id],
+function course(index) {
+  const id = routeIds[index];
+  if (id === undefined) throw new RangeError("Unknown Downhill course");
+  const [name, tag, theme, surface, originalWidth, sourceX, sourceY, sequence] = originalLayouts[id],
+    width = originalWidth * 0.94,
     step = 32 + (id % 4) * 3,
-    len = (x.length - 1) * step;
-  const codes = sequence.split(" "),
-    events = codes.map((type, i) => ({
-      type,
-      s: Math.round((len * (i + 1)) / (codes.length + 1)),
-    }));
+    originalLength = (sourceX.length - 1) * step,
+    len = originalLength * 3,
+    x = sourceX.slice(), y = sourceY.slice();
+  // Append two authored variations at the original point spacing. This adds turns,
+  // grade changes and obstacles instead of stretching the old road into straights.
+  for (let sector = 1; sector < 3; sector++) {
+    const startX = x[x.length - 1], startY = y[y.length - 1];
+    for (let i = 1; i < sourceX.length; i++) {
+      const lateral = sourceX[i] - sourceX[0];
+      const variation = 4 * Math.sin(i * Math.PI / (sourceX.length - 1)) * Math.sin(i * 1.8 + sector);
+      x.push(startX + lateral * (sector === 1 ? -1.08 : 0.95) + variation);
+      y.push(startY + (sourceY[i] - sourceY[0]) * (sector === 1 ? 1.08 : 0.96));
+    }
+  }
+  const codes = sequence.split(" "), events = [];
+  for (let sector = 0; sector < 3; sector++) {
+    const order = sector === 0 ? codes : sector === 1 ? [...codes.slice(1), codes[0]] : [...codes].reverse();
+    order.forEach((type, i) => events.push({type, sector,
+      s: sector * originalLength + Math.round(originalLength * (i + 1) / (order.length + 1))}));
+  }
   const center = (s) => spline(x, s / step),
     base = (s) => spline(y, s / step) + 0.32 * Math.sin(s * 0.12);
   const fork = (s) => {
@@ -272,10 +292,14 @@ function course(id) {
       14: [0.27, 0.59, 2.12],
     },
     bend = bends[id];
-  const turn = (s) =>
-    bend
-      ? bend[2] * ease(clamp((s / len - bend[0]) / (bend[1] - bend[0]), 0, 1))
-      : 0;
+  const turn = (s) => {
+    if (!bend) return 0;
+    let angle = 0;
+    for (let sector = 0; sector < 3; sector++)
+      angle += bend[2] * [1, -0.85, 0.8][sector] * ease(clamp(
+        (s / originalLength - sector - bend[0]) / (bend[1] - bend[0]), 0, 1));
+    return angle;
+  };
   const spine = [];
   if (bend) {
     let px = center(0),
@@ -305,8 +329,29 @@ function course(id) {
         Math.cos(a) * (s - u),
     ];
   }
+  // Inverse of place() near a known progress point. Flight stays in world space;
+  // this projection only queries the trail below it and does not move the rider.
+  function project(wx, wz, hint) {
+    if (!bend) return {s: -wz, l: wx - center(-wz)};
+    let s = clamp(hint, -16, len + 20);
+    for (let i = 0; i < 7; i++) {
+      const a = turn(s), p = place(center(s), s);
+      const residual = -(wx - p[0]) * Math.sin(a) + (wz - p[1]) * Math.cos(a);
+      if (Math.abs(residual) < 0.00001) break;
+      const u = s + 0.05, b = turn(u), q = place(center(u), u);
+      const next = -(wx - q[0]) * Math.sin(b) + (wz - q[1]) * Math.cos(b);
+      const derivative = (next - residual) / 0.05;
+      if (Math.abs(derivative) < 0.05) break;
+      s = clamp(s - clamp(residual / derivative, -8, 8), -16, len + 20);
+    }
+    const p = place(center(s), s), a = turn(s);
+    return {s, l:(wx - p[0]) * Math.cos(a) + (wz - p[1]) * Math.sin(a)};
+  }
   return {
     id,
+    index,
+    originalLength,
+    project,
     name,
     tag,
     theme,
@@ -325,6 +370,6 @@ function course(id) {
     fork,
     feature,
     night: id >= 10,
-    target: Math.round(len / (12 + id * 0.12) + 7),
+    target: Math.round(len / (10.5 + index * 0.16) + 12),
   };
 }

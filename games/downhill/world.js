@@ -1,20 +1,20 @@
 const T = THREE,
   V = (x = 0, y = 0, z = 0) => new T.Vector3(x, y, z);
 const themes = {
-  meadow: [0x84d4f4, 0x84bc32, 0xc68d47, 0x579f20],
-  pine: [0x8dafbc, 0x566348, 0x796449, 0x264735],
-  rock: [0xa6cce2, 0x787a70, 0x958979, 0x525d53],
-  jungle: [0xb8d3bb, 0x5d7640, 0x786047, 0x285e3e],
-  desert: [0xf1bb88, 0xb56d4c, 0xd79965, 0x704237],
-  snow: [0xb0d7e8, 0xe0e9ef, 0xd5e1eb, 0x536974],
+  meadow: [0x64d1ff, 0x6acb24, 0xe9a44d, 0x40b51b],
+  pine: [0x62bfe9, 0x49a83b, 0xbd8247, 0x197f49],
+  rock: [0x74c9fc, 0x8297ae, 0xc7a581, 0x449660],
+  jungle: [0x75dbdb, 0x38b345, 0xbe8044, 0x149450],
+  desert: [0x81c9ff, 0xd9783e, 0xf1b15b, 0x9d4d3b],
+  snow: [0x70caff, 0xeaf5ff, 0xbedff7, 0x438aa2],
   coast: [0x9bd6e3, 0x7a8966, 0xae9773, 0x4b6556],
-  park: [0xa5cfe2, 0x89914f, 0xbb875b, 0x4a6441],
-  falls: [0xb2cfc7, 0x68864c, 0x896c4b, 0x365837],
+  park: [0x64caff, 0x7acb30, 0xe9a354, 0x46a439],
+  falls: [0x66d1f1, 0x52bd3d, 0xd79848, 0x2d9c49],
   grand: [0xedb17a, 0xad6b4d, 0xc18e67, 0x7c4838],
-  neon: [0x333060, 0x41475a, 0x756c70, 0x243448],
+  neon: [0x39297b, 0x35577c, 0x9674ad, 0x226d74],
   sunset: [0xf4ab77, 0x7a7463, 0xac866b, 0x4d4c4a],
   fog: [0x899b9e, 0x526854, 0x6f6556, 0x394c46],
-  aurora: [0x25395a, 0xb5cada, 0xbccfdc, 0x364b5e],
+  aurora: [0x163d74, 0xb9e4ef, 0xa9d9ec, 0x28657e],
   lava: [0x513841, 0x524c50, 0x71605d, 0x312c33],
   city: [0x343c60, 0x536071, 0x8a7b6c, 0x47536a],
   haunted: [0x454568, 0x525b50, 0x796954, 0x39483e],
@@ -238,13 +238,13 @@ function world(scene, c) {
   scene.add(root);
   const hemi = new T.HemisphereLight(
     night ? 0xbddeff : 0xfff5dc,
-    night ? 0x62677e : 0x8a9072,
-    night ? 1.35 : 1.35,
+    night ? 0x62677e : 0x779c68,
+    night ? 1.35 : 1.15,
   );
   root.add(hemi);
   const sun = new T.DirectionalLight(
-    night ? 0xc0d8ff : 0xffe0b0,
-    night ? 1.1 : 2.3,
+    night ? 0xc0d8ff : 0xffedcf,
+    night ? 1.1 : 2.0,
   );
   sun.castShadow = true;
   sun.shadow.mapSize.set(1024, 1024);
@@ -267,7 +267,7 @@ function world(scene, c) {
         low: { value: horizon },
         high: {
           value: new T.Color(
-            night ? 0x08132c : c.theme === "sunset" ? 0x645c87 : 0x279be6,
+            night ? 0x08132c : c.theme === "sunset" ? 0x645c87 : 0x188ff3,
           ),
         },
         dark: { value: night ? 1 : 0 },
@@ -405,9 +405,11 @@ function world(scene, c) {
   if (!stone && !city && !snow) {
     landscape.material.color.set(land);
     landscape.material.map = texture("land", 91);
+    landscape.material.map.colorSpace = T.SRGBColorSpace;
     landscape.material.normalScale.set(.24, .24);
-    trail.material.color.set(0xe0a55f);
+    trail.material.color.set(0xf0ad5b);
     trail.material.map = texture("trail", 94);
+    trail.material.map.colorSpace = T.SRGBColorSpace;
     trail.material.normalScale.set(.28, .28);
   }
   // Batch scenery by material and geometry, including wheelside details, to bound draw calls.
@@ -745,7 +747,7 @@ function world(scene, c) {
     );
   }
   const water = standard(
-    c.theme === "lava" ? 0xff5422 : snow ? 0x8acbdf : 0x21c5d6,
+    c.theme === "lava" ? 0xff5422 : snow ? 0x8acbdf : 0x09ccdf,
     {
       roughness: 0.22,
       metalness: 0.32,

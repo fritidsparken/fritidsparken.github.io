@@ -10,9 +10,9 @@ def mat(n,c):
  m=bpy.data.materials.new(n); m.diffuse_color=(*c,1); m.use_nodes=True
  bs=m.node_tree.nodes.get('Principled BSDF'); bs.inputs['Base Color'].default_value=(*c,1); bs.inputs['Roughness'].default_value=.78
  return m
-leaf=[mat('Needles'+str(i),c) for i,c in enumerate([(.21,.48,.018),(.34,.63,.028),(.46,.72,.04),(.27,.55,.012)])]
-bark=mat('Warm cedar',(.38,.145,.039)); wood=mat('Honey timber',(.63,.28,.07)); gold=mat('Cut wood',(.77,.45,.14)); stone=mat('Lavender granite',(.38,.42,.49)); white=mat('Snow',(.85,.94,1)); blue=mat('Mountain blue',(.22,.4,.66))
-petals=[mat('Petal'+str(i),c) for i,c in enumerate([(1,.77,.05),(1,.17,.38),(.94,.93,.78)])]; green=mat('Grass',(.3,.57,.016))
+leaf=[mat('Needles'+str(i),c) for i,c in enumerate([(.10,.52,.008),(.23,.72,.012),(.39,.83,.018),(.15,.63,.006)])]
+bark=mat('Warm cedar',(.38,.145,.039)); wood=mat('Honey timber',(.63,.28,.07)); gold=mat('Cut wood',(.77,.45,.14)); stone=mat('Lavender granite',(.38,.42,.49)); white=mat('Snow',(.85,.94,1)); blue=mat('Mountain blue',(.085,.29,.73))
+petals=[mat('Petal'+str(i),c) for i,c in enumerate([(1,.68,.008),(1,.035,.28),(.98,.97,.87)])]; green=mat('Grass',(.13,.65,.008))
 def uv(n,p,s,m):
  bpy.ops.mesh.primitive_uv_sphere_add(segments=12,ring_count=8,location=p); o=bpy.context.object; o.name=n; o.scale=s; o.data.materials.append(m)
  for f in o.data.polygons:f.use_smooth=True

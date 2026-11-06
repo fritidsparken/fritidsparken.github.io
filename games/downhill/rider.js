@@ -21,13 +21,13 @@ function rider(parent, model, color) {
   }));
   // Preserve eight bike choices with distinct wheelbase, tire width and geometry.
   const variant = [
-    [1, 1, 1], [1.12, 1.18, .95], [1.04, .82, 1.04],
-    [1.02, 1.1, .88], [1.08, 1.28, .98], [.87, .92, .92],
-    [1.06, 1.08, .96], [1.02, .9, 1.02],
+    [1, 1, 1], [1.12, 1.18, .95], [1.04, .94, 1.04],
+    [1.02, 1.1, .88], [1.08, 1.28, .98], [.87, .96, .92],
+    [1.06, 1.08, .96], [1.02, .96, 1.02],
   ][model] || [1, 1, 1];
   frame.scale.set(1, variant[2], variant[0]);
-  const rear = V(0, .395, .65 * variant[0]);
-  const front = V(0, .395, -.72 * variant[0]);
+  const rear = V(0, .425, .65 * variant[0]);
+  const front = V(0, .425, -.72 * variant[0]);
   const handZ = -.52 * variant[0];
   bars.position.set(0, 1.23, handZ);
   const recolored = new Map();
@@ -66,7 +66,7 @@ function rider(parent, model, color) {
     wheels[0].position.copy(rear); wheels[1].position.copy(front);
     wheels.forEach((w) => {
       w.position.y += travel;
-      w.rotation.set(-distance / .395, 0, 0);
+      w.rotation.set(-distance / .425, 0, 0);
       w.scale.set(variant[1], 1, 1);
     });
     wheels[1].rotation.y = lean * .20;
@@ -77,15 +77,15 @@ function rider(parent, model, color) {
     body.position.set(lean * .06, -compress * .10 + extension * .17, pitch * .07 + extension * .40);
     for (const { sign: k, leg, arm } of limbs) {
       const p = phase + (k > 0 ? 0 : Math.PI);
-      const hip = V(k * .145, 1.3, .19).add(body.position);
-      const foot = V(k * .17, .42 + .15 * Math.sin(p) + extension * .55, .15 * Math.cos(p) + extension * .73);
+      const hip = V(k * .18, 1.3, .19).add(body.position);
+      const foot = V(k * .20, .42 + .15 * Math.sin(p) + extension * .55, .15 * Math.cos(p) + extension * .73);
       const knee = hip.clone().lerp(foot, .5);
       knee.z -= .28 * (1 - extension);
       segment(leg[0], hip, knee); segment(leg[1], knee, foot);
       leg[2].position.copy(knee); leg[2].rotation.set(0, 0, 0); leg[2].scale.setScalar(1);
       leg[3].position.copy(foot); leg[3].rotation.set(-extension * .45, 0, 0); leg[3].scale.setScalar(1);
-      const shoulder = V(k * .25, 1.68, -.03).add(body.position);
-      const hand = V(k * .31, 1.23, handZ);
+      const shoulder = V(k * .31, 1.68, -.03).add(body.position);
+      const hand = V(k * .34, 1.23, handZ);
       const elbow = shoulder.clone().lerp(hand, .5);
       elbow.x += k * .09; elbow.z += .10;
       segment(arm[0], shoulder, elbow); segment(arm[1], elbow, hand);
