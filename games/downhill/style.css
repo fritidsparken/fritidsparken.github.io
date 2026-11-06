@@ -351,3 +351,33 @@ dialog p {
   color: #ffdc98;
   font-weight: 700;
 }
+
+/* Keep the scenery dominant and controls clear of device safe areas. */
+#stage { overscroll-behavior: none; -webkit-user-select: none; }
+#hud { left: max(8px, env(safe-area-inset-left)); right: max(8px, env(safe-area-inset-right)); }
+#touch { left: max(12px, env(safe-area-inset-left)); right: max(12px, env(safe-area-inset-right)); }
+#touch button { min-width: 58px; min-height: 58px; border-radius: 18px; }
+#touch .ride-stick { width: clamp(100px, 24vw, 132px); height: clamp(100px, 24vw, 132px); }
+.audio-option { font-size: .82rem; }
+#start:disabled { cursor: wait; opacity: .75; }
+#toast { max-width: min(90vw, 440px); width: max-content; }
+#panel { max-height: 85dvh; overflow: auto; }
+@media (hover: hover) and (pointer: fine) {
+  #touch { display: none; }
+  #keyHint { display: block; max-width: 94vw; white-space: normal; text-align: center; }
+}
+@media (max-width: 420px) {
+  .chip { font-size: .85rem; }
+  #hud button { font-size: .82rem; min-height: 42px; }
+  #hudName { max-width: 90px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+  #touch .ride-stick { width: 104px; height: 104px; }
+  #touch button { min-width: 54px; min-height: 48px; }
+  #raceGoal { top: 64px; }
+  #progress { top: 58px; }
+  #toast { top: 25%; font-size: .85rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; }
+}

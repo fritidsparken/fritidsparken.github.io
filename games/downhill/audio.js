@@ -2,12 +2,24 @@
 const sound = (() => {
   let ctx,
     out,
+    musicBus,
+    effectsBus,
     tires,
     filter,
     next = 0,
     beat = 0,
     click = 0,
+    bird = 0,
     enabled = true;
+  const settings = { music: true, effects: true };
+  function configure(values) {
+    for (const key of ["music", "effects"])
+      if (typeof values[key] === "boolean") settings[key] = values[key];
+    if (ctx) {
+      musicBus.gain.setTargetAtTime(settings.music ? 0.75 : 0, ctx.currentTime, 0.04);
+      effectsBus.gain.setTargetAtTime(settings.effects ? 0.65 : 0, ctx.currentTime, 0.04);
+    }
+  }
   function init() {
     if (!ctx) {
       const C = window.AudioContext || window.webkitAudioContext;
@@ -16,6 +28,11 @@ const sound = (() => {
       out = ctx.createGain();
       out.gain.value = 0.55;
       out.connect(ctx.destination);
+      musicBus = ctx.createGain();
+      effectsBus = ctx.createGain();
+      musicBus.connect(out);
+      effectsBus.connect(out);
+      configure(settings);
       let buffer = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate),
         r = rng(321),
         samples = buffer.getChannelData(0);
@@ -27,14 +44,14 @@ const sound = (() => {
       filter.type = "bandpass";
       tires = ctx.createGain();
       tires.gain.value = 0;
-      src.connect(filter).connect(tires).connect(out);
+      src.connect(filter).connect(tires).connect(effectsBus);
       src.start();
     }
     ctx.resume().catch(() => {});
     out.gain.value = enabled ? 0.55 : 0;
   }
-  function note(f, d, amp, type = "sine", end = f) {
-    if (!ctx) return;
+  function note(f, d, amp, type = "sine", end = f, music = false) {
+    if (!ctx || !(music ? settings.music : settings.effects)) return;
     let t = ctx.currentTime,
       o = ctx.createOscillator(),
       g = ctx.createGain();
@@ -44,7 +61,8 @@ const sound = (() => {
     g.gain.setValueAtTime(0.0001, t);
     g.gain.exponentialRampToValueAtTime(amp, t + 0.008);
     g.gain.exponentialRampToValueAtTime(0.0001, t + d);
-    o.connect(g).connect(out);
+    o.connect(g).connect(music ? musicBus : effectsBus);
+    o.onended = () => { o.disconnect(); g.disconnect(); };
     o.start();
     o.stop(t + d + 0.02);
   }
@@ -59,20 +77,26 @@ const sound = (() => {
       note(brake ? 620 : pedal ? 116 : 210, 0.027, 0.026, "triangle");
       click = t + (pedal ? 0.32 : 1.2 / Math.max(3, v));
     }
+    if (settings.effects && t > bird && v < 22) {
+      // Original synthesized two-note birdsong; no downloaded samples.
+      note(1750 + 150 * Math.sin(beat), 0.17, 0.022, "sine", 2450);
+      bird = t + 8 + (beat % 4);
+    }
     if (t >= next) {
       let chord = [146.83, 174.61, 130.81, 196][Math.floor(beat / 8) % 4];
       note(
         chord * [1, 1.5, 2, 1.25, 1.5, 2.5, 2, 1.5][beat % 8],
         0.39,
         0.085,
-        "sine",
+        "sine", undefined, true,
       );
-      if (beat % 4 === 0) note(chord / 2, 0.78, 0.095, "triangle");
+      if (beat % 4 === 0) note(chord / 2, 0.78, 0.095, "triangle", chord / 2, true);
       next = t + 0.31;
       beat++;
     }
   }
   return {
+    configure,
     init,
     tick,
     land: (p) =>
