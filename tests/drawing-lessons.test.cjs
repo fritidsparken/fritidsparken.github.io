@@ -4,7 +4,18 @@ const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/st
 const source=fs.readFileSync('js/drawing-guides.js','utf8').split('// Paced drawing lessons:')[1];
 const script=source.slice(source.indexOf('(()=>{'));
 const site=fs.readFileSync('js/site.js','utf8');
-const ids=vm.runInNewContext(site.slice(site.indexOf('const drawingAnimals='),site.indexOf('let activeDrawing='))+'drawingAnimals.map(a=>a.id)');
+const newSource=fs.readFileSync('js/drawing-new-100.js','utf8');
+const window={};vm.runInNewContext(newSource,{window});
+const registry=site.slice(site.indexOf('const drawingAnimals='),site.indexOf('function drawingStepCount'));
+const ids=vm.runInNewContext(registry+'drawingAnimals.map(a=>a.id)',{window});
+const gallery=site.slice(site.indexOf('function drawingGallery('),site.indexOf('function pearlSvg('));
+// Exercise the actual dialog builder; this caught the missing a.steps.concat crash.
+for(const id of ids){
+ const html=vm.runInNewContext(registry+gallery+'activeDrawing='+JSON.stringify(id)+';drawingGallery("")', {window,drawingGuideSprite:a=>'<canvas data-drawing-guide="'+a.id+'"></canvas>'});
+ assert.ok(html.includes('role="dialog"'),id+' opens a dialog');
+ assert.ok(!html.includes('undefined'),id+' has complete instructions');
+}
+assert.equal(new Set(Object.values(window.newDrawingLessons).map(l=>JSON.stringify(l.groups))).size,100,'all new motifs have distinct artwork');
 function setup(id){
  const observers=[],frames=new Map();let seq=0,clock=100;
  class El{
@@ -27,7 +38,7 @@ function setup(id){
  }
  const document={body:new El('body'),head:new El('head'),hidden:false,createElement:t=>new El(t),createElementNS:(_,t)=>new El(t),getElementById:()=>null,querySelectorAll:s=>document.body.querySelectorAll(s)};
  const modal=new El('article');modal.className='draw-modal';const holder=new El('div');holder.className='draw-modal-guides';const canvas=new El('canvas');canvas.dataset.drawingGuide=id;holder.append(canvas);modal.append(holder);document.body.append(modal);
- vm.runInNewContext(script,{document,MutationObserver:class{constructor(fn){this.fn=fn;observers.push(this)}observe(){}disconnect(){this.stopped=true}},requestAnimationFrame:fn=>{frames.set(++seq,fn);return seq},cancelAnimationFrame:n=>frames.delete(n)});
+ vm.runInNewContext(script,{window,document,MutationObserver:class{constructor(fn){this.fn=fn;observers.push(this)}observe(){}disconnect(){this.stopped=true}},requestAnimationFrame:fn=>{frames.set(++seq,fn);return seq},cancelAnimationFrame:n=>frames.delete(n)});
  const lesson=()=>holder.querySelector('.draw-lesson'),cards=()=>holder.querySelectorAll('.draw-lesson-board'),next=()=>holder.querySelector('.draw-lesson-wait')?.querySelector('button');
  function finish(){let guard=0;while(frames.size){assert.ok(guard++<1000,'animation terminates');clock+=3000;const pending=[...frames.values()];frames.clear();pending.forEach(fn=>fn(clock))}}
  return {document,holder,modal,observers,frames,lesson,cards,next,finish};
@@ -43,4 +54,4 @@ for(const id of ids){
  }
  const close=setup(id);close.modal.remove();close.observers.forEach(o=>!o.stopped&&o.fn());assert.equal(close.frames.size,0,id+' close cancels animation');
 }
-assert.equal(ids.length,33);console.log('PASS: all 33 motifs × 5 steps, pause gates, replay, double-click protection, and close cleanup.');
+assert.equal(ids.length,133);console.log('PASS: all 133 dialogs open; 133 motifs × 5 steps, pause gates, replay, double-click protection, and close cleanup.');

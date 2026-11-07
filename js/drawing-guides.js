@@ -164,13 +164,32 @@ mount(document);
   function render(index,svg){
    const active=[];
    if(lesson){
+    let grainId;
+    if(index===4&&lesson.illustrated){
+     grainId='drawing-grain-'+id;
+     const grain=element('pattern',{id:grainId,width:28,height:30,patternUnits:'userSpaceOnUse'});
+     grain.append(element('path',{d:'M2 3l2 4m9-1 2 3m7 6 2 4m-16 1 2 3m9 2 2 4M1 27l2 3',stroke:'#fff8df','stroke-width':.55,fill:'none'}));svg.append(grain);
+    }
     // Keep construction lines until the clean contour step, then remove them.
     if(index>0&&index<3)lesson.groups[0].forEach(([d])=>path(svg,d,{opacity:.25,'stroke-width':1.4}));
     const first=index===0?0:1,last=Math.min(index,3);
     for(let group=first;group<=last;group++){
      lesson.groups[group].forEach(([d,color])=>{
-      const p=path(svg,d,{fill:color?(index===4?color:'#082c1d'):'none',...(group===0?{opacity:.6,'stroke-width':1.5}:{})});
-      if(index===4&&color){p.setAttribute('fill-opacity',0);active.push({p,color:true,fillOnly:true})}
+      const filled=color&&(!lesson.illustrated||/[zZ]/.test(d));
+      let pigment=color;
+      if(index===4&&filled&&lesson.illustrated){
+       const gradientId='drawing-pigment-'+id+'-'+group+'-'+svg.querySelectorAll('path').length;
+       const gradient=element('linearGradient',{id:gradientId,gradientUnits:'userSpaceOnUse',x1:60,y1:70,x2:220,y2:320});
+       window.drawingPigment(color).forEach((c,n)=>gradient.append(element('stop',{offset:n/2,'stop-color':c})));
+       svg.append(gradient);pigment='url(#'+gradientId+')';
+      }
+      const p=path(svg,d,{fill:filled?(index===4?pigment:'#082c1d'):'none',...(index===4&&lesson.illustrated?{stroke:color&&!filled?color:'#3e4d3e','stroke-width':1.7}:{}),...(group===0?{opacity:.6,'stroke-width':1.5}:{})});
+      if(index===4&&filled){
+       p.setAttribute('fill-opacity',0);
+       let texture;
+       if(grainId){texture=element('path',{d,fill:'url(#'+grainId+')','fill-opacity':0,stroke:'none'});svg.append(texture)}
+       active.push({p,color:true,fillOnly:true,texture});
+      }
       else if(group===index)active.push({p});
      });
     }
@@ -207,7 +226,7 @@ mount(document);
     if(!document.hidden)elapsed+=dt;
     const a=active[item],duration=a.color?(lesson?450:700):Math.max(650,Math.min(2800,a.length*9));
     const progress=Math.min(1,elapsed/duration);
-    if(a.color){a.p.setAttribute(a.fillOnly?'fill-opacity':'opacity',progress);pen.setAttribute('visibility','hidden')}
+    if(a.color){a.p.setAttribute(a.fillOnly?'fill-opacity':'opacity',progress);if(a.texture)a.texture.setAttribute('fill-opacity',progress*.12);pen.setAttribute('visibility','hidden')}
     else{a.p.style.strokeDashoffset=a.length*(1-progress);const pt=a.p.getPointAtLength(a.length*progress);pen.setAttribute('cx',pt.x);pen.setAttribute('cy',pt.y)}
     if(progress===1){if(a.fill)a.p.setAttribute('fill',a.fill);item++;elapsed=0}
     if(item<active.length){frame=requestAnimationFrame(tick);return}
