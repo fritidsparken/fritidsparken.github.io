@@ -295,8 +295,8 @@ window.paintNewDrawingSprite=canvas=>{
  const lesson=lessons[canvas.dataset.drawingGuide];if(!lesson||canvas.dataset.rendered)return false;
  canvas.dataset.loading='1';
  const img=new Image();img.onload=()=>{
- canvas.width=1993;canvas.height=530;const ctx=canvas.getContext('2d');
- for(let i=0;i<5;i++)ctx.drawImage(img,(34+i*388)*img.width/1993,150*img.height/789,372*img.width/1993,515*img.height/789,34+i*388,8,372,515);
+ canvas.width=1924;canvas.height=498;const ctx=canvas.getContext('2d');
+ for(let i=0;i<5;i++)ctx.drawImage(img,(34+i*388)*img.width/1993,150*img.height/789,372*img.width/1993,515*img.height/789,i*388,0,372,498);
  canvas.dataset.rendered='1';delete canvas.dataset.loading;
  };img.onerror=()=>{canvas.dataset.failed='1';delete canvas.dataset.loading};img.src=lesson.sheet;
  return true;

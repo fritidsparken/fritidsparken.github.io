@@ -22,7 +22,7 @@ const crops={
 };
 // Crop inside each source frame so only the shared outer frame is rendered.
 const panelInteriors={"halloween-ghost-guide.webp":[[42,154,416,636],[445,154,794,636],[823,154,1170,636],[1199,154,1548,636],[1578,154,1953,636]],"halloween-pumpkin-guide.webp":[[42,154,416,636],[445,154,794,636],[823,154,1170,636],[1199,154,1548,636],[1578,154,1953,636]],"halloween-bat-guide.webp":[[42,154,416,636],[445,154,794,636],[823,154,1170,636],[1199,154,1548,636],[1578,154,1953,636]],"boat-chalkboard.png":[[69,166,424,573],[455,166,790,573],[821,166,1170,573],[1201,166,1550,573],[1580,166,1931,570]],"butterfly.png":[[45,130,401,637],[428,130,788,637],[815,130,1176,637],[1202,130,1564,637],[1590,130,1948,637]],"car-chalkboard.png":[[67,167,423,574],[455,167,794,574],[825,167,1171,574],[1203,167,1551,574],[1582,167,1933,574]],"cat-slate-guide.png":[[68,165,422,581],[453,165,790,581],[821,165,1169,581],[1200,165,1548,581],[1579,165,1932,581]],"dinosaur.png":[[45,118,384,659],[415,118,782,659],[813,118,1179,659],[1209,118,1569,659],[1600,118,1947,659]],"dog-chalkboard.png":[[48,220,366,666],[397,220,704,666],[735,220,1040,666],[1070,220,1379,666],[1409,220,1728,666]],"dolphin.png":[[45,143,424,657],[437,143,789,657],[817,143,1194,657],[1208,143,1576,656],[1589,143,1948,657]],"dragon.png":[[45,145,421,645],[434,145,803,645],[816,145,1191,645],[1204,145,1581,645],[1594,145,1947,645]],"elephant-chalkboard.png":[[42,216,361,653],[388,216,704,653],[729,216,1045,653],[1070,216,1390,653],[1415,216,1740,653]],"flower-chalkboard.png":[[69,167,423,572],[454,167,790,572],[822,167,1170,572],[1202,167,1549,572],[1581,167,1930,572]],"giraffe.png":[[45,109,406,694],[439,109,790,694],[821,109,1173,694],[1205,109,1560,694],[1592,109,1948,694]],"horse.png":[[45,116,382,656],[412,116,779,656],[809,116,1176,656],[1205,116,1572,656],[1602,116,1947,656]],"house-chalkboard.png":[[40,230,360,651],[386,230,703,651],[729,230,1046,651],[1072,230,1388,651],[1415,230,1735,651]],"kite-chalkboard.png":[[68,166,422,573],[454,166,792,573],[823,166,1171,573],[1202,166,1550,573],[1581,166,1930,573]],"koala.png":[[45,152,392,627],[423,152,783,627],[815,152,1177,627],[1208,152,1572,627],[1603,152,1947,627]],"owl.png":[[45,141,397,649],[430,141,788,649],[819,141,1177,649],[1208,141,1567,649],[1597,141,1935,650]],"panda.png":[[45,140,402,644],[436,140,789,644],[820,140,1177,644],[1205,140,1562,644],[1592,140,1948,644]],"peacock.png":[[45,124,389,659],[421,124,783,659],[813,124,1180,659],[1211,124,1574,659],[1604,124,1948,659]],"penguin.png":[[45,147,405,648],[434,147,788,649],[814,147,1169,649],[1198,148,1561,649],[1588,147,1947,649]],"phoenix.png":[[45,125,397,697],[429,125,784,697],[816,125,1177,697],[1209,125,1567,697],[1599,125,1948,697]],"rabbit-chalkboard.png":[[48,190,368,683],[397,190,707,683],[735,190,1041,683],[1069,190,1377,683],[1406,190,1727,683]],"rocket-chalkboard.png":[[50,178,361,653],[391,178,698,653],[728,178,1034,653],[1063,178,1378,653],[1407,178,1731,654]],"snake.png":[[42,154,415,635],[447,154,811,636],[823,154,1189,636],[1202,154,1565,636],[1579,154,1956,635]],"tiger.png":[[45,128,394,653],[427,128,784,653],[817,128,1176,653],[1209,128,1567,653],[1600,128,1948,653]],"tree-chalkboard.png":[[67,168,420,572],[451,168,790,572],[820,168,1170,572],[1199,168,1551,572],[1581,168,1932,572]],"turtle.png":[[45,157,416,657],[428,156,799,657],[811,156,1181,657],[1193,156,1577,657],[1590,156,1947,658]],"umbrella-chalkboard.png":[[69,166,422,573],[454,166,792,573],[824,166,1171,573],[1202,166,1550,573],[1582,166,1932,573]],"wolf.png":[[45,126,386,616],[418,126,780,616],[812,126,1176,616],[1208,126,1573,616],[1604,126,1947,616]]};
-const W=1993,H=789,PW=372,PH=498,GAP=16,LEFT=34,TOP=147;
+const W=1924,H=789,PW=372,PH=498,GAP=16,LEFT=0,TOP=147;
 const missingNumbers=new Set(["fox-guide-final.webp","lion-guide.webp"]);
 const panelCutsCache=new Map();
 function getPanelCuts(img,crop,file){
@@ -59,7 +59,7 @@ function paint(canvas){
  canvas.dataset.loading="1";
  const img=new Image();
  img.onload=()=>{
-  const renderTop=16,renderHeight=PH+32;
+  const renderTop=0,renderHeight=PH;
   canvas.width=W;canvas.height=renderHeight;
   const ctx=canvas.getContext("2d",{willReadFrequently:true});
   ctx.clearRect(0,0,W,renderHeight);
@@ -149,40 +149,37 @@ mount(document);
    const style=document.createElement('style');style.id='draw-lesson-style';style.textContent=`
 body:has(.draw-modalback){overflow:hidden}
 .draw-modalback{padding:8px!important}
-.draw-modal.animated-drawing{box-sizing:border-box;display:flex!important;flex-direction:column;gap:10px;width:min(1320px,calc(100vw - 16px))!important;max-height:calc(100dvh - 16px)!important;padding:14px!important;overflow:auto;--board-h:min(31dvh,calc((100vw - 128px)*.2677));}
+.draw-modal.animated-drawing{box-sizing:border-box;display:flex!important;flex-direction:column;gap:6px;width:min(1320px,calc(100vw - 16px))!important;max-height:calc(100dvh - 16px)!important;padding:10px!important;overflow:hidden;--board-h:min(34dvh,calc((100vw - 52px)*.2588));}
 .draw-modal.animated-drawing .draw-modal-title{flex:none;margin:0 46px 0 0;min-height:38px;gap:8px}
 .draw-modal.animated-drawing .draw-modal-title h2{font-size:clamp(17px,2.4vw,26px)}
 .draw-modal.animated-drawing .draw-modal-title>span{font-size:28px}
 .draw-modal.animated-drawing .draw-modal-close{top:10px;right:10px;width:36px;height:36px;font-size:26px;z-index:1}
-.draw-modal.animated-drawing .draw-modal-guides{flex:none;min-width:0;width:100%;box-sizing:border-box;background:#182b21!important;padding:8px!important;margin:0!important}
-.draw-modal.animated-drawing .draw-modal-guides>.draw-guide-sprite{display:block;width:min(100%,94dvh)!important;height:auto!important;max-height:25dvh!important;aspect-ratio:1993/530!important;object-fit:contain;margin:0 auto!important}
+.draw-modal.animated-drawing .draw-modal-guides{flex:none;min-width:0;width:min(100%,calc(var(--board-h)*3.86346));align-self:center;box-sizing:content-box;background:#182b21!important;padding:0!important;margin:0!important}
+.draw-modal.animated-drawing .draw-modal-guides>.draw-guide-sprite{display:block;width:100%!important;height:auto!important;max-height:none!important;aspect-ratio:1924/498!important;margin:0!important}
 .draw-modal.animated-drawing .draw-lesson{margin:8px 0 0;color:#fff4e2}
-.draw-modal.animated-drawing .draw-lesson-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;align-items:start}
+.draw-modal.animated-drawing .draw-lesson-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));column-gap:.8316%;align-items:start}
+
 .draw-lesson-card{min-width:0;margin:0;display:flex;flex-direction:column;align-items:center}
-.draw-modal.animated-drawing .draw-lesson-board,.draw-modal.animated-drawing .draw-lesson-wait{box-sizing:border-box;width:min(100%,calc(var(--board-h)*.747));height:var(--board-h);aspect-ratio:372/498;border:2px solid #416b4e;border-radius:12px;background:radial-gradient(ellipse at top,#164b34,#082c1d);margin:0 auto;}
+.draw-modal.animated-drawing .draw-lesson-board,.draw-modal.animated-drawing .draw-lesson-wait{box-sizing:border-box;width:100%;height:auto;aspect-ratio:372/498;border:2px solid #416b4e;border-radius:12px;background:radial-gradient(ellipse at top,#164b34,#082c1d);margin:0 auto;}
 .draw-lesson-board{display:block}
 .draw-lesson-wait{display:flex;align-items:center;justify-content:center;padding:6px;text-align:center}
 .draw-lesson button{font:inherit;cursor:pointer;border-radius:10px;padding:6px;border:1px solid #709680;background:#f8ae55;color:#18231e;font-weight:750;min-height:44px;max-width:100%;white-space:normal;line-height:1.2}
 .draw-lesson button:focus-visible{outline:3px solid white;outline-offset:2px}
-.draw-modal.animated-drawing .draw-lesson-replay{margin-top:5px;background:#214e38!important;color:#fff4e2!important;width:min(100%,calc(var(--board-h)*.747));font-size:12px!important}
+.draw-modal.animated-drawing .draw-lesson-replay{margin-top:5px;background:#214e38!important;color:#fff4e2!important;width:100%;font-size:12px!important}
 .draw-modal.animated-drawing .draw-lesson-status{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .draw-lesson [hidden]{display:none!important}
-@media(max-width:600px) and (orientation:portrait){
- .draw-modal.animated-drawing{--board-h:min(23dvh,calc((100vw - 84px)*.446));padding:10px!important;gap:6px}
- .draw-modal.animated-drawing .draw-lesson-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
- .draw-modal.animated-drawing .draw-modal-guides>.draw-guide-sprite{width:min(100%,60dvh)!important;height:auto!important}
- .draw-lesson button{font-size:12px}
+@media(max-width:600px){
+ .draw-modal.animated-drawing{padding:8px!important;--board-h:min(32dvh,calc((100vw - 36px)*.2588))}
+ .draw-lesson button{font-size:10px;padding:3px;min-height:36px;border-radius:6px}
 }
 @media(max-height:460px) and (orientation:landscape){
- .draw-modal.animated-drawing{--board-h:29dvh;padding:8px!important;gap:4px}
+ .draw-modal.animated-drawing{--board-h:calc((100dvh - 112px)/2);padding:8px!important;gap:4px}
  .draw-modal.animated-drawing .draw-modal-title{min-height:30px}
  .draw-modal.animated-drawing .draw-modal-title h2{font-size:17px}
  .draw-modal.animated-drawing .draw-modal-title>span{font-size:22px}
- .draw-modal.animated-drawing .draw-modal-guides{padding:5px!important}
- .draw-modal.animated-drawing .draw-modal-guides>.draw-guide-sprite{width:min(100%,86dvh)!important;height:auto!important}
- .draw-modal.animated-drawing .draw-lesson{margin-top:4px}
- .draw-lesson button{font-size:11px;padding:4px}
+ .draw-lesson button{font-size:10px;padding:3px;min-height:30px}
 }
+
 `;
    document.head.append(style);
   }
@@ -199,26 +196,15 @@ body:has(.draw-modalback){overflow:hidden}
   function render(index,svg){
    const active=[];
    if(lesson?.sheet){
-    const stages=window.tracedDrawingStages?.[id];
-    if(!stages)throw new Error('Ritlinjer saknas för '+id);
-    const stage=stages[Math.min(index,3)],maskId='exact-ink-'+id+'-'+index;
-    const mask=element('mask',{id:maskId,maskUnits:'userSpaceOnUse',x:0,y:0,width:280,height:375});
-    mask.append(element('rect',{x:0,y:0,width:280,height:375,fill:'#000'}));
-    // Keep only the frame and number visible while the actual source ink is drawn.
-    mask.append(element('path',{d:'M0 0H280V375H0ZM9 49V366H271V49Z',fill:'#fff','fill-rule':'evenodd'}));
-    svg.append(mask);
-    const panel=element('svg',{x:0,y:0,width:280,height:375,viewBox:(34+index*388)+' 150 372 515',preserveAspectRatio:'none'});
-    panel.append(element('image',{href:lesson.sheet,width:1993,height:789}));
-    const ink=element('g',{mask:'url(#'+maskId+')'});ink.append(panel);svg.append(ink);
-    const runs=[...stage.fixed,...stage.draw];
-    runs.forEach(d=>{
-     const p=element('path',{d,fill:'none',stroke:'#fff','stroke-width':index===4?18:5,'stroke-linecap':'round','stroke-linejoin':'round'});
-     mask.append(p);active.push({p,exact:true});
-    });
-    // The completed frame is the original panel, never an approximate vector copy.
-    const complete=element('svg',{x:0,y:0,width:280,height:375,viewBox:(34+index*388)+' 150 372 515',preserveAspectRatio:'none',opacity:0});
-    complete.append(element('image',{href:lesson.sheet,width:1993,height:789}));svg.append(complete);
-    svg.exactCompletedPanel=complete;
+    const stage=window.tracedDrawingStages[id][Math.min(index,3)];
+    const source=()=>{
+     const panel=element('svg',{x:0,y:0,width:280,height:375,viewBox:(34+index*388)+' 150 372 515',preserveAspectRatio:'none',opacity:0});
+     panel.append(element('image',{href:lesson.sheet,width:1993,height:789}));return panel;
+    };
+    stage.fixed.forEach(d=>path(svg,d));
+    stage.draw.forEach(d=>{const p=path(svg,d,index===0?{opacity:.6,'stroke-width':1.5}:{});if(index<4)active.push({p});});
+    const complete=source();svg.append(complete);svg.exactCompletedPanel=complete;
+    if(index===4)active.push({p:complete,color:true});
     return active;
    }
    if(lesson){
@@ -274,7 +260,7 @@ body:has(.draw-modalback){overflow:hidden}
    const circle=element('circle',{cx:25,cy:25,r:19,fill:'#ff791e'}),num=element('text',{x:25,y:32,'text-anchor':'middle',fill:'#fff','font-size':23,'font-family':'system-ui','font-weight':700});num.textContent=index+1;svg.append(circle,num);
    const active=render(index,svg);
    active.forEach(a=>{if(!a.color){a.length=a.p.getTotalLength();a.p.style.strokeDasharray=a.length;a.p.style.strokeDashoffset=a.length;if(a.p.getAttribute('fill')!=='none'){a.fill=a.p.getAttribute('fill');a.p.setAttribute('fill','none')}}});
-   if(lesson?.sheet){const total=active.reduce((n,a)=>n+a.length,0);active.forEach(a=>a.duration=Math.max(45,a.length/total*(index===4?12000:20000)));}
+   if(lesson?.sheet&&index<4){active.forEach(a=>a.duration=Math.max(120,Math.min(2800,a.length*9)));}
    const pen=element('circle',{r:4,fill:'#ffbf63',stroke:'#fff','stroke-width':1});svg.append(pen);
 
    status.textContent='Steg '+(index+1)+' av 5 – följ pennan.';

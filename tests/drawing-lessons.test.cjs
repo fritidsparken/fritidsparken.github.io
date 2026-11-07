@@ -48,10 +48,9 @@ for(const id of ids){
  for(let i=0;i<5;i++){
   t.finish();
   if(id.startsWith('nyrit')){
-   const exact=t.cards()[i].exactCompletedPanel;
-   assert.ok(exact,id+' uses original panel');
-   assert.equal(exact.getAttribute('opacity'),'1',id+' finishes with exact original pixels');
-   assert.equal(exact.getAttribute('viewBox'),(34+i*388)+' 150 372 515',id+' selects matching source step');
+   assert.equal(t.cards()[i].querySelectorAll('mask').length,0,id+' uses the same unmasked stroke renderer as the bat');
+   assert.equal(t.cards()[i].exactCompletedPanel.getAttribute('opacity'),'1',id+' completes the matching original image');
+   assert.ok(t.cards()[i].querySelectorAll('path').length>0,id+' draws real paths');
   }
   assert.equal(t.cards().length,i+1,id+' remains paused');assert.equal(t.frames.size,0);
   const repeats=t.holder.querySelectorAll('.draw-lesson-replay');assert.equal(repeats.length,i+1);
