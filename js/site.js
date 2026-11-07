@@ -80,8 +80,8 @@ const drawingAnimals=[
 {id:"bat",name:"Båt",article:"en",difficulty:"Lätt",emoji:"⛵",kind:"boat",subjectKind:"Saker"},
 {id:"pappersdrake",name:"Pappersdrake",article:"en",difficulty:"Lätt",emoji:"🪁",kind:"kite",subjectKind:"Saker"}
 ];
-drawingAnimals.push(...(window.newDrawingSubjects||[]));
 let activeDrawing=null,drawingStep=1,drawingDifficulty="Alla",drawingKind="Alla";
+drawingAnimals.push(...(window.newDrawingSubjects||[]));
 const drawingGuideAsset={spoke:"halloween-ghost-guide.webp",pumpa:"halloween-pumpkin-guide.webp",fladdermus:"halloween-bat-guide.webp",katt:"cat-slate-guide.png",hund:"dog-chalkboard.png",kanin:"rabbit-chalkboard.png",fjaril:"butterfly.png",panda:"panda.png",lejon:"lion-guide.webp",rav:"fox-guide-final.webp",elefant:"elephant-chalkboard.png",uggla:"owl.png",skoldpadda:"turtle.png",dinosaurie:"dinosaur.png",giraff:"giraffe.png",hast:"horse.png",tiger:"tiger.png",drake:"dragon.png",varg:"wolf.png",pafagel:"peacock.png",delfin:"dolphin.png",pingvin:"penguin.png",koala:"koala.png",orm:"snake.png",fenix:"phoenix.png",blomma:"flower-chalkboard.png",hus:"house-chalkboard.png",raket:"rocket-chalkboard.png",bil:"car-chalkboard.png",paraply:"umbrella-chalkboard.png",trad:"tree-chalkboard.png",bat:"boat-chalkboard.png",pappersdrake:"kite-chalkboard.png"};
 const drawingDirections={
 spoke:["Rita en rund huvudform och en klockformad kropp med en lätt mittlinje.","Forma två vinkande armar och en mjukt vågig nederkant.","Lägg till två stora ögon, ögonbryn och en liten glad mun.","Sudda hjälplinjen och förstärk konturen. Rita några mjuka veck i kroppen."],
