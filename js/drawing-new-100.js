@@ -12,7 +12,7 @@ const categories=[
 ["Roliga snacks","food",[
 ["Popcorn","🍿"],["Pommes frites","🍟"],["Hamburgare","🍔"],["Tårta","🎂"],["Marshmallow","🍡"],["Kaka","🍪"],["Chokladkaka","🍫"],["Munk med strössel","🍩"],["Citron","🍋"],["Vattenmelon","🍉"]]],
 ["Magiska motiv","magic",[
-["Enhörning","🦄"],["Drakunge","🐲"],["Sjöjungfru","🧜"],["Trollstav","🪄"],["Sagocastle","🏰"],["Regnbågsmoln","🌈"],["Magisk svamp","🍄"],["Älva","🧚"],["Robotmonster","🤖"],["Slime","🟢"]]],
+["Enhörning","🦄"],["Drakunge","🐲"],["Sjöjungfru","🧜"],["Trollstav","🪄"],["Sagoslott","🏰"],["Regnbågsmoln","🌈"],["Magisk svamp","🍄"],["Älva","🧚"],["Robotmonster","🤖"],["Slime","🟢"]]],
 ["Havets djur","sea",[
 ["Bläckfisk","🐙"],["Manet","🪼"],["Sjöstjärna","⭐"],["Krabba","🦀"],["Haj","🦈"],["Sjöhäst","🐠"],["Val","🐳"],["Tropisk fisk","🐠"],["Säl","🦭"],["Korall","🪸"]]],
 ["Fordon och fart","vehicle",[
@@ -135,6 +135,10 @@ function makeLesson(name,type,v){
    if(variety===3){add(1,'M140 58L61 205H100L48 268H232L180 205H219Z','#67b186');add(1,'M128 266V323H152V266Z','#9c755a');add(3,circle(115,195,13),pink);add(3,circle(167,245,12),'#f8d276')}
    if(variety===4){add(1,'M140 80Q203 61 218 134Q234 221 140 298Q46 221 62 134Q77 61 140 80Z',color);add(1,'M139 113L158 132L139 150L121 132Z',light);add(3,circle(112,244,11),pink);add(3,circle(170,244,11),pink)}
    add(2,circle(117,170,8,10),dark);add(2,circle(163,170,8,10),dark);add(2,'M128 193Q140 208 152 193');
+ }
+ // Every stage must contain at least one drawable path for the paced animation clock.
+ for(let stage=0;stage<4;stage++){
+  if(!g[stage].length)add(stage,stage===2?'M127 200Q140 216 153 200':'M130 280L140 287L150 280');
  }
  // Each has four incremental geometry groups; the fifth step uses the shared color-fill animation.
  const texts=['Rita den stora grundformen med mjuka hjälplinjer.',
