@@ -258,7 +258,9 @@ function makeLesson(name){
 }
 const subjects=[],lessons={};let count=0;
 for(const [category,type,items] of categories)for(const [name,emoji] of items){
+ if(count>=30)continue;
  const id='nyrit'+String(++count).padStart(3,'0'),lesson=makeLesson(name);
+ lesson.sheet='assets/drawing-guides/illustrated-100/'+id+'.webp';
  const n=lesson.groups.flat().length;
  if(type==='animal'){
   lesson.texts[0]='Börja med lätta grundformer för huvud och kropp. Följ proportionerna i första rutan.';
@@ -279,7 +281,7 @@ for(const [category,type,items] of categories)for(const [name,emoji] of items){
  }
 
  const article=['Lamm','Marsvin','Tennisracket','Badmintonracket','Flygplan','Sagoslott','Regnbågsmoln','Robotmonster','Slime','UFO','Rymdäventyr','Hjärta','Fyrverkeri'].includes(name)?'ett':'en';
- subjects.push({id,name,article,difficulty:n<16?'Lätt':n<28?'Medel':'Svårt',emoji,kind:type,subjectKind:type==='animal'||type==='sea'?'Djur':'Saker',category});
+ subjects.push({id,name,article,difficulty:({Hamster:'Medel',Igelkott:'Svårt',Marsvin:'Medel',Ekorre:'Svårt',Mus:'Medel',Lamm:'Medel',Gris:'Medel',Kyckling:'Lätt',Groda:'Medel',Björnung:'Medel',Axolotl:'Svårt',Kapybara:'Medel',Quokka:'Medel','Röd panda':'Svårt',Fennekräv:'Svårt',Utter:'Medel',Wombat:'Medel',Lemur:'Svårt',Alpacka:'Svårt',Sockerglidare:'Svårt',Donut:'Lätt',Glass:'Lätt','Bubble tea':'Lätt',Cupcake:'Medel',Våffla:'Medel',Pizza:'Lätt',Taco:'Medel',Sushi:'Medel',Jordgubbe:'Lätt',Avokado:'Lätt'})[name],emoji,kind:type,subjectKind:type==='animal'||type==='sea'?'Djur':'Saker',category});
  lessons[id]=lesson;
 }
 window.newDrawingSubjects=subjects;window.newDrawingLessons=lessons;
@@ -291,31 +293,13 @@ window.drawingPigment=(color)=>{
 };
 window.paintNewDrawingSprite=canvas=>{
  const lesson=lessons[canvas.dataset.drawingGuide];if(!lesson||canvas.dataset.rendered)return false;
+ canvas.dataset.loading='1';
+ const img=new Image();img.onload=()=>{
  canvas.width=1993;canvas.height=530;const ctx=canvas.getContext('2d');
- for(let i=0;i<5;i++){
-  const x=34+i*388,y=16;
-  ctx.save();ctx.beginPath();ctx.roundRect(x,y,372,498,17);ctx.clip();
-  const bg=ctx.createRadialGradient(x+150,y+20,0,x+180,y+250,420);bg.addColorStop(0,'#164b34');bg.addColorStop(1,'#082c1d');ctx.fillStyle=bg;ctx.fillRect(x,y,372,498);
-  // Fixed-seed fine grain; no randomness or flickering between gallery and dialog.
-  ctx.globalAlpha=.055;ctx.fillStyle='#f4ead3';for(let j=0;j<2000;j++)ctx.fillRect(x+(j*73.19)%372,y+(j*131.37)%498,1,1);ctx.globalAlpha=1;
-  ctx.translate(x,y);ctx.scale(372/280,498/375);
-  if(i>0&&i<3){ctx.globalAlpha=.23;ctx.strokeStyle='#f4ead3';ctx.lineWidth=1.4;for(const [d] of lesson.groups[0])ctx.stroke(new Path2D(d));ctx.globalAlpha=1;}
-  for(let k=i===0?0:1;k<=Math.min(i,3);k++)for(const [d,color] of lesson.groups[k]){
-   const path=new Path2D(d);ctx.lineJoin='round';ctx.lineCap='round';ctx.lineWidth=k===0?1.5:i===4?1.7:2.3;
-   const closed=/[zZ]/.test(d);
-   if(color&&closed){
-    if(i===4){const grad=ctx.createLinearGradient(60,70,220,320);window.drawingPigment(color).forEach((c,n)=>grad.addColorStop(n/2,c));ctx.fillStyle=grad;}else ctx.fillStyle='#082c1d';
-    ctx.fill(path);
-    if(i===4){ctx.save();ctx.clip(path);ctx.globalAlpha=.12;ctx.strokeStyle='#fff8df';ctx.lineWidth=.55;
-     ctx.beginPath();for(let j=0;j<460;j++){const gx=(j*71.27)%280,gy=(j*113.81)%375;ctx.moveTo(gx,gy);ctx.lineTo(gx+2,gy+4)}ctx.stroke();ctx.restore();}
+ for(let i=0;i<5;i++)ctx.drawImage(img,(34+i*388)*img.width/1993,150*img.height/789,372*img.width/1993,515*img.height/789,34+i*388,8,372,515);
+ canvas.dataset.rendered='1';delete canvas.dataset.loading;
+ };img.onerror=()=>{canvas.dataset.failed='1';delete canvas.dataset.loading};img.src=lesson.sheet;
+ return true;
 
-   }
-   ctx.strokeStyle=k===0?'#829d87':i===4?(color&&!closed?color:'#3e4d3e'):'#f4ead3';ctx.stroke(path);
-  }
-  if(i===4){ctx.globalAlpha=.08;ctx.fillStyle='#fff5df';for(let j=0;j<3200;j++)ctx.fillRect((j*71.27)%280,(j*113.81)%375,.65,.65);ctx.globalAlpha=1;}
-  ctx.fillStyle='#ff791e';ctx.beginPath();ctx.arc(25,25,19,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.font='700 23px system-ui';ctx.textAlign='center';ctx.fillText(String(i+1),25,32);
-  ctx.restore();ctx.strokeStyle='#416b4e';ctx.lineWidth=3;ctx.beginPath();ctx.roundRect(x,y,372,498,17);ctx.stroke();
- }
- canvas.dataset.rendered='1';return true;
 };
 })();

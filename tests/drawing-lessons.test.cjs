@@ -15,7 +15,7 @@ for(const id of ids){
  assert.ok(html.includes('role="dialog"'),id+' opens a dialog');
  assert.ok(!html.includes('undefined'),id+' has complete instructions');
 }
-assert.equal(new Set(Object.values(window.newDrawingLessons).map(l=>JSON.stringify(l.groups))).size,100,'all new motifs have distinct artwork');
+assert.equal(new Set(Object.values(window.newDrawingLessons).map(l=>JSON.stringify(l.groups))).size,30,'all new motifs have distinct artwork');
 function setup(id){
  const observers=[],frames=new Map();let seq=0,clock=100;
  class El{
@@ -54,4 +54,4 @@ for(const id of ids){
  }
  const close=setup(id);close.modal.remove();close.observers.forEach(o=>!o.stopped&&o.fn());assert.equal(close.frames.size,0,id+' close cancels animation');
 }
-assert.equal(ids.length,133);console.log('PASS: all 133 dialogs open; 133 motifs × 5 steps, pause gates, replay, double-click protection, and close cleanup.');
+assert.equal(ids.length,63);console.log('PASS: all 63 dialogs open; 63 motifs × 5 steps, pause gates, replay, double-click protection, and close cleanup.');

@@ -198,6 +198,15 @@ body:has(.draw-modalback){overflow:hidden}
   function path(svg,d,attrs={}){const p=element('path',{d,fill:'none',stroke:'#f4ead3','stroke-width':2.3,'stroke-linecap':'round','stroke-linejoin':'round',...attrs});svg.append(p);return p}
   function render(index,svg){
    const active=[];
+   if(lesson?.sheet){
+    const clipId='sheet-reveal-'+id+'-'+index;
+    const clip=element('clipPath',{id:clipId});const reveal=element('rect',{x:0,y:0,width:280,height:0});clip.append(reveal);svg.append(clip);
+    const panel=element('svg',{x:0,y:0,width:280,height:375,viewBox:(34+index*388)+' 150 372 515',preserveAspectRatio:'none','clip-path':'url(#'+clipId+')'});
+    // Clip in outer coordinates so the exact illustrated panel is progressively revealed.
+    const group=element('g',{'clip-path':'url(#'+clipId+')'});panel.removeAttribute?.('clip-path');
+    panel.append(element('image',{href:lesson.sheet,width:1993,height:789}));group.append(panel);svg.append(group);
+    return [{p:reveal,color:true,sweep:true}];
+   }
    if(lesson){
     let grainId;
     if(index===4&&lesson.illustrated){
@@ -259,9 +268,10 @@ body:has(.draw-modalback){overflow:hidden}
     if(disposed||!section.isConnected)return;
     const dt=last?now-last:0;last=now;
     if(!document.hidden)elapsed+=dt;
-    const a=active[item],duration=a.color?(lesson?450:700):Math.max(650,Math.min(2800,a.length*9));
+    const a=active[item],duration=a.sweep?4200:a.color?(lesson?450:700):Math.max(650,Math.min(2800,a.length*9));
     const progress=Math.min(1,elapsed/duration);
-    if(a.color){a.p.setAttribute(a.fillOnly?'fill-opacity':'opacity',progress);if(a.texture)a.texture.setAttribute('fill-opacity',progress*.12);pen.setAttribute('visibility','hidden')}
+    if(a.sweep){a.p.setAttribute('height',375*progress);pen.setAttribute('cx',140);pen.setAttribute('cy',375*progress)}
+    else if(a.color){a.p.setAttribute(a.fillOnly?'fill-opacity':'opacity',progress);if(a.texture)a.texture.setAttribute('fill-opacity',progress*.12);pen.setAttribute('visibility','hidden')}
     else{a.p.style.strokeDashoffset=a.length*(1-progress);const pt=a.p.getPointAtLength(a.length*progress);pen.setAttribute('cx',pt.x);pen.setAttribute('cy',pt.y)}
     if(progress===1){if(a.fill)a.p.setAttribute('fill',a.fill);item++;elapsed=0}
     if(item<active.length){frame=requestAnimationFrame(tick);return}
