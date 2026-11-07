@@ -195,18 +195,6 @@ body:has(.draw-modalback){overflow:hidden}
   function path(svg,d,attrs={}){const p=element('path',{d,fill:'none',stroke:'#f4ead3','stroke-width':2.3,'stroke-linecap':'round','stroke-linejoin':'round',...attrs});svg.append(p);return p}
   function render(index,svg){
    const active=[];
-   if(lesson?.sheet){
-    const stage=window.tracedDrawingStages[id][Math.min(index,3)];
-    const source=()=>{
-     const panel=element('svg',{x:0,y:0,width:280,height:375,viewBox:(34+index*388)+' 150 372 515',preserveAspectRatio:'none',opacity:0});
-     panel.append(element('image',{href:lesson.sheet,width:1993,height:789}));return panel;
-    };
-    stage.fixed.forEach(d=>path(svg,d));
-    stage.draw.forEach(d=>{const p=path(svg,d,index===0?{opacity:.6,'stroke-width':1.5}:{});if(index<4)active.push({p});});
-    const complete=source();svg.append(complete);svg.exactCompletedPanel=complete;
-    if(index===4)active.push({p:complete,color:true});
-    return active;
-   }
    if(lesson){
     let grainId;
     if(index===4&&lesson.illustrated){
@@ -260,7 +248,6 @@ body:has(.draw-modalback){overflow:hidden}
    const circle=element('circle',{cx:25,cy:25,r:19,fill:'#ff791e'}),num=element('text',{x:25,y:32,'text-anchor':'middle',fill:'#fff','font-size':23,'font-family':'system-ui','font-weight':700});num.textContent=index+1;svg.append(circle,num);
    const active=render(index,svg);
    active.forEach(a=>{if(!a.color){a.length=a.p.getTotalLength();a.p.style.strokeDasharray=a.length;a.p.style.strokeDashoffset=a.length;if(a.p.getAttribute('fill')!=='none'){a.fill=a.p.getAttribute('fill');a.p.setAttribute('fill','none')}}});
-   if(lesson?.sheet&&index<4){active.forEach(a=>a.duration=Math.max(120,Math.min(2800,a.length*9)));}
    const pen=element('circle',{r:4,fill:'#ffbf63',stroke:'#fff','stroke-width':1});svg.append(pen);
 
    status.textContent='Steg '+(index+1)+' av 5 – följ pennan.';
@@ -275,7 +262,6 @@ body:has(.draw-modalback){overflow:hidden}
     else{a.p.style.strokeDashoffset=a.length*(1-progress);const pt=a.p.getPointAtLength(a.length*progress);pen.setAttribute('cx',pt.x);pen.setAttribute('cy',pt.y)}
     if(progress===1){if(a.fill)a.p.setAttribute('fill',a.fill);item++;elapsed=0}
     if(item<active.length){frame=requestAnimationFrame(tick);return}
-    if(svg.exactCompletedPanel)svg.exactCompletedPanel.setAttribute('opacity',1);
     pen.remove();playing=false;completed=Math.max(completed,index);
     const repeat=document.createElement('button');repeat.type='button';repeat.className='draw-lesson-replay';repeat.textContent='Visa igen';repeat.addEventListener('click',()=>play(index,card,true));card.append(repeat);
     section.querySelectorAll('.draw-lesson-replay').forEach(b=>b.disabled=false);

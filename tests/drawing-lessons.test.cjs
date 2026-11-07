@@ -5,7 +5,7 @@ const source=fs.readFileSync('js/drawing-guides.js','utf8').split('// Paced draw
 const script=source.slice(source.indexOf('(()=>{'));
 const site=fs.readFileSync('js/site.js','utf8');
 const newSource=fs.readFileSync('js/drawing-new-100.js','utf8');
-const window={};vm.runInNewContext(newSource,{window});vm.runInNewContext(fs.readFileSync('js/drawing-traced-30.js','utf8'),{window});
+const window={};vm.runInNewContext(newSource,{window});vm.runInNewContext(fs.readFileSync('js/drawing-reference-30.js','utf8'),{window});
 const registry=site.slice(site.indexOf('const drawingAnimals='),site.indexOf('function drawingStepCount'));
 const ids=vm.runInNewContext(registry+'drawingAnimals.map(a=>a.id)',{window});
 const gallery=site.slice(site.indexOf('function drawingGallery('),site.indexOf('function pearlSvg('));
@@ -16,6 +16,14 @@ for(const id of ids){
  assert.ok(!html.includes('undefined'),id+' has complete instructions');
 }
 assert.equal(new Set(Object.values(window.newDrawingLessons).map(l=>JSON.stringify(l.groups))).size,30,'all new motifs have distinct artwork');
+assert.equal(window.referenceDrawingCount,30,'all 30 use authored reference strokes');
+for(const [id,lesson] of Object.entries(window.newDrawingLessons)){
+ assert.ok(lesson.groups[0].length<=15,id+' starts with a small set of complete construction lines');
+ for(const group of lesson.groups)for(const [d] of group){
+  assert.equal((d.match(/[Mm]/g)||[]).length,1,id+' never jumps between disconnected fragments within a stroke');
+  assert.ok(!/NaN|undefined/.test(d),id+' has valid coordinates');
+ }
+}
 function setup(id){
  const observers=[],frames=new Map();let seq=0,clock=100;
  class El{
@@ -49,7 +57,8 @@ for(const id of ids){
   t.finish();
   if(id.startsWith('nyrit')){
    assert.equal(t.cards()[i].querySelectorAll('mask').length,0,id+' uses the same unmasked stroke renderer as the bat');
-   assert.equal(t.cards()[i].exactCompletedPanel.getAttribute('opacity'),'1',id+' completes the matching original image');
+   assert.equal(t.cards()[i].querySelectorAll('image').length,0,id+' has no bitmap replacement');
+   assert.equal(window.newDrawingLessons[id].referenceStrokes,true,id+' uses authored reference paths');
    assert.ok(t.cards()[i].querySelectorAll('path').length>0,id+' draws real paths');
   }
   assert.equal(t.cards().length,i+1,id+' remains paused');assert.equal(t.frames.size,0);
