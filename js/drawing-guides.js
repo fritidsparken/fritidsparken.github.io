@@ -142,17 +142,52 @@ mount(document);
   const id=canvas.dataset.drawingGuide,lesson=lessons[id];
   if(id!=='katt'&&!lesson)return;
   const name=lesson?lesson.name:'Katten';
-  const instructions=lesson?lesson.texts:steps.map(step=>step.text);
   const holder=canvas.closest('.draw-modal-guides');
   if(!holder||holder.querySelector('.draw-lesson'))return;
   holder.closest('.draw-modal').classList.add('animated-drawing');
   if(!document.getElementById('draw-lesson-style')){
    const style=document.createElement('style');style.id='draw-lesson-style';style.textContent=`
-.animated-drawing .draw-modal-guides{grid-column:1/-1!important;background:#182b21!important;padding:14px!important}.animated-drawing .draw-instructions{grid-column:1/-1!important;grid-row:auto!important;color:var(--ink)!important}.animated-drawing .draw-modal-title p{color:var(--muted)!important}.draw-lesson{margin:20px 0 0;color:#fff4e2}.draw-lesson h3{font-size:20px;margin:0 0 8px}.draw-lesson p{line-height:1.5}.draw-lesson-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;align-items:start}.draw-lesson-card{min-width:0;margin:0}.draw-lesson-board,.draw-lesson-wait{width:100%;aspect-ratio:372/498;border:2px solid #416b4e;border-radius:17px;background:radial-gradient(ellipse at top,#164b34,#082c1d);box-sizing:border-box}.draw-lesson-board{display:block}.draw-lesson-card figcaption{font-size:14px;margin-top:9px;line-height:1.45}.draw-lesson-wait{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:15px;padding:12px;text-align:center}.draw-lesson button{font:inherit;cursor:pointer;border-radius:12px;padding:12px;border:1px solid #709680;background:#f8ae55;color:#18231e;font-weight:750;min-height:44px;white-space:normal}.draw-lesson button:focus-visible{outline:3px solid white;outline-offset:4px}.draw-lesson-replay{margin-top:9px;background:#214e38!important;color:#fff4e2!important;width:100%;font-size:13px!important}.draw-lesson-status{min-height:1.5em;color:#f6d5a5}.draw-lesson [hidden]{display:none!important}@media(max-width:760px){.draw-lesson-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:380px){.draw-lesson-grid{grid-template-columns:1fr}}`;
+body:has(.draw-modalback){overflow:hidden}
+.draw-modalback{padding:8px!important}
+.draw-modal.animated-drawing{box-sizing:border-box;display:flex!important;flex-direction:column;gap:10px;width:min(1320px,calc(100vw - 16px))!important;max-height:calc(100dvh - 16px)!important;padding:14px!important;overflow:auto;--board-h:min(31dvh,calc((100vw - 128px)*.2677));}
+.draw-modal.animated-drawing .draw-modal-title{flex:none;margin:0 46px 0 0;min-height:38px;gap:8px}
+.draw-modal.animated-drawing .draw-modal-title h2{font-size:clamp(17px,2.4vw,26px)}
+.draw-modal.animated-drawing .draw-modal-title>span{font-size:28px}
+.draw-modal.animated-drawing .draw-modal-close{top:10px;right:10px;width:36px;height:36px;font-size:26px;z-index:1}
+.draw-modal.animated-drawing .draw-modal-guides{flex:none;min-width:0;width:100%;box-sizing:border-box;background:#182b21!important;padding:8px!important;margin:0!important}
+.draw-modal.animated-drawing .draw-modal-guides>.draw-guide-sprite{display:block;width:min(100%,94dvh)!important;height:auto!important;max-height:25dvh!important;aspect-ratio:1993/530!important;object-fit:contain;margin:0 auto!important}
+.draw-modal.animated-drawing .draw-lesson{margin:8px 0 0;color:#fff4e2}
+.draw-modal.animated-drawing .draw-lesson-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;align-items:start}
+.draw-lesson-card{min-width:0;margin:0;display:flex;flex-direction:column;align-items:center}
+.draw-modal.animated-drawing .draw-lesson-board,.draw-modal.animated-drawing .draw-lesson-wait{box-sizing:border-box;width:min(100%,calc(var(--board-h)*.747));height:var(--board-h);aspect-ratio:372/498;border:2px solid #416b4e;border-radius:12px;background:radial-gradient(ellipse at top,#164b34,#082c1d);margin:0 auto;}
+.draw-lesson-board{display:block}
+.draw-lesson-wait{display:flex;align-items:center;justify-content:center;padding:6px;text-align:center}
+.draw-lesson button{font:inherit;cursor:pointer;border-radius:10px;padding:6px;border:1px solid #709680;background:#f8ae55;color:#18231e;font-weight:750;min-height:44px;max-width:100%;white-space:normal;line-height:1.2}
+.draw-lesson button:focus-visible{outline:3px solid white;outline-offset:2px}
+.draw-modal.animated-drawing .draw-lesson-replay{margin-top:5px;background:#214e38!important;color:#fff4e2!important;width:min(100%,calc(var(--board-h)*.747));font-size:12px!important}
+.draw-modal.animated-drawing .draw-lesson-status{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.draw-lesson [hidden]{display:none!important}
+@media(max-width:600px) and (orientation:portrait){
+ .draw-modal.animated-drawing{--board-h:min(23dvh,calc((100vw - 84px)*.446));padding:10px!important;gap:6px}
+ .draw-modal.animated-drawing .draw-lesson-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+ .draw-modal.animated-drawing .draw-modal-guides>.draw-guide-sprite{width:min(100%,60dvh)!important;height:auto!important}
+ .draw-lesson button{font-size:12px}
+}
+@media(max-height:460px) and (orientation:landscape){
+ .draw-modal.animated-drawing{--board-h:29dvh;padding:8px!important;gap:4px}
+ .draw-modal.animated-drawing .draw-modal-title{min-height:30px}
+ .draw-modal.animated-drawing .draw-modal-title h2{font-size:17px}
+ .draw-modal.animated-drawing .draw-modal-title>span{font-size:22px}
+ .draw-modal.animated-drawing .draw-modal-guides{padding:5px!important}
+ .draw-modal.animated-drawing .draw-modal-guides>.draw-guide-sprite{width:min(100%,86dvh)!important;height:auto!important}
+ .draw-modal.animated-drawing .draw-lesson{margin-top:4px}
+ .draw-lesson button{font-size:11px;padding:4px}
+}
+`;
    document.head.append(style);
   }
   const section=document.createElement('section');section.className='draw-lesson';section.setAttribute('aria-label','Rita '+name.toLocaleLowerCase('sv')+' med animation');
-  section.innerHTML='<h3>Rita med mig – '+name.toLocaleLowerCase('sv')+'</h3><p>Följ pennan och rita på ditt papper. Nästa steg väntar tills du är klar.</p><div class="draw-lesson-grid"></div><p class="draw-lesson-status" role="status" aria-live="polite"></p>';
+  section.innerHTML='<div class="draw-lesson-grid"></div><p class="draw-lesson-status" role="status" aria-live="polite"></p>';
   // The site's dialog backdrop delegates close clicks: keep lesson clicks inside it.
   section.addEventListener('click',e=>e.stopPropagation());holder.append(section);
   const grid=section.querySelector('.draw-lesson-grid'),status=section.querySelector('.draw-lesson-status');
@@ -217,7 +252,7 @@ mount(document);
    const active=render(index,svg);
    active.forEach(a=>{if(!a.color){a.length=a.p.getTotalLength();a.p.style.strokeDasharray=a.length;a.p.style.strokeDashoffset=a.length;if(a.p.getAttribute('fill')!=='none'){a.fill=a.p.getAttribute('fill');a.p.setAttribute('fill','none')}}});
    const pen=element('circle',{r:4,fill:'#ffbf63',stroke:'#fff','stroke-width':1});svg.append(pen);
-   const caption=document.createElement('figcaption');caption.textContent=(index+1)+'. '+instructions[index];card.append(caption);
+
    status.textContent='Steg '+(index+1)+' av 5 – följ pennan.';
    let item=0,elapsed=0,last=0;
    function tick(now){
@@ -231,7 +266,7 @@ mount(document);
     if(progress===1){if(a.fill)a.p.setAttribute('fill',a.fill);item++;elapsed=0}
     if(item<active.length){frame=requestAnimationFrame(tick);return}
     pen.remove();playing=false;completed=Math.max(completed,index);
-    const repeat=document.createElement('button');repeat.type='button';repeat.className='draw-lesson-replay';repeat.textContent='Visa steget igen';repeat.addEventListener('click',()=>play(index,card,true));card.append(repeat);
+    const repeat=document.createElement('button');repeat.type='button';repeat.className='draw-lesson-replay';repeat.textContent='Visa igen';repeat.addEventListener('click',()=>play(index,card,true));card.append(repeat);
     section.querySelectorAll('.draw-lesson-replay').forEach(b=>b.disabled=false);
     if(next)next.hidden=false;
     if(!replay&&index<4)addWait(index+1);
@@ -241,10 +276,9 @@ mount(document);
   }
   function addWait(index){
    const slot=document.createElement('div');slot.className='draw-lesson-wait';
-   const label=document.createElement('span');label.textContent='Redo för steg '+(index+1)+'?';
    const button=document.createElement('button');button.type='button';button.textContent='Okej, jag är klar';
-   button.addEventListener('click',()=>{if(playing)return;const card=document.createElement('figure');card.className='draw-lesson-card';slot.replaceWith(card);play(index,card);card.tabIndex=-1;card.focus({preventScroll:true});card.scrollIntoView({block:'nearest',behavior:'smooth'})});
-   slot.append(label,button);grid.append(slot);
+   button.addEventListener('click',()=>{if(playing)return;const card=document.createElement('figure');card.className='draw-lesson-card';slot.replaceWith(card);play(index,card);card.tabIndex=-1;card.focus({preventScroll:true})});
+   slot.append(button);grid.append(slot);
   }
   const first=document.createElement('figure');first.className='draw-lesson-card';grid.append(first);play(0,first);
  }
