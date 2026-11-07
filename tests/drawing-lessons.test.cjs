@@ -46,7 +46,14 @@ function setup(id){
 for(const id of ids){
  const t=setup(id);assert.ok(t.lesson(),id+' mounted');assert.equal(t.cards().length,1);assert.equal(t.next(),undefined);
  for(let i=0;i<5;i++){
-  t.finish();assert.equal(t.cards().length,i+1,id+' remains paused');assert.equal(t.frames.size,0);
+  t.finish();
+  if(id.startsWith('nyrit')){
+   const exact=t.cards()[i].exactCompletedPanel;
+   assert.ok(exact,id+' uses original panel');
+   assert.equal(exact.getAttribute('opacity'),'1',id+' finishes with exact original pixels');
+   assert.equal(exact.getAttribute('viewBox'),(34+i*388)+' 150 372 515',id+' selects matching source step');
+  }
+  assert.equal(t.cards().length,i+1,id+' remains paused');assert.equal(t.frames.size,0);
   const repeats=t.holder.querySelectorAll('.draw-lesson-replay');assert.equal(repeats.length,i+1);
   repeats[i].click();assert.equal(t.holder.querySelector('.draw-lesson-wait')?.hidden,i<4?true:undefined);t.finish();assert.equal(t.cards().length,i+1,id+' replay adds no steps');
   if(i<4){const button=t.next();assert.ok(button);button.click();button.click();assert.equal(t.cards().length,i+2,id+' double-click advances once');assert.equal(t.next(),undefined,id+' button replaced')}

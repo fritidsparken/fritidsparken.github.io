@@ -201,13 +201,24 @@ body:has(.draw-modalback){overflow:hidden}
    if(lesson?.sheet){
     const stages=window.tracedDrawingStages?.[id];
     if(!stages)throw new Error('Ritlinjer saknas för '+id);
-    const stage=stages[Math.min(index,3)];
-    stage.fixed.forEach(d=>path(svg,d,{'stroke-width':1.5}));
-    stage.draw.forEach(d=>{const p=path(svg,d,{'stroke-width':1.5});if(index<4)active.push({p})});
-    if(index===4){
-     const panel=element('svg',{x:0,y:0,width:280,height:375,viewBox:'1586 150 372 515',preserveAspectRatio:'none',opacity:0});
-     panel.append(element('image',{href:lesson.sheet,width:1993,height:789}));svg.append(panel);active.push({p:panel,color:true});
-    }
+    const stage=stages[Math.min(index,3)],maskId='exact-ink-'+id+'-'+index;
+    const mask=element('mask',{id:maskId,maskUnits:'userSpaceOnUse',x:0,y:0,width:280,height:375});
+    mask.append(element('rect',{x:0,y:0,width:280,height:375,fill:'#000'}));
+    // Keep only the frame and number visible while the actual source ink is drawn.
+    mask.append(element('path',{d:'M0 0H280V375H0ZM9 49V366H271V49Z',fill:'#fff','fill-rule':'evenodd'}));
+    svg.append(mask);
+    const panel=element('svg',{x:0,y:0,width:280,height:375,viewBox:(34+index*388)+' 150 372 515',preserveAspectRatio:'none'});
+    panel.append(element('image',{href:lesson.sheet,width:1993,height:789}));
+    const ink=element('g',{mask:'url(#'+maskId+')'});ink.append(panel);svg.append(ink);
+    const runs=[...stage.fixed,...stage.draw];
+    runs.forEach(d=>{
+     const p=element('path',{d,fill:'none',stroke:'#fff','stroke-width':index===4?18:5,'stroke-linecap':'round','stroke-linejoin':'round'});
+     mask.append(p);active.push({p,exact:true});
+    });
+    // The completed frame is the original panel, never an approximate vector copy.
+    const complete=element('svg',{x:0,y:0,width:280,height:375,viewBox:(34+index*388)+' 150 372 515',preserveAspectRatio:'none',opacity:0});
+    complete.append(element('image',{href:lesson.sheet,width:1993,height:789}));svg.append(complete);
+    svg.exactCompletedPanel=complete;
     return active;
    }
    if(lesson){
@@ -263,6 +274,7 @@ body:has(.draw-modalback){overflow:hidden}
    const circle=element('circle',{cx:25,cy:25,r:19,fill:'#ff791e'}),num=element('text',{x:25,y:32,'text-anchor':'middle',fill:'#fff','font-size':23,'font-family':'system-ui','font-weight':700});num.textContent=index+1;svg.append(circle,num);
    const active=render(index,svg);
    active.forEach(a=>{if(!a.color){a.length=a.p.getTotalLength();a.p.style.strokeDasharray=a.length;a.p.style.strokeDashoffset=a.length;if(a.p.getAttribute('fill')!=='none'){a.fill=a.p.getAttribute('fill');a.p.setAttribute('fill','none')}}});
+   if(lesson?.sheet){const total=active.reduce((n,a)=>n+a.length,0);active.forEach(a=>a.duration=Math.max(45,a.length/total*(index===4?12000:20000)));}
    const pen=element('circle',{r:4,fill:'#ffbf63',stroke:'#fff','stroke-width':1});svg.append(pen);
 
    status.textContent='Steg '+(index+1)+' av 5 – följ pennan.';
@@ -271,12 +283,13 @@ body:has(.draw-modalback){overflow:hidden}
     if(disposed||!section.isConnected)return;
     const dt=last?now-last:0;last=now;
     if(!document.hidden)elapsed+=dt;
-    const a=active[item],duration=a.color?(lesson?450:700):Math.max(650,Math.min(2800,a.length*9));
+    const a=active[item],duration=a.duration??(a.color?(lesson?450:700):Math.max(650,Math.min(2800,a.length*9)));
     const progress=Math.min(1,elapsed/duration);
     if(a.color){a.p.setAttribute(a.fillOnly?'fill-opacity':'opacity',progress);if(a.texture)a.texture.setAttribute('fill-opacity',progress*.12);pen.setAttribute('visibility','hidden')}
     else{a.p.style.strokeDashoffset=a.length*(1-progress);const pt=a.p.getPointAtLength(a.length*progress);pen.setAttribute('cx',pt.x);pen.setAttribute('cy',pt.y)}
     if(progress===1){if(a.fill)a.p.setAttribute('fill',a.fill);item++;elapsed=0}
     if(item<active.length){frame=requestAnimationFrame(tick);return}
+    if(svg.exactCompletedPanel)svg.exactCompletedPanel.setAttribute('opacity',1);
     pen.remove();playing=false;completed=Math.max(completed,index);
     const repeat=document.createElement('button');repeat.type='button';repeat.className='draw-lesson-replay';repeat.textContent='Visa igen';repeat.addEventListener('click',()=>play(index,card,true));card.append(repeat);
     section.querySelectorAll('.draw-lesson-replay').forEach(b=>b.disabled=false);
