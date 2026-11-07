@@ -5,7 +5,7 @@ const source=fs.readFileSync('js/drawing-guides.js','utf8').split('// Paced draw
 const script=source.slice(source.indexOf('(()=>{'));
 const site=fs.readFileSync('js/site.js','utf8');
 const newSource=fs.readFileSync('js/drawing-new-100.js','utf8');
-const window={};vm.runInNewContext(newSource,{window});
+const window={};vm.runInNewContext(newSource,{window});vm.runInNewContext(fs.readFileSync('js/drawing-traced-30.js','utf8'),{window});
 const registry=site.slice(site.indexOf('const drawingAnimals='),site.indexOf('function drawingStepCount'));
 const ids=vm.runInNewContext(registry+'drawingAnimals.map(a=>a.id)',{window});
 const gallery=site.slice(site.indexOf('function drawingGallery('),site.indexOf('function pearlSvg('));
