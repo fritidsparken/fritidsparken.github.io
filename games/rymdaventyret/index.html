@@ -15,7 +15,7 @@
       content="Flyg genom solsystemet, landa på månar och upptäck rymden i Rymdäventyret."
     />
     <title>Rymdäventyret · Fritidsparken</title>
-    <link rel="stylesheet" href="style.css?v=20261108-8" />
+    <link rel="stylesheet" href="style.css?v=20261108-9" />
   </head>
   <body>
     <canvas id="space" aria-label="Spelvärlden" tabindex="0"></canvas>
@@ -36,9 +36,7 @@
         >✦ <span>FRITIDSPARKEN</span></a
       ><span class="edition"
         >RYMDÄVENTYRET <small>EN RESA GENOM SOLSYSTEMET</small></span
-      ><button id="menu-btn" title="Pausa (Esc)" aria-label="Öppna menyn">
-        ☰
-      </button>
+      >
     </header>
     <section id="home" class="screen">
       <div class="intro">
@@ -87,7 +85,7 @@
       </div>
       <div id="nav-marker" hidden>◇<span></span></div>
       <div class="reticle">＋</div>
-      <details class="edge-drawer instruments-drawer"><summary aria-label="Visa eller dölj instrument" title="Instrument">◴</summary><div class="flight-dashboard">
+      <div class="flight-dashboard">
         <div class="speed">
           <strong id="speed">0</strong><small>HASTIGHET</small>
         </div>
@@ -111,16 +109,18 @@
           aria-label="Minikarta"
         ></canvas>
       </div>
-      </details><details class="edge-drawer actions-drawer"><summary aria-label="Visa eller dölj spelverktyg" title="Spelverktyg">☷</summary><nav class="toolbar">
+      <nav class="toolbar">
         <button id="map-btn" aria-label="Öppna rymdkartan">◎ <span>Karta</span><kbd>M</kbd></button
         ><button id="camera-btn" aria-label="Byt kamera">▣ <span>Kamera</span><kbd>C</kbd></button
-        ><button id="interact">◇ <span>Interagera</span><kbd>E</kbd></button
-        ><button id="assist-btn" hidden>✧ <span>Flyghjälp</span></button
-        ><button id="takeoff-btn" hidden>↑ <span>Starta raketen</span></button
-        ><button id="autopilot-btn" hidden>Avbryt autopilot</button
-        ><button id="photo-btn" hidden>Ta bild</button
+        ><button id="interact" aria-label="Interagera" title="Interagera">◇ <span>Interagera</span><kbd>E</kbd></button
+        ><button id="assist-btn" aria-label="Flyghjälp" title="Flyghjälp" hidden>✧ <span>Flyghjälp</span></button
+        ><button id="takeoff-btn" aria-label="Starta raketen" title="Starta raketen" hidden>↑ <span>Starta raketen</span></button
+        ><button id="autopilot-btn" aria-label="Avbryt autopilot" title="Avbryt autopilot" hidden>■</button
+        ><button id="photo-btn" aria-label="Ta bild" title="Ta bild" hidden>◉</button
         ><button id="fullscreen" aria-label="Helskärm">⛶ <span>Helskärm</span></button>
-      </nav></details>
+      <button id="menu-btn" title="Pausa (Esc)" aria-label="Öppna menyn">
+        ☰
+      </button></nav>
       <div id="help">
         W / S gas & broms · A / D sväng · ↑ / ↓ höjd · Shift turbo · Space
         stabilisera
@@ -146,6 +146,6 @@
       <div id="panel-content"></div>
     </dialog>
     <script src="../../js/vendor/three.min.js"></script>
-    <script type="module" src="boot.mjs?v=20261108-8"></script>
+    <script type="module" src="boot.mjs?v=20261108-9"></script>
   </body>
 </html>
