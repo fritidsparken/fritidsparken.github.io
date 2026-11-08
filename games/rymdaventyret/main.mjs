@@ -6,7 +6,7 @@ import {
   CAMERAS,
   arrival,
   worldPosition,
-} from "./data.mjs";
+} from "./data.mjs?v=20261108-4";
 import {
   clamp,
   dist,
@@ -20,7 +20,7 @@ import {
   collisionResponse,
   steerTo,
   segmentHitsSphere,
-} from "./systems.mjs";
+} from "./systems.mjs?v=20261108-4";
 import { SpaceRenderer } from "./render.mjs";
 import { SpaceAudio } from "./audio.mjs";
 const $ = (id) => document.getElementById(id),
@@ -1039,9 +1039,10 @@ function frame(ms) {
               }
             }
             const aligned = steerTo(ship, target, dt);
-            input.gas = aligned ? clamp(d / 240, 0.12, 1) : 0;
+            input.gas = aligned ? clamp(d / 1200, 0.024, 1) : 0;
             input.boost = aligned && d > 900;
-            input.brake = !aligned && ship.speed > 20;
+            // Brake early enough for precise approaches at the higher cruise speed.
+            input.brake = (!aligned && ship.speed > 20) || (aligned && ship.speed > Math.max(20, d * 1.2));
           }
         }
       }

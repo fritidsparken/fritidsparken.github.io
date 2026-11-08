@@ -42,7 +42,7 @@ test("frame-rate independent acceleration and fuel consumption", () => {
   }
   const a = sim(30),
     b = sim(60);
-  assert.ok(Math.abs(a.ship.position.z - b.ship.position.z) < 2);
+  assert.ok(Math.abs(a.ship.position.z - b.ship.position.z) / Math.abs(b.ship.position.z - 1000) < 0.001);
   assert.ok(a.state.fuel < 100);
   assert.ok(Math.abs(a.state.fuel - b.state.fuel) < 0.02);
 });
@@ -222,4 +222,19 @@ test("every planet texture is a binary image and required model exports exist", 
 test('malformed numeric fields and completed active missions cannot poison resumed state',()=>{
   const s=validateSave({...freshState(),engine:'broken',tank:NaN,step:'broken',mission:'school',completed:['school','school']});
   assert.equal(s.engine,0);assert.equal(s.tank,0);assert.equal(s.step,0);assert.equal(s.mission,null);assert.deepEqual(s.completed,['school']);
+});
+
+// Verify reachable speed, not just the configured cap, for all purchased engines.
+test("fivefold cruise and turbo are reachable and emergency braking stops the fastest ship", () => {
+  for (let engine = 0; engine <= 3; engine++) {
+    for (const boost of [false, true]) {
+      const state = freshState(); state.engine = engine;
+      const ship = { position: {x:0,y:0,z:0}, yaw:0, pitch:0, speed:0 };
+      const expected = 5 * (boost ? 200 + engine * 35 : 65 + engine * 15);
+      for (let i=0; i<600; i++) advanceFlight(ship,{gas:1,boost},1/60,state);
+      assert.ok(ship.speed > expected * .999 && ship.speed <= expected);
+      for (let i=0; i<120; i++) advanceFlight(ship,{brake:true},1/60,state);
+      assert.ok(ship.speed < .01, "stabilizer stops upgraded turbo in two seconds");
+    }
+  }
 });

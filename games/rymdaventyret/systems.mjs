@@ -138,7 +138,8 @@ export function advanceFlight(ship, input, dt, s) {
   ship.pitch = clamp(ship.pitch + pitch * dt * 0.65, -1.35, 1.35);
   const boost = input.boost && s.energy > 2;
   const gas = clamp(input.gas || 0, -1, 1);
-  const max = boost ? 200 + s.engine * 35 : 65 + s.engine * 15;
+  // Fivefold cruise and turbo speeds, including every engine upgrade.
+  const max = 5 * (boost ? 200 + s.engine * 35 : 65 + s.engine * 15);
   const target = gas > 0 && (s.mode === "free" || s.fuel > 0) ? max * gas : 0;
   ship.speed +=
     (target - ship.speed) *

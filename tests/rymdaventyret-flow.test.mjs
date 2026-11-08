@@ -35,7 +35,7 @@ async function game(saved = null) {
   const document = { body: new Element(), hidden: false, getElementById(id) { if (!elements.has(id)) elements.set(id, new Element()); return elements.get(id); }, addEventListener() {}, querySelectorAll() { return []; } };
   const storage = new Map(saved ? [[systems.SAVE_KEY, JSON.stringify(saved)]] : []);
   const localStorage = { getItem: k => storage.get(k), setItem: (k,v) => storage.set(k,v) };
-  let source = original.replace(/import\s*\{([\s\S]*?)\}\s*from\s*"\.\/(.*?)";/g, (_, names, file) => `const {${names}} = deps[${JSON.stringify(file)}];`);
+  let source = original.replace(/import\s*\{([\s\S]*?)\}\s*from\s*"\.\/(.*?)";/g, (_, names, file) => `const {${names}} = deps[${JSON.stringify(file.split('?')[0])}];`);
   source = source.replace(/boot\(\);\s*$/, '');
   const create = new Function('deps', 'document', 'window', 'localStorage', 'requestAnimationFrame', source + `
     return {boot,start,acceptMission,navigate,jump,doLand,takeOff,interact,photo,showPanel,closePanel,handleClick,frame,save,

@@ -1,6 +1,6 @@
 # Rymdäventyret
 
-Rymdäventyret for Fritidsparken, revision 20261108-3. Three.js r160/WebGL, native Blender/GLB models, no build step or CDN dependency.
+Rymdäventyret for Fritidsparken, revision 20261108-4. Three.js r160/WebGL, native Blender/GLB models, no build step or CDN dependency.
 
 Serve the repository with a static HTTP server and open `/games/rymdaventyret/`. Opening the HTML as a `file:` URL will not load ES modules/GLB assets reliably.
 
@@ -24,7 +24,13 @@ node --experimental-vm-modules --test tests/rymdaventyret*.test.mjs
 python3 tools/blender/space/verify_assets.py
 ```
 
-46 automated tests cover controller-level completion of every expedition, autopilot trips from Earth to every destination, real GLB parsing, camera transforms, terrain/rover construction, flight/fuel/collision behavior, upgrade spending and save recovery. Controller tests run actual main.mjs with DOM/audio/render adapters; they place the ship near objectives to verify interaction rules. They do not verify human-input difficulty or rendered gameplay.
+47 automated tests cover controller-level completion of every expedition, autopilot trips from Earth to every destination, real GLB parsing, camera transforms, terrain/rover construction, flight/fuel/collision behavior, upgrade spending and save recovery. Controller tests run actual main.mjs with DOM/audio/render adapters; they place the ship near objectives to verify interaction rules. They do not verify human-input difficulty or rendered gameplay.
+
+## Revision 20261108-4
+
+- Fivefold cruise and turbo speed at all engine levels; acceleration reaches the higher speeds in the same time.
+- Earlier autopilot braking and reduced throttle near destinations preserve precise mission approaches.
+- Versioned physics imports ensure returning players receive the updated flight controller.
 
 ## Revision 20261108-2
 

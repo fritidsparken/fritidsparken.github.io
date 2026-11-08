@@ -42,7 +42,7 @@ async function harness() {
   const ctx=vm.createContext(sandbox);
   const deps={'./data.mjs':data,'./systems.mjs':systems,'./render.mjs':{SpaceRenderer:Renderer},'./audio.mjs':{SpaceAudio:Audio}};
   const module=new vm.SourceTextModule(source+'\nexport {state,ship,ready,started,surface,rover,transition,auto,goal,goalType,cameraMode};',{context:ctx});
-  await module.link(spec=>{const values=deps[spec];return new vm.SyntheticModule(Object.keys(values),function(){for(const[k,v]of Object.entries(values))this.setExport(k,v);},{context:ctx});});
+  await module.link(spec=>{const values=deps[spec.split('?')[0]];return new vm.SyntheticModule(Object.keys(values),function(){for(const[k,v]of Object.entries(values))this.setExport(k,v);},{context:ctx});});
   await module.evaluate();
   await new Promise(r=>setImmediate(r));
   let ms=0;
