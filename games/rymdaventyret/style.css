@@ -1144,3 +1144,34 @@ button, summary, #stick, #stick * { touch-action: none; }
   #stick { bottom: calc(env(safe-area-inset-bottom) + 16px); }
   .touch-right { bottom: calc(env(safe-area-inset-bottom) + 16px); }
 }
+/* No page gestures on the flight surface; panels retain vertical scrolling. */
+html, body, #space, #hud, #touch { touch-action: none; overscroll-behavior: none; }
+#panel-content, .edge-drawer .toolbar { touch-action: pan-y; }
+#gas-btn[aria-pressed="true"] { background: #205d49; border-color: #8ef0b7; color: #caffdf; box-shadow: 0 0 0 2px #8ef0b730; }
+/* A joined edge tab and sheet, with consistent row alignment and scrolling. */
+.edge-drawer { top: calc(env(safe-area-inset-top) + 68px); }
+.edge-drawer .toolbar {
+  top: 0; left: 43px; width: 184px; max-width: calc(100vw - 100px);
+  max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 230px);
+  min-height: 50px; padding: 8px; gap: 4px;
+  border: 1px solid #426074; border-radius: 0 12px 12px 12px;
+  box-shadow: 0 8px 28px #0008; background: #0c1c2bf5;
+}
+.edge-drawer .toolbar button {
+  display: flex; align-items: center; justify-content: flex-start;
+  width: 100%; min-width: 0; margin: 0; padding: 10px 12px;
+  border: 0; border-radius: 7px; gap: 10px; font-size: 12px;
+  background: #20384b; white-space: normal;
+}
+.edge-drawer .toolbar button span { display: inline !important; }
+.edge-drawer .flight-dashboard {
+  top: 0; right: 43px; width: 148px; padding: 12px; gap: 12px;
+  border: 1px solid #426074; border-radius: 12px 0 12px 12px;
+  background: #0c1c2bf5; box-shadow: 0 8px 28px #0008;
+}
+.edge-drawer .speed { display: flex; justify-content: space-between; align-items: baseline; }
+.edge-drawer .speed strong { font-size: 25px; }
+.edge-drawer .speed small { font-size: 7px; letter-spacing: 0; }
+.edge-drawer .meters { gap: 8px; }
+.edge-drawer .meters label { font-size: 9px; }
+.edge-drawer .meters meter { width: 62px; height: 7px; }

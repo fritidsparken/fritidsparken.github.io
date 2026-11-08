@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta
       name="viewport"
-      content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"
+      content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,viewport-fit=cover,user-scalable=no"
     />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -15,7 +15,7 @@
       content="Flyg genom solsystemet, landa på månar och upptäck rymden i Rymdäventyret."
     />
     <title>Rymdäventyret · Fritidsparken</title>
-    <link rel="stylesheet" href="style.css?v=20261108-6" />
+    <link rel="stylesheet" href="style.css?v=20261108-7" />
   </head>
   <body>
     <canvas id="space" aria-label="Spelvärlden" tabindex="0"></canvas>
@@ -128,9 +128,9 @@
       <div id="touch">
         <div id="stick" aria-label="Styrspak"><i></i></div>
         <div class="touch-right">
-          <button data-hold="boost">TURBO</button
-          ><button data-hold="gas">GAS ↑</button
-          ><button data-hold="brake">BROMS</button>
+          <button id="boost-btn" data-hold="boost">TURBO</button
+          ><button id="gas-btn" aria-pressed="false" aria-label="Gas. Dubbeltryck för gaslås" data-hold="gas">GAS ↑</button
+          ><button id="brake-btn" data-hold="brake">BROMS</button>
         </div>
       </div>
     </section>
@@ -146,6 +146,6 @@
       <div id="panel-content"></div>
     </dialog>
     <script src="../../js/vendor/three.min.js"></script>
-    <script type="module" src="boot.mjs?v=20261108-6"></script>
+    <script type="module" src="boot.mjs?v=20261108-7"></script>
   </body>
 </html>

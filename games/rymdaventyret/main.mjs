@@ -6,7 +6,7 @@ import {
   CAMERAS,
   arrival,
   worldPosition,
-} from "./data.mjs?v=20261108-6";
+} from "./data.mjs?v=20261108-7";
 import {
   clamp,
   dist,
@@ -52,6 +52,12 @@ let state = saved.state || freshState(),
   frames = 0,
   fpsTime = 0,
   collisionCooldown = 0;
+let gasLocked = false, lastGasTap = null, gasPressStart = 0;
+function setGasLock(value) {
+  gasLocked = value;
+  $("gas-btn").setAttribute("aria-pressed", String(value));
+  $("gas-btn").textContent = value ? "GAS LÅST ●" : "GAS ↑";
+}
 let hasSave = !!saved.state;
 let ship = {
     position: arrival(WORLDS.find((b) => b.id === "saturn")),
@@ -430,6 +436,7 @@ function closePanel() {
   resetInput();
 }
 function resetInput() {
+  setGasLock(false); lastGasTap = null;
   keys = {};
   held = {};
   joystick = { x: 0, y: 0 };
@@ -847,15 +854,43 @@ function moveStick(e) {
 }
 for (const b of document.querySelectorAll("[data-hold]")) {
   b.addEventListener("pointerdown", (e) => {
-    if (!started || paused) return;
     e.preventDefault();
+    if (!started || paused) return;
     b.setPointerCapture(e.pointerId);
-    held[b.dataset.hold] = true;
+    const kind = b.dataset.hold;
+    if (kind === "gas") {
+      gasPressStart = e.timeStamp;
+      if (gasLocked) { setGasLock(false); lastGasTap = null; }
+      else if (lastGasTap !== null && e.timeStamp - lastGasTap < 350) {
+        setGasLock(true); lastGasTap = null;
+      }
+    }
+    if (kind === "brake") { setGasLock(false); lastGasTap = null; }
+    held[kind] = true;
     sound.start();
   });
-  for (const ev of ["pointerup", "pointercancel", "lostpointercapture"])
-    b.addEventListener(ev, () => (held[b.dataset.hold] = false));
+  b.addEventListener("pointerup", (e) => {
+    if (b.dataset.hold === "gas" && !gasLocked)
+      lastGasTap = e.timeStamp - gasPressStart < 250 ? e.timeStamp : null;
+    held[b.dataset.hold] = false;
+  });
+  b.addEventListener("pointercancel", () => {
+    held[b.dataset.hold] = false;
+    if (b.dataset.hold === "gas") { setGasLock(false); lastGasTap = null; }
+  });
+  b.addEventListener("lostpointercapture", () => { held[b.dataset.hold] = false; });
 }
+for (const type of ["gesturestart", "gesturechange", "gestureend"])
+  document.addEventListener(type, e => e.preventDefault(), { passive: false });
+document.addEventListener("dblclick", e => {
+  if (e.target.closest?.("#hud, #space, #topbar")) e.preventDefault();
+}, { passive: false });
+document.addEventListener("touchmove", e => {
+  if (e.touches.length > 1) e.preventDefault();
+}, { passive: false });
+document.addEventListener("wheel", e => {
+  if (e.ctrlKey || e.metaKey) e.preventDefault();
+}, { passive: false });
 $("space").addEventListener("pointerdown", (e) => {
   if (cameraMode < 3) return;
   pointer = { x: e.clientX, y: e.clientY };
@@ -983,7 +1018,7 @@ function frame(ms) {
       (keys.KeyA || keys.ArrowLeft ? 1 : 0) +
       joystick.x,
     pitch: (keys.ArrowUp ? 1 : 0) - (keys.ArrowDown ? 1 : 0) + joystick.y,
-    gas: held.gas || keys.KeyW ? 1 : held.brake || keys.KeyS ? -1 : 0,
+    gas: held.brake || keys.KeyS ? -1 : held.gas || gasLocked || keys.KeyW ? 1 : 0,
     boost: held.boost || keys.ShiftLeft || keys.ShiftRight,
     brake: held.brake || keys.Space || keys.KeyS,
   };

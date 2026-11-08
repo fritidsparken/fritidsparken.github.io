@@ -18,6 +18,7 @@ async function harness() {
   class Element {
     constructor(id=''){this.id=id;this.dataset={};this.style={};this.hidden=false;this.open=false;this.textContent='';this.width=660;this.height=420;this.firstElementChild={style:{}};this.classList={add(){},remove(){},toggle(){}};this.listeners={};}
     setAttribute(k,v){this[k]=v;}
+    setPointerCapture(){}
     addEventListener(k,f){this.listeners[k]=f;}
     querySelector(){return this.child ||= new Element();}
     set innerHTML(s){this.html=s;for(const m of s.matchAll(/id="([^"]+)"/g)) if(!nodes.has(m[1])) nodes.set(m[1],new Element(m[1]));}
@@ -27,6 +28,7 @@ async function harness() {
     getBoundingClientRect(){return {left:0,top:0,width:660,height:420};}
   }
   for(const m of html.matchAll(/id="([^"]+)"/g)) nodes.set(m[1],new Element(m[1]));
+  for(const kind of ['gas','boost','brake'])nodes.get(kind+'-btn').dataset.hold=kind;
   let render, nextFrame;
   class Renderer {
     constructor(){render=this;this.stations=[];this.collectibles=[];this.rockBounds=[];this.goal={};this.orbit={yaw:0,pitch:0,distance:25};}
@@ -38,10 +40,10 @@ async function harness() {
     project(){return {x:0,y:0,z:0};} screenshot(){this.photos=(this.photos||0)+1;}
   }
   class Audio {set(){} start(){} pause(){} update(){} effect(){}}
-  const sandbox = {console,Math,JSON,setTimeout:()=>{},requestAnimationFrame:f=>{nextFrame=f;},localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},location:{reload(){}},window:{THREE:{},addEventListener:(k,f)=>events[k]=f},document:{body:new Element(),hidden:false,getElementById:id=>{assert.ok(nodes.has(id),'unknown DOM id '+id);return nodes.get(id);},querySelectorAll:()=>[],addEventListener:(k,f)=>events['doc:'+k]=f}};
+  const sandbox = {console,Math,JSON,setTimeout:()=>{},requestAnimationFrame:f=>{nextFrame=f;},localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},location:{reload(){}},window:{THREE:{},addEventListener:(k,f)=>events[k]=f},document:{body:new Element(),hidden:false,getElementById:id=>{assert.ok(nodes.has(id),'unknown DOM id '+id);return nodes.get(id);},querySelectorAll:s=>s==='[data-hold]'?['gas','boost','brake'].map(k=>nodes.get(k+'-btn')):[],addEventListener:(k,f)=>events['doc:'+k]=f}};
   const ctx=vm.createContext(sandbox);
   const deps={'./data.mjs':data,'./systems.mjs':systems,'./render.mjs':{SpaceRenderer:Renderer},'./audio.mjs':{SpaceAudio:Audio}};
-  const module=new vm.SourceTextModule(source+'\nexport {state,ship,ready,started,surface,rover,transition,auto,goal,goalType,cameraMode};',{context:ctx});
+  const module=new vm.SourceTextModule(source+'\nexport {state,ship,ready,started,surface,rover,transition,auto,goal,goalType,cameraMode,gasLocked};',{context:ctx});
   await module.link(spec=>{const values=deps[spec.split('?')[0]];return new vm.SyntheticModule(Object.keys(values),function(){for(const[k,v]of Object.entries(values))this.setExport(k,v);},{context:ctx});});
   await module.evaluate();
   await new Promise(r=>setImmediate(r));
@@ -107,4 +109,19 @@ test('autopilot reaches worlds across the system without passing through planets
     const dest=data.WORLDS.find(b=>b.id===id);
     assert.ok(systems.dist(h.s.ship.position,data.arrival(dest,h.s.state.time))<25);
   }
+});
+
+test('double tap latches gas while turbo is held; brake and pause release it', async()=>{
+ const h=await harness(); h.click('play');
+ const event=t=>({timeStamp:t,pointerId:1,preventDefault(){}});
+ const gas=h.nodes.get('gas-btn'),boost=h.nodes.get('boost-btn'),brake=h.nodes.get('brake-btn');
+ gas.listeners.pointerdown(event(100));gas.listeners.pointerup(event(150));
+ assert.equal(h.s.gasLocked,false);
+ gas.listeners.pointerdown(event(250));gas.listeners.pointerup(event(300));gas.listeners.lostpointercapture();
+ assert.equal(h.s.gasLocked,true);assert.equal(gas['aria-pressed'],'true');
+ boost.listeners.pointerdown(event(400));h.tick(90);boost.listeners.pointerup(event(1900));
+ assert.ok(h.s.state.energy<100);assert.equal(h.s.gasLocked,true);
+ brake.listeners.pointerdown(event(2000));assert.equal(h.s.gasLocked,false);brake.listeners.pointerup(event(2050));
+ gas.listeners.pointerdown(event(2200));gas.listeners.pointerup(event(2250));gas.listeners.pointerdown(event(2350));gas.listeners.pointerup(event(2400));
+ assert.equal(h.s.gasLocked,true);h.click('menu-btn');assert.equal(h.s.gasLocked,false);
 });
