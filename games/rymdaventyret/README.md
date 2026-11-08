@@ -1,6 +1,6 @@
 # Rymdäventyret
 
-Rymdäventyret for Fritidsparken, revision 20261108-4. Three.js r160/WebGL, native Blender/GLB models, no build step or CDN dependency.
+Rymdäventyret for Fritidsparken, revision 20261108-5. Three.js r160/WebGL, native Blender/GLB models, no build step or CDN dependency.
 
 Serve the repository with a static HTTP server and open `/games/rymdaventyret/`. Opening the HTML as a `file:` URL will not load ES modules/GLB assets reliably.
 
@@ -25,6 +25,13 @@ python3 tools/blender/space/verify_assets.py
 ```
 
 47 automated tests cover controller-level completion of every expedition, autopilot trips from Earth to every destination, real GLB parsing, camera transforms, terrain/rover construction, flight/fuel/collision behavior, upgrade spending and save recovery. Controller tests run actual main.mjs with DOM/audio/render adapters; they place the ship near objectives to verify interaction rules. They do not verify human-input difficulty or rendered gameplay.
+
+## Revision 20261108-5
+
+- Compact edge-mounted mobile instruments: upper right in portrait, upper left in landscape.
+- Smaller mission summary, a single horizontally scrollable action bar and safe-area-aware touch controls leave the central flight view clear.
+- Planet facts remain available in the pause menu.
+- Layout inspected with the production markup/CSS in six 320–1024px touch-layout fixtures; WebGL rendering remains subject to the verification limits below.
 
 ## Revision 20261108-4
 

@@ -12,7 +12,7 @@
       content="Flyg genom solsystemet, landa på månar och upptäck rymden i Rymdäventyret."
     />
     <title>Rymdäventyret · Fritidsparken</title>
-    <link rel="stylesheet" href="style.css?v=20261108-4" />
+    <link rel="stylesheet" href="style.css?v=20261108-5" />
   </head>
   <body>
     <canvas id="space" aria-label="Spelvärlden" tabindex="0"></canvas>
@@ -109,14 +109,14 @@
         ></canvas>
       </div>
       <nav class="toolbar">
-        <button id="map-btn">◎ <span>Karta</span><kbd>M</kbd></button
-        ><button id="camera-btn">▣ <span>Kamera</span><kbd>C</kbd></button
+        <button id="map-btn" aria-label="Öppna rymdkartan">◎ <span>Karta</span><kbd>M</kbd></button
+        ><button id="camera-btn" aria-label="Byt kamera">▣ <span>Kamera</span><kbd>C</kbd></button
         ><button id="interact">◇ <span>Interagera</span><kbd>E</kbd></button
         ><button id="assist-btn" hidden>✧ <span>Flyghjälp</span></button
         ><button id="takeoff-btn" hidden>↑ <span>Starta raketen</span></button
         ><button id="autopilot-btn" hidden>Avbryt autopilot</button
         ><button id="photo-btn" hidden>Ta bild</button
-        ><button id="fullscreen">⛶ <span>Helskärm</span></button>
+        ><button id="fullscreen" aria-label="Helskärm">⛶ <span>Helskärm</span></button>
       </nav>
       <div id="help">
         W / S gas & broms · A / D sväng · ↑ / ↓ höjd · Shift turbo · Space
@@ -143,6 +143,6 @@
       <div id="panel-content"></div>
     </dialog>
     <script src="../../js/vendor/three.min.js"></script>
-    <script type="module" src="boot.mjs?v=20261108-4"></script>
+    <script type="module" src="boot.mjs?v=20261108-5"></script>
   </body>
 </html>

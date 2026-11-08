@@ -991,3 +991,103 @@ body.photo-mode #nav-marker {
 @media (max-height: 550px) and (pointer: coarse) {
   .toolbar { max-width: calc(100% - 250px); }
 }
+
+/* Mobile flight HUD: keep the flight view clear, instruments at the edge. */
+@media (pointer: coarse), (max-width: 800px), (max-height: 550px) {
+  body:has(#hud:not([hidden])) #topbar {
+    padding: 0;
+    top: calc(env(safe-area-inset-top) + 8px);
+    right: calc(env(safe-area-inset-right) + 10px);
+    left: auto;
+    background: none;
+  }
+  body:has(#hud:not([hidden])) #topbar .brand,
+  body:has(#hud:not([hidden])) #topbar .edition { display: none; }
+  #menu-btn { width: 44px; height: 44px; padding: 0; }
+  .hud-left {
+    top: calc(env(safe-area-inset-top) + 12px);
+    left: calc(env(safe-area-inset-left) + 12px);
+    width: calc(100% - env(safe-area-inset-left) - env(safe-area-inset-right) - 144px);
+    max-width: 320px;
+  }
+  .hud-left h2 { font-size: 18px; letter-spacing: 0; margin: 0; }
+  .hud-left .eyebrow, #fact-btn, .hud-right,
+  .mission-card > span, .mission-card .text-btn, .mission-card p,
+  .flight-dashboard .destination, .flight-dashboard #minimap,
+  #help, .toolbar kbd, .reticle { display: none; }
+  .mission-card {
+    width: auto; max-width: none; margin-top: 6px; padding: 5px 0 5px 8px;
+    border: 0; border-left: 2px solid var(--gold); border-radius: 0;
+    background: none; backdrop-filter: none;
+  }
+  .mission-card strong { margin: 0; font-size: 11px; line-height: 1.4; font-weight: 500; text-shadow: 0 1px 4px #000; }
+  .flight-dashboard {
+    top: calc(env(safe-area-inset-top) + 60px);
+    right: calc(env(safe-area-inset-right) + 10px);
+    bottom: auto; left: auto; transform: none;
+    width: 110px; padding: 8px; gap: 7px;
+    flex-direction: column; align-items: stretch;
+    border-radius: 8px; background: #0713218c;
+  }
+  .speed { display: flex; align-items: baseline; justify-content: space-between; gap: 3px; }
+  .speed strong { font-size: 21px; font-variant-numeric: tabular-nums; }
+  .speed small { font-size: 7px; letter-spacing: 0; }
+  .meters { width: auto; gap: 5px; }
+  .meters label { font-size: 8px; gap: 4px; }
+  .meters meter { width: 45px; height: 6px; flex-shrink: 0; }
+  .toolbar {
+    left: calc(env(safe-area-inset-left) + 10px);
+    right: calc(env(safe-area-inset-right) + 10px);
+    bottom: calc(env(safe-area-inset-bottom) + 8px);
+    transform: none; width: auto; max-width: none; height: 46px;
+    flex-wrap: nowrap; justify-content: flex-start; align-items: center;
+    gap: 5px; overflow-x: auto; overflow-y: hidden;
+    pointer-events: auto; touch-action: pan-x; scrollbar-width: none;
+  }
+  .toolbar::-webkit-scrollbar { display: none; }
+  .toolbar button { flex: 0 0 auto; min-width: 44px; min-height: 44px; padding: 8px 10px; font-size: 11px; }
+  .toolbar #map-btn span, .toolbar #camera-btn span,
+  .toolbar #fullscreen span { display: none; }
+  .toolbar #interact span, .toolbar #assist-btn span, .toolbar #takeoff-btn span { display: inline; }
+  #autopilot-btn { max-width: none; }
+  #toast { top: calc(env(safe-area-inset-top) + 100px); left: 12px; transform: none; width: auto; max-width: calc(100% - 144px); padding: 8px; font-size: 11px; }
+  #nav-marker { font-size: 22px; }
+  #nav-marker span { font-size: 9px; }
+}
+@media (pointer: coarse) {
+  #stick {
+    width: 100px; height: 100px;
+    left: calc(env(safe-area-inset-left) + 16px);
+    bottom: calc(env(safe-area-inset-bottom) + 76px);
+  }
+  #stick i { width: 40px; height: 40px; left: 29px; top: 29px; }
+  .touch-right {
+    right: calc(env(safe-area-inset-right) + 12px);
+    bottom: calc(env(safe-area-inset-bottom) + 66px);
+    grid-template-columns: 1fr; gap: 5px;
+  }
+  .touch-right button { min-width: 76px; min-height: 44px; padding: 8px 10px; font-size: 10px; background: #10283b9c; }
+}
+@media (orientation: landscape) and (pointer: coarse), (orientation: landscape) and (max-height: 550px) {
+  .flight-dashboard {
+    top: calc(env(safe-area-inset-top) + 10px);
+    left: calc(env(safe-area-inset-left) + 12px);
+    right: auto;
+  }
+  .hud-left {
+    top: calc(env(safe-area-inset-top) + 12px);
+    left: calc(env(safe-area-inset-left) + 140px);
+    width: calc(100% - env(safe-area-inset-left) - env(safe-area-inset-right) - 210px);
+    max-width: 390px;
+  }
+  .hud-left h2 { font-size: 15px; }
+  .mission-card { margin-top: 3px; padding-top: 2px; padding-bottom: 2px; }
+  .toolbar {
+    left: calc(env(safe-area-inset-left) + 132px);
+    right: calc(env(safe-area-inset-right) + 104px);
+    bottom: calc(env(safe-area-inset-bottom) + 8px);
+  }
+  #stick { bottom: calc(env(safe-area-inset-bottom) + 12px); }
+  .touch-right { bottom: calc(env(safe-area-inset-bottom) + 12px); }
+  #toast { left: calc(env(safe-area-inset-left) + 140px); top: calc(env(safe-area-inset-top) + 72px); max-width: calc(100% - 250px); }
+}

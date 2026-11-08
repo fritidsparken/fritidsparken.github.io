@@ -1,4 +1,4 @@
-export const VERSION = "20261108-4";
+export const VERSION = "20261108-5";
 export const PLANETS = [
   {
     id: "mercury",

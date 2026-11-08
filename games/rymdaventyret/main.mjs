@@ -6,7 +6,7 @@ import {
   CAMERAS,
   arrival,
   worldPosition,
-} from "./data.mjs?v=20261108-4";
+} from "./data.mjs?v=20261108-5";
 import {
   clamp,
   dist,
@@ -450,7 +450,7 @@ function showPanel(type) {
     html = "";
   if (type === "pause") {
     title = "En paus bland stjärnorna";
-    html = `<div class="stack"><button data-action="resume" class="primary">Fortsätt resan</button>${surface ? '<button data-action="takeoff">Starta raketen ↑</button>' : ''}<button data-panel="map">Rymdkarta</button><button data-panel="missions">Uppdrag</button><button data-panel="garage">Raketgarage</button><button data-panel="settings">Inställningar</button><button data-action="savehome">Spara och gå till startskärmen</button><button data-panel="newgame">Nytt spel</button></div>`;
+    html = `<div class="stack"><button data-action="resume" class="primary">Fortsätt resan</button>${surface ? '<button data-action="takeoff">Starta raketen ↑</button>' : ''}<button data-panel="map">Rymdkarta</button><button data-panel="missions">Uppdrag</button><button data-panel="facts">Om planeten</button><button data-panel="garage">Raketgarage</button><button data-panel="settings">Inställningar</button><button data-action="savehome">Spara och gå till startskärmen</button><button data-panel="newgame">Nytt spel</button></div>`;
   }
   if (type === "missions") {
     title = "Dina expeditioner";
