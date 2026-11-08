@@ -753,7 +753,7 @@ $("takeoff-btn").onclick = () => { if (surface && transition <= 0 && !paused) ta
 $("assist-btn").onclick = () => {
   if (!mission() || surface) return;
   auto = true;
-  autoGoal = true;
+  autoGoal = true; dockTarget = null;
   destination = mission().world;
   toast("Flyghjälpen följer uppdragets markör. Styr själv för att avbryta.");
 };
@@ -761,7 +761,7 @@ for (const b of WORLDS.filter(b => b.station))
   $("dock-" + b.id).onclick = () => beginDock(b.id);
 $("fact-btn").onclick = () => showPanel("facts");
 $("autopilot-btn").onclick = () => {
-  auto = false;
+  auto = false; dockTarget = null;
   toast("Autopiloten är avstängd.");
 };
 // Safari uses prefixed fullscreen on some devices; iPhone may only allow video fullscreen.
