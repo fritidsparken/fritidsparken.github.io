@@ -1,6 +1,6 @@
 // Catch module/dependency failures as well as errors from the renderer constructor.
 try {
-  await import('./main.mjs?v=20261108-7');
+  await import('./main.mjs?v=20261108-8');
 } catch (error) {
   document.getElementById('loading').hidden = true;
   document.getElementById('error').hidden = false;

@@ -6,7 +6,7 @@ import {
   CAMERAS,
   arrival,
   worldPosition,
-} from "./data.mjs?v=20261108-7";
+} from "./data.mjs?v=20261108-8";
 import {
   clamp,
   dist,
@@ -52,7 +52,7 @@ let state = saved.state || freshState(),
   frames = 0,
   fpsTime = 0,
   collisionCooldown = 0;
-let gasLocked = false, lastGasTap = null, gasPressStart = 0;
+let gasLocked = false, gasCanLatch = false, gasHoldTime = 0, gasPressStart = 0;
 function setGasLock(value) {
   gasLocked = value;
   $("gas-btn").setAttribute("aria-pressed", String(value));
@@ -436,7 +436,7 @@ function closePanel() {
   resetInput();
 }
 function resetInput() {
-  setGasLock(false); lastGasTap = null;
+  setGasLock(false); gasCanLatch = false; gasHoldTime = 0;
   keys = {};
   held = {};
   joystick = { x: 0, y: 0 };
@@ -860,25 +860,31 @@ for (const b of document.querySelectorAll("[data-hold]")) {
     const kind = b.dataset.hold;
     if (kind === "gas") {
       gasPressStart = e.timeStamp;
-      if (gasLocked) { setGasLock(false); lastGasTap = null; }
-      else if (lastGasTap !== null && e.timeStamp - lastGasTap < 350) {
-        setGasLock(true); lastGasTap = null;
+      gasHoldTime = 0;
+      if (gasLocked) {
+        setGasLock(false); gasCanLatch = false; held.gas = false;
+        return;
       }
+      gasCanLatch = true;
     }
-    if (kind === "brake") { setGasLock(false); lastGasTap = null; }
+    if (kind === "brake") { setGasLock(false); gasCanLatch = false; gasHoldTime = 0; }
     held[kind] = true;
     sound.start();
   });
   b.addEventListener("pointerup", (e) => {
-    if (b.dataset.hold === "gas" && !gasLocked)
-      lastGasTap = e.timeStamp - gasPressStart < 250 ? e.timeStamp : null;
+    if (b.dataset.hold === "gas") {
+      if (gasCanLatch && e.timeStamp - gasPressStart >= 600) setGasLock(true);
+      gasCanLatch = false;
+    }
     held[b.dataset.hold] = false;
   });
   b.addEventListener("pointercancel", () => {
     held[b.dataset.hold] = false;
-    if (b.dataset.hold === "gas") { setGasLock(false); lastGasTap = null; }
+    if (b.dataset.hold === "gas") { setGasLock(false); gasCanLatch = false; gasHoldTime = 0; }
   });
-  b.addEventListener("lostpointercapture", () => { held[b.dataset.hold] = false; });
+  b.addEventListener("lostpointercapture", () => { held[b.dataset.hold] = false; if (b.dataset.hold === "gas") gasCanLatch = false; });
+  for (const type of ["touchstart", "touchmove", "touchend"])
+    b.addEventListener(type, e => e.preventDefault(), { passive: false });
 }
 for (const type of ["gesturestart", "gesturechange", "gestureend"])
   document.addEventListener(type, e => e.preventDefault(), { passive: false });
@@ -909,20 +915,16 @@ $("space").addEventListener("pointermove", (e) => {
 });
 for (const ev of ["pointerup", "pointercancel", "lostpointercapture"])
   $("space").addEventListener(ev, () => (pointer = null));
-$("space").addEventListener(
-  "wheel",
-  (e) => {
-    if (cameraMode >= 3) {
-      e.preventDefault();
-      renderer.orbit.distance = clamp(
-        renderer.orbit.distance + e.deltaY * 0.03,
-        10,
-        80,
-      );
-    }
-  },
-  { passive: false },
-);
+// No camera zoom from wheel/trackpad gestures, including pinch-generated wheel events.
+$("space").addEventListener("wheel", e => e.preventDefault(), { passive: false });
+for (const id of ["stick", "space"])
+  for (const type of ["touchstart", "touchmove", "touchend"])
+    $(id).addEventListener(type, e => e.preventDefault(), { passive: false });
+let lastTouchEnd = -Infinity;
+document.addEventListener("touchend", e => {
+  if (e.timeStamp - lastTouchEnd < 350) e.preventDefault();
+  lastTouchEnd = e.timeStamp;
+}, { passive: false, capture: true });
 function updateHud() {
   if (!started) return;
   const m = mission();
@@ -1012,6 +1014,10 @@ function frame(ms) {
   const elapsed = Math.max(0.001, (ms - last) / 1000 || 0.016);
   let dt = Math.min(0.05, elapsed);
   last = ms;
+  if (started && !paused && held.gas && gasCanLatch && !gasLocked) {
+    gasHoldTime += elapsed;
+    if (gasHoldTime >= 0.6) { setGasLock(true); gasCanLatch = false; }
+  }
   let input = {
     turn:
       (keys.KeyD || keys.ArrowRight ? 1 : 0) -

@@ -111,17 +111,19 @@ test('autopilot reaches worlds across the system without passing through planets
   }
 });
 
-test('double tap latches gas while turbo is held; brake and pause release it', async()=>{
- const h=await harness(); h.click('play');
+test('long press locks gas; taps never lock; one press stops; turbo works', async()=>{
+ const h=await harness();h.click('play');
  const event=t=>({timeStamp:t,pointerId:1,preventDefault(){}});
- const gas=h.nodes.get('gas-btn'),boost=h.nodes.get('boost-btn'),brake=h.nodes.get('brake-btn');
+ const gas=h.nodes.get('gas-btn'),boost=h.nodes.get('boost-btn');
  gas.listeners.pointerdown(event(100));gas.listeners.pointerup(event(150));
+ gas.listeners.pointerdown(event(250));gas.listeners.pointerup(event(300));
  assert.equal(h.s.gasLocked,false);
- gas.listeners.pointerdown(event(250));gas.listeners.pointerup(event(300));gas.listeners.lostpointercapture();
+ gas.listeners.pointerdown(event(500));h.tick(40);
  assert.equal(h.s.gasLocked,true);assert.equal(gas['aria-pressed'],'true');
- boost.listeners.pointerdown(event(400));h.tick(90);boost.listeners.pointerup(event(1900));
+ gas.listeners.pointerup(event(1200));gas.listeners.lostpointercapture();
+ boost.listeners.pointerdown(event(1300));h.tick(60);boost.listeners.pointerup(event(2300));
  assert.ok(h.s.state.energy<100);assert.equal(h.s.gasLocked,true);
- brake.listeners.pointerdown(event(2000));assert.equal(h.s.gasLocked,false);brake.listeners.pointerup(event(2050));
- gas.listeners.pointerdown(event(2200));gas.listeners.pointerup(event(2250));gas.listeners.pointerdown(event(2350));gas.listeners.pointerup(event(2400));
- assert.equal(h.s.gasLocked,true);h.click('menu-btn');assert.equal(h.s.gasLocked,false);
+ gas.listeners.pointerdown(event(2400));assert.equal(h.s.gasLocked,false);gas.listeners.pointerup(event(2450));
+ gas.listeners.pointerdown(event(2600));gas.listeners.pointerup(event(3300));assert.equal(h.s.gasLocked,true);
+ h.click('menu-btn');assert.equal(h.s.gasLocked,false);
 });
