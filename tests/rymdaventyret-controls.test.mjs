@@ -127,3 +127,19 @@ test('long press locks gas; taps never lock; one press stops; turbo works', asyn
  gas.listeners.pointerdown(event(2600));gas.listeners.pointerup(event(3300));assert.equal(h.s.gasLocked,true);
  h.click('menu-btn');assert.equal(h.s.gasLocked,false);
 });
+
+test('station marker flies and docks automatically at all four stations',async()=>{
+ const h=await harness();h.click('play');
+ for(const world of data.WORLDS.filter(b=>b.station)) {
+   h.action({jump:world.id});h.tick();
+   h.s.state.fuel=80;h.s.state.shield=50;
+   h.click('dock-'+world.id);
+   for(let i=0;i<2400 && h.s.auto;i++)h.tick();
+   assert.equal(h.s.auto,false,'arrival at '+world.id);
+   assert.equal(h.nodes.get('panel-title').textContent,'Välkommen till stationen');
+   assert.equal(h.s.ship.speed,0);assert.equal(h.s.state.fuel,100);assert.equal(h.s.state.shield,100);
+   h.action({action:'resume'});
+ }
+ h.action({jump:'earth'});h.tick();h.click('dock-earth');h.key('KeyS');h.tick();h.key('KeyS',false);
+ assert.equal(h.s.auto,false,'manual braking cancels docking approach');
+});

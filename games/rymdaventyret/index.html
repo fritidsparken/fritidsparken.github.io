@@ -15,7 +15,7 @@
       content="Flyg genom solsystemet, landa på månar och upptäck rymden i Rymdäventyret."
     />
     <title>Rymdäventyret · Fritidsparken</title>
-    <link rel="stylesheet" href="style.css?v=20261108-9" />
+    <link rel="stylesheet" href="style.css?v=20261108-10" />
   </head>
   <body>
     <canvas id="space" aria-label="Spelvärlden" tabindex="0"></canvas>
@@ -84,7 +84,7 @@
         ><span id="fps"></span>
       </div>
       <div id="nav-marker" hidden>◇<span></span></div>
-      <div class="reticle">＋</div>
+      <div class="reticle">＋</div><button id="dock-earth" class="dock-target" hidden aria-label="Docka automatiskt vid Jorden">◎ Docka</button><button id="dock-mars" class="dock-target" hidden aria-label="Docka automatiskt vid Mars">◎ Docka</button><button id="dock-saturn" class="dock-target" hidden aria-label="Docka automatiskt vid Saturnus">◎ Docka</button><button id="dock-moon" class="dock-target" hidden aria-label="Docka automatiskt vid Månen">◎ Docka</button>
       <div class="flight-dashboard">
         <div class="speed">
           <strong id="speed">0</strong><small>HASTIGHET</small>
@@ -146,6 +146,6 @@
       <div id="panel-content"></div>
     </dialog>
     <script src="../../js/vendor/three.min.js"></script>
-    <script type="module" src="boot.mjs?v=20261108-9"></script>
+    <script type="module" src="boot.mjs?v=20261108-10"></script>
   </body>
 </html>

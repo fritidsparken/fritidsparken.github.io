@@ -1212,3 +1212,10 @@ html, body, #space, #hud, #touch { touch-action: none; overscroll-behavior: none
 #hud #stick { bottom: calc(env(safe-area-inset-bottom) + 48px); }
 .photo-mode #hud .flight-dashboard { display: none; }
 body:has(#hud:not([hidden])) #topbar { display: none; }
+#hud .dock-target {
+  position: absolute; transform: translate(-50%, -50%); z-index: 2;
+  min-height: 40px; padding: 7px 12px; border-radius: 20px;
+  border: 1px solid #78e7d5; background: #092f38d9; color: #e4fff7;
+  font-size: 12px; box-shadow: 0 0 14px #59d8ff30; pointer-events: auto;
+}
+#hud .dock-target:disabled { opacity: .8; }

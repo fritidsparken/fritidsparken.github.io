@@ -6,7 +6,7 @@ import {
   CAMERAS,
   arrival,
   worldPosition,
-} from "./data.mjs?v=20261108-8";
+} from "./data.mjs?v=20261108-10";
 import {
   clamp,
   dist,
@@ -52,6 +52,7 @@ let state = saved.state || freshState(),
   frames = 0,
   fpsTime = 0,
   collisionCooldown = 0;
+let dockTarget = null;
 let gasLocked = false, gasCanLatch = false, gasHoldTime = 0, gasPressStart = 0;
 function setGasLock(value) {
   gasLocked = value;
@@ -340,6 +341,21 @@ function takeOff() {
   save();
   toast("Start klar. Välj nästa destination på kartan.");
 }
+function dockAt(station) {
+  auto = false; dockTarget = null; ship.speed = 0;
+  setGasLock(false); held.gas = false;
+  state.fuel = state.energy = state.shield = state.health = 100;
+  if (goalType === "dock" && mission()?.world === station.body.id) stepDone();
+  sound.effect("dock"); showPanel("dock"); save();
+}
+function beginDock(id) {
+  if (!started || paused || surface || transition > 0) return;
+  const station = renderer.stations?.find(s => s.body.id === id);
+  if (!station) return;
+  resetInput(); destination = id; dockTarget = id; autoGoal = false; auto = true;
+  toast("Automatisk dockning. Styr eller bromsa för att avbryta.");
+  updateHud();
+}
 function interact() {
   if (!started || paused) return;
   if (transition > 0) return;
@@ -392,12 +408,7 @@ function interact() {
       toast("Bromsa till under 20 för att docka.");
       return;
     }
-    ship.speed = 0;
-    state.fuel = state.energy = state.shield = state.health = 100;
-    if (goalType === "dock" && mission()?.world === station.body.id) stepDone();
-    sound.effect("dock");
-    showPanel("dock");
-    save();
+    dockAt(station);
     return;
   }
   if (body().land) {
@@ -436,6 +447,7 @@ function closePanel() {
   resetInput();
 }
 function resetInput() {
+  dockTarget = null;
   setGasLock(false); gasCanLatch = false; gasHoldTime = 0;
   keys = {};
   held = {};
@@ -745,6 +757,8 @@ $("assist-btn").onclick = () => {
   destination = mission().world;
   toast("Flyghjälpen följer uppdragets markör. Styr själv för att avbryta.");
 };
+for (const b of WORLDS.filter(b => b.station))
+  $("dock-" + b.id).onclick = () => beginDock(b.id);
 $("fact-btn").onclick = () => showPanel("facts");
 $("autopilot-btn").onclick = () => {
   auto = false;
@@ -925,6 +939,22 @@ document.addEventListener("touchend", e => {
   if (e.timeStamp - lastTouchEnd < 350) e.preventDefault();
   lastTouchEnd = e.timeStamp;
 }, { passive: false, capture: true });
+function updateDockTargets() {
+  for (const world of WORLDS.filter(b => b.station)) {
+    const button = $("dock-" + world.id);
+    const station = renderer.stations?.find(s => s.body.id === world.id);
+    button.hidden = true;
+    if (!started || paused || surface || transition > 0 || cameraMode === 4 || !station) continue;
+    const q = renderer.project(station.position);
+    if (q.z <= -1 || q.z >= 1 || Math.abs(q.x) > .9 || Math.abs(q.y) > .8 || dist(ship.position,station.position) > 2500) continue;
+    if (WORLDS.some(b => segmentHitsSphere(ship.position,station.position,worldPosition(b,state.time),b.r))) continue;
+    button.hidden = false;
+    button.style.left = (50 + q.x * 50) + "%";
+    button.style.top = (50 - q.y * 50) + "%";
+    button.textContent = auto && dockTarget === world.id ? "◎ Dockar…" : "◎ Docka";
+    button.disabled = auto && dockTarget === world.id;
+  }
+}
 function updateHud() {
   if (!started) return;
   const m = mission();
@@ -969,6 +999,7 @@ function updateHud() {
   else if (renderer.stations?.some((s) => dist(ship.position, s.position) < 60))
     action = "Docka";
   else if (body().land) action = "Landa";
+  $("interact").hidden = action === "Docka";
   $("interact").querySelector("span").textContent = action;
   $("interact").title = action + " (E)";
   $("interact").setAttribute("aria-label", action);
@@ -1068,17 +1099,22 @@ function frame(ms) {
     } else {
       if (auto) {
         if (input.turn || input.pitch || input.gas || input.brake) {
-          auto = false;
+          auto = false; dockTarget = null;
           toast("Du styr nu själv.");
         } else {
           const b = WORLDS.find((w) => w.id === destination);
-          let target = autoGoal && goal && goalType !== "land" ? goal : arrival(b, state.time),
+          let target = dockTarget ? renderer.stationPosition(b, state.time) : autoGoal && goal && goalType !== "land" ? goal : arrival(b, state.time),
             d = dist(ship.position, target);
           const flyThrough = autoGoal && ["gate", "collect"].includes(goalType);
           if (d < (flyThrough ? 8 : 22)) {
             auto = false;
             ship.speed = 0;
             setWorld(b.id);
+            if (dockTarget) {
+              const station = renderer.stations.find(s => s.body.id === dockTarget);
+              if (station) dockAt(station);
+              return;
+            }
             toast(autoGoal ? "Framme vid markören. Använd Interagera eller fotoläget." : "Autopiloten har nått " + b.name);
             save();
           } else {
@@ -1201,6 +1237,7 @@ function frame(ms) {
       cameraDt: paused ? 0 : dt,
     },
   );
+  updateDockTargets();
   sound.update(
     dt,
     ship.speed,
