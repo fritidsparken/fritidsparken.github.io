@@ -107,10 +107,10 @@ for i,name in enumerate(['excavator','dumper','loader','crane','mixer','roller']
  if i==0:
   cyl(upper,'slew bearing',1.04,.26,(0,0,0),S);box(upper,'body',(2.65,.7,2.7),(0,.4,.25),Y,.2);box(upper,'counterweight',(2.4,.7,1.15),(0,.8,1.1),Y,.25);cab(upper,(-.55,.8,.05))
   for k in range(6):box(upper,'engine vent',(.58,.045,.04),(.72,.7+k*.1,1.7),D,.01)
-  b=empty('boom',upper,(.62,.9,-.75));box(b,'boom casting',(.48,3.4,.6),(0,1.7,0),Y,.14);box(b,'raised side plate',(.53,2.8,.3),(0,1.7,-.08),Y,.09);hoses(b,3.4)
+  b=empty('boom',upper,(0,.9,-1.45));box(b,'boom casting',(.48,3.4,.6),(0,1.7,0),Y,.14);box(b,'raised side plate',(.53,2.8,.3),(0,1.7,-.08),Y,.09);hoses(b,3.4)
   st=empty('stick',b,(0,3.4,0));box(st,'stick casting',(.38,2.7,.48),(0,1.35,0),Y,.12);hoses(st,2.7,.22);sc=bucket(st,1.45,(0,2.7,0))
   for par,pos in [(b,(0,0,0)),(st,(0,0,0)),(sc,(0,0,0))]:cyl(par,'joint pin',.17,.69,pos,S,'x')
-  empty('boom_base',upper,(.85,.6,-.3));empty('boom_tip',b,(.23,2.5,.24));hydraulic(upper,'hydraulic_boom','boom_base','boom_tip')
+  empty('boom_base',upper,(.23,.6,-1));empty('boom_tip',b,(.23,2.5,.24));hydraulic(upper,'hydraulic_boom','boom_base','boom_tip')
   empty('stick_base',b,(.21,1.7,-.28));empty('stick_tip',st,(.21,.75,.15));hydraulic(upper,'hydraulic_stick','stick_base','stick_tip')
   empty('bucket_base',st,(.2,1.6,-.27));empty('bucket_tip',sc,(.2,.43,.39));hydraulic(upper,'hydraulic_bucket','bucket_base','bucket_tip')
  elif i==1:
