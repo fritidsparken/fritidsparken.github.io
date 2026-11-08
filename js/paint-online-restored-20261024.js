@@ -214,7 +214,7 @@ function openPainter(IMAGE,TARGET,REFERENCE=""){
  let graveTreeToneMap=null;
  let tool="fill",color="#ef4444",brush=14,acts=[],future=[],W=0,H=0,luma=null,zoom=1,tx=0,ty=0,space=false,active=null,pending=null,gesture=false,pinch=null;
  const autoButton=$('[data-action="auto"]'),autoProgress=document.createElement("progress"),status=$(".fp-paint-status");
- let autoRunning=false;
+ let autoRunning=false,pendingAutoStart=false;
  let ghostReference=null,ghostReferencePixels=null,ghostOriginalInk=null,ghostPumpkinLightMap=null,ghostPumpkinLights=[];
  const getGhostReference=()=>new Promise((resolve,reject)=>{if(ghostReference?.complete&&ghostReference.naturalWidth){resolve(ghostReference);return}const ref=new Image();ref.onload=()=>{ghostReference=ref;resolve(ref)};ref.onerror=reject;const data=horseConfig?horseConfig.reference:window.FP_GHOST_REFERENCE_BASE64;if(!data){reject(new Error("Reference data missing"));return}ref.src="data:image/webp;base64,"+data});
  autoProgress.className="fp-auto-progress";autoProgress.max=1;autoProgress.value=0;autoProgress.hidden=true;
@@ -226,6 +226,7 @@ function openPainter(IMAGE,TARGET,REFERENCE=""){
      catch{status.textContent="Färganpassningen kunde inte öppnas. Stäng och försök igen.";return}
    }
    const prepareCanvas=()=>{
+     if(!back.isConnected)return;
      const isGhostTarget=!!flightHouseConfig||!!motifConfig||!!referenceKey||!!spokConfig||!!owlConfig||!!wreathConfig||!!potionConfig||!!bookConfig||!!graveConfig||!!trainConfig||!!horseConfig||String(TARGET||"").toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset";
      if(flightHouseConfig){W=flightHouseConfig.width;H=flightHouseConfig.height}
      else if(motifConfig){W=motifConfig.width;H=motifConfig.height}
@@ -243,10 +244,11 @@ function openPainter(IMAGE,TARGET,REFERENCE=""){
      const src=document.createElement("canvas");src.width=W;src.height=H;const sctx=src.getContext("2d",{willReadFrequently:true});sctx.drawImage(img,0,0,W,H);
      const dat=sctx.getImageData(0,0,W,H),d=dat.data;luma=new Uint8Array(W*H);for(let i=0,j=0;i<d.length;i+=4,j++){const g=(d[i]*299+d[i+1]*587+d[i+2]*114)/1000;luma[j]=g;const a=Math.max(0,Math.min(255,Math.round((245-g)*1.7)));d[i]=d[i+1]=d[i+2]=0;d[i+3]=a}
      lctx.putImageData(dat,0,0);if(isGhostTarget)ghostOriginalInk=lctx.getImageData(0,0,W,H);fit();window.addEventListener("resize",fit);
+     if(pendingAutoStart&&back.isConnected){pendingAutoStart=false;runAutoColor()}
    };
    if(!flightHouseConfig&&!motifConfig&&!referenceKey&&!spokConfig&&!owlConfig&&!wreathConfig&&!potionConfig&&!bookConfig&&!graveConfig&&!trainConfig&&(horseConfig||String(TARGET||"").toLocaleLowerCase("sv").trim()==="spöke vid det hemsökta huset"))getGhostReference().then(prepareCanvas).catch(()=>{status.textContent="Färgreferensen kunde inte öppnas. Stäng och försök igen."});
    else prepareCanvas();
- };img.onerror=()=>{$(".fp-paint-status").textContent="Bilden kunde inte öppnas. Stäng och försök igen.";};img.src=isTurtleTarget?new URL("skoldpadda.webp",new URL(IMAGE,location.href)).href:isSquirrelTarget?new URL("ekorre.webp",new URL(IMAGE,location.href)).href:isPandaTarget?new URL("panda.webp",new URL(IMAGE,location.href)).href:isLionTarget?new URL("lejon.webp",new URL(IMAGE,location.href)).href:isPenguinTarget?new URL("pingvin.webp",new URL(IMAGE,location.href)).href:isHedgehogTarget?new URL("igelkott.webp",new URL(IMAGE,location.href)).href:isNewAnimalTarget?new URL(animalModel+".webp",new URL(IMAGE,location.href)).href:isGiraffeTarget?new URL("giraff.webp",new URL(IMAGE,location.href)).href:isFoxTarget?new URL("rav.webp",new URL(IMAGE,location.href)).href:isDogTarget?new URL("hund.webp",new URL(IMAGE,location.href)).href:isCatTarget?new URL("katt.webp",new URL(IMAGE,location.href)).href:IMAGE;
+ };img.onerror=()=>{pendingAutoStart=false;$(".fp-paint-status").textContent="Bilden kunde inte öppnas. Stäng och försök igen.";};img.src=isTurtleTarget?new URL("skoldpadda.webp",new URL(IMAGE,location.href)).href:isSquirrelTarget?new URL("ekorre.webp",new URL(IMAGE,location.href)).href:isPandaTarget?new URL("panda.webp",new URL(IMAGE,location.href)).href:isLionTarget?new URL("lejon.webp",new URL(IMAGE,location.href)).href:isPenguinTarget?new URL("pingvin.webp",new URL(IMAGE,location.href)).href:isHedgehogTarget?new URL("igelkott.webp",new URL(IMAGE,location.href)).href:isNewAnimalTarget?new URL(animalModel+".webp",new URL(IMAGE,location.href)).href:isGiraffeTarget?new URL("giraff.webp",new URL(IMAGE,location.href)).href:isFoxTarget?new URL("rav.webp",new URL(IMAGE,location.href)).href:isDogTarget?new URL("hund.webp",new URL(IMAGE,location.href)).href:isCatTarget?new URL("katt.webp",new URL(IMAGE,location.href)).href:IMAGE;
  function fit(){if(!W)return;let r=W/H,aw=stage.clientWidth-24,ah=stage.clientHeight-24,w=Math.min(aw,ah*r);sheet.style.width=w+"px";sheet.style.height=w/r+"px";applyTransform()}
  function applyTransform(){sheet.style.transform="translate(calc(-50% + "+tx+"px),calc(-50% + "+ty+"px)) scale("+zoom+")"}
  function setZoom(z){zoom=Math.max(1,Math.min(4,z));if(zoom===1)tx=ty=0;applyTransform()}
@@ -1440,7 +1442,8 @@ c.putImageData(out,0,0)
    maskCtx.putImageData(image,0,0);
    ctx.drawImage(mask,region.minX*region.scaleX,region.minY*region.scaleY,width*region.scaleX,height*region.scaleY);
  } async function runAutoColor(){
-   if(!autoButton||autoRunning||!W)return;
+   if(!autoButton||autoRunning)return;
+   if(!W){pendingAutoStart=true;status.textContent="Bilden laddas. Färgläggningen startar strax…";return;}
    if(acts.length&&!confirm("Automatisk färgläggning börjar från en tom bild. Vill du rensa din målning och fortsätta?"))return;
    acts=[];future=[];ctx.clearRect(0,0,W,H);if(ghostOriginalInk)lctx.putImageData(ghostOriginalInk,0,0);lines.style.opacity="";autoRunning=true;historyUI();autoButton.disabled=true;
    autoProgress.hidden=false;autoProgress.value=0;sheet.style.pointerEvents="none";toolSet("fill");
