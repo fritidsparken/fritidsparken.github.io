@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"
+    />
+    <meta name="theme-color" content="#07101f" />
+    <meta
+      name="description"
+      content="Flyg genom solsystemet, landa på månar och upptäck rymden i Rymdäventyret."
+    />
+    <title>Rymdäventyret · Fritidsparken</title>
+    <link rel="stylesheet" href="style.css?v=20261108-3" />
+  </head>
+  <body>
+    <canvas id="space" aria-label="Spelvärlden" tabindex="0"></canvas>
+    <div id="loading">
+      <div class="orbit-logo">✦</div>
+      <h1>Rymdäventyret</h1>
+      <p id="load-status">Förbereder din raket…</p>
+      <progress id="load-progress" max="100" value="0"></progress>
+    </div>
+    <div id="error" hidden role="alert">
+      <h2>Grafiken kunde inte starta</h2>
+      <p id="error-text"></p>
+      <button id="retry">Försök igen</button
+      ><a href="../../#Spel">Till Fritidsparken</a>
+    </div>
+    <header id="topbar">
+      <a href="../../#Spel" class="brand" aria-label="Till Fritidsparken"
+        >✦ <span>FRITIDSPARKEN</span></a
+      ><span class="edition"
+        >RYMDÄVENTYRET <small>EN RESA GENOM SOLSYSTEMET</small></span
+      ><button id="menu-btn" title="Pausa (Esc)" aria-label="Öppna menyn">
+        ☰
+      </button>
+    </header>
+    <section id="home" class="screen">
+      <div class="intro">
+        <p class="eyebrow">DITT STORA RYMDÄVENTYR BÖRJAR HÄR</p>
+        <h1>Hela rymden.<br /><em>Din upptäckt.</em></h1>
+        <p>
+          Ta plats i cockpiten. Upptäck åtta planeter,<br />landa på månar och
+          följ stjärnorna hem.
+        </p>
+        <div class="main-actions">
+          <button id="play" class="primary" disabled>
+            Starta äventyret <span>→</span></button
+          ><button id="continue" hidden>Fortsätt resan</button
+          ><button id="free" disabled>Fritt utforskande <span>✧</span></button>
+        </div>
+        <div class="home-links">
+          <button data-panel="missions">Uppdrag</button
+          ><button data-panel="garage">Raketgarage</button
+          ><button data-panel="settings">Inställningar</button>
+        </div>
+        <p id="save-warning" role="status"></p>
+      </div>
+      <div class="home-location">
+        <span class="dot"></span> SATURNUS <small>RINGARNAS HEMLIGHET</small>
+      </div>
+      <footer>
+        Skapad för nyfikna upptäckare
+        <span>8 planeter · 3 månar · 11 expeditioner</span>
+      </footer>
+    </section>
+    <section id="hud" hidden>
+      <div class="hud-left">
+        <p class="eyebrow" id="mode-label">EXPEDITION</p>
+        <h2 id="location">Jorden</h2>
+        <button id="fact-btn" class="text-btn">Lär dig om planeten ↗</button>
+        <div class="mission-card">
+          <span id="mission-label">DITT NÄSTA STEG</span
+          ><strong id="objective">Utforska solsystemet</strong>
+          <p id="mission-progress"></p>
+          <button data-panel="missions" class="text-btn">Välj uppdrag →</button>
+        </div>
+      </div>
+      <div class="hud-right">
+        <span id="wallet">✦ 0</span><span id="camera-name">Bakom raketen</span
+        ><span id="fps"></span>
+      </div>
+      <div id="nav-marker" hidden>◇<span></span></div>
+      <div class="reticle">＋</div>
+      <div class="flight-dashboard">
+        <div class="speed">
+          <strong id="speed">0</strong><small>HASTIGHET</small>
+        </div>
+        <div class="meters">
+          <label>BRÄNSLE <meter id="fuel" max="100" value="100"></meter></label
+          ><label>TURBO <meter id="energy" max="100" value="100"></meter></label
+          ><label>SKÖLD <meter id="shield" max="100" value="100"></meter></label
+          ><label
+            >SKROV <meter id="health" max="100" value="100"></meter
+          ></label>
+        </div>
+        <div class="destination">
+          <small>DESTINATION</small
+          ><strong id="destination">Välj på kartan</strong
+          ><span id="distance"></span>
+        </div>
+        <canvas
+          id="minimap"
+          width="120"
+          height="90"
+          aria-label="Minikarta"
+        ></canvas>
+      </div>
+      <nav class="toolbar">
+        <button id="map-btn">◎ <span>Karta</span><kbd>M</kbd></button
+        ><button id="camera-btn">▣ <span>Kamera</span><kbd>C</kbd></button
+        ><button id="interact">◇ <span>Interagera</span><kbd>E</kbd></button
+        ><button id="assist-btn" hidden>✧ <span>Flyghjälp</span></button
+        ><button id="takeoff-btn" hidden>↑ <span>Starta raketen</span></button
+        ><button id="autopilot-btn" hidden>Avbryt autopilot</button
+        ><button id="photo-btn" hidden>Ta bild</button
+        ><button id="fullscreen">⛶ <span>Helskärm</span></button>
+      </nav>
+      <div id="help">
+        W / S gas & broms · A / D sväng · ↑ / ↓ höjd · Shift turbo · Space
+        stabilisera
+      </div>
+      <div id="touch">
+        <div id="stick" aria-label="Styrspak"><i></i></div>
+        <div class="touch-right">
+          <button data-hold="boost">TURBO</button
+          ><button data-hold="gas">GAS ↑</button
+          ><button data-hold="brake">BROMS</button>
+        </div>
+      </div>
+    </section>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <dialog id="panel">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow" id="panel-tag">DIN EXPEDITION</p>
+          <h2 id="panel-title"></h2>
+        </div>
+        <button id="close-panel" aria-label="Stäng">✕</button>
+      </div>
+      <div id="panel-content"></div>
+    </dialog>
+    <script src="../../js/vendor/three.min.js"></script>
+    <script type="module" src="boot.mjs?v=20261108-3"></script>
+  </body>
+</html>

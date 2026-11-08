@@ -1,5 +1,6 @@
 (() => {
   const games=[
+    {id:'rymdaventyret',title:'Rymdäventyret',tag:'HELA RYMDEN. DIN UPPTÄCKT.',type:'3D · Rymdäventyr',image:'space/rocket/saturn-model-study.png',text:'Flyg genom solsystemet, landa på månar, kör månbil och följ elva expeditioner bland stjärnorna.',url:'./games/rymdaventyret/'},
     {id:'blockvarlden',title:'Blockvärlden',tag:'BYGG DIN EGEN VÄRLD',type:'3D · Bygg & äventyr',image:'blockvarlden/art/icon.webp',text:'Gräv, samla och bygg i en helt egen färgglad kubvärld. Välj kreativt läge eller överlevnad!',url:'./games/blockvarlden/'},
     {id:'skatepark',title:'Skatepark',tag:'HITTA DITT FLYT',type:'3D · Skateboard',image:'game-icons-2026/new-skatepark.webp',text:'Åk fritt i fyra parker och testa loopen i Riverside. Sätt din första kickflip, grinda ett räcke och bygg din egen trickserie.',url:'./games/skatepark/'},
     {id:'downhill',title:'Downhill',tag:'HITTA DIN LINJE',type:'3D · Mountainbike',image:'game-icons-2026/new-downhill.webp',text:'Tio långa leder från alpängar till neonramper. Välj mountainbike, hitta rätt linje och bemästra hopp och trick.',url:'./games/downhill/'},
