@@ -1091,3 +1091,56 @@ body.photo-mode #nav-marker {
   .touch-right { bottom: calc(env(safe-area-inset-bottom) + 12px); }
   #toast { left: calc(env(safe-area-inset-left) + 140px); top: calc(env(safe-area-inset-top) + 72px); max-width: calc(100% - 250px); }
 }
+
+/* Controls are game input surfaces, never selectable text or long-press targets. */
+html, body, #space, #hud, #hud *, #topbar, #topbar *, button, button *, summary {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+button, summary, #stick, #stick * { touch-action: none; }
+.edge-drawer {
+  position: absolute; top: max(24%, calc(env(safe-area-inset-top) + 60px));
+  z-index: 6; pointer-events: auto;
+}
+.actions-drawer { left: env(safe-area-inset-left); }
+.instruments-drawer { right: env(safe-area-inset-right); }
+.edge-drawer > summary {
+  display: grid; place-items: center; width: 44px; height: 44px;
+  list-style: none; cursor: pointer; font-size: 24px;
+  color: #c7e7f5; background: #10283bb3; border: 1px solid #9bdcff44;
+}
+.edge-drawer > summary::-webkit-details-marker { display: none; }
+.actions-drawer > summary { border-radius: 0 12px 12px 0; }
+.instruments-drawer > summary { border-radius: 12px 0 0 12px; }
+.edge-drawer[open] > summary { color: var(--gold); background: #163d56; }
+.edge-drawer:not([open]) > .flight-dashboard,
+.edge-drawer:not([open]) > .toolbar { display: none !important; }
+.edge-drawer .flight-dashboard {
+  position: absolute; top: 0; bottom: auto; left: auto; right: 48px;
+  transform: none; width: 124px; padding: 10px; gap: 9px;
+  display: flex; flex-direction: column; align-items: stretch;
+  background: #071321ed;
+}
+.edge-drawer .meters { width: auto; }
+.edge-drawer .meters meter { width: 48px; }
+.edge-drawer .destination, .edge-drawer #minimap { display: none; }
+.edge-drawer .toolbar {
+  position: absolute; top: 0; bottom: auto; left: 48px; right: auto;
+  transform: none; width: max-content; max-width: min(220px, 65vw);
+  height: auto; max-height: 55dvh; overflow-y: auto; overflow-x: hidden;
+  display: flex; flex-direction: column; align-items: stretch;
+  flex-wrap: nowrap; gap: 5px; padding: 6px; border-radius: 10px;
+  background: #071321ed; touch-action: pan-y;
+}
+.edge-drawer .toolbar button { min-height: 44px; text-align: left; flex-shrink: 0; }
+.edge-drawer .toolbar button span { display: inline; }
+.edge-drawer kbd { display: none; }
+.immersive-mode #topbar .brand, .immersive-mode #topbar .edition,
+.immersive-mode .hud-left, .immersive-mode .hud-right, .immersive-mode #help { display: none; }
+@media (pointer: coarse), (max-width: 800px), (max-height: 550px) {
+  .hud-left, .hud-right { display: none; }
+  #stick { bottom: calc(env(safe-area-inset-bottom) + 16px); }
+  .touch-right { bottom: calc(env(safe-area-inset-bottom) + 16px); }
+}

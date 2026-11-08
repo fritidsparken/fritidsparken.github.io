@@ -6,7 +6,7 @@ import {
   CAMERAS,
   arrival,
   worldPosition,
-} from "./data.mjs?v=20261108-5";
+} from "./data.mjs?v=20261108-6";
 import {
   clamp,
   dist,
@@ -743,16 +743,35 @@ $("autopilot-btn").onclick = () => {
   auto = false;
   toast("Autopiloten är avstängd.");
 };
+// Safari uses prefixed fullscreen on some devices; iPhone may only allow video fullscreen.
 $("fullscreen").onclick = async () => {
+  const root = document.documentElement;
+  const active = document.fullscreenElement || document.webkitFullscreenElement;
   try {
-    if (document.fullscreenElement) await document.exitFullscreen();
-    else if (document.documentElement.requestFullscreen)
-      await document.documentElement.requestFullscreen();
-    else toast("Använd liggande läge för större spelbild.");
+    if (active) {
+      const exit = document.exitFullscreen || document.webkitExitFullscreen;
+      if (exit) await exit.call(document);
+      document.body.classList.remove("immersive-mode");
+    } else if (document.body.classList.contains("immersive-mode")) {
+      document.body.classList.remove("immersive-mode");
+    } else {
+      const enter = root.requestFullscreen || root.webkitRequestFullscreen;
+      if (enter) await enter.call(root);
+      else {
+        document.body.classList.add("immersive-mode");
+        toast("Utökat spelläge. För helt dold webbläsarrad på iPhone: lägg till spelet på hemskärmen och öppna därifrån.");
+      }
+    }
   } catch {
-    toast("Helskärm är inte tillgängligt i den här webbläsaren.");
+    document.body.classList.add("immersive-mode");
+    toast("Webbläsaren tillåter inte äkta helskärm här. Utökat spelläge är aktiverat.");
   }
 };
+// Prevent selection/callouts without disabling click or multi-touch pointer controls.
+for (const type of ["selectstart", "contextmenu", "dragstart"])
+  document.addEventListener(type, (e) => {
+    if (e.target.closest?.("#hud, #topbar, button, summary, #space")) e.preventDefault();
+  });
 window.addEventListener("keydown", (e) => {
   if (["INPUT", "SELECT", "TEXTAREA"].includes(e.target.tagName)) return;
   if (e.code === "Escape") {

@@ -6,13 +6,16 @@
       name="viewport"
       content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"
     />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="theme-color" content="#07101f" />
     <meta
       name="description"
       content="Flyg genom solsystemet, landa på månar och upptäck rymden i Rymdäventyret."
     />
     <title>Rymdäventyret · Fritidsparken</title>
-    <link rel="stylesheet" href="style.css?v=20261108-5" />
+    <link rel="stylesheet" href="style.css?v=20261108-6" />
   </head>
   <body>
     <canvas id="space" aria-label="Spelvärlden" tabindex="0"></canvas>
@@ -84,7 +87,7 @@
       </div>
       <div id="nav-marker" hidden>◇<span></span></div>
       <div class="reticle">＋</div>
-      <div class="flight-dashboard">
+      <details class="edge-drawer instruments-drawer"><summary aria-label="Visa eller dölj instrument" title="Instrument">◴</summary><div class="flight-dashboard">
         <div class="speed">
           <strong id="speed">0</strong><small>HASTIGHET</small>
         </div>
@@ -108,7 +111,7 @@
           aria-label="Minikarta"
         ></canvas>
       </div>
-      <nav class="toolbar">
+      </details><details class="edge-drawer actions-drawer"><summary aria-label="Visa eller dölj spelverktyg" title="Spelverktyg">☷</summary><nav class="toolbar">
         <button id="map-btn" aria-label="Öppna rymdkartan">◎ <span>Karta</span><kbd>M</kbd></button
         ><button id="camera-btn" aria-label="Byt kamera">▣ <span>Kamera</span><kbd>C</kbd></button
         ><button id="interact">◇ <span>Interagera</span><kbd>E</kbd></button
@@ -117,7 +120,7 @@
         ><button id="autopilot-btn" hidden>Avbryt autopilot</button
         ><button id="photo-btn" hidden>Ta bild</button
         ><button id="fullscreen" aria-label="Helskärm">⛶ <span>Helskärm</span></button>
-      </nav>
+      </nav></details>
       <div id="help">
         W / S gas & broms · A / D sväng · ↑ / ↓ höjd · Shift turbo · Space
         stabilisera
@@ -143,6 +146,6 @@
       <div id="panel-content"></div>
     </dialog>
     <script src="../../js/vendor/three.min.js"></script>
-    <script type="module" src="boot.mjs?v=20261108-5"></script>
+    <script type="module" src="boot.mjs?v=20261108-6"></script>
   </body>
 </html>
