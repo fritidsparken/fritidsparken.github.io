@@ -13,13 +13,16 @@
   function render() {
     frame = 0;
     x += (tx - x) * .12; y += (ty - y) * .12;
-    hero.style.setProperty('--depth-x', `${x.toFixed(2)}px`);
-    hero.style.setProperty('--depth-y', `${y.toFixed(2)}px`);
+    document.body.style.setProperty('--depth-x', `${x.toFixed(2)}px`);
+    document.body.style.setProperty('--depth-y', `${y.toFixed(2)}px`);
+    document.body.style.setProperty('--depth-rx', `${(-y/3).toFixed(2)}deg`);
+    document.body.style.setProperty('--depth-ry', `${(x/4).toFixed(2)}deg`);
     if (Math.abs(tx-x)+Math.abs(ty-y) > .05) frame = requestAnimationFrame(render);
   }
   function target(a,b) {tx=a;ty=b;if(!frame)frame=requestAnimationFrame(render);}
   function sync() {
     hero.classList.toggle('home-depth', enabled);
+    document.body.classList.toggle('home-depth-active', enabled);
     button.textContent = enabled ? 'Djup: på' : mobile ? 'Aktivera rörelse' : 'Djup: av';
     button.setAttribute('aria-pressed', String(enabled));
     button.setAttribute('aria-label', 'Djupeffekt i välkomstbilden');
@@ -32,8 +35,8 @@
     const a = (screen.orientation?.angle ?? window.orientation ?? 0) * Math.PI / 180;
     const dx = ((event.gamma-baseline.gamma+540)%360)-180;
     const dy = ((event.beta-baseline.beta+540)%360)-180;
-    target(clamp((dx*Math.cos(a)+dy*Math.sin(a))/25)*16,
-      clamp((dy*Math.cos(a)-dx*Math.sin(a))/25)*10);
+    target(clamp((dx*Math.cos(a)+dy*Math.sin(a))/18)*38,
+      clamp((dy*Math.cos(a)-dx*Math.sin(a))/18)*24);
   }
   button.addEventListener('click', async () => {
     if (enabled) {enabled=false; baseline=null; sync(); return;}
@@ -54,12 +57,11 @@
   window.addEventListener('orientationchange',()=>{baseline=null;target(0,0);});
   screen.orientation?.addEventListener('change',()=>{baseline=null;target(0,0);});
   hero.append(button);
-  hero.addEventListener('pointermove', event => {
+  document.addEventListener('pointermove', event => {
     if (sensors || !enabled || !document.body.classList.contains('std-home')) return;
-    const r=hero.getBoundingClientRect();
-    target(((event.clientX-r.left)/r.width-.5)*32, ((event.clientY-r.top)/r.height-.5)*20);
+    target(clamp((event.clientX/innerWidth-.5)*2)*38, clamp((event.clientY/innerHeight-.5)*2)*24);
   },{passive:true});
-  for(const name of ['pointerleave','pointerup','pointercancel']) hero.addEventListener(name,()=>{if(!sensors)target(0,0);},{passive:true});
+  for(const name of ['pointerleave','pointerup','pointercancel']) document.addEventListener(name,()=>{if(!sensors)target(0,0);},{passive:true});
   reduced.addEventListener('change',()=>{enabled=false;baseline=null;sync();});
   document.addEventListener('visibilitychange',()=>{baseline=null;if(document.hidden)target(0,0);});
   sync();

@@ -1,6 +1,13 @@
 body.std-design.std-home .std-hero.home-depth{box-shadow:inset 0 12px 22px #071e3520,inset 0 -12px 22px #071e3518}
-body.std-design.std-home .home-depth .std-hero-image{transform:translate(var(--depth-x,0px),var(--depth-y,0px)) scale(1.09);will-change:transform}
-body.std-design.std-home .home-depth .std-hero-copy{transform:translate(calc(var(--depth-x,0px) * -.28),calc(var(--depth-y,0px) * -.28))}
+body.std-design.std-home .home-depth .std-hero-image{transform:translate(var(--depth-x,0px),var(--depth-y,0px)) scale(1.2);will-change:transform}
+body.std-design.std-home .home-depth .std-hero-copy{transform:translate(calc(var(--depth-x,0px) * -.45),calc(var(--depth-y,0px) * -.45))}
 body.std-design .home-depth-toggle{position:absolute;top:16px;bottom:auto;left:16px;z-index:5;border:1px solid #ffffffa8;border-radius:20px;padding:8px 14px;min-height:44px;background:#ffffffed;color:#173547;font:700 13px system-ui;cursor:pointer;box-shadow:0 2px 12px #071e3520}
 body.std-design .home-depth-toggle:focus-visible{outline:3px solid #168836;outline-offset:3px}
 body.std-design:not(.std-home) .home-depth-toggle{display:none}
+
+/* Keep category hit areas still; raise and tilt the artwork within each tile. */
+body.std-design.std-home.home-depth-active .std-categories>button{perspective:600px;box-shadow:inset 0 2px 3px #ffffffaa,0 7px 0 color-mix(in srgb,var(--tile),#173547 18%),0 13px 18px #17354728}
+body.std-design.std-home.home-depth-active .std-categories .std-icon{transform:translate(calc(var(--depth-x,0px) * .22),calc(var(--depth-y,0px) * .22)) rotateX(var(--depth-rx,0deg)) rotateY(var(--depth-ry,0deg)) scale(1.1);filter:drop-shadow(0 9px 4px #17354750);transition:filter .2s;transform-origin:center}
+body.std-design.std-home.home-depth-active .std-categories>button:nth-child(even) .std-icon{transform:translate(calc(var(--depth-x,0px) * .32),calc(var(--depth-y,0px) * .32)) rotateX(var(--depth-rx,0deg)) rotateY(var(--depth-ry,0deg)) scale(1.12)}
+body.std-design.std-home.home-depth-active .std-categories>button>span{transform:translate(calc(var(--depth-x,0px) * -.05),calc(var(--depth-y,0px) * -.05))}
+body.std-design.std-home.home-depth-active .std-categories>button:hover .std-icon{filter:drop-shadow(0 12px 5px #17354765)}
