@@ -39,6 +39,9 @@ jobs:
           name: github-pages-${{ github.run_attempt }}
           # Upload entire repository
           path: '.'
+      # Allow GitHub's artifact index time to register the uploaded package.
+      - name: Wait for artifact availability
+        run: sleep 45
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
