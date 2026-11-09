@@ -1,6 +1,6 @@
 // Numeric IDs belong to blocks/registry.json. String IDs belong to props/manifest.json.
 // Each entry is one transaction. Only recipes tagged workbench require a nearby bench.
-export const consumables = {apple: 3, bread: 6, potion: 4};
+export const consumables = {apple: 3, bread: 6, potion: 4, blueberries: 2, lingonberries: 2, carrot: 3, potato: 3, baked_potato: 5, fruit_bowl: 5, sandwich: 6, vegetable_soup: 7, apple_pie: 7, berry_cake: 8};
 export const durability = {pickaxe: 80, axe: 64, shovel: 56, hammer: 96, rod: 48};
 
 const hand = (out, count, needs) => ({out, count, needs});
@@ -24,6 +24,7 @@ export const recipes = [
     ...(plank === 31 ? [] : [hand('workbench', 1, {[plank]: 4})])
   ]),
 
+  hand('flashlight', 1, {31: 1, 106: 1, torch: 1}),
   hand('torch', 4, {31: 1, 76: 1}),
   hand('torch', 2, {31: 1, 18: 1}),
   hand('fence', 3, {31: 3}),
@@ -45,6 +46,17 @@ export const recipes = [
   hand('apple', 1, {5: 3}),
   hand('potion', 1, {71: 2}),
   bench('bread', 2, {24: 2, 76: 1}),
+  // Fruit and vegetables can be collected from vegetation and turned into meals.
+  hand('blueberries', 3, {71: 1}),
+  hand('lingonberries', 3, {70: 1}),
+  hand('carrot', 2, {24: 1}),
+  hand('potato', 2, {24: 1, 2: 1}),
+  hand('fruit_bowl', 1, {apple: 1, blueberries: 1, lingonberries: 1}),
+  hand('sandwich', 1, {bread: 1, carrot: 1}),
+  bench('baked_potato', 1, {potato: 1, 76: 1}),
+  bench('vegetable_soup', 1, {carrot: 1, potato: 1}),
+  bench('apple_pie', 1, {apple: 2, bread: 1}),
+  bench('berry_cake', 1, {bread: 1, blueberries: 1, lingonberries: 1}),
 
   // Fired clay, dressed stone, sheet metals, colored glass, and inlaid floors.
   bench(88, 4, {8: 3, 76: 1}), bench(89, 4, {8: 2, 6: 1, 76: 1}),

@@ -1,6 +1,6 @@
 import {eggs} from '../entities/mutations.js';
 import * as db from '../persistence/worlds.js';
-import {recipes} from '../inventory/recipes.js';
+import {recipes} from '../inventory/recipes.js?v=varld2';
 const $=id=>document.getElementById(id);
 function el(tag,text){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n}
 function btn(text,fn){const n=el('button',text);n.onclick=fn;return n}

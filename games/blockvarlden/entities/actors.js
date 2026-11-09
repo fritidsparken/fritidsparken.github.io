@@ -258,7 +258,8 @@ export function createActors({scene, ground, seed = 0, waterLevel = -Infinity, b
     }else {a.y=floor;a.velocity=0;}
     a.timer-=dt;
     let lead=a.yaw,pace=0;
-    if(a.tamed){
+    // Hatched creatures belong to the player, but wander instead of chasing them.
+    if(a.tamed && a.id!=='mutation'){
       a.state=distance>2.1?'walk':'idle';
       if(swims)a.state='swim';
       if(distance>2.1){lead=Math.atan2(dx,dz);pace=Math.min(7,.8+distance*.45);}
@@ -324,7 +325,7 @@ export function createActors({scene, ground, seed = 0, waterLevel = -Infinity, b
       const key='-99999999,'+n;
       state.pets[key]={id:'mutation',...spot,seed:seed>>>0};
       spawn(key,'mutation',spot.x,spot.y,spot.z,.5,true,seed);
-      return {ok:true,message:mutationTraits(seed).name+' är kläckt och följer dig!'};
+      return {ok:true,message:mutationTraits(seed).name+' är kläckt och vandrar fritt!'};
     },
     hit(raycaster,maxDistance=7) {
       if(quiet||disposed||!pickMeshes.length)return null;
@@ -340,7 +341,7 @@ export function createActors({scene, ground, seed = 0, waterLevel = -Infinity, b
     feed(key,item) {
       const a=actors.get(key);
       if(!a||quiet)return {ok:false,message:'Djuret har gått vidare.'};
-      if(a.tamed)return {ok:false,message:speciesNames[a.id]+' är redan tam och följer dig.'};
+      if(a.tamed)return {ok:false,message:speciesNames[a.id]+(a.id==='mutation'?' är redan tam och vandrar fritt.':' är redan tam och följer dig.')};
       if(!['apple','bread','viltmat'].includes(item))return {ok:false,message:'Håll fram äpple, bröd eller viltproviant för att tämja djuret.'};
       a.tamed=true;a.state='eat';a.health=2;
       state.pets[key]={id:a.id,x:a.x,y:a.y,z:a.z};

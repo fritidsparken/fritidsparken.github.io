@@ -1,10 +1,14 @@
-import {decodeActor} from '../entities/actors.js';
+import {decodeActor} from '../entities/actors.js?v=varld2';
 let avatar;
-export async function connect(server,code,api){
+// The room service persists block edits. Reserve a distant cell for room settings so
+// existing servers can share the host’s choice without a separate deployment.
+const SETTINGS_CELL=[999999,79,999999];
+const isSettingsCell=c=>Array.isArray(c)&&c[0]===SETTINGS_CELL[0]&&c[1]===SETTINGS_CELL[1]&&c[2]===SETTINGS_CELL[2]&&(c[3]===1||c[3]===2);
+export async function connect(server,code,quiet,api){
  avatar??=fetch('../../assets/blockvarlden/actors/stigfinnare.glb').then(r=>r.arrayBuffer()).then(decodeActor).catch(e=>{avatar=null;throw e});
  const model=await avatar;
  const ws=new WebSocket(server+'/'+(code||'create')),peers=new Map(),cells=[],queued=[];
- let id,room,owner,locked=false,active=false,closed=false,last=0,previous='',started=false;
+ let id,room,owner,locked=false,active=false,closed=false,last=0,previous='',started=false,joined=false,starting=false,roomQuiet;
  const send=m=>{if(ws.readyState===1)ws.send(JSON.stringify(m))};
  function update(m){
   if(m.type==='edit')api.edit(m.cell);
@@ -31,15 +35,28 @@ export async function connect(server,code,api){
  };
  return new Promise((resolve,reject)=>{
   const timeout=setTimeout(()=>ws.close(),15000);
-  ws.onclose=()=>{clearTimeout(timeout);if(!active)reject(Error('Rummet gick inte att öppna. Kontrollera koden. Rummet kan vara fullt eller låst.'));if(!closed&&started)api.lost()};
+  async function startWhenReady(){
+   if(!joined||typeof roomQuiet!=='boolean'||starting)return;
+   starting=true;started=true;clearTimeout(timeout);await api.start(room,cells,session,roomQuiet);
+   if(ws.readyState!==1)return;
+   active=true;api.status(room,!!owner,locked);for(const msg of queued)update(msg);resolve();
+  }
+  ws.onclose=()=>{clearTimeout(timeout);if(!active)reject(Error(joined&&typeof roomQuiet!=='boolean'?'Värden behöver först öppna rummet igen för att dela inställningen för djur.':'Rummet gick inte att öppna. Kontrollera koden. Rummet kan vara fullt eller låst.'));if(!closed&&started)api.lost()};
   ws.onmessage=async e=>{
    try{
     const m=JSON.parse(e.data);
     if(m.type==='welcome'){id=m.id;room=m.code;locked=m.locked;owner=m.owner||localStorage.getItem('bv-owner-'+room);if(m.owner)localStorage.setItem('bv-owner-'+room,owner);send({type:'join',owner});return}
-    if(m.type==='cells'||m.type==='ready'){cells.push(...m.cells);return}
-    if(m.type==='joined'){clearTimeout(timeout);started=true;await api.start(room,cells,session);if(ws.readyState!==1)return;active=true;api.status(room,!!owner,locked);for(const msg of queued)update(msg);resolve();return}
+    if(m.type==='cells'||m.type==='ready'){for(const cell of m.cells){if(isSettingsCell(cell))roomQuiet=cell[3]===2;else cells.push(cell)}return}
+    if(m.type==='joined'){
+     joined=true;
+     // Only the host chooses, and only once: reopening an existing room keeps its setting.
+     if(owner&&typeof roomQuiet!=='boolean'){roomQuiet=quiet===true;send({type:'edit',cell:[...SETTINGS_CELL,roomQuiet?2:1]})}
+     await startWhenReady();return;
+    }
+    if(m.type==='edit'&&isSettingsCell(m.cell)){roomQuiet=m.cell[3]===2;await startWhenReady();return}
     if(active)update(m);else queued.push(m);
    }catch(err){reject(err);ws.close()}
   };
  });
 }
+
