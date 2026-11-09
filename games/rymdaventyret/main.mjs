@@ -964,8 +964,10 @@ function updateDockTargets() {
     if (!visible) continue;
     button.style.left = (50 + q.x * 50) + "%";
     button.style.top = (50 - q.y * 50) + "%";
-    button.textContent = auto && dockTarget === world.id ? "◎ Dockar…" : "◎ Docka";
-    button.disabled = auto && dockTarget === world.id;
+    const docking = auto && dockTarget === world.id;
+    const label = docking ? "◎ Dockar…" : "◎ Docka";
+    if (button.textContent !== label) button.textContent = label;
+    if (button.disabled !== docking) button.disabled = docking;
   }
 }
 function updateHud() {
