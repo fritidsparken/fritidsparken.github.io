@@ -757,8 +757,17 @@ $("assist-btn").onclick = () => {
   destination = mission().world;
   toast("Flyghjälpen följer uppdragets markör. Styr själv för att avbryta.");
 };
-for (const b of WORLDS.filter(b => b.station))
-  $("dock-" + b.id).onclick = () => beginDock(b.id);
+for (const b of WORLDS.filter(b => b.station)) {
+  const button = $("dock-" + b.id);
+  // Mobile: start immediately while the projected target is under the finger.
+  // Mouse and keyboard retain the native click path.
+  button.addEventListener("pointerdown", e => {
+    if (e.pointerType !== "touch" && e.pointerType !== "pen") return;
+    e.preventDefault();
+    beginDock(b.id);
+  });
+  button.onclick = () => beginDock(b.id);
+}
 $("fact-btn").onclick = () => showPanel("facts");
 $("autopilot-btn").onclick = () => {
   auto = false; dockTarget = null;
@@ -936,19 +945,23 @@ for (const id of ["stick", "space"])
     $(id).addEventListener(type, e => e.preventDefault(), { passive: false });
 let lastTouchEnd = -Infinity;
 document.addEventListener("touchend", e => {
-  if (e.timeStamp - lastTouchEnd < 350) e.preventDefault();
+  if (e.timeStamp - lastTouchEnd < 350 && !e.target.closest?.(".dock-target")) e.preventDefault();
   lastTouchEnd = e.timeStamp;
 }, { passive: false, capture: true });
 function updateDockTargets() {
   for (const world of WORLDS.filter(b => b.station)) {
     const button = $("dock-" + world.id);
     const station = renderer.stations?.find(s => s.body.id === world.id);
-    button.hidden = true;
-    if (!started || paused || surface || transition > 0 || cameraMode === 4 || !station) continue;
-    const q = renderer.project(station.position);
-    if (q.z <= -1 || q.z >= 1 || Math.abs(q.x) > .9 || Math.abs(q.y) > .8 || dist(ship.position,station.position) > 2500) continue;
-    if (WORLDS.some(b => segmentHitsSphere(ship.position,station.position,worldPosition(b,state.time),b.r))) continue;
-    button.hidden = false;
+    let visible = started && !paused && !surface && transition <= 0 && cameraMode !== 4 && !!station;
+    let q;
+    if (visible) {
+      q = renderer.project(station.position);
+      visible = q.z > -1 && q.z < 1 && Math.abs(q.x) <= .9 && Math.abs(q.y) <= .8 && dist(ship.position, station.position) <= 2500;
+    }
+    if (visible) visible = !WORLDS.some(b => segmentHitsSphere(ship.position, station.position, worldPosition(b, state.time), b.r));
+    // Changing hidden on every frame interrupts a finger's pending click.
+    if (button.hidden !== !visible) button.hidden = !visible;
+    if (!visible) continue;
     button.style.left = (50 + q.x * 50) + "%";
     button.style.top = (50 - q.y * 50) + "%";
     button.textContent = auto && dockTarget === world.id ? "◎ Dockar…" : "◎ Docka";

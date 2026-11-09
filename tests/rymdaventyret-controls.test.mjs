@@ -143,3 +143,19 @@ test('station marker flies and docks automatically at all four stations',async()
  h.action({jump:'earth'});h.tick();h.click('dock-earth');h.key('KeyS');h.tick();h.key('KeyS',false);
  assert.equal(h.s.auto,false,'manual braking cancels docking approach');
 });
+
+test('station marker stays visible across frames and touch starts automatic docking', async()=>{
+  const h=await harness(); h.click('play'); h.action({jump:'earth'}); h.tick();
+  const marker=h.nodes.get('dock-earth');
+  const station=h.render.stations.find(s=>s.body.id==='earth');
+  Object.assign(h.s.ship.position, {x:station.position.x+200,y:station.position.y,z:station.position.z+200});
+  let hidden=marker.hidden, hides=0;
+  Object.defineProperty(marker,'hidden',{get(){return hidden;},set(v){hidden=v;if(v)hides++;}});
+  h.tick(2);assert.equal(marker.hidden,false);hides=0;
+  h.tick(10);assert.equal(hides,0,'visible marker must not disappear between touch events');
+  let prevented=false;
+  marker.listeners.pointerdown({pointerType:'touch',preventDefault(){prevented=true;}});
+  assert.equal(prevented,true); assert.equal(h.s.auto,true,'touch must start docking immediately');
+  for(let i=0;i<2400 && h.s.auto;i++) h.tick();
+  assert.equal(h.nodes.get('panel-title').textContent,'Välkommen till stationen');
+});
