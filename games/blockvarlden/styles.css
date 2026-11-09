@@ -61,3 +61,8 @@ body.screen-stick #actions button{min-height:44px}
 .companion-label strong{overflow:hidden;text-overflow:ellipsis;font-size:12px}.companion-label span{color:#e1e8ce}
 @media(max-width:500px){.companions{width:102px;right:10px;top:94px}.companion-label{max-width:180px}#hud #stick{width:84px;height:84px}#hud #actions button{padding:8px;min-width:50px}}
 @media(max-height:490px){.companions{width:88px;top:67px;right:12px}.companions-heading{font-size:9px;margin-bottom:3px}.compass-scale{font-size:9px}#room-info{top:38px!important;font-size:10px;padding:4px 7px}#hud #stick{width:80px;height:80px}#hud #actions{gap:4px}#hud #actions button{min-height:40px;padding:6px 9px}}
+
+/* Keep long custom codes clear of the compass on small displays. */
+#room-info{max-width:calc(100vw - 24px);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:6px 9px}
+@media(min-height:491px){.companions{top:110px}}
+.room-form{border:0;padding:0;margin:0;min-width:0}.room-form small{display:block;line-height:1.4;color:#526652}

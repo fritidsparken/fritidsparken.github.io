@@ -219,7 +219,8 @@ async function enableRooms(){
    },
    status(code,owner,locked){
     const b=$('room-info');b.hidden=false;b.disabled=!owner;
-    b.textContent='Rum '+code+' · '+(meta.mode==='survival'?'Överlevnad':'Kreativt')+(meta.quiet?' · Utan djur':' · Med djur')+(owner?(locked?' · Lås upp':' · Lås rum'):'');
+    b.textContent='Rum '+code+(owner?(locked?' · Lås upp':' · Lås rum'):'');
+    b.title=(meta.mode==='survival'?'Överlevnad':'Kreativt')+(meta.quiet?' · Utan djur':' · Med djur');
     b.onclick=()=>roomSession?.lock();
     try{localStorage.setItem('bv-last-room',code)}catch{}
    },
