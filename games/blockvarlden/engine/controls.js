@@ -41,13 +41,15 @@ export function controls(canvas, api) {
   }, {passive:false});
   canvas.onpointerdown = e => {
     if (!api.active()) return;
-    if (e.pointerType === 'mouse' && !document.body.classList.contains('screen-stick')) {
-      if (document.pointerLockElement !== canvas) {canvas.requestPointerLock?.()?.catch?.(()=>{});return;}
-      if (e.button === 0) api.mine(true);
-      if (e.button === 1) { e.preventDefault(); api.pickBlock(); }
-      if (e.button === 2) api.build();
-    } else if (look === null) {
-      look=e.pointerId; lastX=e.clientX; lastY=e.clientY; canvas.setPointerCapture(look);
+    // Keep the pointer available for the joystick and action buttons on desktop.
+    if (e.pointerType === 'mouse') {
+      if (e.button === 1) { e.preventDefault(); api.pickBlock(); return; }
+      if (e.button === 2) { e.preventDefault(); api.build(); return; }
+      if (e.button !== 0) return;
+      if (document.pointerLockElement === canvas) { api.mine(true); return; }
+    }
+    if (look === null) {
+      e.preventDefault(); look=e.pointerId; lastX=e.clientX; lastY=e.clientY; canvas.setPointerCapture(look);
     }
   };
   canvas.onpointermove = e => {
@@ -71,9 +73,10 @@ export function controls(canvas, api) {
       if (id==='jump') jump();
       if (id==='dig') api.mine(true);
     };
-    b.onlostpointercapture=e=>{
+    b.onpointerup=b.onpointercancel=b.onlostpointercapture=e=>{
       if (touches.get(id)!==e.pointerId) return;
       touches.delete(id); if(id==='dig') api.mine(false);
+      if(b.hasPointerCapture(e.pointerId))b.releasePointerCapture(e.pointerId);
     };
   }
   $('build').onclick=api.build; $('pack').onclick=api.pack; $('pause').onclick=api.pause; $('cam').onclick=api.camera;

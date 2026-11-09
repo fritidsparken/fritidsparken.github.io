@@ -5,7 +5,8 @@ import {move,occupied,target,eye} from './engine/player.js';
 import {blueprint} from './engine/blueprint.js';
 import {createFixtureInteractions,stepHeight} from './engine/fixtures.js';
 import {bindFullscreen} from './engine/display.js?v=2';
-import {controls} from './engine/controls.js';
+import {controls} from './engine/controls.js?v=kompis3';
+import {createCompanions} from './ui/companions.js?v=kompis3';
 import {adaptiveGraphics} from './rendering/quality.js';
 import {createSky} from './rendering/sky.js';
 import {loadProps} from './entities/props.js';
@@ -15,15 +16,15 @@ import {createAudio} from './audio/sound.js';
 import {consumables,durability} from './inventory/recipes.js?v=varld2';
 import {extraFoods,extraFoodIcons,withExtraFood} from './inventory/food.js';
 import {flashlight,withFlashlight} from './inventory/flashlight.js';
-import {panels} from './ui/panels.js?v=varld2';
+import {panels} from './ui/panels.js?v=kompis3';
 import * as db from './persistence/worlds.js';
 const $=id=>document.getElementById(id),base='../../assets/blockvarlden/',T=window.THREE;
 const settings={quality:1,sense:1,fov:72,outfit:'skog',music:.45,effects:.7,ambience:.45};
 try{Object.assign(settings,JSON.parse(localStorage.getItem('blockvarlden-options-v2')||'{}'))}catch{}
-let roomSession=null;
+let roomSession=null,companions;
 let reg,kit,atlas,catalog=[],defs={},lookup={},renderer,scene,camera,sky,world,land,fixtures,actors,meta,ui,input,highlight,lamps=[],root,ray,glints;
 let suspended=true,waiting=false,homeBusy=false,selected=0,pending=new Map(),removed=new Set(),queue=Promise.resolve(),elapsed=0,lastSave=0,lastStep=0,actionTime=0,actionName='',mineHeld=false,mineKey='',mineTime=0,hit,lastHit=0,lastPanel=0,weather='clear',weatherStep=-1;
-const pickups=new Map(), lampChecks=new Map();
+const pickups=new Map(), lampChecks=new Map(),harvesting=new Set();
 const lampBlock=id=>id===140||id===141;
 let graphics,clip,player,handModel,handId,fishAt=-10,flashlightOn=false,flashlightLight,flashlightTarget;const audio=createAudio(),radius=()=>[2,3,4,5][graphics?.level??settings.quality]||2,active=()=>!!meta&&!suspended&&!waiting;
 function toast(t){const note=document.getElementById('dialog-status');if(note&&$('panel').open)note.textContent=t;$('toast').textContent=t;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('toast').textContent='',2600)}
@@ -64,16 +65,31 @@ function updateDrops(dt){
   if(meta.mode==='survival')add(rec.id,rec.count);meta.drops.splice(meta.drops.indexOf(rec),1);removeDrop(rec,obj);bar();checkpoint();
  }
 }
-function configure(){document.body.classList.toggle('screen-stick',!!settings.screenStick);try{localStorage.setItem('blockvarlden-options-v2',JSON.stringify(settings))}catch{}for(const k of ['music','effects','ambience'])audio.volume(k,settings[k]);if(renderer){graphics.set(settings.quality);camera.fov=settings.fov;resize()}}
+function configure(){document.body.classList.add('screen-stick');try{localStorage.setItem('blockvarlden-options-v2',JSON.stringify(settings))}catch{}for(const k of ['music','effects','ambience'])audio.volume(k,settings[k]);if(renderer){graphics.set(settings.quality);camera.fov=settings.fov;resize()}}
 function resize(){if(!renderer)return;renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()}
 function suspend(){suspended=true;input?.clear();document.exitPointerLock?.();audio.pause()}
 function checkpoint(){if(meta)save().catch(()=>toast('Kunde inte spara. Kontrollera ledigt utrymme.'))}
 function resume(){if(!meta)return;suspended=false;graphics.resetSamples();audio.start();checkpoint()}
 async function refreshHome(){const worlds=await db.list();$('continue').disabled=!worlds.length}
-function save(){if(!meta||roomSession)return Promise.resolve();meta.fly=player.fly;meta.position=(fixtures?.standingPosition(player)||player.seatEntry||player.p).toArray();meta.yaw=player.yaw;meta.pitch=player.pitch;meta.removed=[...removed];const m=structuredClone(meta),batch=pending;pending=new Map();const job=queue.catch(()=>{}).then(()=>db.save(m,[...batch.values()]));queue=job.catch(e=>{if(meta?.id===m.id)for(const [k,v] of batch)if(!pending.has(k))pending.set(k,v);throw e});queue.catch(()=>{});return queue}
-function cleanup(){if(!world)return;for(const [rec,obj] of pickups)removeDrop(rec,obj);world.dispose();land.dispose();actors.dispose();scene.remove(root);for(const light of lamps)scene.remove(light);lamps=[];root=null;world=null;meta=null;highlight.visible=false;flashlightOn=false;if(flashlightLight)flashlightLight.visible=false}
+function save(){if(!meta)return Promise.resolve();if(meta.roomCode)return saveRoomProgress();meta.fly=player.fly;meta.position=(fixtures?.standingPosition(player)||player.seatEntry||player.p).toArray();meta.yaw=player.yaw;meta.pitch=player.pitch;meta.removed=[...removed];const m=structuredClone(meta),batch=pending;pending=new Map();const job=queue.catch(()=>{}).then(()=>db.save(m,[...batch.values()]));queue=job.catch(e=>{if(meta?.id===m.id)for(const [k,v] of batch)if(!pending.has(k))pending.set(k,v);throw e});queue.catch(()=>{});return queue}
+function saveRoomProgress(){
+ if(!meta?.roomCode||!player)return Promise.resolve();
+ const progress={bag:meta.bag,slots:meta.slots,wear:meta.wear,life:meta.life,food:meta.food,position:player.p.toArray(),yaw:player.yaw,pitch:player.pitch,flashlightGranted:meta.flashlightGranted};
+ try{localStorage.setItem('bv-progress-v3-'+meta.roomCode,JSON.stringify(progress));return Promise.resolve()}catch(e){return Promise.reject(e)}
+}
+function restoreRoomProgress(m){
+ try{const p=JSON.parse(localStorage.getItem('bv-progress-v3-'+m.roomCode)||'null');if(!p)return;
+  for(const key of ['bag','wear'])if(p[key]&&typeof p[key]==='object'&&!Array.isArray(p[key]))m[key]=Object.fromEntries(Object.entries(p[key]).filter(([id,n])=>lookup[id]&&Number.isFinite(n)&&n>=0));
+  if(Array.isArray(p.slots)&&p.slots.length===9&&p.slots.every(id=>lookup[id]))m.slots=p.slots;
+  for(const key of ['food','life'])if(Number.isFinite(p[key]))m[key]=Math.max(0,Math.min(10,p[key]));
+  if(Array.isArray(p.position)&&p.position.length===3&&p.position.every(n=>Number.isFinite(n)&&Math.abs(n)<1e6))m.position=p.position;
+  for(const key of ['yaw','pitch'])if(Number.isFinite(p[key]))m[key]=p[key];
+  m.flashlightGranted=p.flashlightGranted===true;
+ }catch{}
+}
+function cleanup(){companions?.hide();if(!world)return;for(const [rec,obj] of pickups)removeDrop(rec,obj);world.dispose();land.dispose();actors.dispose();scene.remove(root);for(const light of lamps)scene.remove(light);lamps=[];root=null;world=null;meta=null;highlight.visible=false;flashlightOn=false;if(flashlightLight)flashlightLight.visible=false}
 async function home(){suspend();await save();roomSession?.close();roomSession=null;if($('room-info'))$('room-info').hidden=true;cleanup();$('loading').hidden=true;$('hud').hidden=true;$('home').hidden=false;await refreshHome()}
-function setupRenderer(){if(renderer)return;try{renderer=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'})}catch{throw Error('WebGL kunde inte starta. Aktivera grafikacceleration i webbläsaren och öppna spelet igen.')};graphics=adaptiveGraphics(renderer);document.body.prepend(renderer.domElement);scene=new T.Scene();camera=new T.PerspectiveCamera(settings.fov,1,.045,240);camera.rotation.order='YXZ';scene.add(camera);sky=createSky(scene);ray=new T.Raycaster();highlight=new T.LineSegments(new T.EdgesGeometry(new T.BoxGeometry(1.012,1.012,1.012)),new T.LineBasicMaterial({color:0xffe6a1}));highlight.visible=false;scene.add(highlight);
+function setupRenderer(){if(renderer)return;try{renderer=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'})}catch{throw Error('WebGL kunde inte starta. Aktivera grafikacceleration i webbläsaren och öppna spelet igen.')};graphics=adaptiveGraphics(renderer);document.body.prepend(renderer.domElement);scene=new T.Scene();camera=new T.PerspectiveCamera(settings.fov,1,.045,240);camera.rotation.order='YXZ';scene.add(camera);companions=createCompanions(T,$('hud'));sky=createSky(scene);ray=new T.Raycaster();highlight=new T.LineSegments(new T.EdgesGeometry(new T.BoxGeometry(1.012,1.012,1.012)),new T.LineBasicMaterial({color:0xffe6a1}));highlight.visible=false;scene.add(highlight);
  flashlightLight=new T.SpotLight(0xfff1cd,35,24,Math.PI/6,.4,1.5);flashlightTarget=new T.Object3D();scene.add(flashlightLight,flashlightTarget);flashlightLight.target=flashlightTarget;flashlightLight.visible=false;
  glints=new T.Points(new T.BufferGeometry(),new T.PointsMaterial({size:.09,color:0xe2b880}));glints.visible=false;scene.add(glints);
  input=controls(renderer.domElement,{active,pack:()=>ui.pack(),pause:()=>ui.pause(),camera:()=>{player.third=!player.third},fly:()=>{if(meta.mode==='creative')player.fly=!player.fly},slot,cycle:step=>slot((selected+step+9)%9),pickBlock:()=>{findHit();if(!hit)return;const id=hit.kind==='prop'?hit.obj.userData.record.id:hit.id;if(!lookup[id]||(meta.mode==='survival'&&!meta.bag[id]))return;const i=meta.slots.indexOf(id);if(i>=0)slot(i);else{meta.slots[selected]=id;slot(selected)}},drop:dropItem,turn:(x,y)=>{player.yaw-=x*.0029*settings.sense;player.pitch=Math.max(-1.48,Math.min(1.48,player.pitch-y*.0029*settings.sense))},mine:on=>{mineHeld=on;if(on){findHit();mining(0)}else{mineKey='';mineTime=0}},build:use});
@@ -102,7 +118,7 @@ function findHit(){if(!world||!player)return;const o=player.p.clone();o.y+=fixtu
 }
 function effects(pos,color){const arr=new Float32Array(18*3);for(let i=0;i<arr.length;i+=3){arr[i]=(Math.random()-.5)*.8;arr[i+1]=Math.random()*.7;arr[i+2]=(Math.random()-.5)*.8}glints.geometry.dispose();glints.geometry=new T.BufferGeometry();glints.geometry.setAttribute('position',new T.BufferAttribute(arr,3));glints.position.copy(pos);glints.material.color.set(color||'#baa882');glints.visible=true;glints.userData.until=elapsed+.3}
 function animateAct(a){actionName=a;actionTime=elapsed+.44}
-function mining(dt){if(!active()||!hit||!mineHeld)return;const id=meta.slots[selected],tool=durability[id]&&meta.bag[id]>0?id:null;if(roomSession&&hit.kind!=='block')return;if(hit.key!==mineKey){mineTime=0;mineKey=hit.key;audio.effect('dig',defs[hit.id]?.sound)}
+function mining(dt){if(!active()||!hit||!mineHeld)return;const id=meta.slots[selected],tool=durability[id]&&meta.bag[id]>0?id:null;if(roomSession&&!['block','plant'].includes(hit.kind))return;if(hit.key!==mineKey){mineTime=0;mineKey=hit.key;audio.effect('dig',defs[hit.id]?.sound)}
  if(hit.kind==='animal'){
    const result=actors.attack(hit.key);if(!result)return;
    animateAct('use');audio.effect('dig');toast(result.message);
@@ -114,12 +130,28 @@ function mining(dt){if(!active()||!hit||!mineHeld)return;const id=meta.slots[sel
  if(!softPlant&&performance.now()-lastBreak<280)return;mineTime+=dt;highlight.material.color.set(mineTime>delay*.45?0xff9b52:0xffe6a1);animateAct(hit.kind==='plant'?'chop':'dig');if(mineTime<delay)return;
  
  if(meta.mode==='survival'&&hit.kind==='block'&&hit.id>=76&&hit.id<=87&&tool!=='pickaxe'){mineHeld=false;toast('Använd en bergshacka för att ta loss malmen');return}
+ if(roomSession&&hit.kind==='plant'){harvestRoomPlant({...hit},tool);return}
  let drop,amount=1;const at=new T.Vector3();
  if(hit.kind==='block'){if(hit.cell[1]===0){mineHeld=false;toast('Du har nått berggrunden');return}const key=hit.cell.join(',');if(meta.containers?.[key]&&Object.values(meta.containers[key].items||{}).some(v=>v>0)){toast('Töm lådan först');mineHeld=false;return}if(!edit(hit.cell,0))return;if(meta.containers)delete meta.containers[key];if(meta.crops)delete meta.crops[key];drop=defs[hit.id].drop||hit.id;at.set(...hit.cell).addScalar(.5)}
  if(hit.kind==='plant'){removed.add(hit.plantKey);land.refresh();drop=({oak:4,pine:42,palm:50,rocks:3,shrub:'apple',log:4,reeds:75})[hit.id]||11;amount=['oak','pine','palm'].includes(hit.id)?4:1;at.set(hit.x,world.surface(hit.x,hit.z),hit.z)}
  if(hit.kind==='prop'){const rec=hit.obj.userData.record;if(player.seat===hit.obj&&!fixtures.dismount(player))return;if(rec.items&&Object.values(rec.items).some(v=>v>0)){toast('Töm lådan först');mineHeld=false;return}drop=rec.id;at.copy(hit.obj.position);root.remove(hit.obj);meta.props.splice(meta.props.indexOf(rec),1);refreshLights()}
  if(meta.mode==='survival'){add(drop,amount);if(hit.kind==='plant'){if(['oak','pine','palm'].includes(hit.id))add(({oak:5,pine:64,palm:65})[hit.id],2);if(hit.id==='shrub')add(70);if(hit.id==='flowers')add(71);if(hit.id==='roots')add(74)}if(tool){meta.wear[tool]=(meta.wear[tool]??durability[tool])-1;if(meta.wear[tool]<=0){add(tool,-1);delete meta.wear[tool];toast('Verktyget är utslitet')}}}
  lastBreak=performance.now();effects(at,defs[drop]?.color);audio.effect('break',defs[drop]?.sound);mineTime=0;mineKey='';hit=null;lastHit=0;bar()}
+function harvestRoomPlant(target,tool){
+ if(harvesting.has(target.plantKey))return;
+ const session=roomSession,state=meta;harvesting.add(target.plantKey);mineTime=0;mineKey='';hit=null;lastBreak=performance.now();
+ session.harvest(target.plantKey).then(accepted=>{
+  if(!accepted||session!==roomSession||state!==meta)return;
+  const drop=({oak:4,pine:42,palm:50,rocks:3,shrub:'apple',log:4,reeds:75})[target.id]||11;
+  if(meta.mode==='survival'){
+   add(drop,['oak','pine','palm'].includes(target.id)?4:1);
+   if(['oak','pine','palm'].includes(target.id))add(({oak:5,pine:64,palm:65})[target.id],2);
+   if(target.id==='shrub')add(70);if(target.id==='flowers')add(71);if(target.id==='roots')add(74);
+   if(tool){meta.wear[tool]=(meta.wear[tool]??durability[tool])-1;if(meta.wear[tool]<=0){add(tool,-1);delete meta.wear[tool];toast('Verktyget är utslitet')}}
+  }
+  effects(new T.Vector3(target.x,world.surface(target.x,target.z),target.z),defs[drop]?.color);audio.effect('break',defs[drop]?.sound);bar();checkpoint();
+ }).catch(()=>{if(session===roomSession)toast('Skörden kunde inte sparas. Försök igen.')}).finally(()=>harvesting.delete(target.plantKey));
+}
 function nearBench(){if(root.children.some(o=>o.userData.record?.id==='workbench'&&o.position.distanceTo(player.p)<5))return true;const p=player.p;for(let x=-3;x<=3;x++)for(let y=-2;y<=2;y++)for(let z=-3;z<=3;z++)if(world.at(p.x+x,p.y+y,p.z+z)===136)return true;return false}
 let lastBuild=-Infinity,lastBreak=-Infinity;
 function use(){if(!active()||performance.now()-lastBuild<360)return;findHit();const id=meta.slots[selected],s=meta.mode==='survival';if(id==='flashlight'){if(s&&!meta.bag[id])return toast('Du behöver en ficklampa i ryggsäcken');flashlightOn=!flashlightOn;lastBuild=performance.now();toast(flashlightOn?'Ficklampan är tänd':'Ficklampan är släckt');return}if(player.seat){if(!fixtures.dismount(player))toast('Frigör plats bredvid stolen');return}
@@ -141,14 +173,14 @@ function use(){if(!active()||performance.now()-lastBuild<360)return;findHit();co
  if(defs[id]){if(lampBlock(+id)&&!world.solid(p[0],p[1]-1,p[2]))return toast('Lampan behöver stöd under sig');if(!edit(p,+id))return}else{if(durability[id])return toast('Håll Gräv för att använda verktyget');const record={id,p:[p[0]+.5,p[1],p[2]+.5],rot:Math.round(player.yaw/(Math.PI/2))*Math.PI/2};if(id==='door'&&(p[1]>=79||world.at(p[0],p[1]+1,p[2])!==0))return toast('Dörren behöver två fria block på höjden');
  if(id==='lantern'){const ground=fixtures.locateLantern(record,player);if(!ground)return toast('Lyktan behöver ett ledigt underlag');record.p=ground}
  if(meta.props.some(o=>o.p.every((v,i)=>v===record.p[i])))return;meta.props.push(record);attach(record)}lastBuild=performance.now();if(s)add(id,-1);audio.effect('place',defs[id]?.sound);animateAct('build');bar()}
-function switchMode(){if(roomSession)return toast('Rummet har kreativt läge');meta.mode=meta.mode==='survival'?'creative':'survival';player.fly=false;bar();toast(meta.mode==='creative'?'Kreativt läge':'Överlevnadsläge')}
+function switchMode(){if(roomSession)return toast('Skaparen har valt '+(meta.mode==='creative'?'kreativt läge':'överlevnad')+' för hela världen');meta.mode=meta.mode==='survival'?'creative':'survival';player.fly=false;bar();toast(meta.mode==='creative'?'Kreativt läge':'Överlevnadsläge')}
 function damage(n){if(meta.mode!=='survival'||meta.difficulty==='Lätt')return;meta.life-=n;audio.effect('hurt');animateAct('hurt');if(meta.life<=0){player.p.fromArray(spawn(world));player.v=0;meta.life=meta.food=10;waiting=true;toast('Du vaknar vid din startplats')}}
 function frame(now){requestAnimationFrame(frame);const ms=now-(frame.last||now),dt=Math.min(.1,ms/1000);frame.last=now;if(!world||suspended)return;if(!waiting)graphics.sample(ms,now);elapsed+=Math.min(.5,ms/1000);const p=player.p;world.update(p.x,p.z,radius());roomSession?.frame(dt,p,player.yaw);if(world.error){$('loading').hidden=true;suspend();toast(world.error);ui.pause();return}if(waiting){for(const dx of [-16,0,16])for(const dz of [-16,0,16])if(world.at(p.x+dx,0,p.z+dz)===null)return;$('loading').hidden=true;while(occupied(world,p)&&p.y<80)p.y+=.25;waiting=false}
  updateDrops(dt);const keys=input.read(dt);if(player.seat&&(keys.f||keys.r||keys.up))fixtures.dismount(player);if(!player.seat)move(player,world,dt,keys,meta.mode,speed=>{if(speed>14)damage(Math.ceil((speed-14)/4))},p=>fixtures.collides(p),p=>stepHeight(root,p));
  camera.rotation.set(player.pitch,player.yaw,0);camera.position.copy(p);camera.position.y+=fixtures.seatEye(player);const eyePos=camera.position.clone();
  if(player.third){const back=new T.Vector3(0,0,1).applyQuaternion(camera.quaternion);for(let r=.12;r<=3.8;r+=.12){const test=eyePos.clone().addScaledVector(back,r);if(world.solid(test.x,test.y,test.z)||fixtures.collides(test,.06,.1))break;camera.position.copy(test)}}
  if(handModel){handModel.visible=!player.third;const swing=mineHeld?Math.sin(elapsed*15):elapsed<actionTime?Math.sin((actionTime-elapsed)*7):0;handModel.rotation.set(-.22+swing*.5,.15,-.35+swing*.16);handModel.position.y=-.41+(player.moving?.015*Math.sin(elapsed*9):0)}
- camera.updateMatrixWorld();const hasFlashlight=meta.slots[selected]==='flashlight'&&(meta.mode==='creative'||meta.bag.flashlight>0);flashlightLight.visible=flashlightOn&&hasFlashlight;if(flashlightLight.visible){flashlightLight.position.copy(eyePos);const direction=new T.Vector3();camera.getWorldDirection(direction);flashlightTarget.position.copy(eyePos).addScaledVector(direction,10);flashlightTarget.updateMatrixWorld()}meta.time=(meta.time+dt/720)%1;const info=world.info(p.x,p.z),night=meta.time<.23||meta.time>.78,under=p.y+3<info.height,sub=world.at(p.x,p.y+eye,p.z)===25;
+ camera.updateMatrixWorld();companions.update({players:roomSession?.players()??null,position:p,yaw:player.yaw,camera});const hasFlashlight=meta.slots[selected]==='flashlight'&&(meta.mode==='creative'||meta.bag.flashlight>0);flashlightLight.visible=flashlightOn&&hasFlashlight;if(flashlightLight.visible){flashlightLight.position.copy(eyePos);const direction=new T.Vector3();camera.getWorldDirection(direction);flashlightTarget.position.copy(eyePos).addScaledVector(direction,10);flashlightTarget.updateMatrixWorld()}meta.time=(meta.time+dt/720)%1;const info=world.info(p.x,p.z),night=meta.time<.23||meta.time>.78,under=p.y+3<info.height,sub=world.at(p.x,p.y+eye,p.z)===25;
  const wstep=Math.floor(meta.time*15);if(wstep!==weatherStep){weatherStep=wstep;const n=hash(wstep,info.biome,world.seed);weather=n<.51?'clear':n<.68?'cloud':n<.79?'fog':info.biome===4?'snow':n>.95?'storm':'rain'}
  world.clock.value=elapsed;sky.update({position:camera.position,time:meta.time,weather,quality:graphics.level,underground:under,underwater:sub});scene.fog.density=Math.max(scene.fog.density,1.44/(radius()*16));land.update(p.x,p.z);actors.update(dt,{x:p.x,y:p.y+eye,z:p.z,yaw:player.yaw,moving:player.moving,thirdPerson:player.third,outfit:settings.outfit,night,quiet:!!meta.quiet,action:player.seat?'rest':elapsed<actionTime?actionName:player.swim?'swim':!player.grounded&&!player.fly?'jump':player.moving?(keys.sprint?'run':'walk'):'idle'});fixtures.poseSeated(scene,player);
  if(elapsed-lastHit>.09){findHit();lastHit=elapsed}if(mineHeld)mining(dt);if(glints.visible){glints.position.y+=dt*.42;if(elapsed>glints.userData.until)glints.visible=false}
@@ -159,7 +191,7 @@ function frame(now){requestAnimationFrame(frame);const ms=now-(frame.last||now),
  });refreshLights();$('region').textContent=biomes[info.biome]+' · '+(night?'Natt':'Dag');$('stats').textContent=meta.mode==='creative'?'Kreativt'+(player.fly?' · Flygläge':''):'♥ '+Math.ceil(meta.life)+'/10  ·  Mat '+Math.ceil(meta.food)+'/10';audio.setScene({biome:biomes[info.biome],weather,night,creative:meta.mode==='creative',underwater:sub,underground:under});if(meta.food<=0||world.at(p.x,p.y+.25,p.z)===26)damage(.5);if(meta.food>8)meta.life=Math.min(10,meta.life+.025)}
  if(elapsed-lastSave>8){lastSave=elapsed;save().catch(()=>toast('Kunde inte spara. Kontrollera ledigt utrymme.'))}renderer.render(scene,camera)}
 const ready=Promise.all([fetch(base+'blocks/registry.json').then(r=>r.json()),loadProps(T).then(withFaunaFood).then(eggKit).then(withFlashlight).then(k=>withExtraFood(T,k)),new T.TextureLoader().loadAsync(base+'blocks/atlas.png'),fetch(base+'props/manifest.json').then(r=>r.json())]).then(([r,k,a,props])=>{reg=r;kit=k;atlas=a;atlas.colorSpace=T.SRGBColorSpace;atlas.magFilter=T.NearestFilter;atlas.minFilter=T.NearestFilter;atlas.generateMipmaps=false;catalog=[...reg.blocks,faunaFood,flashlight,...extraFoods,...eggs,...props.assets.map(p=>p.id==='door'?{...p,name:'Trädörr'}:p)];lookup=Object.fromEntries(catalog.map(v=>[v.id,v]));defs=Object.fromEntries(reg.blocks.map(v=>[v.id,v]))});
-ui=panels({hatch:selection=>{if(roomSession)return {ok:false,message:'Varelselabbet finns i egna världar.'};const mix=mixEggs(selection,meta.bag,meta.mode==='creative');const result=actors.hatch(mix.seed,player.p);if(result.ok){if(meta.mode!=='creative')for(const [id,n] of mix.entries)add(id,-n);audio.effect('craft');bar();checkpoint()}return result},shared:()=>!!roomSession,fullscreen:bindFullscreen($('fullscreen'),toast),start,save,home,refreshHome,suspend,resume,toast,defs:()=>defs,propIds:()=>kit.ids,settings,configure,meta:()=>meta,name,icon,checkpoint,slotIndex:()=>selected,setSlot:slot,bagChanged:bar,catalog:()=>roomSession?catalog.filter(item=>defs[item.id]||item.id==='flashlight'||item.category==='Mat'):catalog,sound:n=>audio.effect(n),pick:id=>{meta.slots[selected]=id;bar()},nearBench,switchMode,blueprint:op=>{if(roomSession)return 'Bygg ett block i taget i rummet.';findHit();if(hit?.kind!=='block')return 'Sikta på ett block först.';return op==='mark'?clip.mark(hit.cell):clip.paste(hit.prev)},craft:r=>{if(meta.mode==='survival'){if(r.station&&!nearBench()||Object.entries(r.needs).some(([k,n])=>(meta.bag[k]||0)<n))return;for(const [k,n] of Object.entries(r.needs))add(k,-n)}add(r.out,r.count);audio.effect('craft');bar()}});
+ui=panels({hatch:selection=>{if(roomSession)return {ok:false,message:'Varelselabbet finns i egna världar.'};const mix=mixEggs(selection,meta.bag,meta.mode==='creative');const result=actors.hatch(mix.seed,player.p);if(result.ok){if(meta.mode!=='creative')for(const [id,n] of mix.entries)add(id,-n);audio.effect('craft');bar();checkpoint()}return result},shared:()=>!!roomSession,fullscreen:bindFullscreen($('fullscreen'),toast),start,save,home,refreshHome,suspend,resume,toast,defs:()=>defs,propIds:()=>kit.ids,settings,configure,meta:()=>meta,name,icon,checkpoint,slotIndex:()=>selected,setSlot:slot,bagChanged:bar,catalog:()=>roomSession?catalog.filter(item=>defs[item.id]||item.id==='flashlight'||item.category==='Mat'||item.category==='Verktyg'):catalog,sound:n=>audio.effect(n),pick:id=>{meta.slots[selected]=id;bar()},nearBench,switchMode,blueprint:op=>{if(roomSession)return 'Bygg ett block i taget i rummet.';findHit();if(hit?.kind!=='block')return 'Sikta på ett block först.';return op==='mark'?clip.mark(hit.cell):clip.paste(hit.prev)},craft:r=>{if(meta.mode==='survival'){if(r.station&&!nearBench()||Object.entries(r.needs).some(([k,n])=>(meta.bag[k]||0)<n))return;for(const [k,n] of Object.entries(r.needs))add(k,-n)}add(r.out,r.count);audio.effect('craft');bar()}});
 addEventListener('resize',resize);addEventListener('pagehide',()=>save().catch(()=>{}));document.addEventListener('visibilitychange',()=>{if(document.hidden&&meta){save().catch(()=>{});if(active())ui.pause()}});
 ready.then(async()=>{try{await db.migrate()}catch{toast('En äldre sparfil kunde inte importeras')}await refreshHome();if($('play-fullscreen'))$('play-fullscreen').disabled=false}).catch(e=>toast('Kunde inte läsa speldata: '+e.message));
 
@@ -169,14 +201,16 @@ async function enableRooms(){
  const {server}=await fetch('./network/config.json',{cache:'no-store'}).then(r=>r.json());
  if(!server)return;
  open.hidden=false;
- open.onclick=()=>ui.lobby(async (code,quiet)=>{
-  const {connect}=await import('./network/client.js?v=varld2');
-  await connect(server,code,quiet,{
+ open.onclick=()=>ui.lobby(async options=>{
+  const {connect}=await import('./network/client.js?v=kompis3');
+  await connect(server,options,{
    scene:()=>scene,
-   async start(code,edits,session,quiet){
-    const m=db.fresh('Rum '+code,'creative',code,'Lätt');m.quiet=quiet===true;roomSession=session;
+   async start(code,edits,session,roomSettings){
+    await ready;await save();roomSession?.close();roomSession=null;
+    const m=db.fresh('Rum '+code,roomSettings.mode,code,roomSettings.difficulty);m.quiet=roomSettings.quiet;m.roomCode=code;m.removed=[...(session.removed||[])];restoreRoomProgress(m);roomSession=session;
     try{await start(m,edits);ui.close()}catch(e){session.close();roomSession=null;throw e}
    },
+   harvest(key){removed.add(key);land?.refresh()},
    edit(cell){
     if(world.set(...cell))return;
     world.record(...cell);
@@ -185,7 +219,7 @@ async function enableRooms(){
    },
    status(code,owner,locked){
     const b=$('room-info');b.hidden=false;b.disabled=!owner;
-    b.textContent='Rum '+code+(owner?(locked?' · Lås upp':' · Lås rum'):'');
+    b.textContent='Rum '+code+' · '+(meta.mode==='survival'?'Överlevnad':'Kreativt')+(meta.quiet?' · Utan djur':' · Med djur')+(owner?(locked?' · Lås upp':' · Lås rum'):'');
     b.onclick=()=>roomSession?.lock();
     try{localStorage.setItem('bv-last-room',code)}catch{}
    },

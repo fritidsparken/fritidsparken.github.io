@@ -38,3 +38,26 @@ body.screen-stick #actions button{min-height:44px}
 @media(max-height:490px) and (min-width:510px){.pack-hint{position:absolute;top:17px;left:155px}}
 
 .lab-egg{display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid #ffffff22}.lab-egg strong{flex:1}.lab-egg small{display:block;font-size:12px;opacity:.7}.lab-egg button{min-width:40px;min-height:40px}.lab-footer{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center}.lab-footer p{grid-column:1/-1;margin:0;font-size:13px}.pack-tabs{flex-wrap:wrap}
+
+/* Screen controls remain available for mouse, touch and keyboard players. */
+#hud #stick{display:grid;place-items:center;position:absolute;left:max(14px,env(safe-area-inset-left));bottom:max(70px,calc(env(safe-area-inset-bottom) + 56px));width:94px;height:94px;border:2px solid #ffffffa6;border-radius:50%;background:#173b32ad;box-shadow:inset 0 0 0 9px #ffffff08,0 3px 14px #0004;cursor:grab}
+#hud #stick:active{cursor:grabbing;background:#285849c9}
+#hud #stick i{display:block;width:36px;height:36px;margin:0;border-radius:50%;background:#fff6de;box-shadow:0 2px 7px #0005;pointer-events:none}
+#hud #actions{display:grid;position:absolute;right:max(12px,env(safe-area-inset-right));bottom:max(70px,calc(env(safe-area-inset-bottom) + 56px));grid-template-columns:repeat(2,minmax(56px,1fr));gap:6px}
+#hud #actions button{min-height:46px;padding:9px 12px;background:#173b32e6;border-color:#dce9d591;box-shadow:0 2px 6px #0003}
+#hud #actions button:active{background:#587349;border-color:#ffdc85}
+.companions{position:absolute;top:max(96px,calc(env(safe-area-inset-top) + 87px));right:max(12px,env(safe-area-inset-right));width:126px;text-align:center;color:#f6f7e7;text-shadow:0 1px 3px #000;pointer-events:none}
+.companions-heading{font-size:11px;font-weight:800;letter-spacing:.04em;margin-bottom:5px}
+.compass-dial{position:relative;width:100%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,transparent 34%,#dce7c92e 35%,transparent 36%,transparent 68%,#dce7c932 69%,transparent 70%),linear-gradient(90deg,transparent calc(50% - .5px),#cfe3c224 50%,transparent calc(50% + .5px)),linear-gradient(transparent calc(50% - .5px),#cfe3c224 50%,transparent calc(50% + .5px)),#0d2c27d9;border:2px solid #d9e5c49e;box-shadow:0 3px 15px #0019,inset 0 0 16px #041b16b3}
+.compass-self{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#ffda78;font-size:16px;line-height:1;z-index:2}
+.compass-north{position:absolute;transform:translate(-50%,-50%);font-size:9px;font-weight:850;color:#fff0bc}
+.compass-scale{display:block;margin-top:3px;font-size:10px;font-weight:650}
+.compass-friend{position:absolute;width:8px;height:8px;transform:translate(-50%,-50%);border-radius:50%;background:var(--friend-color);box-shadow:0 0 0 2px #0b201e,0 0 7px var(--friend-color);z-index:3}
+.compass-friend.outside{border:1px solid var(--friend-color);background:#163c30}
+.compass-friend-name{position:absolute;left:50%;top:10px;transform:translateX(-50%);font-size:8px;font-weight:700;white-space:nowrap;background:#102b25c9;border-radius:3px;padding:0 2px}
+.companion-labels{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.companion-label{position:absolute;left:0;top:0;display:flex;align-items:center;gap:7px;max-width:240px;border:1px solid #e5f2d552;border-radius:20px;background:#112c25dc;padding:4px 9px;box-shadow:0 2px 8px #0004;white-space:nowrap;font-size:11px;color:white}
+.companion-label::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--friend-color);flex:none}
+.companion-label strong{overflow:hidden;text-overflow:ellipsis;font-size:12px}.companion-label span{color:#e1e8ce}
+@media(max-width:500px){.companions{width:102px;right:10px;top:94px}.companion-label{max-width:180px}#hud #stick{width:84px;height:84px}#hud #actions button{padding:8px;min-width:50px}}
+@media(max-height:490px){.companions{width:88px;top:67px;right:12px}.companions-heading{font-size:9px;margin-bottom:3px}.compass-scale{font-size:9px}#room-info{top:38px!important;font-size:10px;padding:4px 7px}#hud #stick{width:80px;height:80px}#hud #actions{gap:4px}#hud #actions button{min-height:40px;padding:6px 9px}}

@@ -17,13 +17,12 @@ export function panels(api){
  const fauna=select([['on','Med djur och varelser'],['off','Utan djur och fiender']],'on');const form=el('form');form.append(field('Världens namn',name),field('Djurliv',fauna),field('Spelläge',mode),field('Svårighetsgrad',difficulty),field('Världsfrö',seed));const b=el('button','Skapa värld →');b.className='gold';form.append(b);form.onsubmit=async e=>{e.preventDefault();b.disabled=true;try{const m=db.fresh(name.value,mode.value,seed.value,difficulty.value);m.quiet=fauna.value==='off';await api.start(m,[]);close()}catch(err){msg(err);b.disabled=false}};c.append(form)}
  async function worlds(){show('worlds','Mina världar');const arr=await db.list();if(current!=='worlds')return;if(!arr.length)c.append(el('p','Dina sparade världar visas här.'));for(const m of arr){const row=el('div');row.className='line';const desc=el('strong',m.name);desc.append(el('small',(m.mode==='creative'?'Kreativt':'Överlevnad')+' · '+new Date(m.updated).toLocaleString('sv-SE')));row.append(desc,btn('Spela',run(async()=>{await api.start(m,await db.readEdits(m.id));close()})),btn('Exportera',run(async()=>{const url=URL.createObjectURL(new Blob([JSON.stringify({version:2,world:m,edits:await db.readEdits(m.id)})],{type:'application/json'})),a=el('a');a.href=url;a.download=m.name+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000)})),btn('Ta bort',run(async()=>{if(confirm('Ta bort '+m.name+' från den här enheten?')){await db.remove(m.id);await worlds();api.refreshHome()}})));c.append(row)}
  const input=el('input');input.type='file';input.accept='.json,application/json';input.onchange=run(async()=>{if(!input.files[0])return;if(input.files[0].size>32e6)throw Error('Filen är för stor');const v=JSON.parse(await input.files[0].text()),m=db.validateImport(v,api.defs(),api.propIds());await db.save(m,v.edits);await worlds();api.refreshHome()});c.append(field('Importera en exporterad värld',input))}
- function settings(){show('settings','Inställningar');const s=api.settings;const stick=select([['auto','Automatiskt · touch på mobil'],['on','Visa skärmjoystick även för mus'] ],s.screenStick?'on':'auto');
- stick.onchange=()=>{s.screenStick=stick.value==='on';api.configure()};c.append(field('Skärmjoystick',stick));
+ function settings(){show('settings','Inställningar');const s=api.settings;c.append(el('p','Joysticken och knapparna Hopp, Bygg och Gräv visas alltid, även på dator.'));
  if(api.meta()&&!api.shared()){const animals=select([['on','Med djur och varelser'],['off','Utan djur och fiender']],api.meta().quiet?'off':'on');animals.onchange=()=>{api.meta().quiet=animals.value==='off';api.checkpoint()};c.append(field('Djurliv i den här världen',animals))}
  const q=select(['LOW','MEDIUM','HIGH','ULTRA'].map((v,i)=>[i,v]),s.quality);q.onchange=()=>{s.quality=+q.value;api.configure()};c.append(field('Grafik',q));
  const outfit=select([['skog','Skogsgrön'],['hav','Havsblå'],['lingon','Lingonröd'],['lavendel','Lavendel']],s.outfit);outfit.onchange=()=>{s.outfit=outfit.value;api.configure()};c.append(field('Jackans färg i tredjeperson',outfit));
  for(const [k,name,min,max,step] of [['fov','Synfält',55,100,1],['sense','Kamerakänslighet',.4,2,.1],['music','Musik',0,1,.05],['effects','Effekter',0,1,.05],['ambience','Omgivning',0,1,.05]]){const n=el('input');n.type='range';Object.assign(n,{min,max,step,value:s[k]});n.oninput=()=>{s[k]=+n.value;api.configure()};c.append(field(name,n))}}
- function pause(){if(!api.meta())return;show('pause','Expeditionen är pausad');const row=el('div');row.className='row';row.append(btn('Fortsätt',close),btn('Helskärm',()=>{api.fullscreen();close()}),btn('Spara',run(async()=>{await api.save();api.toast('Världen sparad')})),btn('Inställningar',settings),btn('Byt spelläge',()=>{api.switchMode();close()}),btn('Till startmenyn',run(async()=>{await api.home();close()})));c.append(row,el('p','WASD för att gå, Ctrl för att springa och mellanslag för att hoppa. Håll vänster musknapp för att gräva. Högerklicka för att bygga eller använda ett föremål. Shift smyger och håller dig kvar vid kanter. Dubbeltryck mellanslag för att flyga i kreativt läge. E öppnar och stänger ryggsäcken. Mushjulet eller 1–9 väljer plats, mittenklick plockar block, Q släpper ett föremål och F5 byter kamera. På mobil går du med vänster joystick och siktar genom att svepa. För spaken helt framåt för att springa. Dubbeltryck Hopp för att flyga.'))}
+ function pause(){if(!api.meta())return;show('pause','Expeditionen är pausad');const row=el('div');row.className='row';row.append(btn('Fortsätt',close),btn('Helskärm',()=>{api.fullscreen();close()}),btn('Spara',run(async()=>{await api.save();api.toast('Världen sparad')})),btn('Inställningar',settings),btn('Byt spelläge',()=>{api.switchMode();close()}),btn('Till startmenyn',run(async()=>{await api.home();close()})));c.append(row,el('p','Gå med joysticken eller WASD. Dra i spelbilden för att titta runt. Håll Gräv-knappen för att gräva, tryck Bygg för att bygga eller använda ett föremål och Hopp för att hoppa. Knapparna fungerar med mus och touch. Högerklick fungerar också för Bygg. Ctrl springer, mellanslag hoppar och Shift smyger vid kanter. För joysticken helt framåt för att springa. Dubbeltryck Hopp eller mellanslag för att flyga i kreativt läge. E öppnar ryggsäcken. Mushjulet eller 1–9 väljer plats, mittenklick plockar block, Q släpper ett föremål och F5 byter kamera.'))}
  function pack(){
   const opening=current!=='pack';
   show('pack','Ryggsäcken');
@@ -51,7 +50,7 @@ export function panels(api){
   const library=btn(creative?'Alla material':'Mina föremål',()=>{tab='library';pack()});
   const craft=btn('Tillverka',()=>{tab='craft';pack()});
   library.setAttribute('aria-pressed',String(tab==='library'));craft.setAttribute('aria-pressed',String(tab==='craft'));
-  tabs.append(library);if(!api.shared()){tabs.append(craft);const lab=btn('🥚 Varelselabb',()=>{tab='lab';pack()});lab.setAttribute('aria-pressed',String(tab==='lab'));tabs.append(lab)}
+  tabs.append(library);if(!api.shared()||!creative)tabs.append(craft);if(!api.shared()){const lab=btn('🥚 Varelselabb',()=>{tab='lab';pack()});lab.setAttribute('aria-pressed',String(tab==='lab'));tabs.append(lab)}
   if(creative&&!api.shared()){
    const actions=select([['','Byggverktyg…'],['mark','Markera hörn'],['paste','Klistra in bygge']],'');
    actions.setAttribute('aria-label','Byggverktyg');
@@ -91,8 +90,8 @@ export function panels(api){
   if(tab==='craft'){
    list.classList.add('recipe-list');
    function draw(){
-    list.replaceChildren();const benchNearby=creative||api.nearBench();
-    for(const recipe of recipes.filter(r=>match(r.out))){
+    list.replaceChildren();const benchNearby=creative||api.nearBench(),available=new Set(catalog.map(item=>String(item.id)));
+    for(const recipe of recipes.filter(r=>match(r.out)&&(!api.shared()||available.has(String(r.out))&&Object.keys(r.needs).every(id=>available.has(id))))){
      const needs=Object.entries(recipe.needs),row=el('div');row.className='line';
      const name=el('strong',display(recipe.out)+' × '+recipe.count);
      name.append(el('small',needs.map(([id,n])=>display(id)+' '+(creative?'∞':(m.bag[id]||0))+'/'+n).join(' · ')+(recipe.station?' · arbetsbänk':'')));
@@ -171,15 +170,50 @@ export function panels(api){
  }
  function lobby(join){
   show('room','Spela tillsammans');
-  const code=el('input');code.maxLength=8;code.value=localStorage.getItem('bv-last-room')||'';
-  const fauna=select([['on','Med djur och varelser'],['off','Utan djur och fiender']],'on');
-  const group=el('fieldset'),row=el('div');row.className='row';
-  const enter=async (value,quiet)=>{
-   group.disabled=true;$('close').disabled=true;
-   try{await join(value,quiet)}catch(e){api.toast(e.message)}finally{group.disabled=false;$('close').disabled=false}
-  };
-  row.append(btn('Skapa rum',()=>enter('',fauna.value==='off')),btn('Gå med',()=>{const value=code.value.trim().toUpperCase();if(/^[A-HJ-NP-Z2-9]{8}$/.test(value))enter(value,fauna.value==='off');else api.toast('Ange rumskodens åtta tecken.')}));
-  group.append(field('Djurliv',fauna),field('Rumskod',code),row);c.append(el('p','Bygg med upp till åtta spelare. Dela koden med dina kompisar.'),group);
+  const choices=el('div');choices.className='row room-choices';
+  const create=btn('Skapa en värld',()=>roomForm('create'));
+  const enter=btn('Gå med i en värld',()=>roomForm('join'));
+  create.className='gold';choices.append(create,enter);
+  c.append(el('p','Spela med upp till åtta kompisar. Skapa en värld med en egen kod eller gå med med kompisens kod.'),choices);
+  function roomForm(action){
+   const creating=action==='create';
+   show('room',creating?'Skapa en gemensam värld':'Gå med i en värld');
+   const form=el('form'),group=el('fieldset');group.className='room-form';
+   const name=el('input');name.type='text';name.required=true;name.maxLength=20;
+   name.value=localStorage.getItem('bv-player-name')||'';name.placeholder='Ditt namn i spelet';name.autocomplete='nickname';
+   const code=el('input');code.type='text';code.required=true;code.minLength=3;code.maxLength=24;
+   code.pattern='[A-Za-z0-9\\-]{3,24}';code.autocomplete='off';code.spellcheck=false;code.setAttribute('autocapitalize','characters');
+   code.value=creating?'':localStorage.getItem('bv-last-room')||'';
+   code.placeholder=creating?'Till exempel KOMPISAR123':'Skriv skaparens kod';
+   code.setAttribute('aria-describedby','room-code-help');
+   const hint=el('small',creating?'Välj 3–24 bokstäver, siffror eller bindestreck. Dela sedan koden med dina kompisar.':'Skriv samma kod som den som skapade världen.');hint.id='room-code-help';
+   group.append(field('Ditt namn',name),field(creating?'Välj en egen rumskod':'Rumskod',code),hint);
+   let fauna,mode,difficulty;
+   if(creating){
+    fauna=select([['on','Med djur och varelser'],['off','Utan djur och fiender']],'on');
+    mode=select([['creative','Kreativt · bygg fritt'],['survival','Överlevnad · samla och skapa']],'creative');
+    difficulty=select(['Lätt','Normal','Utmanande'].map(t=>[t,t]),'Lätt');
+    const difficultyField=field('Svårighetsgrad',difficulty);difficultyField.hidden=true;
+    mode.onchange=()=>{difficultyField.hidden=mode.value!=='survival'};
+    group.append(field('Djurliv',fauna),field('Spelläge',mode),difficultyField,el('p','Dina val gäller för alla som går med i världen.'));
+   }else group.append(el('p','Du spelar med samma djurliv, spelläge och svårighetsgrad som skaparen har valt.'));
+   const row=el('div');row.className='row';
+   const submit=el('button',creating?'Skapa och spela':'Gå med och spela');submit.type='submit';submit.className='gold';
+   const back=btn('Tillbaka',()=>lobby(join));back.type='button';row.append(submit,back);group.append(row);form.append(group);c.append(form);
+   form.onsubmit=async e=>{
+    e.preventDefault();if(group.disabled)return;
+    const value=code.value.trim().toUpperCase(),playerName=name.value.trim();
+    if(!/^[A-Z0-9-]{3,24}$/.test(value)){api.toast('Koden ska ha 3–24 bokstäver, siffror eller bindestreck.');code.focus();return}
+    if(!playerName){api.toast('Skriv ditt namn så kompisarna känner igen dig.');name.focus();return}
+    const options={action,code:value,name:playerName};
+    if(creating)options.settings={quiet:fauna.value==='off',mode:mode.value,difficulty:difficulty.value};
+    group.disabled=true;$('close').disabled=true;submit.textContent=creating?'Skapar världen …':'Ansluter …';
+    try{await join(options);localStorage.setItem('bv-player-name',playerName);localStorage.setItem('bv-last-room',value)}
+    catch(error){api.toast(error.message||String(error))}
+    finally{group.disabled=false;$('close').disabled=false;submit.textContent=creating?'Skapa och spela':'Gå med och spela'}
+   };
+   (name.value?code:name).focus();
+  }
  }
  return {lobby,close,pause,pack,chest,bed,isOpen:()=>d.open}
 }
