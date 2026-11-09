@@ -1,0 +1,232 @@
+[
+  {
+    "name": "audino",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/13-audino.jpeg",
+    "sourceFile": "hf_20261109_090122_0d345657-7ba6-43a0-89bf-467eb2b58bb5.png",
+    "sourceSHA256": "acc0e7543398be9a911b93057d1814801c2722bb4ac83fa518d9a82ae0cb00e9",
+    "width": 1330,
+    "height": 1880,
+    "affine": [
+      [
+        1.0289943218231201,
+        0.0001087136406567879,
+        -6.3005595207214355
+      ],
+      [
+        -0.00017762249626684934,
+        0.9749841690063477,
+        23.743356704711914
+      ]
+    ],
+    "alignmentScore": 0.92564596227984,
+    "texture": "audino-texture.webp",
+    "reference": "audino-reference.webp"
+  },
+  {
+    "name": "spiritomb",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/15-spiritomb.jpeg",
+    "sourceFile": "hf_20261109_090122_6b6e35b9-d35c-4ba1-8a98-19b8949ec35a.png",
+    "sourceSHA256": "de9c22762ceb44919ac21bfade0c9fa3dd6c1d17b1ffceb4a3839e80b1898122",
+    "width": 1330,
+    "height": 1880,
+    "affine": [
+      [
+        1.0275520086288452,
+        -2.573509846115485e-05,
+        -5.416167259216309
+      ],
+      [
+        1.340254493698012e-05,
+        0.9745574593544006,
+        23.976606369018555
+      ]
+    ],
+    "alignmentScore": 0.9121212067780418,
+    "texture": "spiritomb-texture.webp",
+    "reference": "spiritomb-reference.webp"
+  },
+  {
+    "name": "salamence",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/20-salamence.jpeg",
+    "sourceFile": "hf_20261109_090131_4caef20e-9ef4-48f4-bd4b-337faf509ccd.png",
+    "sourceSHA256": "ea0ba94314a05c9896359b0e07b6b63e2a1ebb1d086497193bded1796584762c",
+    "width": 1330,
+    "height": 1880,
+    "affine": [
+      [
+        1.0440237522125244,
+        8.230565435951576e-05,
+        -24.49895477294922
+      ],
+      [
+        -0.00010317300620954484,
+        0.9856603145599365,
+        13.648462295532227
+      ]
+    ],
+    "alignmentScore": 0.9831628630946829,
+    "texture": "salamence-texture.webp",
+    "reference": "salamence-reference.webp"
+  },
+  {
+    "name": "chespin",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/16-chespin-alt1.jpeg",
+    "sourceFile": "hf_20261109_090132_5166c70e-fab9-4954-8285-c37d76ea3cbd.png",
+    "sourceSHA256": "c7310935f6aacd4b91d9b50d8704eac6e47059b47f6438a61a0d6237d711eb10",
+    "width": 1330,
+    "height": 1880,
+    "affine": [
+      [
+        1.0565457344055176,
+        -9.206079266732559e-05,
+        -25.722360610961914
+      ],
+      [
+        0.00010282811854267493,
+        1.0001064538955688,
+        0.20548535883426666
+      ]
+    ],
+    "alignmentScore": 0.9453948196226408,
+    "texture": "chespin-texture.webp",
+    "reference": "chespin-reference.webp"
+  },
+  {
+    "name": "xatu",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/21-xatu.jpeg",
+    "sourceFile": "hf_20261109_090132_6b9bc7f1-e213-42c1-a332-1fcdc914f683.png",
+    "sourceSHA256": "59464f97155a2762bec29df85e8aa222b91866d45873d9e91a9d65654971ffe6",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.0300945043563843,
+        -0.0001657253160374239,
+        -8.143014907836914
+      ],
+      [
+        0.00023742603661958128,
+        0.9824211001396179,
+        17.074129104614258
+      ]
+    ],
+    "alignmentScore": 0.7060871222919077,
+    "texture": "xatu-texture.webp",
+    "reference": "xatu-reference.webp"
+  },
+  {
+    "name": "wigglytuff",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/22-wigglytuff.jpeg",
+    "sourceFile": "hf_20261109_090132_fd46c6eb-d837-4b0b-a1a6-94da57019a79.png",
+    "sourceSHA256": "f9302055291f4df0f7c84f7081db5c3f044e723dfb45df320c917aac260fc830",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.0281230211257935,
+        0.00030648280517198145,
+        -5.955577373504639
+      ],
+      [
+        -9.25213098526001e-05,
+        0.9788941740989685,
+        20.33123779296875
+      ]
+    ],
+    "alignmentScore": 0.9658047501823515,
+    "texture": "wigglytuff-texture.webp",
+    "reference": "wigglytuff-reference.webp"
+  },
+  {
+    "name": "snorunt",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/18-snorunt.jpeg",
+    "sourceFile": "hf_20261109_090133_7d4ad030-16b7-4310-9374-c59e9c2ced58.png",
+    "sourceSHA256": "6810bfb974f17ff2a48c2cde679d3d694b744014e69b6783da9400e246d51da3",
+    "width": 1330,
+    "height": 1880,
+    "affine": [
+      [
+        1.037723422050476,
+        0.0004445826925802976,
+        -11.266581535339355
+      ],
+      [
+        -0.00014143750013317913,
+        0.9825425148010254,
+        16.657363891601562
+      ]
+    ],
+    "alignmentScore": 0.9734451043285035,
+    "texture": "snorunt-texture.webp",
+    "reference": "snorunt-reference.webp"
+  },
+  {
+    "name": "ledian",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/19-ledian.jpeg",
+    "sourceFile": "hf_20261109_090134_176fb5af-9128-4015-8759-8cc7f597ba8c.png",
+    "sourceSHA256": "a2c00df2a131c82394b765462d91f9068ca576db313271d8c0c81f09d39d1662",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.0331710577011108,
+        0.0005377464112825692,
+        -8.928299903869629
+      ],
+      [
+        -0.0006338613457046449,
+        0.9823621511459351,
+        18.648590087890625
+      ]
+    ],
+    "alignmentScore": 0.8180171513093697,
+    "texture": "ledian-texture.webp",
+    "reference": "ledian-reference.webp"
+  },
+  {
+    "name": "weedle",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/23-weedle.jpeg",
+    "sourceFile": "hf_20261109_090143_650503c4-6667-4dd2-a98c-dcb62bbf03fc.png",
+    "sourceSHA256": "ba6e3a6cbf48873c94b21c9e7d10541a6f74dba80d8741a77cf20c340e5b08e5",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.0245834589004517,
+        -0.0003158437612000853,
+        -3.6058177947998047
+      ],
+      [
+        0.00022382473980542272,
+        0.9721455574035645,
+        26.217065811157227
+      ]
+    ],
+    "alignmentScore": 0.9488060555395811,
+    "texture": "weedle-texture.webp",
+    "reference": "weedle-reference.webp"
+  },
+  {
+    "name": "venonat",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/26-venonat.jpeg",
+    "sourceFile": "hf_20261109_090143_eb6edcbb-af0d-4fb5-afaf-40a9ddbf9c2f.png",
+    "sourceSHA256": "62e4dd1ad560c4bd5957c1e56e429eabfbe480391a408cad50c864ca65557e64",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.0221401453018188,
+        0.0003402435395400971,
+        -3.8128743171691895
+      ],
+      [
+        0.0001779583253664896,
+        0.9740256071090698,
+        24.48084831237793
+      ]
+    ],
+    "alignmentScore": 0.9198132342502117,
+    "texture": "venonat-texture.webp",
+    "reference": "venonat-reference.webp"
+  }
+]

@@ -21,7 +21,8 @@ const keepalive=setTimeout(()=>{throw Error("Painter test timed out")},180000);
 (async()=>{while(!context.patched)await new Promise(r=>setImmediate(r));new vm.Script(context.patched);
 const code=context.patched.replace('function openPainter(IMAGE,TARGET,REFERENCE=""){','globalThis.openPainter=function openPainter(IMAGE,TARGET,REFERENCE=""){').replace(' if(autoButton)autoButton.addEventListener("click",safeRunAutoColor);','globalThis.controls={back,REFERENCE,runAutoColor,redraw,paint,lines,undo,redo,autoButton,status,autoProgress,save:()=>back.querySelector(`[data-action="save"]`).onclick(),acts:()=>acts,W:()=>W}; if(autoButton)autoButton.addEventListener("click",safeRunAutoColor);');vm.runInContext(code,context);
 const manifest=JSON.parse(fs.readFileSync('assets/pokemon-references-20261109/manifest.json'));
-assert.equal(manifest.length,10);
+const newManifest=JSON.parse(fs.readFileSync('assets/pokemon-references-20261109-b/manifest.json'));
+assert.equal(manifest.length,10);assert.equal(newManifest.length,10);manifest.push(...newManifest);
 for(const entry of [...manifest,{name:'sommar-regression',original:'assets/mandala-summer-2026/midsommar.webp'}]){
  const id=entry.name;context.openPainter('./'+entry.original,id);const c=context.controls;
  assert.equal(c.W(),0,'asynchronous image loading');await c.runAutoColor();assert.match(c.status.textContent,/startar strax/);

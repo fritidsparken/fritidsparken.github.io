@@ -151,15 +151,21 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
   // the reference image to its card, not to the wider browser viewport.
   // Exact user-supplied Pokémon references, registered to the unchanged originals.
   // Reuse Summer's mask painting, history, RGB samples, progress and timing.
+  const newPokemonReferences = new Set(["audino", "spiritomb", "chespin", "snorunt", "ledian", "salamence", "xatu", "wigglytuff", "weedle", "venonat"]);
   const pokemonReferences = {
     "01-spoink.jpeg":"spoink", "02-meowstic.jpeg":"meowstic",
     "03-seadra.jpeg":"seadra", "04-masquerain.jpeg":"masquerain",
     "05-metagross.jpeg":"metagross", "06-torterra-alt1.jpeg":"torterra",
     "08-cacturne.jpeg":"cacturne", "11-pelipper.jpeg":"pelipper",
-    "12-seviper.jpeg":"seviper", "14-loudred.jpeg":"loudred"
+    "12-seviper.jpeg":"seviper", "14-loudred.jpeg":"loudred",
+    "13-audino.jpeg":"audino", "15-spiritomb.jpeg":"spiritomb",
+    "16-chespin-alt1.jpeg":"chespin", "18-snorunt.jpeg":"snorunt",
+    "19-ledian.jpeg":"ledian", "20-salamence.jpeg":"salamence",
+    "21-xatu.jpeg":"xatu", "22-wigglytuff.jpeg":"wigglytuff",
+    "23-weedle.jpeg":"weedle", "26-venonat.jpeg":"venonat"
   };
   replaceOnce('function openPainter(IMAGE,TARGET,REFERENCE=""){',
-    'function openPainter(IMAGE,TARGET,REFERENCE=""){\n const pokemonReferencePaths='+JSON.stringify(pokemonReferences)+';\n const pokemonReferencePath=new URL(IMAGE,location.href).pathname;\n const pokemonReferenceName=pokemonReferencePath.includes("/pokemon-20261021/")?pokemonReferencePaths[pokemonReferencePath.split("/").pop()]:null;\n const isPokemonReferenceTarget=!!pokemonReferenceName;\n const pokemonTexture=isPokemonReferenceTarget?"./assets/pokemon-references-20261109/"+pokemonReferenceName+"-texture.webp":"";\n if(isPokemonReferenceTarget)REFERENCE="./assets/pokemon-references-20261109/"+pokemonReferenceName+"-reference.webp";',
+    'function openPainter(IMAGE,TARGET,REFERENCE=""){\n const pokemonReferencePaths='+JSON.stringify(pokemonReferences)+';\n const newPokemonReferences='+JSON.stringify([...newPokemonReferences])+';\n const pokemonReferencePath=new URL(IMAGE,location.href).pathname;\n const pokemonReferenceName=pokemonReferencePath.includes("/pokemon-20261021/")?pokemonReferencePaths[pokemonReferencePath.split("/").pop()]:null;\n const isPokemonReferenceTarget=!!pokemonReferenceName;\n const pokemonReferenceDir="./assets/pokemon-references-20261109"+(newPokemonReferences.includes(pokemonReferenceName)?"-b":"")+"/";\n const pokemonTexture=isPokemonReferenceTarget?pokemonReferenceDir+pokemonReferenceName+"-texture.webp":"";\n if(isPokemonReferenceTarget)REFERENCE=pokemonReferenceDir+pokemonReferenceName+"-reference.webp";',
     'ten exact Pokémon reference mappings');
   source=source.replaceAll('isSummerTarget||isAutumnTarget||isWinterTarget||isBakeryTarget||isMachineTarget',
     'isPokemonReferenceTarget||isSummerTarget||isAutumnTarget||isWinterTarget||isBakeryTarget||isMachineTarget');
