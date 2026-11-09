@@ -1,4 +1,5 @@
 /* Shared presentation: one layout; theme tokens change only colour and artwork. */
+body.std-design #catalog .fun-card[data-funtool="ansiktsloppa"] .fun-photo{margin-inline:auto}
 @font-face{font-family:FPStandardNunito;font-style:normal;font-weight:400 900;font-display:swap;src:url('../assets/standard/nunito-latin.woff2') format('woff2')}
 .standard-only{display:none}
 body.std-design{--bg:#f2f9ff;--paper:#fff;--ink:#09213d;--muted:#53687b;--green:#168836;--mint:#e3f5ed;--line:#dbe7ef;--header:#071e35;--hero-wash:#e7f6ff;--hero-ink:#09213d;--tile-tint:transparent;--tile-mix:22%;--radius:24px;--shadow:0 8px 28px #15365312;background:var(--bg);font-family:FPStandardNunito,ui-rounded,system-ui,sans-serif;font-size:16px;line-height:1.5}
