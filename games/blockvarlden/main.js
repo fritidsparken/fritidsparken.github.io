@@ -13,7 +13,7 @@ import {createLandscape} from './entities/landscape.js';
 import {createActors,withFaunaFood,faunaFood} from './entities/actors.js';
 import {createAudio} from './audio/sound.js';
 import {consumables,durability} from './inventory/recipes.js';
-import {panels} from './ui/panels.js?v=varelselabb1';
+import {panels} from './ui/panels.js?v=faunaval1';
 import * as db from './persistence/worlds.js';
 const $=id=>document.getElementById(id),base='../../assets/blockvarlden/',T=window.THREE;
 const settings={quality:1,sense:1,fov:72,outfit:'skog',music:.45,effects:.7,ambience:.45};
@@ -165,12 +165,12 @@ async function enableRooms(){
  const {server}=await fetch('./network/config.json',{cache:'no-store'}).then(r=>r.json());
  if(!server)return;
  open.hidden=false;
- open.onclick=()=>ui.lobby(async code=>{
+ open.onclick=()=>ui.lobby(async (code,quiet)=>{
   const {connect}=await import('./network/client.js');
   await connect(server,code,{
    scene:()=>scene,
    async start(code,edits,session){
-    const m=db.fresh('Rum '+code,'creative',code,'Lätt');m.quiet=true;roomSession=session;
+    const m=db.fresh('Rum '+code,'creative',code,'Lätt');m.quiet=quiet===true;roomSession=session;
     try{await start(m,edits);ui.close()}catch(e){session.close();roomSession=null;throw e}
    },
    edit(cell){
