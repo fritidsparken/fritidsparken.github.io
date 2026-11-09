@@ -172,13 +172,14 @@ export function panels(api){
  function lobby(join){
   show('room','Spela tillsammans');
   const code=el('input');code.maxLength=8;code.value=localStorage.getItem('bv-last-room')||'';
+  const fauna=select([['on','Med djur och varelser'],['off','Utan djur och fiender']],'on');
   const group=el('fieldset'),row=el('div');row.className='row';
-  const enter=async value=>{
+  const enter=async (value,quiet)=>{
    group.disabled=true;$('close').disabled=true;
-   try{await join(value)}catch(e){api.toast(e.message)}finally{group.disabled=false;$('close').disabled=false}
+   try{await join(value,quiet)}catch(e){api.toast(e.message)}finally{group.disabled=false;$('close').disabled=false}
   };
-  row.append(btn('Skapa rum',()=>enter('')),btn('Gå med',()=>{const value=code.value.trim().toUpperCase();if(/^[A-HJ-NP-Z2-9]{8}$/.test(value))enter(value);else api.toast('Ange rumskodens åtta tecken.')}));
-  group.append(field('Rumskod',code),row);c.append(el('p','Bygg med upp till åtta spelare. Dela koden med dina kompisar.'),group);
+  row.append(btn('Skapa rum',()=>enter('',fauna.value==='off')),btn('Gå med',()=>{const value=code.value.trim().toUpperCase();if(/^[A-HJ-NP-Z2-9]{8}$/.test(value))enter(value,fauna.value==='off');else api.toast('Ange rumskodens åtta tecken.')}));
+  group.append(field('Djurliv',fauna),field('Rumskod',code),row);c.append(el('p','Bygg med upp till åtta spelare. Dela koden med dina kompisar.'),group);
  }
  return {lobby,close,pause,pack,chest,bed,isOpen:()=>d.open}
 }
