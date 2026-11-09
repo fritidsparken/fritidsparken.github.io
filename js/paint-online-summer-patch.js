@@ -149,6 +149,27 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
   // Keep the close button on the right even when the landscape runtime puts
   // the image-navigation controls after it in the header's DOM order. Limit
   // the reference image to its card, not to the wider browser viewport.
+  // Exact user-supplied Pokémon references, registered to the unchanged originals.
+  // Reuse Summer's mask painting, history, RGB samples, progress and timing.
+  const pokemonReferences = {
+    "01-spoink.jpeg":"spoink", "02-meowstic.jpeg":"meowstic",
+    "03-seadra.jpeg":"seadra", "04-masquerain.jpeg":"masquerain",
+    "05-metagross.jpeg":"metagross", "06-torterra-alt1.jpeg":"torterra",
+    "08-cacturne.jpeg":"cacturne", "11-pelipper.jpeg":"pelipper",
+    "12-seviper.jpeg":"seviper", "14-loudred.jpeg":"loudred"
+  };
+  replaceOnce('function openPainter(IMAGE,TARGET,REFERENCE=""){',
+    'function openPainter(IMAGE,TARGET,REFERENCE=""){\n const pokemonReferencePaths='+JSON.stringify(pokemonReferences)+';\n const pokemonReferencePath=new URL(IMAGE,location.href).pathname;\n const pokemonReferenceName=pokemonReferencePath.includes("/pokemon-20261021/")?pokemonReferencePaths[pokemonReferencePath.split("/").pop()]:null;\n const isPokemonReferenceTarget=!!pokemonReferenceName;\n const pokemonTexture=isPokemonReferenceTarget?"./assets/pokemon-references-20261109/"+pokemonReferenceName+"-texture.webp":"";\n if(isPokemonReferenceTarget)REFERENCE="./assets/pokemon-references-20261109/"+pokemonReferenceName+"-reference.webp";',
+    'ten exact Pokémon reference mappings');
+  source=source.replaceAll('isSummerTarget||isAutumnTarget||isWinterTarget||isBakeryTarget||isMachineTarget',
+    'isPokemonReferenceTarget||isSummerTarget||isAutumnTarget||isWinterTarget||isBakeryTarget||isMachineTarget');
+  replaceOnce('if(isPokemonTarget){\n     const title=', 'if(isPokemonTarget&&!REFERENCE){\n     const title=', 'show supplied reference without generated suggestion');
+  replaceOnce('ref.onerror=()=>reject(new Error("Referens saknas"));ref.src=REFERENCE;',
+    'ref.onerror=()=>reject(new Error("Referens saknas"));ref.src=isPokemonReferenceTarget?pokemonTexture:REFERENCE;',
+    'sample aligned RGB texture without duplicate contours');
+  replaceOnce('plan=summerPaintingPlan(await findAutoRegions(true));',
+    'plan=summerPaintingPlan(await findAutoRegions(true));\n       if(isPokemonReferenceTarget)plan.sort((a,b)=>b.region.area-a.region.area);',
+    'large Pokémon areas before details');
   const referenceLayoutCSS = `
 .fp-pokemon-suggestion-title{margin:0 54px 8px 2px;color:#203b2a;font-size:clamp(19px,3vw,26px);line-height:1.15}
 .fp-pokemon-suggestion-note{max-width:760px;margin:0 52px 10px 2px;color:#45574a;font-size:14px;line-height:1.45}

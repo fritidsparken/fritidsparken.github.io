@@ -1,0 +1,232 @@
+[
+  {
+    "name": "spoink",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/01-spoink.jpeg",
+    "sourceFile": "hf_20261109_085903_547dbacf-e439-449e-b89a-90d2c6ada771(1).png",
+    "sourceSHA256": "cd956fef330bd0558678a84f6697966ddc4b72d2d4b490961c7ab27940640fcb",
+    "width": 1330,
+    "height": 1880,
+    "affine": [
+      [
+        1.0299463272094727,
+        0.0008915113285183907,
+        -7.325765132904053
+      ],
+      [
+        -0.00016797140415292233,
+        0.976940393447876,
+        22.204835891723633
+      ]
+    ],
+    "alignmentScore": 0.9600403503858882,
+    "texture": "spoink-texture.webp",
+    "reference": "spoink-reference.webp"
+  },
+  {
+    "name": "meowstic",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/02-meowstic.jpeg",
+    "sourceFile": "hf_20261109_090049_f19a01d9-c78e-478b-8554-71343b733258.png",
+    "sourceSHA256": "d600874d9e6f6a281c4d4937f2fb40db2e7e2938e56d41c60218b21bf46de311",
+    "width": 1330,
+    "height": 1880,
+    "affine": [
+      [
+        1.042807936668396,
+        -9.172234422294423e-05,
+        -16.769664764404297
+      ],
+      [
+        0.0002017303486354649,
+        0.9894075989723206,
+        10.28701114654541
+      ]
+    ],
+    "alignmentScore": 0.9513020401396689,
+    "texture": "meowstic-texture.webp",
+    "reference": "meowstic-reference.webp"
+  },
+  {
+    "name": "seadra",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/03-seadra.jpeg",
+    "sourceFile": "hf_20261109_090048_c9b49b67-ff14-47b4-a5b1-400dfa12ee14.png",
+    "sourceSHA256": "f7105f3ea9211af166929aeb12b9da236c8b8779bde3165c3cfc01a086771201",
+    "width": 1330,
+    "height": 1880,
+    "affine": [
+      [
+        1.024714469909668,
+        0.0005934259970672429,
+        -7.88544225692749
+      ],
+      [
+        0.00012385103036649525,
+        0.9715995192527771,
+        27.312772750854492
+      ]
+    ],
+    "alignmentScore": 0.9592101463687299,
+    "texture": "seadra-texture.webp",
+    "reference": "seadra-reference.webp"
+  },
+  {
+    "name": "masquerain",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/04-masquerain.jpeg",
+    "sourceFile": "hf_20261109_090048_7a40ee5d-2cc8-40c4-b39e-47cddacb5da1.png",
+    "sourceSHA256": "dfcf5da9dbad2477cf99fadda20093b8a4d6fe6f3b367e25d78355e6e33da2a0",
+    "width": 1330,
+    "height": 1880,
+    "affine": [
+      [
+        1.0384242534637451,
+        0.00024151825346052647,
+        -13.618112564086914
+      ],
+      [
+        -7.79197653173469e-05,
+        0.9874614477157593,
+        11.676063537597656
+      ]
+    ],
+    "alignmentScore": 0.9868667901172341,
+    "texture": "masquerain-texture.webp",
+    "reference": "masquerain-reference.webp"
+  },
+  {
+    "name": "metagross",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/05-metagross.jpeg",
+    "sourceFile": "hf_20261109_090049_7eccc50c-0fee-499c-b448-cff4adfd67da.png",
+    "sourceSHA256": "47e6f2e04bb8b1d32b9ee057630d1589ae369cdd776c2b613e7f26a67219859e",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.0267395973205566,
+        0.0002004975831368938,
+        -4.919364929199219
+      ],
+      [
+        -0.00015763954434078187,
+        0.9747694134712219,
+        23.922592163085938
+      ]
+    ],
+    "alignmentScore": 0.9840332651423418,
+    "texture": "metagross-texture.webp",
+    "reference": "metagross-reference.webp"
+  },
+  {
+    "name": "torterra",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/06-torterra-alt1.jpeg",
+    "sourceFile": "hf_20261109_090048_1f90e259-e513-4516-a483-43fcb84a2305.png",
+    "sourceSHA256": "1b9dbd784ae04303f5b8b13a5404d7574921bf495a882ef7fab5346bf2e60179",
+    "width": 1330,
+    "height": 1880,
+    "affine": [
+      [
+        1.0417778491973877,
+        0.00016431816038675606,
+        -17.804454803466797
+      ],
+      [
+        -0.00012189090193714947,
+        0.9865816831588745,
+        12.843281745910645
+      ]
+    ],
+    "alignmentScore": 0.9611148119017296,
+    "texture": "torterra-texture.webp",
+    "reference": "torterra-reference.webp"
+  },
+  {
+    "name": "cacturne",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/08-cacturne.jpeg",
+    "sourceFile": "hf_20261109_090049_cc7f8357-d76e-481c-aa5f-6ac8ee8ee409.png",
+    "sourceSHA256": "d5ccd0bd81f51bf073c0687e0f480f5d93bb418e1ff662be41359388afe6efe2",
+    "width": 1330,
+    "height": 1880,
+    "affine": [
+      [
+        1.0276188850402832,
+        7.247945632116171e-06,
+        -13.970762252807617
+      ],
+      [
+        -0.000174923989106901,
+        0.9763134121894836,
+        22.435237884521484
+      ]
+    ],
+    "alignmentScore": 0.9960947046029025,
+    "texture": "cacturne-texture.webp",
+    "reference": "cacturne-reference.webp"
+  },
+  {
+    "name": "pelipper",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/11-pelipper.jpeg",
+    "sourceFile": "hf_20261109_090121_1fc25ad2-2c1a-43bc-a0ae-2576b1a2a1ee.png",
+    "sourceSHA256": "691d6dc27d27c12979f3c0b691e6ae4feb46b4d2902e7bc7c08c806ca52d1f22",
+    "width": 1330,
+    "height": 1880,
+    "affine": [
+      [
+        1.0475674867630005,
+        0.0004467815160751343,
+        -30.019569396972656
+      ],
+      [
+        0.00035427481634542346,
+        0.9927209615707397,
+        6.82314920425415
+      ]
+    ],
+    "alignmentScore": 0.9696677274817732,
+    "texture": "pelipper-texture.webp",
+    "reference": "pelipper-reference.webp"
+  },
+  {
+    "name": "seviper",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/12-seviper.jpeg",
+    "sourceFile": "hf_20261109_090121_aad7e464-0bd5-4a11-8bd5-c39dd3b9c56f.png",
+    "sourceSHA256": "b2d69b001e3d1b6cabea5cecbf06cc97e39802287e1fbfd302e1f8ce3de04efc",
+    "width": 1330,
+    "height": 1880,
+    "affine": [
+      [
+        1.0364030599594116,
+        -0.002418359974399209,
+        -4.303670883178711
+      ],
+      [
+        0.0007867806125432253,
+        0.9826939702033997,
+        15.770915985107422
+      ]
+    ],
+    "alignmentScore": 0.9488136347313377,
+    "texture": "seviper-texture.webp",
+    "reference": "seviper-reference.webp"
+  },
+  {
+    "name": "loudred",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/14-loudred.jpeg",
+    "sourceFile": "hf_20261109_090121_534f2f83-4976-429e-95d8-76ab854f10d3.png",
+    "sourceSHA256": "595a2029108f5be2ba527e91468c2224ffda08d1b3b03e7065debbdf59527c46",
+    "width": 1330,
+    "height": 1880,
+    "affine": [
+      [
+        1.0290337800979614,
+        7.994232873898e-05,
+        -6.318450450897217
+      ],
+      [
+        -2.178798968088813e-05,
+        0.9745372533798218,
+        24.01302719116211
+      ]
+    ],
+    "alignmentScore": 0.9923453181426669,
+    "texture": "loudred-texture.webp",
+    "reference": "loudred-reference.webp"
+  }
+]
