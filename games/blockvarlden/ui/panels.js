@@ -1,6 +1,6 @@
 import {eggs} from '../entities/mutations.js';
 import * as db from '../persistence/worlds.js';
-import {recipes} from '../inventory/recipes.js?v=varld2';
+import {recipes} from '../inventory/recipes.js?v=expedition1';
 const $=id=>document.getElementById(id);
 function el(tag,text){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n}
 function btn(text,fn){const n=el('button',text);n.onclick=fn;return n}
@@ -20,7 +20,7 @@ export function panels(api){
  function settings(){show('settings','Inställningar');const s=api.settings;c.append(el('p','Joysticken och knapparna Hopp, Bygg och Gräv visas alltid, även på dator.'));
  if(api.meta()&&!api.shared()){const animals=select([['on','Med djur och varelser'],['off','Utan djur och fiender']],api.meta().quiet?'off':'on');animals.onchange=()=>{api.meta().quiet=animals.value==='off';api.checkpoint()};c.append(field('Djurliv i den här världen',animals))}
  const q=select(['LOW','MEDIUM','HIGH','ULTRA'].map((v,i)=>[i,v]),s.quality);q.onchange=()=>{s.quality=+q.value;api.configure()};c.append(field('Grafik',q));
- const outfit=select([['skog','Skogsgrön'],['hav','Havsblå'],['lingon','Lingonröd'],['lavendel','Lavendel']],s.outfit);outfit.onchange=()=>{s.outfit=outfit.value;api.configure()};c.append(field('Jackans färg i tredjeperson',outfit));
+ const outfit=select([['skog','Skogsgrön'],['hav','Havsblå'],['lingon','Lingonröd'],['lavendel','Lavendel'],['sailor','Sjömanskläder'],['explorer','Utforskarkläder']],s.outfit);outfit.onchange=()=>{s.outfit=outfit.value;api.configure()};c.append(field('Kläder i tredjeperson',outfit));
  for(const [k,name,min,max,step] of [['fov','Synfält',55,100,1],['sense','Kamerakänslighet',.4,2,.1],['music','Musik',0,1,.05],['effects','Effekter',0,1,.05],['ambience','Omgivning',0,1,.05]]){const n=el('input');n.type='range';Object.assign(n,{min,max,step,value:s[k]});n.oninput=()=>{s[k]=+n.value;api.configure()};c.append(field(name,n))}}
  function pause(){if(!api.meta())return;show('pause','Expeditionen är pausad');const row=el('div');row.className='row';row.append(btn('Fortsätt',close),btn('Helskärm',()=>{api.fullscreen();close()}),btn('Spara',run(async()=>{await api.save();api.toast('Världen sparad')})),btn('Inställningar',settings),btn('Byt spelläge',()=>{api.switchMode();close()}),btn('Till startmenyn',run(async()=>{await api.home();close()})));c.append(row,el('p','Gå med joysticken eller WASD. Dra i spelbilden för att titta runt. Håll Gräv-knappen för att gräva, tryck Bygg för att bygga eller använda ett föremål och Hopp för att hoppa. Knapparna fungerar med mus och touch. Högerklick fungerar också för Bygg. Ctrl springer, mellanslag hoppar och Shift smyger vid kanter. För joysticken helt framåt för att springa. Dubbeltryck Hopp eller mellanslag för att flyga i kreativt läge. E öppnar ryggsäcken. Mushjulet eller 1–9 väljer plats, mittenklick plockar block, Q släpper ett föremål och F5 byter kamera.'))}
  function pack(){
@@ -119,7 +119,7 @@ export function panels(api){
   search.oninput=categories.onchange=draw;draw();
  }
  function chest(record){
-  show('chest','Förvaringslåda');record.items??={};
+  show('chest',record.id==='shelf'?'Förvaringshylla':'Förvaringslåda');record.items??={};
   const m=api.meta(),creative=m.mode==='creative',catalog=api.catalog().slice().sort((a,b)=>a.name.localeCompare(b.name,'sv'));
   const frame=el('section');frame.className='chest-frame';
   const toolbar=el('div');toolbar.className='chest-tools';

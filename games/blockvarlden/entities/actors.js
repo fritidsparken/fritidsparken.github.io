@@ -59,13 +59,21 @@ export function decodeActor(buffer) {
       const skeleton = new T.Skeleton(skin.joints.map(i => nodes[i]), inverses);
       mesh.bind(skeleton, mesh.matrixWorld);
       const mixer = new T.AnimationMixer(root);
-      let active, outfit;
+      let active, outfit, hat;
+      const hatMaterials=[new T.MeshStandardMaterial({color:0xf3ead6}),new T.MeshStandardMaterial({color:0xa87737})];
+      const hatGeometry=new T.CylinderGeometry(.22,.25,.13,8),brimGeometry=new T.CylinderGeometry(.32,.32,.04,8);
       return {setOutfit(choice = 'skog') {
         if (outfit === choice) return;
         outfit = choice;
+        if(hat){root.remove(hat);hat=null}
+        if(choice==='sailor'||choice==='explorer'){
+          hat=new T.Group();const mat=hatMaterials[choice==='sailor'?0:1];
+          const crown=new T.Mesh(hatGeometry,mat);crown.position.y=1.79;hat.add(crown);
+          const brim=new T.Mesh(brimGeometry,mat);brim.position.y=1.73;hat.add(brim);root.add(hat);
+        }
         if (mesh.geometry !== geometry) mesh.geometry.dispose();
         mesh.geometry = geometry;
-        const hue = {hav: [0.8, .63, 1.55], lingon: [4.4, .38, .54], lavendel: [3.1, .70, 1.50]}[choice];
+        const hue = {sailor:[5,1.3,1.3],explorer:[5,1.0,.4],hav: [0.8, .63, 1.55], lingon: [4.4, .38, .54], lavendel: [3.1, .70, 1.50]}[choice];
         if (!hue) return;
         // The artist's turquoise coat pigment is distinct from skin, hair and trim.
         const colored = geometry.clone(), colors = colored.getAttribute('color');
@@ -83,6 +91,7 @@ export function decodeActor(buffer) {
         if (active) active.crossFadeTo(next, .18, false);
         active = next;
       }, dispose() {
+        hatGeometry.dispose();brimGeometry.dispose();hatMaterials.forEach(m=>m.dispose());
         root.removeFromParent(); mixer.stopAllAction(); mixer.uncacheRoot(root); skeleton.dispose();
         if (mesh.geometry !== geometry) mesh.geometry.dispose();
       }};

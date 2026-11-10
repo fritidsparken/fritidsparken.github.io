@@ -2,6 +2,7 @@ import {isTree,trunkHit} from './trunks.js';
 
 // Walkable horizontal surfaces and body blockers in model-local coordinates.
 const specs = {
+  shelf:[.49,.26,1.62], campfire:[.45,.45,.3],
   stairs:[.50,.50,1], slab:[.50,.50,.5], bed:[.44,.86,.62],
   chest:[.45,.31,.67], table:[.56,.385,.8275], workbench:[.51,.40,.8575],
   chair:[.245,.235,.4875], door:[.475,.09,1.98], window:[.50,.075,1],

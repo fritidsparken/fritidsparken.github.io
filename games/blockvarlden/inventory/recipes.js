@@ -7,6 +7,12 @@ const hand = (out, count, needs) => ({out, count, needs});
 const bench = (out, count, needs) => ({out, count, needs, station: 'workbench'});
 
 export const recipes = [
+  hand('campfire',1,{31:3,3:4}),
+  hand('shelf',1,{31:6}),
+  hand('boat',1,{31:8}),
+  hand('map',1,{75:2}),
+  hand('outfit_sailor',1,{75:4,71:1}),
+  hand('outfit_explorer',1,{75:4,70:1}),
   // Simple hand tools can be made before the player has found a tree.
   hand('shovel', 1, {1: 2, 3: 1}),
   hand('axe', 1, {1: 2, 3: 3}),
