@@ -15,7 +15,7 @@
       content="Flyg genom solsystemet, landa på månar och upptäck rymden i Rymdäventyret."
     />
     <title>Rymdäventyret · Fritidsparken</title>
-    <link rel="stylesheet" href="style.css?v=20261112-surface-action" />
+    <link rel="stylesheet" href="style.css?v=20261112-surface-bar" />
   </head>
   <body>
     <canvas id="space" aria-label="Spelvärlden" tabindex="0"></canvas>
@@ -114,7 +114,6 @@
         ><button id="camera-btn" aria-label="Byt kamera">▣ <span>Kamera</span><kbd>C</kbd></button
         ><button id="interact" aria-label="Interagera" title="Interagera">◇ <span>Interagera</span><kbd>E</kbd></button
         ><button id="assist-btn" aria-label="Flyghjälp" title="Flyghjälp" hidden>✧ <span>Flyghjälp</span></button
-        ><button id="takeoff-btn" aria-label="Starta raketen" title="Starta raketen" hidden>↑ <span>Starta raketen</span></button
         ><button id="autopilot-btn" aria-label="Avbryt autopilot" title="Avbryt autopilot" hidden>■</button
         ><button id="photo-btn" aria-label="Ta bild" title="Ta bild" hidden>◉</button
         ><button id="fullscreen" aria-label="Helskärm">⛶ <span>Helskärm</span></button>
@@ -125,7 +124,10 @@
         W / S gas & broms · A / D sväng · ↑ / ↓ höjd · Shift turbo · Space
         stabilisera
       </div>
-      <button id="surface-action" class="surface-action" hidden>Kör månbil</button>
+      <div class="surface-controls" aria-label="Kontroller på ytan">
+        <button id="surface-action" class="surface-action" hidden>Kör månbil</button>
+        <button id="takeoff-btn" aria-label="Starta raketen" title="Starta raketen" hidden>↑ <span>Starta raketen</span></button>
+      </div>
       <div id="touch">
         <div id="stick" aria-label="Styrspak"><i></i></div>
         <div class="touch-right">
