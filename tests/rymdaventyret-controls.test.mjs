@@ -159,3 +159,26 @@ test('station marker stays visible across frames and touch starts automatic dock
   for(let i=0;i<2400 && h.s.auto;i++) h.tick();
   assert.equal(h.nodes.get('panel-title').textContent,'Välkommen till stationen');
 });
+
+
+test('visible surface button drives the rover, returns to the rocket and hides after takeoff', async()=>{
+  const h=await harness();h.click('free');h.action({jump:'moon'});h.tick();
+  const button=h.nodes.get('surface-action');
+  assert.equal(button.hidden,true,'surface action is absent during flight');
+  h.click('interact');h.tick(30);
+  assert.equal(button.hidden,true,'wait until the landing finishes');
+  h.tick(150);
+  assert.equal(button.hidden,false);
+  assert.equal(button.textContent,'Kör månbil');
+  assert.equal(button['aria-label'],'Kör månbil');
+  h.click('surface-action');h.tick();
+  assert.equal(h.s.rover,true,'touch action enters the rover without a keyboard');
+  assert.equal(button.textContent,'Samla / återvänd');
+  Object.assign(h.s.ship.position,{x:0,z:0});
+  h.click('surface-action');
+  assert.equal(h.s.rover,false,'the same button returns to the rocket');
+  assert.equal(h.nodes.get('panel-title').textContent,'Tillbaka vid raketen');
+  h.action({action:'resume'});h.click('takeoff-btn');h.tick(15);
+  assert.equal(h.s.surface,null);
+  assert.equal(button.hidden,true,'no surface button remains after takeoff');
+});

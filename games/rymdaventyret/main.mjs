@@ -369,7 +369,7 @@ function interact() {
       };
       ship.speed = 0;
       toast(
-        "Kör månbilen med samma kontroller. E nära raketen för att återvända.",
+        "Kör månbilen med samma kontroller. Tryck på Samla / återvänd nära raketen för att återvända.",
       );
       return;
     }
@@ -749,6 +749,7 @@ $("map-btn").onclick = () => {
 $("camera-btn").onclick = changeCamera;
 $("photo-btn").onclick = photo;
 $("interact").onclick = interact;
+$("surface-action").onclick = () => { interact(); updateHud(); };
 $("takeoff-btn").onclick = () => { if (surface && transition <= 0 && !paused) takeOff(); };
 $("assist-btn").onclick = () => {
   if (!mission() || surface) return;
@@ -1014,7 +1015,12 @@ function updateHud() {
   else if (renderer.stations?.some((s) => dist(ship.position, s.position) < 60))
     action = "Docka";
   else if (body().land) action = "Landa";
-  $("interact").hidden = action === "Docka";
+  // Surface interaction stays outside the compact, horizontally scrolling toolbar.
+  // It must have a readable touch target when the keyboard E shortcut is unavailable.
+  $("surface-action").hidden = !surface || transition > 0;
+  $("surface-action").textContent = action;
+  $("surface-action").setAttribute("aria-label", action);
+  $("interact").hidden = action === "Docka" || !!surface;
   $("interact").querySelector("span").textContent = action;
   $("interact").title = action + " (E)";
   $("interact").setAttribute("aria-label", action);
