@@ -186,7 +186,7 @@ body.std-design.halloween .std-inspiration>button{color:#281521}
 /* Existing calendar door and popup events remain owned by advent-calendar.js. */
 body.std-design #julkalender,body.std-design .advent-preview,body.std-design .advent-motion-toggle{display:none}
 body.std-design .std-hero #advent-today-shortcut{position:absolute;z-index:2;left:14%;top:50%;transform:translate(-50%,-50%);width:140px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:none;color:#fff6d9;text-align:center;cursor:pointer}
-body.std-design .std-hero #advent-today-shortcut[hidden],body.std-design.std-browsing #advent-today-shortcut{display:none}
+body.std-design .std-hero #advent-today-shortcut[hidden],body.std-design.std-browsing:not(.christmas) #advent-today-shortcut{display:none}
 body.std-design .advent-banner-caption,body.std-design .advent-banner-status{font-size:14px;font-weight:900;text-shadow:0 2px 6px #102a18}
 body.std-design .advent-banner-door{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;aspect-ratio:4/5;border:2px solid #e1c184;border-radius:46% 46% 10px 10px;background:linear-gradient(115deg,#6c1b24,#a33839 48%,#531a23);box-shadow:0 12px 20px #14291980,inset 0 0 0 6px #6e241f,inset 0 0 0 8px #dcb46b;transition:transform .2s}
 body.std-design .advent-banner-door strong{font:700 64px/1 Georgia,serif}
@@ -292,7 +292,14 @@ body.std-design.dark:not(.halloween):not(.christmas) :is(.primary,.std-inspirati
  body.std-design .advent-banner-caption,body.std-design .advent-banner-status{font-size:12px}
  body.std-design .advent-banner-door strong{font-size:42px}
 }
-@media(prefers-reduced-motion:reduce){body.std-design *,body.std-design *:before,body.std-design *:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+/* The calendar has its own explicit motion setting. Preserve its original door
+   animation instead of freezing it on the closed cover under reduced motion. */
+@media(prefers-reduced-motion:reduce){
+ body.std-design *,body.std-design *:before,body.std-design *:after{scroll-behavior:auto!important;transition:none!important}
+ body.std-design :not(.advent-motion-enabled,.advent-motion-enabled *),
+ body.std-design :not(.advent-motion-enabled,.advent-motion-enabled *):before,
+ body.std-design :not(.advent-motion-enabled,.advent-motion-enabled *):after{animation:none!important}
+}
 
 /* Keep long category names inside their tiles at every screen width. */
 body.std-design .std-categories>button>span{width:100%;max-width:100%;min-width:0;overflow-wrap:anywhere;hyphens:auto;font-size:clamp(11px,1.05vw,16px)}
@@ -307,4 +314,31 @@ body.std-design .std-categories>button>span{width:100%;max-width:100%;min-width:
 @media (max-width:700px){
  body.std-design .std-categories{grid-template-columns:repeat(2,minmax(0,1fr))}
  body.std-design .std-popular-grid > :nth-child(n+5){display:none}
+}
+
+/* Reserve real space for seasonal links, the timer and sound controls. */
+body.std-design .std-controls{flex:0 0 auto}
+body.std-design .std-controls #theme{display:grid!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
+body.std-design:is(.christmas,.halloween) .std-controls #theme{display:none!important}
+body.std-design #stdNavigation button{flex:0 0 auto}
+body.std-design #stdNavigation{overflow-x:auto;justify-content:flex-start;scrollbar-width:thin}
+@media(min-width:701px) and (max-width:1439px){
+ body.std-design .std-topbar{flex-wrap:wrap}
+ body.std-design .std-menu-toggle{display:none}
+ body.std-design #stdNavigation{display:flex;order:10;flex:1 0 100%;flex-wrap:wrap;justify-content:center;border-top:1px solid #ffffff30;padding-top:6px}
+ body.std-design .std-header-search{margin-left:auto}
+}
+@media(max-width:700px){
+ body.std-design .std-menu-toggle{display:none}
+ body.std-design #stdNavigation{display:flex;order:10;flex:1 0 100%;flex-wrap:nowrap;justify-content:flex-start}
+ body.std-design #stdNavigation button{flex:0 0 auto;font-size:13px;padding:8px}
+}
+/* Keep today's door available when Julpyssel is the Christmas landing page. */
+body.std-design.christmas.std-browsing .std-hero #advent-today-shortcut{display:flex;width:110px}
+@media(max-width:700px){
+ body.std-design.christmas.std-browsing .std-hero{height:215px}
+ body.std-design.christmas.std-browsing .std-hero #advent-today-shortcut{top:25px;left:70px;width:88px}
+ body.std-design.christmas.std-browsing .std-hero-copy{left:136px;right:12px;top:60px}
+ body.std-design.christmas.std-browsing .std-hero h1{font-size:clamp(22px,5.7vw,34px);letter-spacing:-1px}
+ body.std-design.christmas.std-browsing .std-hero p{font-size:16px}
 }

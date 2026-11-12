@@ -64,3 +64,7 @@ body:not(.christmas) .advent,body.halloween .advent,.advent[hidden],body:not(.ch
  .advent-dialog .advent-message,.advent-dialog .advent-answer{font-size:18px}
  .advent-hinge span{font-size:28px}.advent-hinge b{font-size:76px}.advent-hinge small{font-size:10px;margin-top:8px}
 }
+
+/* The opened content must remain visible even if an animation is interrupted. */
+.advent-dialog.is-revealed .advent-hinge{opacity:0;visibility:hidden;pointer-events:none}
+.advent-dialog.is-revealed .advent-animal,.advent-dialog.is-revealed .advent-message{opacity:1;transform:none}
