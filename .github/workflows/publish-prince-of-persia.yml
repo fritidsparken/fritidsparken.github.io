@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'game-upload/prince-of-persia-github.zip.part*'
+      - 'game-upload/prince-of-persia-github.zip.part03'
   workflow_dispatch:
 
 permissions:
