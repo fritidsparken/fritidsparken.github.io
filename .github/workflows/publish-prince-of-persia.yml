@@ -4,7 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'game-upload/prince-of-persia-github.zip.part03'
+      - 'prince-of-persia-github.zip.part03'
+      - '.github/workflows/publish-prince-of-persia.yml'
   workflow_dispatch:
 
 permissions:
@@ -26,12 +27,12 @@ jobs:
         run: |
           set -euo pipefail
           for n in 01 02 03; do
-            test -s "game-upload/prince-of-persia-github.zip.part$n" || {
+            test -s "prince-of-persia-github.zip.part$n" || {
               echo "::error::Saknar del $n av spelarkivet"
               exit 1
             }
           done
-          cat game-upload/prince-of-persia-github.zip.part{01,02,03} > "$RUNNER_TEMP/prince-of-persia.zip"
+          cat prince-of-persia-github.zip.part{01,02,03} > "$RUNNER_TEMP/prince-of-persia.zip"
           echo "bfc96146d7c5602ebd44edc25d974e23cfb84c32d197c0891aa8736dfebbfb03  $RUNNER_TEMP/prince-of-persia.zip" | sha256sum -c -
           python3 - <<'PY'
           import pathlib, zipfile
@@ -55,7 +56,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add games/prince-of-persia/
-          git rm -f game-upload/prince-of-persia-github.zip.part{01,02,03}
+          git rm -f prince-of-persia-github.zip.part{01,02,03}
           git commit -m "Publish Prince of Persia game from archive"
           git pull --rebase origin main
           git push origin HEAD:main
