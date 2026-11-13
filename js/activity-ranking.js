@@ -38,6 +38,15 @@
   if(!board)return;
   const list = board.querySelector('ol');
   const symbols = {'mala-online':'🎨','rita-steg-for-steg':'✏️',klippdockor:'✂️',parlmonster:'🟣',julpyssel:'🎄',halloweenpyssel:'🎃'};
+  function formatDuration(seconds) {
+    const total = Math.floor(Number(seconds));
+    if (!Number.isFinite(total) || total < 0) return 'tid saknas';
+    if (total < 60) return total + ' s';
+    const minutes = Math.floor(total / 60);
+    if (minutes < 60) return minutes + ' min';
+    const rest = minutes % 60;
+    return Math.floor(minutes / 60) + ' h' + (rest ? ' ' + rest + ' min' : '');
+  }
   function render(rows) {
     const items = document.createDocumentFragment();
     rows.filter(row => Object.hasOwn(names, row.activity_id))
@@ -48,8 +57,8 @@
         const game = window.FPGameHub?.games.find(entry => entry.id === gameId);
         const item = document.createElement('li');
         const link = document.createElement('a');
-        link.setAttribute('aria-label', names[slug]);
-        link.title = names[slug];
+        const caption = names[slug] + ' (' + formatDuration(row.seconds) + ')';
+        link.title = caption;
         if (game && ['four','plane','bike'].includes(gameId)) {
           link.href = '#catalog';
           link.dataset.standardGame = gameId;
@@ -70,7 +79,7 @@
           icon.append(image);
         } else icon.textContent = symbols[slug] || '🎮';
         const label = document.createElement('span');
-        label.textContent = names[slug];
+        label.textContent = caption;
         link.append(icon, label);
         item.append(link);
         items.append(item);
