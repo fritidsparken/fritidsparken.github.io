@@ -1062,3 +1062,9 @@ button,button *,#stick,#stick span {
   #titleMenu .worlds { margin-bottom: 10px; }
   #keys { display: none; }
 }
+
+/* The shared back-to-Fritidsparken floating button covers mobile gameplay.
+   Hide it only for this game on touch/mobile screens. */
+@media (pointer: coarse), (max-width: 767px) {
+  #fp-game-menu-back { display: none !important; }
+}

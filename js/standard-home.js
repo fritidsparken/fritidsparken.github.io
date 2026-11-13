@@ -51,28 +51,38 @@
   const ranking = document.getElementById('fp-ranking');
   const rankingToggle = categoryNavigation.querySelector('[data-ranking-toggle]');
   if (ranking && rankingToggle) {
-    categoryNavigation.querySelector('.std-categories').append(ranking);
+    const categoryGrid = categoryNavigation.querySelector('.std-categories');
+    categoryGrid.append(ranking);
+    function positionRanking() {
+      const panelWidth = Math.min(560, categoryGrid.clientWidth - 16);
+      const left = Math.max(8, Math.min(rankingToggle.offsetLeft, categoryGrid.clientWidth - panelWidth - 8));
+      const top = rankingToggle.offsetTop + rankingToggle.offsetHeight + 6;
+      ranking.style.setProperty('--fp-ranking-left', left + 'px');
+      ranking.style.setProperty('--fp-ranking-top', top + 'px');
+    }
     function showRanking(show) {
       ranking.hidden = !show;
       ranking.style.display = show ? '' : 'none';
       rankingToggle.setAttribute('aria-expanded', String(show));
+      if (show) positionRanking();
     }
     showRanking(false);
     rankingToggle.addEventListener('click', () => {
       const opening = ranking.hidden;
       showRanking(opening);
       if (opening && window.matchMedia('(max-width: 1100px)').matches) {
-        // Bring the first ranked icons into view without requiring a manual scroll.
         requestAnimationFrame(() => {
-          const firstIcon = ranking.querySelector('.ranking-icon') || ranking;
-          const bounds = firstIcon.getBoundingClientRect();
+          // Keep the Topplistan tile visible immediately above its dropdown.
+          const tile = rankingToggle.getBoundingClientRect();
+          const panel = ranking.getBoundingClientRect();
           const viewHeight = window.visualViewport?.height || window.innerHeight;
-          if (bounds.bottom > viewHeight - 12 || bounds.top < 0) {
-            ranking.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          if (panel.bottom > viewHeight - 8 || tile.top < 0) {
+            rankingToggle.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
         });
       }
     });
+    window.addEventListener('resize', () => { if (!ranking.hidden) positionRanking(); });
     document.addEventListener('click', event => {
       if (event.target.closest('[data-standard-category], [data-standard-game], [data-standard-pearl]')) showRanking(false);
     }, true);
