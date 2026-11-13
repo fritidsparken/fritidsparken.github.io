@@ -60,12 +60,18 @@
           else link.dataset.standardCategory = Object.keys(categories).find(key => categories[key] === slug);
         } else link.href = '/games/' + slug + '/';
         const asset = game?.image || ({ansiktsloppan:'tool_ansiktsloppa.svg','rita-steg-for-steg':'standard/drawing-step-cover.jpg'})[slug];
+        const icon = document.createElement('span');
+        icon.className = 'ranking-icon';
+        icon.setAttribute('aria-hidden', 'true');
         if (asset) {
           const image = document.createElement('img');
           image.src = '/assets/' + asset;
           image.alt = '';
-          link.append(image);
-        } else link.textContent = symbols[slug] || '🎮';
+          icon.append(image);
+        } else icon.textContent = symbols[slug] || '🎮';
+        const label = document.createElement('span');
+        label.textContent = names[slug];
+        link.append(icon, label);
         item.append(link);
         items.append(item);
       });
