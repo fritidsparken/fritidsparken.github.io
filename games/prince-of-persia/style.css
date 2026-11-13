@@ -1043,3 +1043,9 @@ button,button *,#stick,#stick span {
 #bridgeStick, #bridgeJump, #bridgePause { z-index: 5; }
 #bridgeStick span { pointer-events: none; }
 @media (any-pointer: coarse) { #bridgeJump { right: max(20px, env(safe-area-inset-right)); } }
+
+#titleMenu .menu-options { position: fixed; top: calc(max(8px, env(safe-area-inset-top)) + 52px); right: max(8px, env(safe-area-inset-right)); z-index: 10; color: white; }
+#titleMenu .menu-options summary { cursor: pointer; list-style: none; padding: 10px 14px; border: 1px solid #f4d7a6; border-radius: 10px; background: #211d1eea; }
+#titleMenu .menu-options summary::-webkit-details-marker { display: none; }
+#titleMenu .menu-options div { display: grid; gap: 6px; padding: 8px; background: #211d1ef5; border-radius: 10px; }
+@media (any-pointer: coarse) { #titleMenu .tools { display: flex; } #bridgePreview { display: none !important; } }
