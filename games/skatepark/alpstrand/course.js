@@ -1,6 +1,6 @@
 // Renderer and physics share the triangles and rail splines exported from Blender.
 export const alpstrand = {
-  name: 'Alpstrand Vertpark',
+  name: 'Sjövikens skatepark',
   area: 'ALPSJÖN',
   desc: 'Carva i den stora bowlen och ta sats mot verttornet vid sjön.',
   sky: 0xb9e2ff,
@@ -153,6 +153,22 @@ const vertFaces = [
   face(-32.5,23,-90,8.3,5.4,17.2),
   face(-47,-8.3,-90,6.8,3.4,12),
 ];
+
+// Project a rear-side touchdown onto the riding surface, just below the lip.
+export function quarterReentry(x, z) {
+  for (const ramp of vertFaces) {
+    const rx = x - ramp.x, rz = z - ramp.z;
+    const behind = rx * ramp.dx + rz * ramp.dz;
+    const across = rx * ramp.dz - rz * ramp.dx;
+    if (behind <= 0 || Math.abs(across) > ramp.width / 2) continue;
+    return {
+      x: ramp.x + across * ramp.dz - ramp.dx,
+      z: ramp.z - across * ramp.dx - ramp.dz,
+      dir: Math.atan2(ramp.dx, ramp.dz)
+    };
+  }
+  return null;
+}
 
 export function vertStep(p, dx, dz, dt, braking) {
   for (const f of vertFaces) {
