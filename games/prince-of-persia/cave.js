@@ -44,9 +44,14 @@ let introSeen=saved.introSeen==='brage',completed=!!saved.completed,outroPending
 let mode='loading',z=checkpoint,x=0,height=0,vy=0,speed=0,stride=0,last=0,acc=0;
 let stickX=0,stickY=0,wantJump=false,recovery=0,notice=0;
 const held=new Set();
+const previousPose={},pose={};
+let cameraZ=z,cameraX=0,viewZ=z,viewX=0;
+function capture(target){Object.assign(target,{z,x,height,vy,stride,cameraZ,cameraX})}
+function snapCamera(){cameraZ=z;cameraX=x*.52;capture(previousPose);capture(pose);viewZ=cameraZ;viewX=cameraX}
+
 function persist(){try{localStorage.setItem(key,JSON.stringify({level,cp:checkpoint,introSeen:introSeen?'brage':false,completed,outroPending}));localStorage.setItem('lostWorlds.cave','1')}catch{}}
 function clearInput(){held.clear();stickX=stickY=0;wantJump=false}
-function reset(){const pit=crossings[level];if(checkpoint>pit.start-2&&checkpoint<pit.end+1)checkpoint=Math.max(0,pit.start-5);z=checkpoint;x=height=vy=speed=stride=recovery=0;clearInput()}
+function reset(){const pit=crossings[level];if(checkpoint>pit.start-2&&checkpoint<pit.end+1)checkpoint=Math.max(0,pit.start-5);z=checkpoint;x=height=vy=speed=stride=recovery=0;snapCamera();clearInput()}
 function ui(state){
   mode=state;$('menu').hidden=!['loading','ready','pause','finished','error'].includes(state);
   $('story').hidden=state!=='story';$('hud').hidden=state!=='run';$('touch').hidden=state!=='run';
@@ -104,7 +109,8 @@ function update(dt){
  x=clamp(x+sideways*dt*2.8,-1.38,1.38);
  if(wantJump && height===0){vy=6.2;height=.001}wantJump=false;
  if(height>0){height=Math.max(0,height+vy*dt);vy-=15*dt;if(!height)vy=0}
- const old=z;z+=speed*dt;stride+=speed*dt*.23;
+ const old=z;z+=speed*dt;stride+=speed*dt*.15;
+ cameraZ+=(z-cameraZ)*(1-Math.exp(-dt*6));cameraX+=(x*.52-cameraX)*(1-Math.exp(-dt*5));
  const pit=crossings[level];
  if(!height&&!supported(pit,z,x)){fallBack();return}
  if(z>=pit.end+1 && checkpoint<pit.end+1){checkpoint=pit.end+1;persist()}
@@ -129,25 +135,28 @@ async function loadImage(id){
  await im.decode();art[id]=im;
 }
 const feet=477, horizon=252;
-// One fixed camera per cave. Only absolute course coordinates determine the projected footprint.
+// Every world-space footprint uses the same camera transform.
 function project(at){
- const scale=1/(1+at/42);
+ const scale=23/Math.max(3,23+at-viewZ);
  return {scale,y:horizon+(feet-horizon)*scale};
 }
-function sidePos(lane,scale){return 480+lane*177*scale}
+function sidePos(lane,scale){return 480+(lane-viewX)*177*scale}
 function drawObstacle(at,lane,low){
+ if(at<viewZ-17)return;
  const p=project(at),xx=sidePos(lane,p.scale),s=p.scale;
  const im=art[low?'beam':'rock'],w=(low?179:132)*s,h=w*im.height/im.width;
  ctx.fillStyle='rgba(13,11,14,.45)';ctx.beginPath();ctx.ellipse(xx,p.y,w*.49,7*s,0,0,Math.PI*2);ctx.fill();
  ctx.drawImage(im,xx-w/2,p.y-h,w,h);
 }
 function drawBed(bed){
+ if(bed.at<viewZ-17)return;
  const p=project(bed.at),cx=sidePos(bed.lane,p.scale),sz=p.scale,k=spikeLift(bed);
  ctx.save();ctx.translate(cx,p.y);ctx.scale(sz,sz);ctx.fillStyle='#50463f';ctx.beginPath();ctx.ellipse(0,0,66,5,0,0,Math.PI*2);ctx.fill();
  for(let i=-2;i<=2;i++){const lx=i*21;ctx.fillStyle='#c0aa85';ctx.beginPath();ctx.moveTo(lx-5,0);ctx.lineTo(lx,-(4+31*k));ctx.lineTo(lx+5,0);ctx.fill()}
  ctx.restore();
 }
 function drawCrossing(pit){
+ if(pit.end<viewZ-17)return;
  const near=project(pit.start),far=project(pit.end);
  ctx.beginPath();
  for(const [j,p,l] of [[0,near,-1.96],[1,far,-1.96],[2,far,1.96],[3,near,1.96]])ctx[j?'lineTo':'moveTo'](sidePos(l,p.scale),p.y);
@@ -156,6 +165,7 @@ function drawCrossing(pit){
  shade.addColorStop(0,'#57463c');shade.addColorStop(.18,'#241f25');shade.addColorStop(.72,'#101117');shade.addColorStop(1,'#332d31');
  ctx.fillStyle=shade;ctx.fillRect(0,far.y,960,near.y-far.y);
  for(const pad of [...pit.pads].reverse()){
+  if(pad.at<viewZ-17)continue;
   const p=project(pad.at),cx=sidePos(pad.lane,p.scale),rx=177*pit.radius*p.scale,ry=(project(pad.at-pit.halfLength).y-project(pad.at+pit.halfLength).y)/2;
   const shaft=ctx.createLinearGradient(cx-rx,0,cx+rx,0);shaft.addColorStop(0,'#4c3930');shaft.addColorStop(.35,'#806650');shaft.addColorStop(1,'#28252a');
   ctx.fillStyle=shaft;ctx.fillRect(cx-rx,p.y,rx*2,near.y-p.y);
@@ -165,11 +175,12 @@ function drawCrossing(pit){
  ctx.restore();
 }
 function drawPlayer(){
+ const {z,x,height,vy,stride}=pose;
  const p=project(z),s=p.scale,xx=sidePos(x,s),bottom=p.y-height*50*s;
  ctx.fillStyle='rgba(9,13,17,.38)';ctx.beginPath();ctx.ellipse(xx,p.y,(27-height*3)*s,6*s,0,0,Math.PI*2);ctx.fill();
  const h=151*s,w=h*290/300;
  if(height>0){const im=art['jump'+(vy>3?0:vy>0?1:vy>-3?2:3)];ctx.drawImage(im,xx-w/2,bottom-h,w,h)}
- else{const frame=Math.floor(stride*40)%40;ctx.drawImage(art['run-cycle'],frame%8*200,Math.floor(frame/8)*210,200,210,xx-w/2,bottom-h,w,h)}
+ else{const frame=Math.floor(stride*40)%40;ctx.drawImage(art['run-steady'],frame%8*200,Math.floor(frame/8)*210,200,210,xx-w/2,bottom-h,w,h)}
 }
 function drawGoal(){
  const p=project(passages[level][1]),xx=sidePos(0,p.scale),s=p.scale;
@@ -182,6 +193,17 @@ function drawGoal(){
  }
  ctx.restore();
 }
+// Sparse seams on the cave floor give nearby obstacles a shared reference for depth.
+function floorDetails(){
+ const first=Math.max(0,Math.ceil((viewZ-16)/4));
+ for(let i=first;i*4<Math.min(passages[level][1],viewZ+90);i++){
+  const at=i*4,p=project(at),pit=crossings[level];
+  if(at>pit.start&&at<pit.end)continue;
+  const lane=Math.sin(i*37.2+level)*1.58,xx=sidePos(lane,p.scale),w=(8+6*Math.cos(i))*p.scale;
+  ctx.strokeStyle='rgba(72,57,49,.24)';ctx.lineWidth=Math.max(.5,p.scale);
+  ctx.beginPath();ctx.moveTo(xx-w,p.y);ctx.lineTo(xx,p.y-1.2*p.scale);ctx.lineTo(xx+w,p.y);ctx.stroke();
+ }
+}
 function render(){
  const w=canvas.clientWidth,h=canvas.clientHeight,dpr=Math.min(devicePixelRatio||1,2);
  if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr)}
@@ -191,23 +213,28 @@ function render(){
  ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#10181f';ctx.fillRect(0,0,canvas.width,canvas.height);
  // Portrait keeps the whole control lane in view while the cavern fills the screen.
  const fill=Math.max(w/im.width,h/im.height),bw=im.width*fill,bh=im.height*fill;
- const dx=(w-bw)/2,dy=clamp(oy+horizon*v-bh*.46,h-bh,0);
+ const scenery=outroPending||completed?1:1.03+.08*viewZ/passages[level][1];
+ const sw=bw*scenery,sh=bh*scenery;
+ const dx=clamp((w-sw)/2-viewX*14*v,w-sw,0),dy=clamp(oy+horizon*v-sh*.46,h-sh,0);
  ctx.setTransform(dpr,0,0,dpr,0,0);
- ctx.drawImage(im,dx,dy,bw,bh);
+ ctx.drawImage(im,dx,dy,sw,sh);
  if(outroPending||completed)return;
  ctx.setTransform(v*dpr,0,0,v*dpr,ox*dpr,oy*dpr);
- if(!art["run-cycle"])return;
- drawGoal();drawCrossing(crossings[level]);
- const obstacles=traps[level];for(let i=obstacles.length-1;i>=0;i--)if(obstacles[i][0]>=z)drawObstacle(...obstacles[i]);
- if(beds[level].at>=z)drawBed(beds[level]);
- drawPlayer();if(beds[level].at<z)drawBed(beds[level]);for(let i=obstacles.length-1;i>=0;i--)if(obstacles[i][0]<z)drawObstacle(...obstacles[i]);
+ if(!art["run-steady"])return;
+ floorDetails();drawGoal();drawCrossing(crossings[level]);
+ const obstacles=traps[level];for(let i=obstacles.length-1;i>=0;i--)if(obstacles[i][0]>=pose.z)drawObstacle(...obstacles[i]);
+ if(beds[level].at>=pose.z)drawBed(beds[level]);
+ drawPlayer();if(beds[level].at<pose.z)drawBed(beds[level]);for(let i=obstacles.length-1;i>=0;i--)if(obstacles[i][0]<pose.z)drawObstacle(...obstacles[i]);
  if(recovery>0){ctx.fillStyle='rgba(63,25,22,'+Math.min(.38,recovery)+')';ctx.fillRect(0,0,960,540)}
 }
 function frame(now){
- if(mode==='run'){acc+=Math.min(.08,(now-last)/1000);while(acc>=1/90&&mode==='run'){acc-=1/90;update(1/90)}}
+ if(mode==='run'){acc+=Math.min(.08,(now-last)/1000);while(acc>=1/90&&mode==='run'){acc-=1/90;capture(previousPose);update(1/90)}
+ capture(pose);const blend=clamp(acc*90,0,1);
+ for(const key of Object.keys(pose))pose[key]=previousPose[key]+(pose[key]-previousPose[key])*blend;
+ viewZ=pose.cameraZ;viewX=pose.cameraX;}
  last=now;render();requestAnimationFrame(frame);
 }
-Promise.all([...passages.map((_,i)=>'cave'+i),'ending','rock','beam','run-cycle',...Array.from({length:4},(_,i)=>'jump'+i)].map(loadImage)).then(()=>{
+Promise.all([...passages.map((_,i)=>'cave'+i),'ending','rock','beam','run-steady',...Array.from({length:4},(_,i)=>'jump'+i)].map(loadImage)).then(()=>{
  const arrived=new URLSearchParams(location.search).get('from')==='aqueduct';
  if(arrived){level=0;checkpoint=0;introSeen=completed=outroPending=false}
  reset();persist();panel(completed?'finished':'ready',completed?'Tillsammans igen':'Flöjtens eko',completed?'Navid och Laleh har kommit hem.':'Håll upp för att springa in i grottan. Styr åt sidorna och hoppa med mellanslag eller hoppknappen. Ned bromsar.',completed?'Spela om':'Fortsätt');
