@@ -51,14 +51,28 @@
   const ranking = document.getElementById('fp-ranking');
   const rankingToggle = categoryNavigation.querySelector('[data-ranking-toggle]');
   if (ranking && rankingToggle) {
-    categoryNavigation.after(ranking);
+    categoryNavigation.querySelector('.std-categories').append(ranking);
     function showRanking(show) {
       ranking.hidden = !show;
       ranking.style.display = show ? '' : 'none';
       rankingToggle.setAttribute('aria-expanded', String(show));
     }
     showRanking(false);
-    rankingToggle.addEventListener('click', () => showRanking(ranking.hidden));
+    rankingToggle.addEventListener('click', () => {
+      const opening = ranking.hidden;
+      showRanking(opening);
+      if (opening && window.matchMedia('(max-width: 1100px)').matches) {
+        // Bring the first ranked icons into view without requiring a manual scroll.
+        requestAnimationFrame(() => {
+          const firstIcon = ranking.querySelector('.ranking-icon') || ranking;
+          const bounds = firstIcon.getBoundingClientRect();
+          const viewHeight = window.visualViewport?.height || window.innerHeight;
+          if (bounds.bottom > viewHeight - 12 || bounds.top < 0) {
+            ranking.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        });
+      }
+    });
     document.addEventListener('click', event => {
       if (event.target.closest('[data-standard-category], [data-standard-game], [data-standard-pearl]')) showRanking(false);
     }, true);
