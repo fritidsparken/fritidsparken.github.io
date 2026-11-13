@@ -43,6 +43,12 @@ function playTheme() {
   if (musicEnabled && !menu.hidden && !document.hidden) theme.play().catch(musicLabel);
 }
 theme.onplay = theme.onpause = musicLabel;
+function unlockMenuMusic(event) {
+  if (event.target.closest('#musicToggle')) return;
+  playTheme();
+}
+document.addEventListener('pointerdown', unlockMenuMusic, { capture: true });
+document.addEventListener('keydown', unlockMenuMusic, { capture: true });
 $('musicToggle').onclick = () => {
   if (theme.paused) {
     musicEnabled = true;

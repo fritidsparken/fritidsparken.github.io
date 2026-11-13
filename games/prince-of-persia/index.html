@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#111d22">
-    <title>De försvunna världarna</title>
+    <title>The Lost World</title>
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
@@ -131,7 +131,7 @@
       <img id="titleStill" alt="" src="assets/images/menu/title.webp">
       <canvas id="titleMotion" hidden aria-hidden="true"></canvas>
       <article>
-        <h1 id="gameTitle">De försvunna<br> världarna</h1>
+        <h1 id="gameTitle">The Lost<br> World</h1>
         <div class="worlds" aria-label="Välj värld">
           <button class="world" id="palaceChoice" aria-pressed="true"><img src="assets/images/menu/palace.webp" alt=""><span><b>Solportens väg</b><small id="palaceState">Värld 1 · Tio banor</small></span></button>
           <button class="world" id="jungleChoice" disabled><img src="assets/images/menu/jungle.webp" alt=""><span><b>Djungelvärlden</b><small id="jungleState">Låst · Klara Solportens väg</small></span></button>
@@ -152,7 +152,7 @@
       </article>
     </section>
     <button id="touchPause" aria-label="Pausa spelet">Ⅱ</button>
-    <audio id="theme" preload="metadata" loop src="assets/audio/music/menu.mp3"></audio>
+    <audio id="theme" preload="auto" autoplay loop src="assets/audio/music/action.mp3"></audio>
     <script src="assets/manifest.js"></script>
     <script defer src="palace/rooms.js"></script>
     <script defer src="palace/simulation.js"></script>
@@ -167,7 +167,7 @@
     <script defer src="jungle/renderer.js"></script>
     <script defer src="atlas.js"></script>
     <script defer src="intro.js?v=20261113-music"></script>
-    <script defer src="menu.js"></script>
+    <script defer src="menu.js?v=lost-world-20261113"></script>
     <script defer src="controls.js"></script>
     <script defer src="main.js"></script>
     <script defer src="title-animation.js"></script>
