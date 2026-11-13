@@ -36,22 +36,47 @@
   setInterval(sync,1000);sync();
   const board=document.getElementById('fp-ranking');
   if(!board)return;
-  const list=board.querySelector('ol'), sort=board.querySelector('select'), status=board.querySelector('p');
-  let rows=[];
-  function render(){
-    list.replaceChildren();
-    rows.slice().sort((a,b)=>b[sort.value]-a[sort.value] || b.opens-a.opens).slice(0,5).forEach(row=>{
-      const li=document.createElement('li'), action=document.createElement('a');
-      const slug=row.activity_id, game=Object.keys(aliases).find(k=>aliases[k]===slug)||slug;
-      if(['four','plane','bike'].includes(game)){action.href='#catalog';action.dataset.standardGame=game;}
-      else if(slug==='ansiktsloppan')action.href='/ansiktsloppan/';
-      else if(Object.values(categories).includes(slug)||slug==='parlmonster'){action.href='#catalog';if(slug==='parlmonster')action.dataset.standardPearl='';else action.dataset.standardCategory=Object.keys(categories).find(k=>categories[k]===slug);}
-      else action.href='/games/'+slug+'/';
-      action.textContent=names[slug];li.append(action,' · '+row.opens+' öppningar · '+(row.seconds<60?row.seconds+' s':Math.round(row.seconds/60)+' min'));list.append(li);
-    });
-    status.textContent=rows.length?'Senaste 30 dagarna':'Listan fylls när aktiviteterna används.';
+  const list = board.querySelector('ol');
+  const symbols = {'mala-online':'🎨','rita-steg-for-steg':'✏️',klippdockor:'✂️',parlmonster:'🟣',julpyssel:'🎄',halloweenpyssel:'🎃'};
+  function render(rows) {
+    const items = document.createDocumentFragment();
+    rows.filter(row => Object.hasOwn(names, row.activity_id))
+      .sort((a,b) => b.opens-a.opens || b.seconds-a.seconds)
+      .slice(0,5).forEach(row => {
+        const slug = row.activity_id;
+        const gameId = Object.keys(aliases).find(id => aliases[id] === slug) || slug;
+        const game = window.FPGameHub?.games.find(entry => entry.id === gameId);
+        const item = document.createElement('li');
+        const link = document.createElement('a');
+        link.setAttribute('aria-label', names[slug]);
+        link.title = names[slug];
+        if (game && ['four','plane','bike'].includes(gameId)) {
+          link.href = '#catalog';
+          link.dataset.standardGame = gameId;
+        } else if (slug === 'ansiktsloppan') link.href = '/ansiktsloppan/';
+        else if (symbols[slug]) {
+          link.href = '#catalog';
+          if (slug === 'parlmonster') link.dataset.standardPearl = '';
+          else link.dataset.standardCategory = Object.keys(categories).find(key => categories[key] === slug);
+        } else link.href = '/games/' + slug + '/';
+        const asset = game?.image || ({ansiktsloppan:'tool_ansiktsloppa.svg','rita-steg-for-steg':'standard/drawing-step-cover.jpg'})[slug];
+        if (asset) {
+          const image = document.createElement('img');
+          image.src = '/assets/' + asset;
+          image.alt = '';
+          link.append(image);
+        } else link.textContent = symbols[slug] || '🎮';
+        item.append(link);
+        items.append(item);
+      });
+    list.replaceChildren(items);
   }
-  sort.addEventListener('change',render);
-  async function refresh(){try{const response=await fetch(endpoint,{headers});if(!response.ok)throw Error();rows=(await response.json()).filter(row=>Object.hasOwn(names,row.activity_id));render();}catch{status.textContent='Statistiken kunde inte hämtas just nu.';}}
-  refresh();setInterval(()=>{if(!document.hidden)refresh();},60000);
+  async function refresh() {
+    try {
+      const response = await fetch(endpoint,{headers});
+      if (response.ok) render(await response.json());
+    } catch { /* Keep the last available icons during a network interruption. */ }
+  }
+  refresh();
+  setInterval(() => { if (!document.hidden) refresh(); },60000);
 })();
