@@ -7,7 +7,7 @@ function mount(){
  if(document.getElementById('fp-game-menu-back'))return;
  const button=document.createElement('button');button.id='fp-game-menu-back';button.type='button';
  button.textContent='⌂ Fritidsparken';button.setAttribute('aria-label','Tillbaka till spelmenyn på Fritidsparken.se');
- Object.assign(button.style,{position:'fixed',top:'max(8px, env(safe-area-inset-top))',right:'max(8px, env(safe-area-inset-right))',zIndex:'2147483647',minHeight:'44px',padding:'10px 16px',border:'2px solid #ffffff',borderRadius:'14px',background:'#fffbed',color:'#125466',font:'bold 14px system-ui,sans-serif',boxShadow:'0 3px 12px #0003',cursor:'pointer',touchAction:'manipulation'});
+ Object.assign(button.style,{position:'fixed',top:'max(8px, env(safe-area-inset-top))',left:'max(8px, env(safe-area-inset-left))',zIndex:'2147483647',minHeight:'44px',padding:'10px 16px',border:'2px solid #ffffff',borderRadius:'14px',background:'#fffbed',color:'#125466',font:'bold 14px system-ui,sans-serif',boxShadow:'0 3px 12px #0003',cursor:'pointer',touchAction:'manipulation'});
  button.addEventListener('click',go);
  (document.fullscreenElement || document.body).appendChild(button);
 }

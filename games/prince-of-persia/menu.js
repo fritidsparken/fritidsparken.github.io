@@ -19,8 +19,7 @@ document.addEventListener('visibilitychange', () => {
 const menu = $('titleMenu'),
   theme = $('theme');
 let journey = Boolean(previous.v),
-  jungleSelected = false,
-  musicEnabled = true;
+  jungleSelected = false;
 let jungleOpen = Boolean(previous.finished);
 try {
   jungleOpen ||= localStorage.getItem('lostWorlds.jungle') === '1';
@@ -36,30 +35,16 @@ if (jungleOpen) {
   unlockJungle();
 }
 theme.volume = .45;
-function musicLabel() {
-  $('musicToggle').textContent = theme.paused ? 'Spela menymusik' : 'Stäng av musiken';
-}
 function playTheme() {
-  if (musicEnabled && !menu.hidden && !document.hidden) theme.play().catch(musicLabel);
+  if (!menu.hidden && !document.hidden) theme.play().catch(() => {});
 }
-theme.onplay = theme.onpause = musicLabel;
 theme.addEventListener('canplay', playTheme);
 window.addEventListener('pageshow', playTheme);
-function unlockMenuMusic(event) {
-  if (event.target.closest('#musicToggle')) return;
+function unlockMenuMusic() {
   playTheme();
 }
 document.addEventListener('pointerdown', unlockMenuMusic, { capture: true });
 document.addEventListener('keydown', unlockMenuMusic, { capture: true });
-$('musicToggle').onclick = () => {
-  if (theme.paused) {
-    musicEnabled = true;
-    playTheme();
-  } else {
-    musicEnabled = false;
-    theme.pause();
-  }
-};
 function refreshPalaceStages() {
   const picker = $('palaceStage');
   picker.replaceChildren();
@@ -170,11 +155,6 @@ $('jungleChoice').onclick = () => {
 $('touchPause').onclick = openMenu;
 $('menuFull').onclick = () => {
   if (document.fullscreenElement) document.exitFullscreen().catch(() => {});else document.documentElement.requestFullscreen?.().catch(() => {});
-  playTheme();
-};
-$('menuAtlas').onclick = () => {
-  $('app').inert = false;
-  $('atlas').click();
   playTheme();
 };
 $('book').addEventListener('close', () => {
