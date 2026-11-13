@@ -20,6 +20,21 @@ const passages=[
  ['Koppargruvan',155,[[21,0,0],[36,1,1],[51,-1,0],[66,0,1],[81,1,0],[98,-1,1],[113,0,0],[130,1,1],[144,-1,0]]],
  ['Flöjtens källa',168,[[24,0,1],[40,1,0],[55,-1,0],[70,0,1],[86,-1,0],[101,1,1],[116,0,0],[132,-1,1],[149,1,0]]]
 ];
+// Crossing spacing follows the jungle course, scaled to this world's forward speed.
+const crossings=passages.map((room,i)=>{
+ const start=31+i*3,step=(10+i*.55)*.85,count=6+Math.floor(i/2);
+ const pads=Array.from({length:count},(_,j)=>({at:start+step*(.82+j),lane:(j%2?-.46:.46)*(i%2?1:-1)}));
+ return {start,end:pads[count-1].at+step*.82,pads,radius:.86-i*.045,halfLength:2.15-i*.1};
+});
+const traps=passages.map((room,i)=>room[2].filter(([at])=>at<crossings[i].start-4||at>crossings[i].end+4));
+// A dark pressure bed becomes visible before its anchored spikes rise.
+const beds=passages.map((room,i)=>({at:crossings[i].start-11,lane:i%2?-.8:.8}));
+function spikeLift(bed){return clamp((z-bed.at+8)/3,0,1)}
+function supported(pit,at,lane){
+ if(at<=pit.start||at>=pit.end)return true;
+ return pit.pads.some(p=>((at-p.at)/pit.halfLength)**2+((lane-p.lane)/pit.radius)**2<=1);
+}
+function fallBack(){recovery=.58;notice=1.5;$('copy').textContent='Tillbaka vid senaste fästet';$('copy').hidden=false}
 const key='lostWorlds.cave.v1';
 let saved={};try{saved=JSON.parse(localStorage.getItem(key))||{}}catch{}
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -31,7 +46,7 @@ let stickX=0,stickY=0,wantJump=false,recovery=0,notice=0;
 const held=new Set();
 function persist(){try{localStorage.setItem(key,JSON.stringify({level,cp:checkpoint,introSeen:introSeen?'brage':false,completed,outroPending}));localStorage.setItem('lostWorlds.cave','1')}catch{}}
 function clearInput(){held.clear();stickX=stickY=0;wantJump=false}
-function reset(){z=checkpoint;x=height=vy=speed=stride=recovery=0;clearInput()}
+function reset(){const pit=crossings[level];if(checkpoint>pit.start-2&&checkpoint<pit.end+1)checkpoint=Math.max(0,pit.start-5);z=checkpoint;x=height=vy=speed=stride=recovery=0;clearInput()}
 function ui(state){
   mode=state;$('menu').hidden=!['loading','ready','pause','finished','error'].includes(state);
   $('story').hidden=state!=='story';$('hud').hidden=state!=='run';$('touch').hidden=state!=='run';
@@ -90,15 +105,20 @@ function update(dt){
  if(wantJump && height===0){vy=6.2;height=.001}wantJump=false;
  if(height>0){height=Math.max(0,height+vy*dt);vy-=15*dt;if(!height)vy=0}
  const old=z;z+=speed*dt;stride+=speed*dt*.23;
- for(const [at,lane,bar] of passages[level][2]){
+ const pit=crossings[level];
+ if(!height&&!supported(pit,z,x)){fallBack();return}
+ if(z>=pit.end+1 && checkpoint<pit.end+1){checkpoint=pit.end+1;persist()}
+ const bed=beds[level];
+ if(Math.abs(z-bed.at)<.82 && Math.abs(x-bed.lane)<.42 && height<.7){fallBack();return}
+ for(const [at,lane,bar] of traps[level]){
    if(old<=at+.9 && z>=at-.9 && Math.abs(x-lane)<(bar?.57:.49) && height<(bar?.59:1.9)){
-     recovery=.58;notice=1.5;$('copy').textContent='Tillbaka vid senaste fästet';$('copy').hidden=false;return;
+     fallBack();return;
    }
  }
  const milestone=Math.floor(z/40)*40;
- const near=passages[level][2].find(([at])=>Math.abs(at-milestone)<5);
+ const near=traps[level].find(([at])=>Math.abs(at-milestone)<5);
  const safe=near?Math.max(milestone,near[0]+4):milestone;
- if(z>=safe && safe>checkpoint && safe<=passages[level][1]-10){checkpoint=safe;persist()}
+ if((safe<pit.start-3||safe>pit.end+1) && z>=safe && safe>checkpoint && safe<=passages[level][1]-10){checkpoint=safe;persist()}
  $('distance').value=Math.min(1,z/passages[level][1]);
  if(z<passages[level][1])return;
  if(level<4){level++;checkpoint=0;reset();persist();enterRun()}
@@ -121,12 +141,35 @@ function drawObstacle(at,lane,low){
  ctx.fillStyle='rgba(13,11,14,.45)';ctx.beginPath();ctx.ellipse(xx,p.y,w*.49,7*s,0,0,Math.PI*2);ctx.fill();
  ctx.drawImage(im,xx-w/2,p.y-h,w,h);
 }
+function drawBed(bed){
+ const p=project(bed.at),cx=sidePos(bed.lane,p.scale),sz=p.scale,k=spikeLift(bed);
+ ctx.save();ctx.translate(cx,p.y);ctx.scale(sz,sz);ctx.fillStyle='#50463f';ctx.beginPath();ctx.ellipse(0,0,66,5,0,0,Math.PI*2);ctx.fill();
+ for(let i=-2;i<=2;i++){const lx=i*21;ctx.fillStyle='#c0aa85';ctx.beginPath();ctx.moveTo(lx-5,0);ctx.lineTo(lx,-(4+31*k));ctx.lineTo(lx+5,0);ctx.fill()}
+ ctx.restore();
+}
+function drawCrossing(pit){
+ const near=project(pit.start),far=project(pit.end);
+ ctx.beginPath();
+ for(const [j,p,l] of [[0,near,-1.96],[1,far,-1.96],[2,far,1.96],[3,near,1.96]])ctx[j?'lineTo':'moveTo'](sidePos(l,p.scale),p.y);
+ ctx.closePath();ctx.save();ctx.clip();
+ const shade=ctx.createLinearGradient(0,far.y,0,near.y);
+ shade.addColorStop(0,'#57463c');shade.addColorStop(.18,'#241f25');shade.addColorStop(.72,'#101117');shade.addColorStop(1,'#332d31');
+ ctx.fillStyle=shade;ctx.fillRect(0,far.y,960,near.y-far.y);
+ for(const pad of [...pit.pads].reverse()){
+  const p=project(pad.at),cx=sidePos(pad.lane,p.scale),rx=177*pit.radius*p.scale,ry=(project(pad.at-pit.halfLength).y-project(pad.at+pit.halfLength).y)/2;
+  const shaft=ctx.createLinearGradient(cx-rx,0,cx+rx,0);shaft.addColorStop(0,'#4c3930');shaft.addColorStop(.35,'#806650');shaft.addColorStop(1,'#28252a');
+  ctx.fillStyle=shaft;ctx.fillRect(cx-rx,p.y,rx*2,near.y-p.y);
+  ctx.beginPath();ctx.ellipse(cx,p.y,rx,ry,0,0,Math.PI*2);ctx.fillStyle='#ae9778';ctx.fill();
+  ctx.save();ctx.clip();const stone=art.rock;ctx.globalAlpha=.64;ctx.drawImage(stone,stone.width*.28,stone.height*.50,stone.width*.43,stone.height*.17,cx-rx,p.y-ry,rx*2,ry*2);ctx.restore();
+ }
+ ctx.restore();
+}
 function drawPlayer(){
  const p=project(z),s=p.scale,xx=sidePos(x,s),bottom=p.y-height*50*s;
  ctx.fillStyle='rgba(9,13,17,.38)';ctx.beginPath();ctx.ellipse(xx,p.y,(27-height*3)*s,6*s,0,0,Math.PI*2);ctx.fill();
- const id=height>0?'jump'+(vy>3?0:vy>0?1:vy>-3?2:3):'run'+Math.floor(stride*8)%8;
- const im=art[id],h=151*s,w=h*im.width/im.height;
- ctx.drawImage(im,xx-w/2,bottom-h,w,h);
+ const h=151*s,w=h*290/300;
+ if(height>0){const im=art['jump'+(vy>3?0:vy>0?1:vy>-3?2:3)];ctx.drawImage(im,xx-w/2,bottom-h,w,h)}
+ else{const frame=Math.floor(stride*40)%40;ctx.drawImage(art['run-cycle'],frame%8*200,Math.floor(frame/8)*210,200,210,xx-w/2,bottom-h,w,h)}
 }
 function drawGoal(){
  const p=project(passages[level][1]),xx=sidePos(0,p.scale),s=p.scale;
@@ -153,17 +196,24 @@ function render(){
  ctx.drawImage(im,dx,dy,bw,bh);
  if(outroPending||completed)return;
  ctx.setTransform(v*dpr,0,0,v*dpr,ox*dpr,oy*dpr);
- if(!art.run0)return;
- drawGoal();
- const obstacles=passages[level][2];for(let i=obstacles.length-1;i>=0;i--)if(obstacles[i][0]>=z)drawObstacle(...obstacles[i]);
- drawPlayer();for(let i=obstacles.length-1;i>=0;i--)if(obstacles[i][0]<z)drawObstacle(...obstacles[i]);
+ if(!art["run-cycle"])return;
+ drawGoal();drawCrossing(crossings[level]);
+ const obstacles=traps[level];for(let i=obstacles.length-1;i>=0;i--)if(obstacles[i][0]>=z)drawObstacle(...obstacles[i]);
+ if(beds[level].at>=z)drawBed(beds[level]);
+ drawPlayer();if(beds[level].at<z)drawBed(beds[level]);for(let i=obstacles.length-1;i>=0;i--)if(obstacles[i][0]<z)drawObstacle(...obstacles[i]);
  if(recovery>0){ctx.fillStyle='rgba(63,25,22,'+Math.min(.38,recovery)+')';ctx.fillRect(0,0,960,540)}
 }
 function frame(now){
  if(mode==='run'){acc+=Math.min(.08,(now-last)/1000);while(acc>=1/90&&mode==='run'){acc-=1/90;update(1/90)}}
  last=now;render();requestAnimationFrame(frame);
 }
-Promise.all([...passages.map((_,i)=>'cave'+i),'ending','rock','beam',...Array.from({length:8},(_,i)=>'run'+i),...Array.from({length:4},(_,i)=>'jump'+i)].map(loadImage)).then(()=>{
+Promise.all([...passages.map((_,i)=>'cave'+i),'ending','rock','beam','run-cycle',...Array.from({length:4},(_,i)=>'jump'+i)].map(loadImage)).then(()=>{
+ const arrived=new URLSearchParams(location.search).get('from')==='aqueduct';
+ if(arrived){level=0;checkpoint=0;introSeen=completed=outroPending=false}
  reset();persist();panel(completed?'finished':'ready',completed?'Tillsammans igen':'Flöjtens eko',completed?'Navid och Laleh har kommit hem.':'Håll upp för att springa in i grottan. Styr åt sidorna och hoppa med mellanslag eller hoppknappen. Ned bromsar.',completed?'Spela om':'Fortsätt');
+ if(arrived){
+   history.replaceState(null,'',location.pathname+location.hash);
+   $('go').onclick();
+ }
  requestAnimationFrame(frame);
 }).catch(()=>panel('error','Grottan kunde inte öppnas','Kontrollera anslutningen och försök igen.','Försök igen'));

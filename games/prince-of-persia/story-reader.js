@@ -34,7 +34,7 @@ function storyReader(caption, retry) {
     voice=document.getElementById(cue.speaker);
     if(!voice){say();return}
     const clip=voice;
-    const fallback=()=>{if(id!==serial||voice!==clip)return;clip.onended=null;clip.onerror=null;clip.pause();voice=null;clearInterval(timer);say()};
+    const fallback=()=>{if(id!==serial||voice!==clip)return;clip.onended=null;clip.onerror=null;clip.pause();voice=null;clearInterval(timer);if(cue.speaker==='caveVoice')fail();else say()};
     clip.onended=()=>{if(id===serial)next()};clip.onerror=fallback;
     try{
       clip.currentTime=cue.clip[0];clip.play().catch(fallback);

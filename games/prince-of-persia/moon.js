@@ -83,7 +83,7 @@ addEventListener('blur',pause);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)pause()});
 el('go').onclick=()=>{
   if(!loaded){location.reload();return}
-  if(finished){location.assign('cave.html');return}
+  if(finished){location.replace('cave.html?from=aqueduct');return}
   if(!introPlayed){startIntro();return}
   startPlay();
 };
@@ -115,20 +115,13 @@ function tick(dt) {
   if(wave!==null){wave+=160*dt;if(wave>p.x){game.fail('water');return}}
   if(warden){
     stepWarden(warden,dt);
-    if(p.dead)return;
-    // The left jamb of the arch is at 1548. Entering it also counts mid-jump.
-    if(p.x<1548)return;
-    if(warden.phase!=='defeated'){
-      const left=locks.length-warden.hits.size;
-      el('hint').textContent='Porten är låst. '+left+' av tre lås kvar. Gå till en lysande ring och locka ned krossen där.';
-      return;
-    }
+    if(warden.phase!=='defeated')return;
   }else if(p.x<game.room.exit || !p.ground)return;
   if(stage<chapters.length-1){stage++;enter();save(0)}
   else{
     finished=true;active=false;paused=true;keys.clear();jump=false;side=0;save(0);
     try{localStorage.setItem('lostWorlds.cave','1')}catch{}
-    location.assign('cave.html');
+    location.replace('cave.html?from=aqueduct');
   }
 }
 function stroke(x,y,x2,y2,color,width){
@@ -145,6 +138,7 @@ function crusher(x,bottom,w,warning){
   ctx.drawImage(images.crusher,x-w/2,top,w,height);
   if(warning){ctx.fillStyle='#ffd09b';ctx.beginPath();ctx.arc(x,bottom-height*.45,5+2*Math.sin(game.clock*18),0,Math.PI*2);ctx.fill()}
 }
+const movingWater=waterPainter();
 let lastDraw='';
 function render(){
   const w=canvas.clientWidth,h=canvas.clientHeight,d=Math.min(devicePixelRatio||1,2);
@@ -156,7 +150,8 @@ function render(){
   const left=clamp(game.p.x-view*.43,0,1672-view);
   ctx.setTransform(d*zoom,0,0,d*zoom,-left*d*zoom,(h-941*zoom)*d*.5);
   const art=images[game.room.key], t=game.clock;
-  ctx.drawImage(art,0,0,1672,941);
+  ctx.drawImage(movingWater?movingWater(stage,art,t):art,0,0,1672,941);
+  if(!movingWater)paintWaterFallback(ctx,stage,art,t);
   for(const floor of game.all)drawSpan(floor);
   for(const c of game.cubes)crusher(c.x,c.top+c.dy+c.h,c.w,c.phase==='release');
   if(warden)drawWarden(warden);
@@ -170,6 +165,16 @@ function render(){
       ctx.quadraticCurveTo(wave+12,440,wave-4,512);ctx.lineTo(wave+12,941);ctx.closePath();
       const water=ctx.createLinearGradient(0,405,0,800);water.addColorStop(0,'#bbebe9df');water.addColorStop(.16,'#398d9cda');water.addColorStop(1,'#14394eca');
       ctx.fillStyle=water;ctx.fill();
+      ctx.save();ctx.clip();
+      // Refract the underlying scene in narrow bands inside the moving front.
+      ctx.globalAlpha=.22;
+      for(let y=410;y<941;y+=9){
+        const bend=4*Math.sin(y*.046-t*3)+2*Math.sin(y*.11+t*2);
+        ctx.drawImage(art,0,y,1672,9,bend,y,1672,9);
+      }
+      ctx.globalAlpha=.8;ctx.strokeStyle='#d2f0e7';ctx.lineWidth=2;
+      ctx.beginPath();for(let x=0;x<wave;x+=5){const y=419+8*Math.sin(x*.04-t*5)+1.6*Math.sin(x*.13+t*3);ctx[x?'lineTo':'moveTo'](x,y)}
+      ctx.stroke();ctx.restore();
     }
   }
   paintTrials(game);paintPalacePlayer(game);
