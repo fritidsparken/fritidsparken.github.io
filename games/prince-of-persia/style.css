@@ -1035,3 +1035,6 @@ button,button *,#stick,#stick span {
   height: 100%;
   object-fit: cover;
 }
+
+#titleMenu .home-link { display: inline-flex; align-items: center; justify-content: center; padding: 9px 14px; border: 1px solid rgba(255,255,255,.5); border-radius: 8px; color: #fff; background: rgba(0,0,0,.55); font: inherit; text-decoration: none; }
+#titleMenu .home-link:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
