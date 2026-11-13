@@ -1,4 +1,4 @@
-import {alpstrand, vertStep, vertFlight, followBowl} from "./alpstrand/course.js";
+import {alpstrand, vertStep, vertFlight, followBowl, quarterReentry} from "./alpstrand/course.js";
 import {solkajen,bowlRadius} from './solkajen/layout.js?v=amber2';
 import { riverside, road, endRampHeight, loops, jumps, jumpHeight, loopPoint, tau } from "./riverside/layout.js?v=amber2";
 export const parks = [
@@ -698,7 +698,7 @@ export function tick(p, k, park, dt, emit) {
       }
     }
   }
-  const floor = Math.max(woodFloor||-Infinity,height(park, p.x, p.z, ceiling));
+  let floor = Math.max(woodFloor||-Infinity,height(park, p.x, p.z, ceiling));
   const rise = (floor - ground) / dt;
   if (
     !p.air &&
@@ -723,6 +723,16 @@ export function tick(p, k, park, dt, emit) {
     const previousY = p.y;
     p.vy -= 17.5 * dt;
     p.y += p.vy * dt;
+    if (park === alpstrand && p.vy <= 0 && p.y <= floor) {
+      const entry = quarterReentry(p.x, p.z);
+      if (entry) {
+        p.x = entry.x;
+        p.z = entry.z;
+        p.dir = entry.dir;
+        p.swipe = null;
+        floor = height(park, p.x, p.z);
+      }
+    }
     if (!p.transition) catchRail(p, k, park, emit, previousY);
     if (p.rail) return;
     if (p.y <= floor && p.vy <= Math.max(0, rise)) {
