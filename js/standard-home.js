@@ -8,7 +8,7 @@
   const legacyTop = document.querySelector('.topin');
   const controls = ['theme','seasonPicker','halloweenSound'].map(id => document.getElementById(id));
   const palettes = ['#dcf2d6','#ffe5c6','#fff0b6','#ffdeea','#d4efff','#d7f2df','#e9dfff','#e1e4ff','#ffdeeb','#d2f4ee'];
-  const categories = [['Topplistan','ranking','trophy'],['Skapa','Skapa','scissors'],['Pyssel','Pyssel','palette'],['Färglägga','Mandala','pencils'],['Klippdockor','Klippdockor','dolls'],['Rita steg-för-steg','Rita steg-för-steg','draw'],['Rastlekar','Rast','ball'],['Fritidsgympa','Fritidsgympa','gym'],['Spel','Spel','game'],['Roliga verktyg','Roliga verktyg','tools']];
+  const categories = [['Topplistan','ranking','trophy'],['Skapa','Skapa','scissors'],['Pyssel','Pyssel','palette'],['Färglägga','Mandala','pencils'],['Klippdockor','Klippdockor','dolls'],['How to Draw','Rita steg-för-steg','draw'],['Rastlekar','Rast','ball'],['Fritidsgympa','Fritidsgympa','gym'],['Spel','Spel','game'],['Roliga verktyg','Roliga verktyg','tools']];
   let iconId = 0, browseAll = false;
   function icon(kind) {
     const id = 'std-icon-' + (++iconId);
@@ -84,7 +84,7 @@
     const popular = [
       activityCard('Toarullefigurer','Pyssel',photo('Toarullefigurer'),'data-standard-activity="Toarullefigurer"'),
       activityCard('Pärlmönster','Pyssel',photo('Pärlmönster'),'data-standard-pearl'),
-      activityCard('Rita steg för steg','Färglägga','./assets/standard/drawing-step-cover.jpg','data-standard-category="Rita steg-för-steg"','color'),
+      activityCard('How to Draw','Färglägga','./assets/standard/drawing-step-cover.jpg','data-standard-category="Rita steg-för-steg"','color'),
       activityCard('Hinderbana','Fritidsgympa','./assets/'+obstacle.image,'data-standard-gym="'+esc(obstacle.name)+'"','move'),
       activityCard('Minifigurscen','Pyssel',photo('Minifigurscen'),'data-standard-activity="Minifigurscen"','build')
     ].join('');
@@ -102,7 +102,7 @@
     const act=activities.filter(a=>matches(a.join(' ')));
     const gym=gymGames.filter(g=>matches(g.name+' '+g.description));
     const colors=mandalas.filter(m=>(currentSeason()!=='standard'||(!['Halloween','Jul'].includes(m.type)&&!m.types?.some(t=>['Halloween','Jul'].includes(t))))&&matches(m.title+' '+m.type));
-    const drawings=drawingAnimals.filter(a=>!['spoke','pumpa','fladdermus'].includes(a.id)&&matches('Rita steg för steg '+a.name));
+    const drawings=drawingAnimals.filter(a=>!['spoke','pumpa','fladdermus'].includes(a.id)&&matches('How to Draw Rita steg för steg '+a.name));
     const dolls=paperDolls.filter(m=>!matchesHoliday(m.title+' '+m.img)&&matches('Klippdockor '+m.title));
     const tools=funTools.filter(t=>matches('Roliga verktyg '+t.name+' '+t.desc));
     const games=gameItems.filter(g=>matches(g.title+' '+g.tag));
@@ -110,7 +110,7 @@
     results.innerHTML=`<h2>${count} ${count===1?'träff':'träffar'} för ”${esc(document.getElementById('search').value)}”</h2><button type="button" data-standard-category="Alla">Rensa sökning ×</button>`;
     const activityHtml=act.filter(a=>a[1]!=='Spel').map(a=>activityCard(a[2],a[1],photo(a[2]),a[1]==='Spel'?`data-standard-game="${a[2]==='4 i rad'?'four':a[2].startsWith('Flygpilot')?'plane':'bike'}"`:a[2]==='Pärlmönster'?'data-standard-pearl':`data-standard-activity="${esc(a[2])}"`)).join('');
     const gymHtml=gym.map(g=>activityCard(g.name,'Fritidsgympa','./assets/'+g.image,`data-standard-gym="${esc(g.name)}"`)).join('');
-    const drawingHtml=drawings.map(a=>activityCard('Rita '+a.name,'Rita steg för steg','./assets/drawing-guides/'+(drawingGuideAsset[a.id]||a.id+'.png'),`data-standard-drawing="${esc(a.id)}"`)).join('');
+    const drawingHtml=drawings.map(a=>activityCard('Rita '+a.name,'How to Draw','./assets/drawing-guides/'+(drawingGuideAsset[a.id]||a.id+'.png'),`data-standard-drawing="${esc(a.id)}"`)).join('');
     document.getElementById('catalog').innerHTML=count?`<div class="std-collection-grid">${games.map(g=>activityCard(g.title,'Spel','./assets/'+g.image,`data-standard-game="${g.id}"`,'game')).join('')}${activityHtml}${gymHtml}${drawingHtml}${dolls.map(m=>activityCard(m.title,'Klippdockor',m.img,'data-standard-category="Klippdockor"')).join('')}${tools.map(t=>activityCard(t.name,'Roliga verktyg','./assets/'+t.image,`data-standard-tool="${esc(t.key)}"`)).join('')}</div>${colors.length?'<h3 class="std-search-subtitle">Färgläggningsbilder</h3><div class="std-search-color-grid">'+colors.map(coloringCard).join('')+'</div>':''}`:'<p class="empty">Inga träffar ännu. Prova exempelvis katt, pärlor eller flygpilot.</p>';
   }
   const matchesHoliday=value=>/halloween|mini-jul|jultomte|julgran/i.test(value);
@@ -147,7 +147,7 @@
     header.querySelectorAll('[data-standard-category]').forEach(b=>{const active=b.dataset.standardCategory===category;b.classList.toggle('active',active);if(b.tagName==='BUTTON')b.setAttribute('aria-current',active?'page':'false');});
     document.getElementById('standardSearch').value=document.getElementById('search').value;
     if(atHome){window.FPGameHub?.stop();document.getElementById('catalog').innerHTML='';return;}
-    results.innerHTML=`<h2>${esc(pearlPage?'Pärlmönster':category==='Mandala'?'Färglägga':category==='Fritidsgympa'?'Fritidsgympa':category==='Alla'?'Alla aktiviteter':category)}</h2><button type="button" data-standard-category="Alla">← Till startsidan</button>`;
+    results.innerHTML=`<h2>${esc(pearlPage?'Pärlmönster':category==='Mandala'?'Färglägga':category==='Rita steg-för-steg'?'How to Draw':category==='Alla'?'Alla aktiviteter':category)}</h2><button type="button" data-standard-category="Alla">← Till startsidan</button>`;
     if(category==='Alla'&&q&&!pearlPage){window.FPGameHub?.stop();renderSearch(q);return;}
     originalDraw();
   };
