@@ -184,9 +184,10 @@ function finishChase() {
   } catch {}
   fillChaseStages(jungleRecord.next);
   const last = bridge.level === 9;
+  if (last) unlockMoon();
   $('chaseTitle').textContent = last ? 'Ut ur Soltemplet' : course()[0] + ' klar';
   $('chaseResult').textContent = bridge.total + ' av ' + bridge.coins.length + ' solmynt · Personbästa ' + jungleRecord.best[bridge.level];
-  $('nextChase').textContent = last ? 'Börja från bana 1' : 'Nästa · ' + jungleCourses[bridge.level + 1][0];
+  $('nextChase').textContent = last ? 'Vidare till Månens akvedukt' : 'Nästa · ' + jungleCourses[bridge.level + 1][0];
   $('bridgeEnd').hidden = false;
   $('nextChase').focus();
 }

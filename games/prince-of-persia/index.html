@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="style.css?v=portrait-navid-20261113">
   <meta name="description" content="Spela The Lost World på Fritidsparken. Hoppa, klättra och övervinn hinder på Solportens väg och i djungeln i ett äventyrsspel.">
 <link rel="canonical" href="https://fritidsparken.se/games/prince-of-persia/">
+<style>@media(min-width:680px){#titleMenu .worlds{grid-template-columns:repeat(3,minmax(0,1fr))}} #titleMenu article{max-height:98dvh;overflow-y:auto}</style>
 </head>
   <body>
     <div id="app">
@@ -135,6 +136,7 @@
         <div class="worlds" aria-label="Välj värld">
           <button class="world" id="palaceChoice" aria-pressed="true"><img src="assets/images/menu/palace.webp" alt=""><span><b>Solportens väg</b><small id="palaceState">Värld 1 · Tio banor</small></span></button>
           <button class="world" id="jungleChoice" disabled><img src="assets/images/menu/jungle.webp" alt=""><span><b>Djungelvärlden</b><small id="jungleState">Låst · Klara Solportens väg</small></span></button>
+          <button class="world" id="moonChoice" disabled aria-pressed="false"><img src="assets/images/palace/rooms/05_akvedukten/background.webp" alt=""><span><b>Månens akvedukt</b><small id="moonState">Låst · Klara Djungelvärlden</small></span></button>
         </div>
         <label id="palacePick">Bana <select id="palaceStage"></select></label>
         <label hidden id="chasePick">Bana <select id="jungleStage"></select></label>
@@ -157,15 +159,15 @@
     <script defer src="palace/scenery.js"></script>
     <script defer src="game.js"></script>
     <script defer src="audio.js?v=20261113-music"></script>
-    <script defer src="palace/render.js"></script>
+    <script defer src="palace/render.js?v=moon1"></script>
     <script defer src="jungle/courses.js"></script>
-    <script defer src="jungle/chase.js"></script>
+    <script defer src="jungle/chase.js?v=moon1"></script>
     <script defer src="jungle/avatar.js"></script>
     <script defer src="jungle/terrain.js"></script>
     <script defer src="jungle/renderer.js"></script>
     <script defer src="atlas.js"></script>
     <script defer src="intro.js?v=20261113-music"></script>
-    <script defer src="menu.js?v=menu-clean-20261113"></script>
+    <script defer src="menu.js?v=moon-world-1"></script>
     <script defer src="controls.js?v=joystick-20261113"></script>
     <script defer src="main.js"></script>
     <script defer src="title-animation.js"></script>

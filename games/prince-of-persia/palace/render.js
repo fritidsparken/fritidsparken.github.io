@@ -794,6 +794,44 @@ function draw() {
   paintExitLight(g);
   paintTrials(g);
   paintTreasures(g);
+  paintPalacePlayer(g);
+  drawPickupFeedback();
+  if (fade > 0) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(12,21,29,' + .78 * fade / .38 + ')';
+    ctx.fillRect(0, 0, 1672, 941);
+    ctx.restore();
+  }
+}
+function frame(t) {
+  const dt = Math.min(.06, Math.max(0, (t - last) / 1000));
+  last = t;
+  if (bridge.active || !opening.hidden || !menu.hidden && !atlasOpen) {
+    requestAnimationFrame(frame);
+    return;
+  }
+  if (!paused && !atlasOpen && !route.done) {
+    fade = Math.max(0, fade - dt);
+    if (t >= (route.game.nextMix || 0)) {
+      route.game.nextMix = t + 90;
+      environmentalMix(route.game);
+    }
+    acc += dt;
+    while (acc >= 1 / 120) {
+      route.step(1 / 120, input());
+      acc -= 1 / 120;
+    }
+  } else acc = 0;
+  displayRoom(t, dt);
+  if (!atlasOpen) {
+    followPlayer();
+    draw();
+  }
+  requestAnimationFrame(frame);
+}
+
+function paintPalacePlayer(g) {
+  const p = g.p, r = g.room, scale = g.scale;
   const floors = g.all;
   const support = floors.filter(f => inSpan(f, p.x) && H(f, p.x) >= p.y - .5).sort((a, b) => H(a, p.x) - H(b, p.x))[0];
   if (support && !p.pitfall && p.mode !== 'hang' && p.mode !== 'mantle') {
@@ -839,37 +877,4 @@ function draw() {
     ctx.globalAlpha = opacity;
   }
   ctx.restore();
-  drawPickupFeedback();
-  if (fade > 0) {
-    ctx.save();
-    ctx.fillStyle = 'rgba(12,21,29,' + .78 * fade / .38 + ')';
-    ctx.fillRect(0, 0, 1672, 941);
-    ctx.restore();
-  }
-}
-function frame(t) {
-  const dt = Math.min(.06, Math.max(0, (t - last) / 1000));
-  last = t;
-  if (bridge.active || !opening.hidden || !menu.hidden && !atlasOpen) {
-    requestAnimationFrame(frame);
-    return;
-  }
-  if (!paused && !atlasOpen && !route.done) {
-    fade = Math.max(0, fade - dt);
-    if (t >= (route.game.nextMix || 0)) {
-      route.game.nextMix = t + 90;
-      environmentalMix(route.game);
-    }
-    acc += dt;
-    while (acc >= 1 / 120) {
-      route.step(1 / 120, input());
-      acc -= 1 / 120;
-    }
-  } else acc = 0;
-  displayRoom(t, dt);
-  if (!atlasOpen) {
-    followPlayer();
-    draw();
-  }
-  requestAnimationFrame(frame);
 }
