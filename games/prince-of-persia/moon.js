@@ -75,7 +75,7 @@ addEventListener('blur',pause);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)pause()});
 el('go').onclick=()=>{
   if(!loaded){location.reload();return}
-  if(finished){stage=0;finished=false;introPlayed=false;enter();save(0)}
+  if(finished){location.assign('cave.html');return}
   if(!introPlayed){startIntro();return}
   startPlay();
 };
@@ -108,7 +108,11 @@ function tick(dt) {
   if(warden){stepWarden(warden,dt);if(p.dead||warden.phase!=='defeated')return}
   if(p.x<game.room.exit || !p.ground)return;
   if(stage<chapters.length-1){stage++;enter();save(0)}
-  else{finished=true;save(0);stop('Månporten är öppen','Laleh tar Navids hand. Tillsammans spelar de melodin som för vattnet tillbaka till djungeln.','Spela igen')}
+  else{
+    finished=true;active=false;paused=true;keys.clear();jump=false;side=0;save(0);
+    try{localStorage.setItem('lostWorlds.cave','1')}catch{}
+    location.assign('cave.html');
+  }
 }
 function stroke(x,y,x2,y2,color,width){
   ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x2,y2);ctx.stroke();
@@ -158,15 +162,15 @@ function render(){
   }
 }
 function animate(now){
-  updateIntro(Math.min(.1,(now-last)/1000));
+
   if(active){acc+=Math.min(.06,(now-last)/1000);while(active && acc>=1/120){acc-=1/120;tick(1/120)}}
-  last=now;if(introIndex<0)render();requestAnimationFrame(animate);
+  last=now;if(!moonReader.playing)render();requestAnimationFrame(animate);
 }
 loadSoundEffects();
 Promise.all([...chapters.map(r=>r.key),'span','crusher','warden','idle','climb','run','jumpSoft','jumpStride','jumpTuck'].map(async id=>{
   const image=new Image();image.src=PALACE_ART[id] || "moon-art/"+id+".webp";await image.decode();images[id]=image;
 })).then(()=>{
   loaded=true;finished=Boolean(saved.finished);introPlayed=Boolean(saved.introPlayed);enter(saved.cp);
-  stop(finished?'Månporten är öppen':'Månens akvedukt',finished?'Du har klarat värld III.':'Led vattnet genom palatset. Styr med pilarna och hoppa med mellanslag eller hoppknappen.',finished?'Spela igen':'Spela');
+  stop(finished?'Månporten är öppen':'Månens akvedukt',finished?'Du har klarat värld III.':'Led vattnet genom palatset. Styr med pilarna och hoppa med mellanslag eller hoppknappen.',finished?'Till värld 4':'Spela');
   el('go').disabled=false;requestAnimationFrame(animate);
 }).catch(()=>{stop('Palatset kunde inte öppnas','Kontrollera anslutningen och försök igen.','Försök igen');el('go').disabled=false});

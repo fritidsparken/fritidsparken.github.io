@@ -71,6 +71,10 @@ function unlockMoon() {
   try { localStorage.setItem('lostWorlds.moon','1'); } catch {}
 }
 function refreshMenu() {
+  let caveOpen=false;
+  try {caveOpen=localStorage.getItem('lostWorlds.cave')==='1'||!!JSON.parse(localStorage.getItem('lostWorlds.moon.v2'))?.finished} catch {}
+  $('caveChoice').disabled=!caveOpen;
+  $('caveState').textContent=caveOpen?'Värld 4 · Fem grottor':'Låst · Klara Månens akvedukt';
   $('moonChoice').disabled = !moonOpen;
   $('moonState').textContent = moonOpen ? 'Värld 3 · Tio banor' : 'Låst · Klara Djungelvärlden';
   $('moonChoice').setAttribute('aria-pressed', String(moonSelected));
@@ -153,6 +157,7 @@ $('resetWorld').onclick = () => {
   }
 };
 $('palaceStage').onchange = refreshMenu;
+$('caveChoice').onclick = () => location.assign('cave.html');
 $('moonChoice').onclick = () => { moonSelected = true; jungleSelected = false; refreshMenu(); };
 $('palaceChoice').onclick = () => {
   moonSelected = false;

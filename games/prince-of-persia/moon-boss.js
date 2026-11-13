@@ -36,7 +36,13 @@ function drawWarden(b){
     ctx.strokeStyle=b.hits.has(x)?'#526a69':'#ffdf8a';ctx.lineWidth=6;
     ctx.beginPath();ctx.arc(0,0,42,0,Math.PI*2);ctx.stroke();ctx.restore();
   }
-  if(defeated)return;
+  if(defeated){
+    const glow=ctx.createRadialGradient(1594,564,8,1594,564,136);
+    glow.addColorStop(0,'#fff1bcd9');glow.addColorStop(1,'#efbb5900');
+    ctx.fillStyle=glow;ctx.fillRect(1458,428,272,272);
+    ctx.beginPath();ctx.moveTo(1548,654);ctx.lineTo(1548,543);ctx.quadraticCurveTo(1592,457,1636,543);ctx.lineTo(1636,654);
+    ctx.lineWidth=8;ctx.strokeStyle='#ffdda0';ctx.stroke();return;
+  }
   const amount=b.phase==='impact'?1:b.phase==='drop'?Math.pow(b.clock/.40,2):b.phase==='rise'?Math.max(0,1-b.clock/.95):0;
   const bottom=196+clamp(amount,0,1)*(arenaY-196);
   crusher(b.x,bottom,114,b.phase==='warning');
