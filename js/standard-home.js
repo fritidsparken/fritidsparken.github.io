@@ -8,11 +8,12 @@
   const legacyTop = document.querySelector('.topin');
   const controls = ['theme','seasonPicker','halloweenSound'].map(id => document.getElementById(id));
   const palettes = ['#dcf2d6','#ffe5c6','#fff0b6','#ffdeea','#d4efff','#d7f2df','#e9dfff','#e1e4ff','#ffdeeb','#d2f4ee'];
-  const categories = [['Alla','Alla','bulb'],['Skapa','Skapa','scissors'],['Pyssel','Pyssel','palette'],['Färglägga','Mandala','pencils'],['Klippdockor','Klippdockor','dolls'],['Rita steg-för-steg','Rita steg-för-steg','draw'],['Rastlekar','Rast','ball'],['Fritidsgympa','Fritidsgympa','gym'],['Spel','Spel','game'],['Roliga verktyg','Roliga verktyg','tools']];
+  const categories = [['Topplistan','ranking','trophy'],['Skapa','Skapa','scissors'],['Pyssel','Pyssel','palette'],['Färglägga','Mandala','pencils'],['Klippdockor','Klippdockor','dolls'],['Rita steg-för-steg','Rita steg-för-steg','draw'],['Rastlekar','Rast','ball'],['Fritidsgympa','Fritidsgympa','gym'],['Spel','Spel','game'],['Roliga verktyg','Roliga verktyg','tools']];
   let iconId = 0, browseAll = false;
   function icon(kind) {
     const id = 'std-icon-' + (++iconId);
     const shapes = {
+      trophy:'<path d="M26 21H12v9c0 15 10 23 25 23m37-32h14v9c0 15-10 23-25 23" fill="none" stroke="#d98918" stroke-width="7"/><path d="M25 15h50v16c0 18-10 30-21 33v10h12v8H34v-8h12V64C33 60 25 47 25 31Z" fill="#efb329"/><path d="m50 24 4 9 10 1-8 7 2 10-8-5-9 5 2-10-7-7 10-1Z" fill="#fff5bd"/>',
       gift:'<rect x="16" y="40" width="68" height="43" rx="6" fill="#c93f3f"/><rect x="12" y="31" width="76" height="14" rx="5" fill="#e7514a"/><path d="M47 31v52h9V31Z" fill="#f6d363"/><path d="M50 30C17 29 31 8 41 15q9 5 9 15Zm0 0C83 29 69 8 59 15q-9 5-9 15Z" fill="none" stroke="#f6d363" stroke-width="6"/>',
       pumpkin:'<path d="M48 26c-4-10 0-17 7-20" fill="none" stroke="#528341" stroke-width="6" stroke-linecap="round"/><ellipse cx="50" cy="57" rx="35" ry="27" fill="#f19b32"/><path d="M50 30c-13 7-13 48 0 54m0-54c13 7 13 48 0 54" fill="none" stroke="#c96c22" stroke-width="3"/><path d="m31 52 7-8 6 8Zm25 0 7-8 6 8ZM32 63q18 17 36 0" fill="#58371f"/>',
       draw:'<rect x="17" y="14" width="60" height="72" rx="7" fill="#fff9e8"/><path d="M29 65q7-22 17-12t20-18" fill="none" stroke="#6db37a" stroke-width="5" stroke-linecap="round"/><path d="m35 65 32-39 8 7-32 39-12 4Z" fill="#edae3f"/><path d="m67 26 5-6 8 7-5 6" fill="#e87978"/>',
@@ -43,10 +44,25 @@
   const home = document.createElement('div');
   home.id = 'standardHome';home.className = 'standard-only';
   document.querySelector('.hero').after(home);
-  const categoryPanel = () => `<section class="std-categories" aria-label="Utforska kategorier">${categories.map(([label,cat,symbol],i)=>`<button type="button" data-standard-category="${cat}" ${cat==='Alla'?'data-standard-browse-all':''} style="--tile:${palettes[i]}">${icon(symbol)}<span>${label}</span></button>`).join('')}</section>`;
+  const categoryPanel = () => `<section class="std-categories" aria-label="Utforska kategorier">${categories.map(([label,cat,symbol],i)=>`<button type="button" ${cat==='ranking'?'data-ranking-toggle aria-controls="fp-ranking" aria-expanded="false"':`data-standard-category="${cat}"`} style="--tile:${palettes[i]}">${icon(symbol)}<span>${label}</span></button>`).join('')}</section>`;
   const categoryNavigation = document.createElement('div');
   categoryNavigation.innerHTML = categoryPanel();
   home.before(categoryNavigation);
+  const ranking = document.getElementById('fp-ranking');
+  const rankingToggle = categoryNavigation.querySelector('[data-ranking-toggle]');
+  if (ranking && rankingToggle) {
+    categoryNavigation.after(ranking);
+    function showRanking(show) {
+      ranking.hidden = !show;
+      ranking.style.display = show ? '' : 'none';
+      rankingToggle.setAttribute('aria-expanded', String(show));
+    }
+    showRanking(false);
+    rankingToggle.addEventListener('click', () => showRanking(ranking.hidden));
+    document.addEventListener('click', event => {
+      if (event.target.closest('[data-standard-category], [data-standard-game], [data-standard-pearl]')) showRanking(false);
+    }, true);
+  }
   const searchPanel = document.createElement('form');
   searchPanel.className = 'std-search-panel standard-only';
   searchPanel.setAttribute('role', 'search');
