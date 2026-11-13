@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="sv">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="theme-color" content="#111d22">
+    <title>De försvunna världarna</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div id="app">
+      <header>
+        <div class="brand">
+          <span class="seal" aria-hidden="true">☼</span>
+          <div>
+            <div class="eyebrow">Den förlorade prinsen · Bana I</div>
+            <h1>Solportens väg</h1>
+          </div>
+        </div>
+        <div class="headtools">
+          <span class="tag">Version 25 · Solväktarens väg</span>
+          <button id="atlas" disabled data-load>Bildatlas · 10</button>
+          <button id="full">Helskärm</button>
+        </div>
+      </header>
+      <div class="hud">
+        <div class="hudleft">
+          <span id="counter" class="count">01 / 10</span>
+          <h2 id="roomName">Palatspassagen</h2>
+        </div>
+        <strong id="loot"></strong>
+        <p id="hint">Ta den brutna bron och häv dig upp till terrassen.</p>
+      </div>
+      <div id="progress" aria-hidden="true"></div>
+      <main class="stage">
+        <div id="worldLens">
+          <canvas id="scene" tabindex="0" width="1672" height="941" aria-label="Spelplan för Solportens väg"></canvas>
+        </div>
+        <div class="overlay" id="loading">
+          <span id="loadingText">Öppnar palatset…</span>
+        </div>
+        <div class="overlay" id="end" hidden>
+          <div class="endcard">
+            <span class="eyebrow">Den förlorade prinsen</span>
+            <h2>Solväktarens sigill är ditt</h2>
+            <p id="endStats"></p>
+            <button id="worldMenu">Välj värld</button>
+            <button id="explore">Utforska vidare</button>
+            <button class="gold" id="again">Spela banan igen</button>
+          </div>
+        </div>
+      </main>
+      <div class="actions">
+        <div class="group">
+          <div id="stick" role="group" aria-label="Joystick för att gå åt vänster eller höger">
+            <span></span>
+          </div>
+          <button data-key="left" class="move" aria-label="Gå vänster">←</button>
+          <button data-key="right" class="move" aria-label="Gå höger">→</button>
+          <div class="jumpPair">
+            <button data-key="jump" class="move gold">Hoppa</button>
+            <button data-key="double" class="move" aria-label="Dubbelhopp">Dubbelhopp</button>
+          </div>
+        </div>
+        <div class="group">
+          <button id="pause" disabled data-load>Pausa</button>
+          <button id="retry" disabled data-load>Senaste fäste</button>
+          <button id="demo" disabled data-load>Visa vägen</button>
+          <button id="new" disabled data-load>Börja om</button>
+        </div>
+      </div>
+      <div class="foot">
+        <p id="status" role="status">Banan laddas.</p>
+        <span class="quiet">A/D eller ←/→ för rörelse · Mellanslag eller hoppknappen · Tryck två gånger snabbt för dubbel hopphöjd · Fall: <b id="falls">0</b></span>
+      </div>
+      <dialog id="book">
+        <div class="bookhead">
+          <div>
+            <div class="eyebrow">Palatsets bildatlas</div>
+            <h2>Tio levande miljöer</h2>
+          </div>
+          <button id="closeBook">Tillbaka till banan ×</button>
+        </div>
+        <div class="artframe">
+          <div id="art"></div>
+        </div>
+        <div class="artnav">
+          <div>
+            <span id="artNo" class="eyebrow"></span>
+            <h2 id="artName"></h2>
+            <p id="artDesc"></p>
+          </div>
+          <div class="group">
+            <button id="prevArt" aria-label="Föregående bild">←</button>
+            <button id="nextArt" aria-label="Nästa bild">→</button>
+            <button id="saveArt">Hämta originalbild (PNG)</button>
+            <button id="saveAll">Hämta alla 10 (ZIP)</button>
+          </div>
+        </div>
+        <div id="thumbs" aria-label="Välj referensbild"></div>
+      </dialog>
+    </div>
+    <section id="opening" aria-label="Prinsens berättelse" hidden>
+      <p id="storyLine" aria-live="polite"></p>
+      <button id="skipIntro">Hoppa över</button>
+    </section>
+    <!-- Footsteps by Erdie, https://freesound.org/people/Erdie/sounds/41579/ , licensed under CC BY 3.0 https://creativecommons.org/licenses/by/3.0/ . Minetest Game hard footstep variants, resampled, trimmed and normalized. -->
+    <section id="bridgeView" hidden aria-label="Djungelvärlden">
+      <canvas id="terrain3D" aria-hidden="true"></canvas>
+      <canvas id="bridgeCanvas" tabindex="-1" aria-label="Navid springer mot kameran. Håll pil ner för att springa mot kameran. Styr åt sidorna med vänster och höger pil. Tryck mellanslag för framåtvolt och en gång till i luften för dubbelhopp."></canvas>
+      <div id="bridgeHud">
+        <small></small>
+        <span><i aria-hidden="true">☀</i> <b></b></span>
+      </div>
+      <p id="bridgeNote"></p>
+      <button id="bridgePause" aria-label="Pausa">Ⅱ</button>
+      <button id="bridgeStick" aria-label="Styr i sidled"><span></span></button>
+      <button id="bridgeJump">Hoppa</button>
+      <button id="bridgeDouble" aria-label="Dubbelhopp">Dubbelhopp</button>
+      <section id="bridgeEnd" hidden>
+        <h2 id="chaseTitle"></h2>
+        <p id="chaseResult"></p>
+        <div>
+          <button id="nextChase" class="gold"></button>
+          <button id="replayBridge">Spela om</button>
+          <button id="bridgeBack">Till menyn</button>
+        </div>
+      </section>
+    </section>
+    <section id="titleMenu" aria-labelledby="gameTitle">
+      <img id="titleStill" alt="" src="assets/images/menu/title.webp">
+      <canvas id="titleMotion" hidden aria-hidden="true"></canvas>
+      <article>
+        <h1 id="gameTitle">De försvunna<br> världarna</h1>
+        <div class="worlds" aria-label="Välj värld">
+          <button class="world" id="palaceChoice" aria-pressed="true"><img src="assets/images/menu/palace.webp" alt=""><span><b>Solportens väg</b><small id="palaceState">Värld 1 · Tio banor</small></span></button>
+          <button class="world" id="jungleChoice" disabled><img src="assets/images/menu/jungle.webp" alt=""><span><b>Djungelvärlden</b><small id="jungleState">Låst · Klara Solportens väg</small></span></button>
+        </div>
+        <label id="palacePick">Bana <select id="palaceStage"></select></label>
+        <label hidden id="chasePick">Bana <select id="jungleStage"></select></label>
+        <footer>
+          <button class="gold" id="playWorld" disabled data-load>Starta spelet</button>
+          <button id="resetWorld" hidden>Nytt spel</button>
+        </footer>
+        <div class="tools">
+          <button id="musicToggle">Spela menymusik</button>
+          <button id="bridgePreview" disabled data-load>Provspela djungeln</button>
+          <button id="menuAtlas" disabled data-load>Bildatlas</button>
+          <button id="menuFull">Helskärm</button>
+        </div>
+        <p id="keys">← → för att gå · Mellanslag för att hoppa · Esc för menyn · ↓ Starta djungeljakten</p>
+      </article>
+    </section>
+    <button id="touchPause" aria-label="Pausa spelet">Ⅱ</button>
+    <audio id="theme" preload="metadata" loop src="assets/audio/music/menu.mp3"></audio>
+    <script src="assets/manifest.js"></script>
+    <script defer src="palace/rooms.js"></script>
+    <script defer src="palace/simulation.js"></script>
+    <script defer src="palace/scenery.js"></script>
+    <script defer src="game.js"></script>
+    <script defer src="audio.js"></script>
+    <script defer src="palace/render.js"></script>
+    <script defer src="jungle/courses.js"></script>
+    <script defer src="jungle/chase.js"></script>
+    <script defer src="jungle/avatar.js"></script>
+    <script defer src="jungle/terrain.js"></script>
+    <script defer src="jungle/renderer.js"></script>
+    <script defer src="atlas.js"></script>
+    <script defer src="intro.js"></script>
+    <script defer src="menu.js"></script>
+    <script defer src="controls.js"></script>
+    <script defer src="main.js"></script>
+    <script defer src="title-animation.js"></script>
+  </body>
+</html>
