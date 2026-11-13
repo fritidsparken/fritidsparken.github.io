@@ -53,7 +53,15 @@ function enter(cp=0) {
   game = new MoonChamber(room,Number.isInteger(cp) ? cp : 0,(event,value) => {
     actionSound(event,value);
     if (event === 'checkpoint') save(value);
-    if (event === 'respawn') {wave=null;if(warden)warden=newWarden();el('hint').textContent=room.hint}
+    if (event === 'respawn') {
+      wave=null;
+      if(warden){
+        const hits=warden.hits;
+        warden=newWarden();warden.hits=hits;
+        if(hits.size===locks.length)warden.phase='defeated';
+      }
+      el('hint').textContent=warden?.phase==='defeated'?'Porten är öppen. Spring till höger!':room.hint;
+    }
   });
   // Raised service spans are one-way platforms, so Navid can also run beneath them.
   game.lips=game.lips.filter(lip=>lip.to<game.floors.length);
@@ -105,8 +113,17 @@ function tick(dt) {
     wave=Math.max(24,p.x-360);el('hint').textContent='Slussen är öppen! Håll dig före flodvågen.';
   }
   if(wave!==null){wave+=160*dt;if(wave>p.x){game.fail('water');return}}
-  if(warden){stepWarden(warden,dt);if(p.dead||warden.phase!=='defeated')return}
-  if(p.x<game.room.exit || !p.ground)return;
+  if(warden){
+    stepWarden(warden,dt);
+    if(p.dead)return;
+    // The left jamb of the arch is at 1548. Entering it also counts mid-jump.
+    if(p.x<1548)return;
+    if(warden.phase!=='defeated'){
+      const left=locks.length-warden.hits.size;
+      el('hint').textContent='Porten är låst. '+left+' av tre lås kvar. Gå till en lysande ring och locka ned krossen där.';
+      return;
+    }
+  }else if(p.x<game.room.exit || !p.ground)return;
   if(stage<chapters.length-1){stage++;enter();save(0)}
   else{
     finished=true;active=false;paused=true;keys.clear();jump=false;side=0;save(0);
