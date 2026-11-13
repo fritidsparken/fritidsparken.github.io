@@ -1,6 +1,6 @@
 // Renderer and physics share the triangles and rail splines exported from Blender.
 export const alpstrand = {
-  name: 'Sjövikens skatepark',
+  name: 'Vertigo Bay',
   area: 'ALPSJÖN',
   desc: 'Carva i den stora bowlen och ta sats mot verttornet vid sjön.',
   sky: 0xb9e2ff,
