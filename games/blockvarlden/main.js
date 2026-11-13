@@ -8,7 +8,7 @@ import {move,occupied,target,eye} from './engine/player.js';
 import {blueprint} from './engine/blueprint.js';
 import {createFixtureInteractions,stepHeight} from './engine/fixtures.js?v=expedition1';
 import {bindFullscreen} from './engine/display.js?v=2';
-import {controls} from './engine/controls.js?v=kompis3';
+import {controls} from './engine/controls.js?v=remove1';
 import {createCompanions} from './ui/companions.js?v=kompis3';
 import {adaptiveGraphics} from './rendering/quality.js';
 import {createSky} from './rendering/sky.js';
@@ -70,7 +70,7 @@ function updateDrops(dt){
 }
 function configure(){document.body.classList.add('screen-stick');try{localStorage.setItem('blockvarlden-options-v2',JSON.stringify(settings))}catch{}for(const k of ['music','effects','ambience'])audio.volume(k,settings[k]);if(renderer){graphics.set(settings.quality);camera.fov=settings.fov;resize()}}
 function resize(){if(!renderer)return;renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()}
-function suspend(){suspended=true;input?.clear();document.exitPointerLock?.();audio.pause()}
+function suspend(){removeTarget=null;suspended=true;input?.clear();document.exitPointerLock?.();audio.pause()}
 function checkpoint(){if(meta)save().catch(()=>toast('Kunde inte spara. Kontrollera ledigt utrymme.'))}
 function resume(){if(!meta)return;suspended=false;graphics.resetSamples();audio.start();checkpoint()}
 async function refreshHome(){const worlds=await db.list();$('continue').disabled=!worlds.length}
@@ -95,7 +95,7 @@ async function home(){suspend();await save();roomSession?.close();roomSession=nu
 function setupRenderer(){if(renderer)return;try{renderer=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'})}catch{throw Error('WebGL kunde inte starta. Aktivera grafikacceleration i webbläsaren och öppna spelet igen.')};graphics=adaptiveGraphics(renderer);document.body.prepend(renderer.domElement);scene=new T.Scene();camera=new T.PerspectiveCamera(settings.fov,1,.045,240);camera.rotation.order='YXZ';scene.add(camera);companions=createCompanions(T,$('hud'));sky=createSky(scene);ray=new T.Raycaster();highlight=new T.LineSegments(new T.EdgesGeometry(new T.BoxGeometry(1.012,1.012,1.012)),new T.LineBasicMaterial({color:0xffe6a1}));highlight.visible=false;scene.add(highlight);
  flashlightLight=new T.SpotLight(0xfff1cd,35,24,Math.PI/6,.4,1.5);flashlightTarget=new T.Object3D();scene.add(flashlightLight,flashlightTarget);flashlightLight.target=flashlightTarget;flashlightLight.visible=false;
  glints=new T.Points(new T.BufferGeometry(),new T.PointsMaterial({size:.09,color:0xe2b880}));glints.visible=false;scene.add(glints);
- input=controls(renderer.domElement,{active,pack:()=>ui.pack(),pause:()=>ui.pause(),camera:()=>{player.third=!player.third},fly:()=>{if(meta.mode==='creative')player.fly=!player.fly},slot,cycle:step=>slot((selected+step+9)%9),pickBlock:()=>{findHit();if(!hit)return;const id=hit.kind==='prop'?hit.obj.userData.record.id:hit.id;if(!lookup[id]||(meta.mode==='survival'&&!meta.bag[id]))return;const i=meta.slots.indexOf(id);if(i>=0)slot(i);else{meta.slots[selected]=id;slot(selected)}},drop:dropItem,turn:(x,y)=>{player.yaw-=x*.0029*settings.sense;player.pitch=Math.max(-1.48,Math.min(1.48,player.pitch-y*.0029*settings.sense))},mine:on=>{mineHeld=on;if(on){findHit();mining(0)}else{mineKey='';mineTime=0}},build:use});
+ input=controls(renderer.domElement,{active,pack:()=>ui.pack(),pause:()=>ui.pause(),camera:()=>{player.third=!player.third},fly:()=>{if(meta.mode==='creative')player.fly=!player.fly},slot,cycle:step=>slot((selected+step+9)%9),pickBlock:()=>{findHit();if(!hit)return;const id=hit.kind==='prop'?hit.obj.userData.record.id:hit.id;if(!lookup[id]||(meta.mode==='survival'&&!meta.bag[id]))return;const i=meta.slots.indexOf(id);if(i>=0)slot(i);else{meta.slots[selected]=id;slot(selected)}},drop:dropItem,turn:(x,y)=>{player.yaw-=x*.0029*settings.sense;player.pitch=Math.max(-1.48,Math.min(1.48,player.pitch-y*.0029*settings.sense))},remove:removeAimedTarget,mine:on=>{if(on)removeTarget=null;mineHeld=on;if(on){findHit();mining(0)}else if(removeTarget===null){mineKey='';mineTime=0}},build:use});
  configure();requestAnimationFrame(frame)}
 function spawn(seedWorld){for(let r=0;r<=150;r+=6)for(const [x,z] of [[r,0],[-r,0],[0,r],[0,-r],[r,r]]){const h=seedWorld.info(x,z).height;if(h>21&&h<43)return [x+.5,h+1.02,z+.5]}return [.5,seedWorld.info(0,0).height+1.1,.5]}
 async function start(m,edits){if(homeBusy)return;homeBusy=true;try{await ready;setupRenderer();if(meta){await save();cleanup()}meta=m;meta.bag??={};if(!meta.mapGranted){meta.bag.map=Math.max(1,meta.bag.map||0);meta.mapGranted=true}if(!meta.flashlightGranted){meta.bag.flashlight=Math.max(1,meta.bag.flashlight||0);meta.flashlightGranted=true}flashlightOn=false;lampChecks.clear();for(const [x,y,z,id] of edits||[])if(lampBlock(id))lampChecks.set([x,y,z].join(','),[x,y,z]);meta.props??=[];meta.wear??={};removed=new Set(m.removed||[]);pending=new Map();selected=0;world=new World(scene,reg,atlas,m,edits);clip=blueprint(world,edit,([x,y,z])=>!(Math.abs(player.p.x-x-.5)<.79&&Math.abs(player.p.z-z-.5)<.79&&player.p.y<y+1&&player.p.y+1.75>y));const pos=m.position||spawn(world);player={p:new T.Vector3(...pos),yaw:m.yaw||0,pitch:m.pitch??-.18,fly:m.mode==='creative'&&m.fly===true,third:false,v:0};root=new T.Group();scene.add(root);
@@ -121,7 +121,27 @@ function findHit(){if(!world||!player)return;const o=player.p.clone();o.y+=fixtu
 }
 function effects(pos,color){const arr=new Float32Array(18*3);for(let i=0;i<arr.length;i+=3){arr[i]=(Math.random()-.5)*.8;arr[i+1]=Math.random()*.7;arr[i+2]=(Math.random()-.5)*.8}glints.geometry.dispose();glints.geometry=new T.BufferGeometry();glints.geometry.setAttribute('position',new T.BufferAttribute(arr,3));glints.position.copy(pos);glints.material.color.set(color||'#baa882');glints.visible=true;glints.userData.until=elapsed+.3}
 function animateAct(a){actionName=a;actionTime=elapsed+.44}
-function mining(dt){if(!active()||!hit||!mineHeld)return;const id=meta.slots[selected],tool=durability[id]&&meta.bag[id]>0?id:null;if(roomSession&&!['block','plant'].includes(hit.kind))return;if(hit.key!==mineKey){mineTime=0;mineKey=hit.key;audio.effect('dig',defs[hit.id]?.sound)}
+let removeTarget = null;
+
+function removeAimedTarget() {
+ if (!active()) return;
+ findHit();
+ if (hit?.kind !== 'block' && hit?.kind !== 'prop') {
+   toast('Sikta på ett block eller föremål');
+   return;
+ }
+ if (roomSession && hit.kind === 'prop') {
+   toast('I ett delat rum kan du ta bort block');
+   return;
+ }
+ removeTarget = hit.key;
+ mining(0);
+}
+
+function mining(dt){
+ if (removeTarget !== null && hit?.key !== removeTarget) removeTarget = null;
+ if (!active() || !hit || (!mineHeld && removeTarget === null)) return;
+ const id=meta.slots[selected],tool=durability[id]&&meta.bag[id]>0?id:null;if(roomSession&&!['block','plant'].includes(hit.kind))return;if(hit.key!==mineKey){mineTime=0;mineKey=hit.key;audio.effect('dig',defs[hit.id]?.sound)}
  if(hit.kind==='animal'){
    const result=actors.attack(hit.key);if(!result)return;
    animateAct('use');audio.effect('dig');toast(result.message);
@@ -129,8 +149,9 @@ function mining(dt){if(!active()||!hit||!mineHeld)return;const id=meta.slots[sel
    return;
  }
  const hard=hit.kind==='block'?defs[hit.id].hardness:1,softPlant=hit.kind==='plant'?['flowers','shrub','reeds','roots','mushroom'].includes(hit.id):hit.kind==='prop'?['flowers','shrub','reeds','roots','mushroom'].includes(hit.obj.userData.record.id):defs[hit.id]?.category==='Vegetation',
- delay=softPlant?0:meta.mode==='creative'?.38:Math.min(2.4,.63+hard*.24)/(tool?1.6:1);
+ delay=softPlant||(removeTarget!==null&&meta.mode==='creative')?0:meta.mode==='creative'?.38:Math.min(2.4,.63+hard*.24)/(tool?1.6:1);
  if(!softPlant&&performance.now()-lastBreak<280)return;mineTime+=dt;highlight.material.color.set(mineTime>delay*.45?0xff9b52:0xffe6a1);animateAct(hit.kind==='plant'?'chop':'dig');if(mineTime<delay)return;
+ removeTarget=null;
  
  if(meta.mode==='survival'&&hit.kind==='block'&&hit.id>=76&&hit.id<=87&&tool!=='pickaxe'){mineHeld=false;toast('Använd en bergshacka för att ta loss malmen');return}
  if(roomSession&&hit.kind==='plant'){harvestRoomPlant({...hit},tool);return}
@@ -196,7 +217,7 @@ function frame(now){requestAnimationFrame(frame);const ms=now-(frame.last||now),
  camera.updateMatrixWorld();companions.update({players:roomSession?.players()??null,position:p,yaw:player.yaw,camera});const hasFlashlight=meta.slots[selected]==='flashlight'&&(meta.mode==='creative'||meta.bag.flashlight>0);flashlightLight.visible=flashlightOn&&hasFlashlight;if(flashlightLight.visible){flashlightLight.position.copy(eyePos);const direction=new T.Vector3();camera.getWorldDirection(direction);flashlightTarget.position.copy(eyePos).addScaledVector(direction,10);flashlightTarget.updateMatrixWorld()}meta.time=(meta.time+dt/720)%1;const info=world.info(p.x,p.z),night=meta.time<.23||meta.time>.78,under=p.y+3<info.height,sub=world.at(p.x,p.y+eye,p.z)===25;
  const wstep=Math.floor(meta.time*15);if(wstep!==weatherStep){weatherStep=wstep;const n=hash(wstep,info.biome,world.seed);weather=n<.51?'clear':n<.68?'cloud':n<.79?'fog':info.biome===4?'snow':n>.95?'storm':'rain'}
  world.clock.value=elapsed;sky.update({position:camera.position,time:meta.time,weather,quality:graphics.level,underground:under,underwater:sub});scene.fog.density=Math.max(scene.fog.density,1.44/(radius()*16));land.update(p.x,p.z);nature.update(dt,p,!!meta.quiet);for(const o of root.children){const flame=o.getObjectByName('flame');if(flame)flame.scale.y=1+Math.sin(elapsed*9)*.12}actors.update(dt,{x:p.x,y:p.y+eye,z:p.z,yaw:player.yaw,moving:player.moving,thirdPerson:player.third,outfit:settings.outfit,night,quiet:!!meta.quiet,action:player.seat?'rest':elapsed<actionTime?actionName:player.swim?'swim':!player.grounded&&!player.fly?'jump':player.moving?(keys.sprint?'run':'walk'):'idle'});fixtures.poseSeated(scene,player);
- if(elapsed-lastHit>.09){findHit();lastHit=elapsed}if(mineHeld)mining(dt);if(glints.visible){glints.position.y+=dt*.42;if(elapsed>glints.userData.until)glints.visible=false}
+ if(elapsed-lastHit>.09){findHit();lastHit=elapsed}if(mineHeld||removeTarget!==null)mining(dt);if(glints.visible){glints.position.y+=dt*.42;if(elapsed>glints.userData.until)glints.visible=false}
  if(player.moving&&elapsed-lastStep>.43&&!player.fly){audio.effect(player.swim?'splash':'step',defs[world.at(p.x,p.y-.08,p.z)]?.sound);lastStep=elapsed;if(meta.mode==='survival'&&meta.difficulty!=='Lätt')meta.food=Math.max(0,meta.food-(meta.difficulty==='Utmanande'?.02:.01))}
  if(elapsed-lastPanel>1){lastPanel=elapsed;checkLampBlocks();fixtures.settleLanterns(obj=>{
  const rec=obj.userData.record;meta.props.splice(meta.props.indexOf(rec),1);root.remove(obj);

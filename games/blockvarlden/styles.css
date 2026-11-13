@@ -45,6 +45,12 @@ body.screen-stick #actions button{min-height:44px}
 #hud #stick i{display:block;width:36px;height:36px;margin:0;border-radius:50%;background:#fff6de;box-shadow:0 2px 7px #0005;pointer-events:none}
 #hud #actions{display:grid;position:absolute;right:max(12px,env(safe-area-inset-right));bottom:max(70px,calc(env(safe-area-inset-bottom) + 56px));grid-template-columns:repeat(2,minmax(56px,1fr));gap:6px}
 #hud #actions button{min-height:46px;padding:9px 12px;background:#173b32e6;border-color:#dce9d591;box-shadow:0 2px 6px #0003}
+#hud #actions #dig{grid-column:span 2}
+@media(min-width:560px){
+  #hud #actions{grid-template-columns:repeat(3,auto)}
+  #hud #actions #dig{grid-column:auto}
+  #hud #actions #build{grid-column:2}
+}
 #hud #actions button:active{background:#587349;border-color:#ffdc85}
 .companions{position:absolute;top:max(96px,calc(env(safe-area-inset-top) + 87px));right:max(12px,env(safe-area-inset-right));width:126px;text-align:center;color:#f6f7e7;text-shadow:0 1px 3px #000;pointer-events:none}
 .companions-heading{font-size:11px;font-weight:800;letter-spacing:.04em;margin-bottom:5px}

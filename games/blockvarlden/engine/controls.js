@@ -79,6 +79,7 @@ export function controls(canvas, api) {
       if(b.hasPointerCapture(e.pointerId))b.releasePointerCapture(e.pointerId);
     };
   }
+  $('remove').onclick = api.remove;
   $('build').onclick=api.build; $('pack').onclick=api.pack; $('pause').onclick=api.pause; $('cam').onclick=api.camera;
   const has=(...codes)=>codes.some(k=>keys.has(k));
   return {clear,read:(dt=0)=>{const g=pad.read(dt);return {
