@@ -223,18 +223,14 @@ jStick.onpointerdown = e => {
 jStick.onpointermove = e => {
   if (e.pointerId === bridgePointer) steerBridge(e);
 };
-jStick.onlostpointercapture = e => {
-  if (e.pointerId === bridgePointer) resetBridgeStick();
-};
+for (const kind of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+  jStick.addEventListener(kind, e => {
+    if (e.pointerId === bridgePointer) resetBridgeStick();
+  });
+}
 $('bridgeJump').onpointerdown = e => {
   e.preventDefault();
-  bridgeJump();
-};
-$('bridgeDouble').onpointerdown = e => {
-  e.preventDefault();
-  const before = bridge.jumps;
-  bridgeJump();
-  if (before === 0 && bridge.jumps === 1) bridge.boostAt = bridge.time + .22;
+  if (bridge.jumps === 0) bridgeJump();
 };
 for (const el of document.querySelectorAll('.jumpPair button,#stick,#bridgeStick,#bridgeJump,#bridgeDouble')) {
   for (const kind of ['contextmenu', 'selectstart', 'dragstart']) el.addEventListener(kind, e => e.preventDefault());
