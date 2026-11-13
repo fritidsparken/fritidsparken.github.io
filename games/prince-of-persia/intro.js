@@ -90,7 +90,6 @@ function beginStory(jungle = false) {
 }
 function finishStory() {
   if (opening.hidden) return;
-  if (!jungleStory) scoreOffset = 12 + storyVoice.currentTime;
   storyVoice.pause();
   voicePlaying = false;
   cancelAnimationFrame(chapterFrame);

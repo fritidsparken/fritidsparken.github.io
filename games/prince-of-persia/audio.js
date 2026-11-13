@@ -254,7 +254,7 @@ function prepareScore() {
   });
 }
 function syncScore() {
-  if (!opening.hidden && !jungleStory || !scoreWanted || !scoreBuffer || scoreVoice || document.hidden || !menu.hidden || route.done && !bridge.active && opening.hidden) return;
+  if (!scoreWanted || !scoreBuffer || scoreVoice || document.hidden || !menu.hidden || route.done && !bridge.active && opening.hidden) return;
   const source = pickupAudio.createBufferSource();
   source.buffer = scoreBuffer;
   source.loop = true;
