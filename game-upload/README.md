@@ -1,13 +1,13 @@
-# Importera spelet De försvunna världarna
+# Publicera Prince of Persia – tre separata uppladdningar
 
-Ladda upp de tre filerna som heter:
+GitHubs webbuppladdning kan avvisa en stor uppladdning. **Ladda bara upp en del åt gången, och committa varje del separat till main.**
 
-- prince-of-persia-github.zip.part01
-- prince-of-persia-github.zip.part02
-- prince-of-persia-github.zip.part03
+1. Välj **Add file → Upload files** i denna mapp. Välj endast `prince-of-persia-github.zip.part01` (19 MB) och klicka **Commit changes** till main.
+2. Öppna denna mapp igen. Ladda upp endast `prince-of-persia-github.zip.part02` (19 MB). **Commit changes** till main.
+3. Öppna denna mapp igen. Ladda upp endast `prince-of-persia-github.zip.part03` (17,7 MB). **Commit changes** till main.
 
-Välj **Add file → Upload files** i denna mapp på grenen **main**, dra in alla tre filerna samtidigt och klicka **Commit changes**.
+**Efter den tredje uppladdningen** kör GitHub Actions importen automatiskt. Den verifierar arkivets kontrollsumma, packar upp alla 254 spelfiler till `games/prince-of-persia/`, publicerar dem till `main` och tar bort uppladdningsdelarna.
 
-GitHub Actions kontrollerar då att de tre delarna stämmer, packar upp alla 254 spelfiler till `games/prince-of-persia/`, publicerar dem till `main` och tar bort uppladdningsdelarna. Låt README.md ligga kvar.
+Kontrollera resultatet under **Actions → Publicera Prince of Persia fran uppdelat spelarkiv**.
 
-Spelets adress när publiceringen är klar: https://fritidsparken.se/games/prince-of-persia/
+Speladress efter lyckad körning: https://fritidsparken.se/games/prince-of-persia/
