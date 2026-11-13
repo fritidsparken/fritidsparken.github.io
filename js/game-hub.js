@@ -1,5 +1,6 @@
 (() => {
   const games=[
+    {id:'prince-of-persia',title:'Prince of Persia',tag:'SOLPORTENS VÄG',type:'Plattformsäventyr',image:'game-icons-2026/prince-of-persia.webp',text:'Hoppa över palatsets falluckor och undvik spjuten. Klarar du Solportens väg väntar nya utmaningar i djungeln.',url:'./games/prince-of-persia/'},
     {id:'rymdaventyret',title:'Rymdäventyret',tag:'HELA RYMDEN. DIN UPPTÄCKT.',type:'3D · Rymdäventyr',image:'space/rocket/saturn-model-study.png',text:'Flyg genom solsystemet, landa på månar, kör månbil och följ elva expeditioner bland stjärnorna.',url:'./games/rymdaventyret/'},
     {id:'blockvarlden',title:'Blockvärlden',tag:'BYGG DIN EGEN VÄRLD',type:'3D · Bygg & äventyr',image:'blockvarlden/art/icon.webp',text:'Gräv, samla och bygg i en helt egen färgglad kubvärld. Välj kreativt läge eller överlevnad!',url:'./games/blockvarlden/'},
     {id:'skatepark',title:'Skatepark',tag:'HITTA DITT FLYT',type:'3D · Skateboard',image:'game-icons-2026/new-skatepark.webp',text:'Åk fritt i fyra parker och testa loopen i Riverside. Sätt din första kickflip, grinda ett räcke och bygg din egen trickserie.',url:'./games/skatepark/'},
