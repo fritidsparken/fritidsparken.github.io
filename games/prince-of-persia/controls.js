@@ -210,8 +210,8 @@ function steerBridge(e) {
     y = (box.top + box.height / 2 - e.clientY) / (box.height * .38);
   const n = Math.max(1, Math.hypot(x, y));
   bridgeAxis = x / n;
-  bridgeForward = y / n;
-  jStick.firstElementChild.style.transform = 'translate(' + bridgeAxis * box.width * .25 + 'px,' + -bridgeForward * box.height * .25 + 'px)';
+  bridgeForward = -y / n;
+  jStick.firstElementChild.style.transform = 'translate(' + bridgeAxis * box.width * .25 + 'px,' + bridgeForward * box.height * .25 + 'px)';
 }
 jStick.onpointerdown = e => {
   e.preventDefault();

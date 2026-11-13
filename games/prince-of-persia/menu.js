@@ -43,6 +43,8 @@ function playTheme() {
   if (musicEnabled && !menu.hidden && !document.hidden) theme.play().catch(musicLabel);
 }
 theme.onplay = theme.onpause = musicLabel;
+theme.addEventListener('canplay', playTheme);
+window.addEventListener('pageshow', playTheme);
 function unlockMenuMusic(event) {
   if (event.target.closest('#musicToggle')) return;
   playTheme();
