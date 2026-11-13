@@ -72,7 +72,7 @@ function unlockMoon() {
 }
 function refreshMenu() {
   $('moonChoice').disabled = !moonOpen;
-  $('moonState').textContent = moonOpen ? 'Värld 3 · Tre passager' : 'Låst · Klara Djungelvärlden';
+  $('moonState').textContent = moonOpen ? 'Värld 3 · Tio banor' : 'Låst · Klara Djungelvärlden';
   $('moonChoice').setAttribute('aria-pressed', String(moonSelected));
   $('palacePick').hidden = jungleSelected || moonSelected;
   $('bridgePreview').hidden = !jungleOpen || moonSelected;
