@@ -387,3 +387,8 @@ body.std-design .std-categories > #fp-ranking .ranking-icon {
     font-size: 42px;
   }
 }
+
+/* Center the desktop navigation in the space between the brands and visitor timer. */
+@media (min-width:1440px){
+ body.std-design #stdNavigation{justify-content:safe center}
+}
