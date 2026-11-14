@@ -319,18 +319,10 @@ function createWorldRenderer(gl) {
     gl.clearColor(.49, .57, .47, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.depthMask(false);
-    const backgroundCorners = [[-1, -1, 0], [1, -1, 0], [1, 1, 0], [-1, 1, 0]];
-    let backgroundUV = null;
-    if (bridge.level === 9) {
-      // The panorama is much wider than a phone screen. Crop around the
-      // temple sun instead of squeezing the whole image into the viewport.
-      const art = bridgeArt.vista9;
-      const ratio = art?.naturalWidth && art?.naturalHeight ? art.naturalWidth / art.naturalHeight : 4.02;
-      const span = Math.min(1, (view.w / view.h) / ratio);
-      const left = Math.max(0, Math.min(1 - span, .678 - span / 2));
-      backgroundUV = [[left,1],[left+span,1],[left+span,0],[left,0]];
-    }
-    quad(isCave(bridge.level) ? 'skyline' : 'vista' + bridge.level, 7, backgroundCorners, [1,1,1,1], false, backgroundUV);
+    // Show the unobstructed left portion of the final panorama: the large
+    // temple sun is outside the visible crop in both phone orientations.
+    const backgroundUV = bridge.level === 9 ? [[0,1],[.53,1],[.53,0],[0,0]] : null;
+    quad(isCave(bridge.level) ? 'skyline' : 'vista' + bridge.level, 7, [[-1,-1,0],[1,-1,0],[1,1,0],[-1,1,0]], [1,1,1,1], false, backgroundUV);
     gl.depthMask(true);
     for (const chunk of chunks) {
       if (chunk.lo > cz + 2 || chunk.hi < cz - 68) continue;
