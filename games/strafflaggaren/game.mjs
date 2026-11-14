@@ -35,7 +35,7 @@ $('#homeDots').innerHTML=dots(match.a);$('#awayDots').innerHTML=dots(match.b);wo
 function beginRun(s){shot=s;state.phase='run';state.clock=0;state.power=s.speed;world.target.visible=false;$('#ready').hidden=true;$('#hint').textContent=state.role==='save'?'Tryck i målet där du vill rädda!':'Vilket skott blir det?';}
 function dive(tx,ty){if(aiActed)return;aiActed=true;state.keeper.startX=keeperX;state.keeper.tx=clamp(tx,-3,3);state.keeper.ty=clamp(ty,.35,2.1);state.keeper.time=.001;}
 function resolve(){if(state.phase!=='flight')return;const b=state.ball;const wasDecisive=decisive();state.phase='result';resultClock=0;const goal=b.goal,own=state.role==='shoot',beforeArena=levelMax(),beforeBalls=unlocks.filter(n=>data.xp>=n).length;
- if(own){stats.shots++;if(goal)stats.goals++;stats.best=Math.max(stats.best,Math.round(state.power*3.6));data.record=Math.max(data.record,stats.best);}else{stats.faced++;if(b.saved&&!goal)stats.saves++;}
+ if(own){stats.shots++;if(goal){stats.goals++;window.FPDaily?.record('goal');}stats.best=Math.max(stats.best,Math.round(state.power*3.6));data.record=Math.max(data.record,stats.best);}else{stats.faced++;if(b.saved&&!goal)stats.saves++;}
  if(mode==='match')(own?match.a:match.b).push(goal);
  streak=(own?goal:b.saved&&!goal)?streak+1:0;data.xp+=goal&&own||b.saved&&!own&&!goal?2:1;
  const complete=mode==='challenge'&&[goal&&b.crossing?.x< -2&&b.crossing?.y>1.65,streak>=3,goal&&Math.abs(shot.spin)>.28,goal&&!!b.hit,streak>=2][challenge];
@@ -150,3 +150,4 @@ try{world=createWorld($('#world'));const canvas=world.renderer.domElement;canvas
  }
  requestAnimationFrame(frame);
 }catch(e){console.error(e);panel('<h1>EN LITEN<br><em>TIME OUT</em></h1><p>Webbläsaren kunde inte starta 3D-grafiken. Prova att öppna spelet i en uppdaterad webbläsare med WebGL aktiverat.</p><a href="../../?view=games" target="_top">← Tillbaka till Fritidsparken</a>');}
+
