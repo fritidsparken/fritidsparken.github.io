@@ -201,7 +201,7 @@ function stepBridge(dt) {
     const leaving = clamp(((pit.end + 3) - bridge.d) / 3, 0, 1);
     pillarBlend = Math.max(pillarBlend, Math.min(approaching, leaving));
   }
-  const speed = course()[2] * (.85 - .15 * pillarBlend);
+  const speed = course()[2] * (.85 - .27 * pillarBlend);
   if (bridge.death) {
     bridge.death += dt;
     if (bridge.cause === 'pit') bridge.y -= dt * 4;else {

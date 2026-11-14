@@ -67,7 +67,7 @@ function buildCourse() {
     i = 0;
   while (s < length - 7) {
     if (i % 5 === 2 && s + speed * .78 * (6 + Math.floor(bridge.level / 3) + 1) < length - 6) {
-      const stride = speed * .78,
+      const stride = speed * .68,
         start = s - 2,
         count = 6 + Math.floor(bridge.level / 3);
       const pads = Array.from({
