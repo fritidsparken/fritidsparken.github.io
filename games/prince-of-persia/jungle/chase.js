@@ -194,7 +194,14 @@ function finishChase() {
 }
 function stepBridge(dt) {
   if (bridge.done) return;
-  const speed = course()[2] * .85;
+  // Ease down before pillar crossings and resume normal pace afterwards.
+  let pillarBlend = 0;
+  for (const pit of bridge.pits) {
+    const approaching = clamp((bridge.d - (pit.start - 5)) / 4, 0, 1);
+    const leaving = clamp(((pit.end + 3) - bridge.d) / 3, 0, 1);
+    pillarBlend = Math.max(pillarBlend, Math.min(approaching, leaving));
+  }
+  const speed = course()[2] * (.85 - .15 * pillarBlend);
   if (bridge.death) {
     bridge.death += dt;
     if (bridge.cause === 'pit') bridge.y -= dt * 4;else {
