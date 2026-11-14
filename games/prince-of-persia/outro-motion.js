@@ -1,7 +1,6 @@
 /**
  * Living illustrations for the three original finale paintings.
- * The image is never zoomed: a compact local mesh moves cloth and breathing,
- * while face interiors share one translation and architecture stays fixed.
+ * The original painting and people stay fixed; only masked water is animated.
  * Canvas 2D only; no WebGL, video codecs, network services or dependencies.
  */
 
@@ -162,17 +161,13 @@ function paintTriangle(ctx, source, vertices, triangle, w, h) {
 
 function paintEnvironment(ctx, scene, t, w, h) {
   ctx.save(); ctx.globalCompositeOperation='screen';
-  for (const [x,y,r] of scene.lamps) {
-    const alpha=.017 + (Math.sin(t*1.7+x*23)+Math.sin(t*2.13+y*15))*.004;
-    const glow=ctx.createRadialGradient(x*w,y*h,0,x*w,y*h,r*w);
-    glow.addColorStop(0,`rgba(255,202,104,${alpha*2.5})`); glow.addColorStop(1,'rgba(255,187,85,0)');
-    ctx.fillStyle=glow;ctx.fillRect((x-r)*w,(y-r)*h,r*w*2,r*w*2);
-  }
   for (let wi=0;wi<scene.water.length;wi++) {
     const water=scene.water[wi];
     const minX=Math.min(...water.polygon.map(p=>p[0])), maxX=Math.max(...water.polygon.map(p=>p[0]));
     const minY=Math.min(...water.polygon.map(p=>p[1])), maxY=Math.max(...water.polygon.map(p=>p[1]));
     ctx.save();pathPolygon(ctx,water.polygon,w,h);ctx.clip();
+    // Exclude both people from every water effect.
+    for(const person of scene.people){for(const polygon of [person.body,person.cloth]){ctx.beginPath();ctx.rect(0,0,w,h);polygon.forEach((p,i)=>i?ctx.lineTo(p[0]*w,p[1]*h):ctx.moveTo(p[0]*w,p[1]*h));ctx.closePath();ctx.clip('evenodd');}}
     if (water.kind==='fall') {
       // Fine, differently paced streaks and spray travel down existing water.
       for(let i=0;i<44;i++) {
@@ -186,7 +181,7 @@ function paintEnvironment(ctx, scene, t, w, h) {
       }
     } else {
       for(let i=0;i<24;i++) {
-        const phase=(seeded(i,wi+23)+t*.14)%1;
+        const phase=(seeded(i,wi+23)+t*(.09+seeded(i,53)*.11))%1;
         const x=(minX+seeded(i,wi+14)*(maxX-minX)+Math.sin(t*.7+i)*.0025)*w;
         const y=(minY+seeded(i,wi+31)*(maxY-minY))*h;
         const opacity=Math.sin(phase*Math.PI)*.12;
@@ -195,16 +190,6 @@ function paintEnvironment(ctx, scene, t, w, h) {
       }
     }
     ctx.restore();
-  }
-  for(let i=0;i<scene.dust;i++) {
-    const baseX=seeded(i,50), baseY=seeded(i,80);
-    const x=(baseX+Math.sin(t*.18+i*1.7)*.009)*w;
-    const y=((baseY-t*(.005+seeded(i,31)*.005))%1+1)%1*h;
-    // Do not put floating dots over faces; they remain crisp and readable.
-    if(scene.people.some(p=>ellipse(x/w,y/h,p.head)>.03)) continue;
-    const alpha=(.08+.11*seeded(i,14))*(.4+.6*Math.pow(Math.sin(t*.45+i),2));
-    ctx.fillStyle=`rgba(255,224,162,${alpha})`;
-    ctx.beginPath();ctx.arc(x,y,.45+seeded(i,72)*.7,0,TAU);ctx.fill();
   }
   ctx.restore();
 }
@@ -344,4 +329,5 @@ export function createOutroMotion(canvas, options={}) {
   }
   return {show,stop,dispose,resize,update,stats};
 }
+
 

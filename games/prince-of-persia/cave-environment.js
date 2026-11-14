@@ -118,7 +118,7 @@ export function buildCave(T,scene,course,level=0,previewOnly=false){
  passageMesh(new T.BoxGeometry(8.2,.55,18),boulderMat,0,9.45,9.2);
  passageMesh(new T.BoxGeometry(8.2,9.8,.5),shadowRock,0,4.8,18.4);
  const previewMat=new T.MeshBasicMaterial({color:0xffffff,side:T.DoubleSide,toneMapped:false});materials.push(previewMat);
- const preview=passageMesh(new T.PlaneGeometry(7.4,4.16),previewMat,0,3.8,12.5);preview.name='Actual next-course start';preview.rotation.y=Math.PI;preview.visible=false;
+ const preview=passageMesh(new T.PlaneGeometry(7.4,4.16),previewMat,0,3.8,12.5);preview.name='Actual next-course start';preview.rotation.y=Math.PI;preview.visible=false;if(level===9){preview.scale.set(5.6/7.4,8.4/4.16,1);preview.position.set(0,4.2,3.0);preview.name='Laleh waiting in the palace';}
  function setPreview(map){previewMat.map=map;previewMat.needsUpdate=true;preview.visible=true;}
  passage.userData.nextLevel=level<9?level+1:null;
  for(const z of [4.8,10.8,16.8])passageMesh(arch(7.2,9.1,.23),gold,0,0,z);
@@ -133,3 +133,4 @@ export function buildCave(T,scene,course,level=0,previewOnly=false){
  function dispose(){scene.remove(root);for(const g of geometries)g.dispose();for(const m of materials)m.dispose();for(const t of textures)t.dispose()}
  return {root,update,dispose,ready:Promise.all(pending),door:doorGroup,doorLeaves,passage,setPreview,pits,groundHeight:(x,z)=>height(x,z,row(z))};
 }
+

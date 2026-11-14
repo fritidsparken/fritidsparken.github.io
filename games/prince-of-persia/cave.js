@@ -1,13 +1,13 @@
 import {renderCoursePreview} from './course-preview.js?v=next-ride-20261114';
 import * as THREE from './vendor/three.module.js';
 import {createCourse,CartPhysics,COURSE_NAMES,COURSE_COUNT} from './minecart-track.js?v=names-20261114';
-import {buildCave} from './cave-environment.js?v=next-ride-20261114';
+import {buildCave} from './cave-environment.js?v=palace-arrows-open-20261114';
 import {buildCart} from './minecart-model.js?v=next-ride-20261114';
-import {buildRails} from './minecart-rails.js?v=next-ride-20261114';
+import {buildRails} from './minecart-rails.js?v=palace-arrows-open-20261114';
 import {createCartCamera} from './minecart-camera.js?v=next-ride-20261114';
 import {CoinState,buildCoins} from './minecart-coins.js?v=next-ride-20261114';
 import {createCartAudio} from './minecart-audio.js?v=next-ride-20261114';
-import {createOutroMotion} from './outro-motion.js?v=water-20261114';
+import {createOutroMotion} from './outro-motion.js?v=palace-arrows-open-20261114';
 const $=id=>document.getElementById(id),reader=window.storyReader($('line'),$('retry'));
 const names=COURSE_NAMES, MAIN_MENU='https://fritidsparken.se/games/prince-of-persia/';
 const opening=[
@@ -24,14 +24,14 @@ const KEY='lostWorlds.minecart3d.v2',clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 let saved={};try{saved=JSON.parse(localStorage.getItem(KEY))||{}}catch{}
 let level=Number.isInteger(saved.level)?clamp(saved.level,0,COURSE_COUNT-1):0;
 let seen=!!saved.seen,completed=!!saved.completed,outro=!!saved.outro;
-let unlocked=saved.completed?COURSE_COUNT-1:Math.max(level,Number.isInteger(saved.unlocked)?clamp(saved.unlocked,0,COURSE_COUNT-1):0);
+let unlocked=COURSE_COUNT-1;
 let coinBank=saved.coins&&typeof saved.coins==='object'?saved.coins:{};
 let renderer,scene,camera,followCamera,cart,course,physics,cave,rails,coinState,coins,previous,current;
 let mode='loading',last=0,acc=0,time=0,distance=0,lastCP='',lastRespawns=0,doorSounded=false;
 const sound=createCartAudio(),motion=createOutroMotion($('outroCanvas'),{imageElement:$('storyArt')});
 const STEP=1/90,pos=new THREE.Vector3(),tan=new THREE.Vector3(),orientation=new THREE.Quaternion(),targetQ=new THREE.Quaternion(),forward=new THREE.Vector3(0,0,1);
 let previewTarget;
-async function preparePreview(){previewTarget?.dispose();previewTarget=await renderCoursePreview(THREE,renderer,{createCourse,buildCave,buildRails,buildCart,createCartCamera},level);cave.setPreview(previewTarget.texture);}
+async function preparePreview(){if(level===COURSE_COUNT-1){previewTarget?.dispose();const texture=await new THREE.TextureLoader().loadAsync('echo-art/finale-1.webp');texture.colorSpace=THREE.SRGBColorSpace;texture.repeat.set(.45,1);texture.offset.set(.55,0);previewTarget={dispose:()=>texture.dispose()};cave.setPreview(texture);return;}previewTarget?.dispose();previewTarget=await renderCoursePreview(THREE,renderer,{createCourse,buildCave,buildRails,buildCart,createCartCamera},level);cave.setPreview(previewTarget.texture);}
 let lamp,lampTarget,notified=0,musicTarget=0,endingTimer=0;
 function totalCoins(){return Object.values(coinBank).reduce((n,ids)=>n+(Array.isArray(ids)?new Set(ids).size:0),0)}
 function persist(){
@@ -61,8 +61,8 @@ function tell(lines,end,done){
 }
 function showEndScreen(animate=true){
  clearTimeout(endingTimer);const end=$('endingScreen');end.hidden=false;end.classList.remove('revealed','complete');
- if(animate){ui('fading');void end.offsetWidth;end.classList.add('revealed');music(0);endingTimer=setTimeout(()=>{ui('finished');end.classList.add('complete');$('score').pause();$('playAgain').focus?.()},3500)}
- else{ui('finished');end.classList.add('revealed','complete');$('score').pause();musicTarget=0}
+ if(animate){ui('fading');void end.offsetWidth;end.classList.add('revealed');music(.09);endingTimer=setTimeout(()=>{ui('finished');end.classList.add('complete');music(.09);$('playAgain').focus?.()},3500)}
+ else{ui('finished');end.classList.add('revealed','complete');music(.09)}
 }
 function happyEnd(){outro=false;completed=true;persist();showEndScreen(true)}
 $('playAgain').onclick=()=>{
@@ -159,4 +159,5 @@ $('levelSelect').addEventListener('change',async()=>{
  panel('loading',names[level],'Laddar grottan…','Vänta');try{buildLevel();await Promise.all([cave.ready,cart.ready]);await preparePreview();persist();panel('ready',names[level],'Samla mynt. Välj spår före växeln och hoppa vid rälsens avbrott.','Starta färden')}catch(e){console.error(e);panel('error','Grottan kunde inte laddas','Försök igen.','Försök igen')}
 });
 init();
+
 

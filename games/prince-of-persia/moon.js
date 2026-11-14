@@ -12,7 +12,7 @@ try {
   }
 } catch {saved={}}
 let stage = Number.isInteger(saved.stage) ? clamp(saved.stage,0,chapters.length-1) : 0;
-let unlocked=Number.isInteger(saved.unlocked)?clamp(saved.unlocked,stage,9):stage;
+let unlocked=9;
 const selectedStage=Number(new URLSearchParams(location.search).get('stage'));
 if(new URLSearchParams(location.search).has('stage') && Number.isInteger(selectedStage) && selectedStage>=0 && selectedStage<=unlocked) stage=selectedStage;
 const picker=el('levelSelect');
@@ -282,3 +282,4 @@ Promise.all([...chapters.map(r=>r.key),'span','crusher','warden','idle','climb',
   if(selecting && requestedFromMenu)startPlay();else if(new URLSearchParams(location.search).get('from')==='jungle')el('go').onclick();
 }).catch(()=>{stop('Palatset kunde inte öppnas','Kontrollera anslutningen och försök igen.','Försök igen');el('go').disabled=false});
 }
+

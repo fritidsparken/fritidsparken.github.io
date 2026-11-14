@@ -4,16 +4,17 @@ export function buildRails(THREE,scene,course){
  const gapAt=(route,s)=>route.gaps?.some(g=>s>=g.start&&s<=g.end);
  const dummy=new THREE.Object3D(),up=new THREE.Vector3(0,1,0),forward=new THREE.Vector3(0,0,1);
  // Signs are fixed, physical objects in the cave, visible well before take-off.
- function jumpSignTexture(distance){
+ function jumpSignTexture(distance,side=0){
   if(typeof document==='undefined'){const t=new THREE.DataTexture(new Uint8Array([255,204,92,255]),1,1);t.needsUpdate=true;warningTextures.push(t);return t}
-  const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=256;const c=canvas.getContext('2d');c.fillStyle='#092b32';c.fillRect(0,0,1024,256);c.strokeStyle='#f5ca68';c.lineWidth=12;c.strokeRect(9,9,1006,238);c.fillStyle='#f8deb0';c.textAlign='center';c.font='bold 82px system-ui';c.fillText('HOPP OM '+distance+' m',512,115);c.font='bold 48px system-ui';c.fillStyle='#a0f3ec';c.fillText('VAR REDO ATT HOPPA ↑',512,192);const t=new THREE.CanvasTexture(canvas);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;warningTextures.push(t);return t;
+  const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=256;const c=canvas.getContext('2d');c.fillStyle='#092b32';c.fillRect(0,0,1024,256);c.strokeStyle='#f5ca68';c.lineWidth=12;c.strokeRect(9,9,1006,238);c.fillStyle='#f8deb0';c.textAlign='center';c.font='bold 82px system-ui';c.fillText(side?(side<0?'← VÄNSTER':'HÖGER →'):'HOPP OM '+distance+' m',512,115);c.font='bold 48px system-ui';c.fillStyle='#a0f3ec';c.fillText(side?'KOM IHÅG VÄGEN':'VAR REDO ATT HOPPA ↑',512,192);const t=new THREE.CanvasTexture(canvas);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;warningTextures.push(t);return t;
  }
- function warning(route,gap,distance){const s=Math.max(0,gap.start-distance),actual=Math.round(gap.start-s),sample=route.sample(s),p=new THREE.Vector3(sample.position.x,sample.position.y,sample.position.z),t=new THREE.Vector3(sample.tangent.x,0,sample.tangent.z).normalize(),r=new THREE.Vector3().crossVectors(up,t).normalize();const sign=new THREE.Group();sign.name='Jump warning '+actual+' metres';sign.position.copy(p);sign.rotation.y=Math.atan2(t.x,t.z);group.add(sign);
+ function warning(route,gap,distance,side=0){const s=Math.max(0,gap.start-distance),actual=Math.round(gap.start-s),sample=route.sample(s),p=new THREE.Vector3(sample.position.x,sample.position.y,sample.position.z),t=new THREE.Vector3(sample.tangent.x,0,sample.tangent.z).normalize(),r=new THREE.Vector3().crossVectors(up,t).normalize();const sign=new THREE.Group();sign.name=(side?'Early track arrow ':'Jump warning ')+actual+' metres';sign.position.copy(p);sign.rotation.y=Math.atan2(t.x,t.z);group.add(sign);
   const rim=new THREE.Mesh(new THREE.BoxGeometry(5.9,1.52,.16),new THREE.MeshStandardMaterial({color:0x685431,metalness:.7,roughness:.43}));rim.position.y=4.7;sign.add(rim);
-  const face=new THREE.Mesh(new THREE.PlaneGeometry(5.65,1.35),new THREE.MeshBasicMaterial({map:jumpSignTexture(actual),toneMapped:false}));face.rotation.y=Math.PI;face.position.set(0,4.7,-.09);sign.add(face);
+  const face=new THREE.Mesh(new THREE.PlaneGeometry(5.65,1.35),new THREE.MeshBasicMaterial({map:jumpSignTexture(actual,side),toneMapped:false}));face.rotation.y=Math.PI;face.position.set(0,4.7,-.09);sign.add(face);
   for(const side of [-1,1]){const post=new THREE.Mesh(new THREE.CylinderGeometry(.085,.13,4.85,8),new THREE.MeshStandardMaterial({color:0x8d7958,metalness:.4,roughness:.75}));post.position.set(side*3,2.4,0);sign.add(post)}
   warningSigns.push({routeId:route.id,s,gapStart:gap.start,distance:gap.start-s,object:sign});
  }
+ for(const route of course.routes)if(route.fork)warning(route,{start:route.length},60,route.fork.safeSide);
  const lipMaterial=iron;
  for(const route of course.routes){
   const vertices=[],indices=[],ties=[];
@@ -34,3 +35,4 @@ export function buildRails(THREE,scene,course){
  }
  return {group,warningSigns,highlight(routeId){for(const [id,mat]of routes){mat.emissive.setHex(id===routeId?0xbe8c28:0);mat.emissiveIntensity=id===routeId?.7:0}},dispose(){scene.remove(group);group.traverse(o=>{o.geometry?.dispose();if(o.material&&o.material!==wood)o.material.dispose()});wood.dispose();iron.dispose();lipMaterial.dispose();for(const t of warningTextures)t.dispose()}};
 }
+
