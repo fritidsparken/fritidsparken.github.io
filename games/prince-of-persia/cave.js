@@ -1,12 +1,12 @@
 import * as THREE from './vendor/three.module.js';
-import {createCourse,CartPhysics,COURSE_NAMES,COURSE_COUNT} from './minecart-track.js?v=coins-finale-3';
-import {buildCave} from './cave-environment.js?v=coins-finale-3';
-import {buildCart} from './minecart-model.js?v=coins-finale-3';
-import {buildRails} from './minecart-rails.js?v=coins-finale-3';
-import {createCartCamera} from './minecart-camera.js?v=coins-finale-3';
-import {CoinState,buildCoins} from './minecart-coins.js?v=coins-finale-3';
-import {createCartAudio} from './minecart-audio.js?v=coins-finale-3';
-import {createOutroMotion} from './outro-motion.js?v=coins-finale-3';
+import {createCourse,CartPhysics,COURSE_NAMES,COURSE_COUNT} from './minecart-track.js?v=world-picker-20261114';
+import {buildCave} from './cave-environment.js?v=world-picker-20261114';
+import {buildCart} from './minecart-model.js?v=world-picker-20261114';
+import {buildRails} from './minecart-rails.js?v=world-picker-20261114';
+import {createCartCamera} from './minecart-camera.js?v=world-picker-20261114';
+import {CoinState,buildCoins} from './minecart-coins.js?v=world-picker-20261114';
+import {createCartAudio} from './minecart-audio.js?v=world-picker-20261114';
+import {createOutroMotion} from './outro-motion.js?v=world-picker-20261114';
 const $=id=>document.getElementById(id),reader=window.storyReader($('line'),$('retry'));
 const names=COURSE_NAMES, MAIN_MENU='https://fritidsparken.se/games/prince-of-persia/';
 const opening=[
@@ -23,6 +23,7 @@ const KEY='lostWorlds.minecart3d.v2',clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 let saved={};try{saved=JSON.parse(localStorage.getItem(KEY))||{}}catch{}
 let level=Number.isInteger(saved.level)?clamp(saved.level,0,COURSE_COUNT-1):0;
 let seen=!!saved.seen,completed=!!saved.completed,outro=!!saved.outro;
+let unlocked=saved.completed?COURSE_COUNT-1:Math.max(level,Number.isInteger(saved.unlocked)?clamp(saved.unlocked,0,COURSE_COUNT-1):0);
 let coinBank=saved.coins&&typeof saved.coins==='object'?saved.coins:{};
 let renderer,scene,camera,followCamera,cart,course,physics,cave,rails,coinState,coins,previous,current;
 let mode='loading',last=0,acc=0,time=0,distance=0,lastCP='',lastRespawns=0,doorSounded=false;
@@ -32,7 +33,7 @@ let lamp,lampTarget,notified=0,musicTarget=0,endingTimer=0;
 function totalCoins(){return Object.values(coinBank).reduce((n,ids)=>n+(Array.isArray(ids)?new Set(ids).size:0),0)}
 function persist(){
  if(coinState)coinBank[level]=coinState.exportIds();
- try{localStorage.setItem(KEY,JSON.stringify({level,seen,completed,outro,coins:coinBank,cp:physics?.snapshotCheckpoint()}));localStorage.setItem('lostWorlds.cave','1')}catch{}
+ try{localStorage.setItem(KEY,JSON.stringify({level,unlocked,seen,completed,outro,coins:coinBank,cp:physics?.snapshotCheckpoint()}));localStorage.setItem('lostWorlds.cave','1')}catch{}
 }
 function music(volume){musicTarget=volume;if(volume>0)$('score').play().catch(()=>{})}
 function ui(state){
@@ -60,12 +61,12 @@ function showEndScreen(animate=true){
 function happyEnd(){outro=false;completed=true;persist();showEndScreen(true)}
 $('playAgain').onclick=()=>{
  clearTimeout(endingTimer);sound.setActive(false);motion.stop();$('score').pause();
- try{localStorage.setItem(KEY,JSON.stringify({level:0,seen:false,completed:false,outro:false,coins:{}}))}catch{}
+ try{localStorage.setItem(KEY,JSON.stringify({level:0,unlocked,seen:false,completed:false,outro:false,coins:{}}))}catch{}
  location.href=MAIN_MENU;
 };
 async function advance(){
  persist();if(level===COURSE_COUNT-1){outro=true;persist();tell(ending,true,happyEnd)}
- else{level++;panel('loading','Nästa grotta','Öppnar passagen…','Vänta');buildLevel();await Promise.all([cave.ready,cart.ready]);persist();panel('ready',names[level],'Dörren är öppen. Nästa passage väntar längre in i berget.','Nästa grotta')}
+ else{level++;unlocked=Math.max(unlocked,level);panel('loading','Nästa grotta','Öppnar passagen…','Vänta');buildLevel();await Promise.all([cave.ready,cart.ready]);persist();panel('ready',names[level],'Dörren är öppen. Nästa passage väntar längre in i berget.','Nästa grotta')}
 }
 function snap(){followCamera?.reset();current=physics.snapshot();previous=current;orientation.setFromUnitVectors(forward,new THREE.Vector3(current.tangent.x,current.tangent.y,current.tangent.z).normalize());acc=0;lastRespawns=current.respawns;distance=0}
 function buildLevel(cp){
@@ -136,7 +137,10 @@ async function init(){
   const arrival=new URLSearchParams(location.search),arrived=arrival.get('from')==='aqueduct';
   const resumeArrival=arrived&&arrival.get('resume')==='1'&&saved.seen===true;
   if(arrived&&!resumeArrival){level=0;seen=completed=outro=false;coinBank={}}
-  buildLevel(arrived&&!resumeArrival?null:saved.cp);await Promise.all([cave.ready,cart.ready]);resize();addEventListener('resize',resize);persist();$('score').volume=0;
+  const requested=arrival.has('stage')?Number(arrival.get('stage')):NaN;
+  const selected=arrival.get('from')==='menu'&&Number.isInteger(requested)&&requested>=0&&requested<=unlocked;
+  if(selected){level=requested;completed=outro=false;if(level>0)seen=true}
+  buildLevel(arrived&&!resumeArrival||selected?null:saved.cp);await Promise.all([cave.ready,cart.ready]);resize();addEventListener('resize',resize);persist();$('score').volume=0;
   if(completed)showEndScreen(false);else panel('ready','Flöjtens eko','Tio grottor. En väg hem. Vagnen kör automatiskt. Samla mynt, välj spår och hoppa när rälsen bryts.','Starta färden');
   if(arrived){history.replaceState(null,'',location.pathname);$('go').onclick()}
   last=performance.now();requestAnimationFrame(frame);

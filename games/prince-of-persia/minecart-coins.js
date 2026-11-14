@@ -11,7 +11,8 @@ export function createCoinLayout(course){
  for(const route of course.routes){
   if(route.kind==='dead')continue;
   // Keep coins before/after hazards clear of the jump marker and landing area.
-  for(let s=12,index=0;s<route.length-9;s+=12,index++){
+  for(let base=12,index=0;base<route.length-12;base+=12,index++){
+   const s=base+3.4*Math.sin((course.level+1)*83+index*19+route.id.length*11);
    if(route.gaps?.some(g=>s>=g.start-15&&s<=g.end+13))continue;
    const sample=route.sample(s),position=copy(sample.position);position.y+=1.7;
    coins.push({id:`${COIN_SCHEMA}/${course.level}/${route.id}/${index}`,level:course.level,routeId:route.id,index,s,position,tangent:copy(sample.tangent),phase:coins.length});

@@ -13,6 +13,8 @@ try {
 } catch {saved={}}
 let stage = Number.isInteger(saved.stage) ? clamp(saved.stage,0,chapters.length-1) : 0;
 let unlocked=Number.isInteger(saved.unlocked)?clamp(saved.unlocked,stage,9):stage;
+const selectedStage=Number(new URLSearchParams(location.search).get('stage'));
+if(new URLSearchParams(location.search).has('stage') && Number.isInteger(selectedStage) && selectedStage>=0 && selectedStage<=unlocked) stage=selectedStage;
 const picker=el('levelSelect');
 function refreshPicker(){
   picker.replaceChildren();
@@ -41,7 +43,7 @@ let coins=[], transitioning=false, recoveryHandoff=false;
 const requestedFromMenu=new URLSearchParams(location.search).get('from')==='menu';
 let paused=true;
 let warden;
-let game, wave, active = false, finished = Boolean(saved.finished), loaded = false;
+let game, wave, active = false, finished = Boolean(saved.finished) && !new URLSearchParams(location.search).has('stage'), loaded = false;
 let side = 0, jump = false, last = 0, acc = 0;
 const keys = new Set();
 function save(cp) {
@@ -132,6 +134,7 @@ function tick(dt) {
     wave=Math.max(24,p.x-360);el('hint').textContent='Slussen är öppen! Håll dig före flodvågen.';
   }
   if(wave!==null){wave+=160*dt;if(wave>p.x){game.fail('water');return}}
+  if(stage===chapters.length-1 && p.x>=1500){continueToCave();return}
   if(warden){
     const hits=warden.hits.size;
     stepWarden(warden,dt);
@@ -165,8 +168,9 @@ function makeMoonCoins(chamber,chapter){
   const result=[];
   chamber.all.forEach((floor,surface)=>{
     let slot=0,lastX=-Infinity;
-    for(let x=floor[0]+40;x<Math.min(floor[1]-40,1550);x+=40,slot++){
-      if(x<170 || x-lastX<110)continue;
+    for(let base=floor[0]+40;base<Math.min(floor[1]-60,1530);base+=40,slot++){
+      const x=base+Math.round(17*Math.sin((chapter+1)*91+surface*43+slot*37));
+      if(x<170 || x-lastX<95+(slot%4)*18)continue;
       // Coins invite the player along walkable stone, not inside a crusher or saw.
       if(chamber.hazards.some(h=>h.surface===surface&&Math.abs(h.x-x)<h.width/2+48))continue;
       if(chamber.cubes.some(c=>Math.abs(c.x-x)<85))continue;

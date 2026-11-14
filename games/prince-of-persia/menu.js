@@ -63,7 +63,16 @@ function refreshPalaceStages() {
   });
   picker.value = journey && !route.done ? 'resume' : String(route.done ? route.index : 0);
 }
-let moonSelected = false;
+let moonSelected = false, caveSelected = false;
+const moonNames=['Månskärans port','Den blå cisternen','Kedjegjuteriet','De hängande trädgårdarna','Prismagalleriet','Klockornas reservoar','Himmelsslussen','Tidvattenmaskinen','Förmörkelsens bro','Tidvattenväktaren'];
+const caveNames=['Lyktgången','Blådjupet','Kristallvalvet','Koppargruvan','Ekoklyftan','De glömda valven','Elddjupet','Månstenstunneln','Avgrundens kant','Flöjtens källa'];
+function fillWorldStages(id,names,saveKey){
+ let save={};try{save=JSON.parse(localStorage.getItem(saveKey))||{}}catch{}
+ const max=save.finished||save.completed?9:Math.max(0,Number(save.unlocked)||0,Number(save.stage)||0,Number(save.level)||0);
+ const picker=$(id);picker.replaceChildren();names.forEach((name,i)=>{const option=document.createElement('option');option.value=i;option.disabled=i>max;option.textContent=(i+1)+'. '+name+(option.disabled?' · låst':'');picker.append(option)});
+ picker.value=String(Math.min(9,Math.max(0,Number(save.stage)||Number(save.level)||0)));
+}
+fillWorldStages('moonStage',moonNames,'lostWorlds.moon.v2');fillWorldStages('caveStage',caveNames,'lostWorlds.minecart3d.v2');
 let moonOpen = jungleRecord.best[9] > 0;
 try { moonOpen ||= localStorage.getItem('lostWorlds.moon') === '1'; } catch {}
 function unlockMoon() {
@@ -78,17 +87,18 @@ function refreshMenu() {
   $('moonChoice').disabled = !moonOpen;
   $('moonState').textContent = moonOpen ? 'Värld 3 · Tio banor' : 'Låst · Klara Djungelvärlden';
   $('moonChoice').setAttribute('aria-pressed', String(moonSelected));
-  $('palacePick').hidden = jungleSelected || moonSelected;
-  $('bridgePreview').hidden = !jungleOpen || moonSelected;
-  $('chasePick').hidden = !jungleSelected;
+  $('palacePick').hidden = jungleSelected || moonSelected || caveSelected;
+  $('moonPick').hidden=!moonSelected; $('cavePick').hidden=!caveSelected;
+  $('bridgePreview').hidden = !jungleOpen || moonSelected || caveSelected;
+  $('chasePick').hidden = !jungleSelected || caveSelected;
   $('bridgePreview').textContent = bridge.resume ? 'Fortsätt i djungeln' : 'Provspela djungeln';
   $('palaceState').textContent = journey ? 'Värld 1 · Bana ' + (route.index + 1) + ' · ' + ROOMS[route.index].name : 'Värld 1 · Tio banor';
   $('jungleChoice').disabled = !jungleOpen;
   $('jungleState').textContent = jungleOpen ? 'Värld 2 · Tio banor' : 'Låst · Klara Solportens väg';
-  $('playWorld').textContent = moonSelected ? 'Spela Månens akvedukt' : jungleSelected ? bridge.resume ? 'Fortsätt jakten' : 'Spela vald bana' : $('palaceStage').value === 'resume' ? 'Fortsätt spela' : 'Spela vald bana';
+  $('playWorld').textContent = caveSelected ? 'Spela Flöjtens eko' : moonSelected ? 'Spela Månens akvedukt' : jungleSelected ? bridge.resume ? 'Fortsätt jakten' : 'Spela vald bana' : $('palaceStage').value === 'resume' ? 'Fortsätt spela' : 'Spela vald bana';
   $('playWorld').disabled = !ready;
-  $('resetWorld').hidden = !journey || jungleSelected || moonSelected;
-  $('palaceChoice').setAttribute('aria-pressed', String(!jungleSelected && !moonSelected));
+  $('resetWorld').hidden = !journey || jungleSelected || moonSelected || caveSelected;
+  $('palaceChoice').setAttribute('aria-pressed', String(!jungleSelected && !moonSelected && !caveSelected));
   $('jungleChoice').setAttribute('aria-pressed', String(jungleSelected));
 }
 function openMenu() {
@@ -126,7 +136,8 @@ function enterWorld() {
   syncScore();
 }
 $('playWorld').onclick = () => {
-  if (moonSelected && moonOpen) { location.assign('moon.html?from=menu'); return; }
+  if (caveSelected) { location.assign('cave.html?from=menu&stage='+encodeURIComponent($('caveStage').value)); return; }
+  if (moonSelected && moonOpen) { location.assign('moon.html?from=menu&stage='+encodeURIComponent($('moonStage').value)); return; }
   immersiveStart();
   if (jungleSelected && jungleOpen) startBridge();else {
     const selected = $('palaceStage').value;
@@ -157,16 +168,18 @@ $('resetWorld').onclick = () => {
   }
 };
 $('palaceStage').onchange = refreshMenu;
-$('caveChoice').onclick = () => location.assign('cave.html');
-$('moonChoice').onclick = () => { moonSelected = true; jungleSelected = false; refreshMenu(); };
+$('caveChoice').onclick = () => { caveSelected=true; moonSelected=false; jungleSelected=false; refreshMenu(); };
+$('moonChoice').onclick = () => { moonSelected = true; caveSelected=false; jungleSelected = false; refreshMenu(); };
 $('palaceChoice').onclick = () => {
   moonSelected = false;
+  caveSelected = false;
   jungleSelected = false;
   refreshMenu();
   playTheme();
 };
 $('jungleChoice').onclick = () => {
   moonSelected = false;
+  caveSelected = false;
   jungleSelected = true;
   refreshMenu();
   playTheme();

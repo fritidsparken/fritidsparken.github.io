@@ -25,7 +25,7 @@ async function boot(saved={},options={}){
  assert.equal(g.get('warden.phase'),'defeated');
  g.run("startPlay();Object.assign(game.p,{x:1300,y:654,ground:true});keys.add('ArrowRight')");
  for(let i=0;i<400&&g.calls.navigation.length===0;i++)g.run('tick(1/120)');
- assert.equal(g.calls.navigation[0],'cave.html?from=aqueduct');assert(g.get('game.p.x')>=1600);
+ assert.equal(g.calls.navigation[0],'cave.html?from=aqueduct');assert(g.get('game.p.x')>=1500);
  g.run('tick(1/120);continueToCave();continueToCave()');assert.equal(g.calls.navigation.length,1);
  const save=JSON.parse(g.storage.get('lostWorlds.moon.v2'));assert.equal(save.finished,true);assert.equal(g.storage.get('lostWorlds.cave'),'1');
  console.log('PASS defeated boss → actual reachable portal → exactly one automatic cave handoff');
