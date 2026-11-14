@@ -44,7 +44,7 @@
   const home = document.createElement('div');
   home.id = 'standardHome';home.className = 'standard-only';
   document.querySelector('.hero').after(home);
-  const categoryPanel = () => `<section class="std-categories" aria-label="Utforska kategorier">${categories.map(([label,cat,symbol],i)=>`<button type="button" ${cat==='ranking'?'data-ranking-toggle aria-controls="fp-ranking" aria-expanded="false"':`data-standard-category="${cat}"`} style="--tile:${palettes[i]}">${icon(symbol)}<span>${label}</span></button>`).join('')}</section>`;
+  const categoryPanel = () => `<section class="std-categories" aria-label="Utforska kategorier">${categories.map(([label,cat,symbol],i)=>`<button type="button" ${cat==='ranking'?'data-ranking-toggle aria-controls="fp-ranking" aria-expanded="false"':`data-standard-category="${cat}"`} style="--tile:${palettes[i]}">${icon(symbol)}${cat==='Roliga verktyg'?'<span class="std-tools-label"><span>Roliga</span> <span>verktyg</span></span>':`<span>${label}</span>`}</button>`).join('')}</section>`;
   const categoryNavigation = document.createElement('div');
   categoryNavigation.innerHTML = categoryPanel();
   home.before(categoryNavigation);
@@ -209,5 +209,6 @@
   new MutationObserver(()=>{if(!document.body.classList.contains('std-design')||presentedSeason!==currentSeason()){drawFilters();draw();}}).observe(document.body,{attributes:true,attributeFilter:['class']});
   drawFilters();draw();
 })();
+
 
 
