@@ -29,7 +29,7 @@ picker.onchange=()=>{
   const i=Number(picker.value);
   if(!Number.isInteger(i)||i<0||i>unlocked)return;
   stage=i;finished=false;enter();save(0);
-  stop(game.room.name,game.room.hint,'Spela');
+  startPlay();
 };
 // The same treasure painter and pickup choreography as Solportens väg.
 // A collected ID survives deaths/checkpoints; revisiting it cannot award it again.
@@ -277,7 +277,7 @@ Promise.all([...chapters.map(r=>r.key),'span','crusher','warden','idle','climb',
   const image=new Image();image.src=PALACE_ART[id] || "moon-art/"+id+".webp";await image.decode();images[id]=image;
 })).then(()=>{
   loaded=true;const selecting=new URLSearchParams(location.search).has('stage');enter(selecting?0:saved.cp,!selecting);
-  stop(finished?'Månporten är öppen':'Månens akvedukt',finished?'Du har klarat värld III.':'Led vattnet genom palatset. Styr med pilarna och hoppa med mellanslag eller hoppknappen.',finished?'Till värld 4':'Spela');
+  if(!(selecting && requestedFromMenu))stop(finished?'Månporten är öppen':'Månens akvedukt',finished?'Du har klarat värld III.':'Led vattnet genom palatset. Styr med pilarna och hoppa med mellanslag eller hoppknappen.',finished?'Till värld 4':'Spela');
   el('go').disabled=false;requestAnimationFrame(animate);
   if(selecting && requestedFromMenu)startPlay();else if(new URLSearchParams(location.search).get('from')==='jungle')el('go').onclick();
 }).catch(()=>{stop('Palatset kunde inte öppnas','Kontrollera anslutningen och försök igen.','Försök igen');el('go').disabled=false});

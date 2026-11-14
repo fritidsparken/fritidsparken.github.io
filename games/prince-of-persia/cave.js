@@ -46,7 +46,7 @@ document.addEventListener('pointerdown',unlockCaveSound,{capture:true});
 document.addEventListener('keydown',unlockCaveSound,{capture:true});
 
 function ui(state){
- mode=state;$('menu').hidden=!['loading','ready','pause','error'].includes(state);
+ mode=state;$('menu').hidden=!['ready','pause','error'].includes(state);
  $('story').hidden=state!=='story'&&state!=='fading';$('hud').hidden=state!=='run';$('controls').hidden=state!=='run';$('notice').hidden=true;
  sound.setActive(state==='run');
  if(state!=='story'&&state!=='fading')motion.stop();
@@ -153,7 +153,7 @@ async function init(){
   const selected=arrival.get('from')==='menu'&&Number.isInteger(requested)&&requested>=0&&requested<=unlocked;
   if(selected){level=requested;completed=outro=false;if(level>0)seen=true}
   buildLevel(arrived&&!resumeArrival||selected?null:saved.cp);await Promise.all([cave.ready,cart.ready]);await preparePreview();resize();addEventListener('resize',resize);persist();
-  if(completed)showEndScreen(false);else panel('ready','Flöjtens eko','Tio grottor. En väg hem. Vagnen kör automatiskt. Samla mynt, välj spår och hoppa när rälsen bryts.','Starta färden');
+  if(completed)showEndScreen(false);else if(!selected&&!arrived)panel('ready','Flöjtens eko','Tio grottor. En väg hem. Vagnen kör automatiskt. Samla mynt, välj spår och hoppa när rälsen bryts.','Starta färden');
   if(arrived){history.replaceState(null,'',location.pathname);$('go').onclick()}else if(selected){history.replaceState(null,'',location.pathname);enter()}
   last=performance.now();requestAnimationFrame(frame);
  }catch(e){console.error(e);panel('error','Grottan kunde inte öppnas',renderer?'Ett spelmaterial kunde inte laddas. Kontrollera anslutningen och försök igen.':'Den här banan behöver WebGL 2. Kontrollera webbläsarens grafikstöd och försök igen.','Försök igen')}
@@ -162,7 +162,7 @@ for(const [i,name] of names.entries()){const option=document.createElement('opti
 $('levelSelect').value=level;
 $('levelSelect').addEventListener('change',async()=>{
  if(coinState)coinBank[level]=coinState.exportIds();level=Number($('levelSelect').value);completed=outro=false;$('endingScreen').hidden=true;clearTimeout(endingTimer);
- panel('loading',names[level],'Laddar grottan…','Vänta');try{buildLevel();await Promise.all([cave.ready,cart.ready]);await preparePreview();persist();panel('ready',names[level],'Samla mynt. Välj spår före växeln och hoppa vid rälsens avbrott.','Starta färden')}catch(e){console.error(e);panel('error','Grottan kunde inte laddas','Försök igen.','Försök igen')}
+ panel('loading',names[level],'Laddar grottan…','Vänta');try{buildLevel();await Promise.all([cave.ready,cart.ready]);await preparePreview();persist();enter()}catch(e){console.error(e);panel('error','Grottan kunde inte laddas','Försök igen.','Försök igen')}
 });
 init();
 
