@@ -11,3 +11,12 @@
  body.std-design #fpVisitorTime small{font-size:6px;letter-spacing:.6px}
  body.std-design #fpVisitorTime strong{font-size:10px}
 }
+
+
+/* Ge båda varumärkena samma höjd som tidsrutan på stående mobil. */
+@media(max-width:700px) and (orientation:portrait){
+ body.std-design .std-topbar{align-items:center;column-gap:4px}
+ body.std-design .std-brand,body.std-design .std-plugg{gap:4px;font-size:clamp(10px,3.2vw,15px);line-height:1.1}
+ body.std-design .std-brand img,body.std-design .std-plugg img{width:34px;height:34px;flex:0 0 34px}
+ body.std-design #fpVisitorTime{height:34px;box-sizing:border-box;display:flex;align-items:center}
+}
