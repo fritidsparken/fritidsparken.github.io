@@ -37,7 +37,7 @@ function makeRoute(id,kind,from,to,fn){
 export function createCourse(level=0){
  level=clamp(Math.floor(level)||0,0,COURSE_COUNT-1);const cfg={...profiles[level],turn:profiles[level].turn*1.8,wave:profiles[level].wave*.75},phase=level*.71;
  const base=z=>vec(cfg.turn*(Math.sin(z/cfg.wave+phase)-Math.sin(phase))+cfg.secondary*Math.sin(z/(cfg.wave*2.23)),cfg.height*(Math.sin(z/cfg.vertical+phase)-Math.sin(phase))+.40*Math.sin(z/17)-.19*z+12*Math.sin(z/42),z);
- const routes=[],routeMap=new Map(),junctions=[],pits=[];let cursor=0,progress=0;
+ const routes=[],routeMap=new Map(),junctions=[],pits=[];let cursor=0,progress=0,pendingGap=null;
  const push=r=>{routes.push(r);routeMap.set(r.id,r);return r};
  const branchFn=(at,side,safe,span,spread)=>z=>{const t=z-at,rise=span*.35,merge=span*.57,offset=t<rise?smooth(t/rise):safe?1-smooth((t-merge)/(span-merge)):1;const p=base(z);p.x-=side*spread*offset;return p};
  const addGap=(route,start,length)=>{const end=start+length;route.gaps.push({start,end,worldStart:route.sample(start).position,worldEnd:route.sample(end).position})};
@@ -45,16 +45,18 @@ export function createCourse(level=0){
  for(let i=0;i<cfg.sides.length;i++){
   const approach=2*((i===0?70:cfg.approach)+((i+level)%3-1)*6),at=cursor+approach,safeSide=cfg.sides[i],span=2*(cfg.branch+(i%2)*6),spread=cfg.spread+(i%3)*.3;
   const main=push(makeRoute('main-'+i,'main',cursor,at,base));main.progressStart=progress;progress+=main.length;
+  if(pendingGap!==null){addGap(main,56,pendingGap);pendingGap=null;}
   const safe=push(makeRoute('safe-'+i,'safe',at,at+span,branchFn(at,safeSide,true,span,spread)));safe.progressStart=progress;
   const dead=push(makeRoute('dead-'+i,'dead',at,at+span*.35+12,branchFn(at,-safeSide,false,span,spread)));dead.progressStart=progress;
   const junction={id:i,position:main.sample(main.length).position,safeSide,entryRoute:main.id,safeRoute:safe.id,deadRoute:dead.id};
   main.fork=junction;safe.next='main-'+(i+1);junctions.push(junction);
   const tip=dead.sample(dead.length);pits.push({position:tip.position,direction:tip.tangent,width:12,depth:55+level*2,routeId:dead.id});
-  if(jumpingBranches.has(i))addGap(safe,56,10+level*.3+(i%2));
+  if(jumpingBranches.has(i))pendingGap=10+level*.3+(i%2);
   progress+=safe.length;cursor=at+span;
  }
  const terminal=push(makeRoute('main-'+cfg.sides.length,'main',cursor,cursor+200+level*4,base));terminal.progressStart=progress;
  addGap(terminal,56,10+level*.3);
+ if(pendingGap!==null)addGap(terminal,115,pendingGap);
  progress+=terminal.length;
  return {level,name:COURSE_NAMES[level],theme:level%5,routes,routeMap,startRoute:'main-0',finish:terminal.sample(terminal.length).position,finishTangent:terminal.sample(terminal.length).tangent,junctions,pits,length:progress,baseSpeed:cfg.speed,maxSpeed:cfg.speed*2.0,minSpeed:cfg.speed*.75,gapCount:cfg.gaps};
 }
