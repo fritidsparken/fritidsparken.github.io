@@ -69,6 +69,9 @@
   #titleMenu .tools { margin-top: 7px; gap: 14px; }
   #titleMenu #keys { display: none; }
 }
+@media (min-width: 701px) { #titleMenu h1 { position: relative; top: -3px; } }
+@media (orientation: portrait) and (max-width: 700px), (orientation: landscape) and (max-height: 600px) and (max-width: 1100px) { #titleMenu h1 { position: relative; top: -2px; } }
+#roomName, #bridgeHud small { display: none !important; }
 </style>
 
 </head>
@@ -222,7 +225,7 @@
     <script defer src="palace/simulation.js"></script>
     <script defer src="palace/scenery.js"></script>
     <script defer src="game.js"></script>
-    <script defer src="audio.js?v=20261113-music"></script>
+    <script defer src="audio.js?v=audio-immediate-20261114"></script>
     <script defer src="palace/render.js?v=moon1"></script>
     <script defer src="jungle/courses.js?v=names-20261114"></script>
     <script defer src="jungle/chase.js?v=story-worlds-20261114"></script>

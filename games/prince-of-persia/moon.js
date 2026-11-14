@@ -107,7 +107,9 @@ function startPlay(){
   active=true;paused=false;enablePickupAudio();last=performance.now();el('overlay').hidden=true;
   el('music').volume=.35;el('music').play().catch(()=>{});
 };
+document.addEventListener('pointerdown',()=>{if(active){enablePickupAudio();el('music').play().catch(()=>{})}},{capture:true});
 addEventListener('keydown',e=>{
+  if(active){enablePickupAudio();el('music').play().catch(()=>{})}
   if(e.code==='Escape')pause();
   if(!active || !['ArrowLeft','KeyA','ArrowRight','KeyD','Space','ArrowUp','KeyW'].includes(e.code))return;
   e.preventDefault();keys.add(e.code);

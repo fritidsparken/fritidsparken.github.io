@@ -3,7 +3,7 @@ import * as THREE from './vendor/three.module.js';
 import {createCourse,CartPhysics,COURSE_NAMES,COURSE_COUNT} from './minecart-track.js?v=names-20261114';
 import {buildCave} from './cave-environment.js?v=ceiling-signs-20261114';
 import {buildCart} from './minecart-model.js?v=next-ride-20261114';
-import {buildRails} from './minecart-rails.js?v=ceiling-signs-20261114';
+import {buildRails} from './minecart-rails.js?v=clear-arrows-20261114';
 import {createCartCamera} from './minecart-camera.js?v=next-ride-20261114';
 import {CoinState,buildCoins} from './minecart-coins.js?v=next-ride-20261114';
 import {createCartAudio} from './minecart-audio.js?v=next-ride-20261114';
@@ -53,7 +53,7 @@ function ui(state){
 }
 function panel(state,title,desc,button){ui(state);$('title').textContent=title;$('desc').textContent=desc;$('go').textContent=button;$('go').disabled=state==='loading';$('levelSelect').disabled=['loading','error'].includes(state)}
 function enter(){
- ui('run');last=performance.now();acc=0;$('chapter').textContent='JAKTEN PÅ FLÖJTENS EKO · '+(level+1)+' / '+COURSE_COUNT;$('place').textContent=names[level];music(.18);updateHUD(current);
+ ui('run');sound.resume();last=performance.now();acc=0;$('chapter').textContent='JAKTEN PÅ FLÖJTENS EKO · '+(level+1)+' / '+COURSE_COUNT;$('place').textContent=names[level];music(.18);updateHUD(current);
 }
 function tell(lines,end,done){
  ui('story');$('story').classList.toggle('end',end);

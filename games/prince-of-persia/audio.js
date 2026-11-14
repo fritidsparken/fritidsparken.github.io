@@ -236,6 +236,7 @@ function pickupChime(combo) {
     };
   }
 }
+const scoreBytesPending = readAudioFile(ACTION_MUSIC).catch(() => null);
 let scoreBuffer,
   scorePending,
   scoreVoice,
@@ -246,7 +247,7 @@ let scoreBuffer,
 function prepareScore() {
   enablePickupAudio();
   if (!pickupAudio || scorePending || scoreBuffer) return;
-  scorePending = readAudioFile(ACTION_MUSIC).then(bytes => pickupAudio.decodeAudioData(bytes)).then(b => {
+  scorePending = scoreBytesPending.then(bytes => bytes || readAudioFile(ACTION_MUSIC)).then(bytes => pickupAudio.decodeAudioData(bytes)).then(b => {
     scoreBuffer = b;
     syncScore();
   }).catch(() => {}).finally(() => {
@@ -261,8 +262,7 @@ function syncScore() {
   source.loopEnd = Math.min(scoreBuffer.duration, 145.18);
   scoreGain = pickupAudio.createGain();
   const now = pickupAudio.currentTime;
-  scoreGain.gain.setValueAtTime(0, now);
-  scoreGain.gain.linearRampToValueAtTime(opening.hidden ? .21 : .065, now + .6);
+  scoreGain.gain.setValueAtTime(opening.hidden ? .21 : .065, now);
   source.connect(scoreGain);
   scoreGain.connect(pickupAudio.destination);
   scoreOffset %= source.loopEnd;
