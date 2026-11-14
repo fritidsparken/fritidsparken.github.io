@@ -142,7 +142,7 @@ async function init(){
   if(selected){level=requested;completed=outro=false;if(level>0)seen=true}
   buildLevel(arrived&&!resumeArrival||selected?null:saved.cp);await Promise.all([cave.ready,cart.ready]);resize();addEventListener('resize',resize);persist();$('score').volume=0;
   if(completed)showEndScreen(false);else panel('ready','Flöjtens eko','Tio grottor. En väg hem. Vagnen kör automatiskt. Samla mynt, välj spår och hoppa när rälsen bryts.','Starta färden');
-  if(arrived){history.replaceState(null,'',location.pathname);$('go').onclick()}
+  if(arrived){history.replaceState(null,'',location.pathname);$('go').onclick()}else if(selected){history.replaceState(null,'',location.pathname);enter()}
   last=performance.now();requestAnimationFrame(frame);
  }catch(e){console.error(e);panel('error','Grottan kunde inte öppnas',renderer?'Ett spelmaterial kunde inte laddas. Kontrollera anslutningen och försök igen.':'Den här banan behöver WebGL 2. Kontrollera webbläsarens grafikstöd och försök igen.','Försök igen')}
 }
