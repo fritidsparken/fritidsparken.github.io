@@ -397,3 +397,7 @@ body.std-design .std-categories > #fp-ranking .ranking-icon {
 /* Ikonraden är sidans navigering; dölj den extra toppmenyn på alla skärmar. */
 body.std-design #stdNavigation,
 body.std-design .std-menu-toggle{display:none!important}
+
+
+/* Behåll högerställda verktyg på breda datorskärmar även utan navigationsrad. */
+@media(min-width:1440px){body.std-design .std-topbar > #fpVisitorTime{margin-left:auto}}
