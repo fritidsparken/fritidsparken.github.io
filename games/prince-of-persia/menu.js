@@ -35,6 +35,15 @@ if (jungleOpen) {
   unlockJungle();
 }
 theme.volume = .45;
+// The opening of the original track is very quiet. Begin at the audible phrase.
+const menuMusicStart = 10;
+function cueMenuMusic() {
+  if (Number.isFinite(theme.duration) && theme.duration > menuMusicStart && theme.currentTime < menuMusicStart) {
+    theme.currentTime = menuMusicStart;
+  }
+}
+if (theme.readyState >= 1) cueMenuMusic();
+else theme.addEventListener('loadedmetadata', cueMenuMusic, { once: true });
 function playTheme() {
   if (!menu.hidden && !document.hidden) theme.play().catch(() => {});
 }
