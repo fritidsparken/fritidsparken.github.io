@@ -47,6 +47,8 @@ else theme.addEventListener('loadedmetadata', cueMenuMusic, { once: true });
 function playTheme() {
   if (!menu.hidden && !document.hidden) theme.play().catch(() => {});
 }
+playTheme();
+theme.addEventListener('loadedmetadata', playTheme);
 theme.addEventListener('canplay', playTheme);
 window.addEventListener('pageshow', playTheme);
 function unlockMenuMusic() {
@@ -54,6 +56,9 @@ function unlockMenuMusic() {
 }
 document.addEventListener('pointerdown', unlockMenuMusic, { capture: true });
 document.addEventListener('keydown', unlockMenuMusic, { capture: true });
+document.addEventListener('touchstart', unlockMenuMusic, { capture: true, passive: true });
+document.addEventListener('click', unlockMenuMusic, { capture: true });
+window.addEventListener('focus', playTheme);
 function refreshPalaceStages() {
   const picker = $('palaceStage');
   picker.replaceChildren();
