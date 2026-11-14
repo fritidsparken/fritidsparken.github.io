@@ -69,8 +69,8 @@ function refreshPalaceStages() {
   picker.value = journey && !route.done ? 'resume' : String(route.done ? route.index : 0);
 }
 let moonSelected = false, caveSelected = false;
-const moonNames=['Månskärans port','Den blå cisternen','Kedjegjuteriet','De hängande trädgårdarna','Prismagalleriet','Klockornas reservoar','Himmelsslussen','Tidvattenmaskinen','Förmörkelsens bro','Tidvattenväktaren'];
-const caveNames=['Lyktgången','Blådjupet','Kristallvalvet','Koppargruvan','Ekoklyftan','De glömda valven','Elddjupet','Månstenstunneln','Avgrundens kant','Flöjtens källa'];
+const moonNames=['Månskärans tröskel','Den blå cisternens djup','Kedjornas smedja','Trädgårdarna ovan molnen','Prismornas passage','Klockornas djup','Himlens sluss','Tidvattnets hjärta','Bron under förmörkelsen','Vägen förbi väktaren'];
+const caveNames=['Lyktornas nedfärd','Färden mot blådjupet','Kristallernas tunnel','Koppargruvans kurvor','Ekoklyftans stup','De glömda spåren','Elddjupets ras','Månstenens mörker','Avgrundens växlar','Färden till flöjtens källa'];
 function fillWorldStages(id,names,saveKey){
  let save={};try{save=JSON.parse(localStorage.getItem(saveKey))||{}}catch{}
  const max=save.finished||save.completed?9:Math.max(0,Number(save.unlocked)||0,Number(save.stage)||0,Number(save.level)||0);
@@ -236,3 +236,4 @@ $('bridgePreview').onclick = () => {
   immersiveStart();
   startBridge();
 };
+

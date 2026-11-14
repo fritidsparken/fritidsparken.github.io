@@ -11,7 +11,7 @@ const norm=a=>{const n=Math.hypot(a.x,a.y,a.z)||1;return mul(a,1/n)};
 const lerp=(a,b,t)=>add(mul(a,1-t),mul(b,t));
 const smooth=t=>(t=clamp(t,0,1),t*t*(3-2*t));
 const GRAVITY=18;
-export const COURSE_NAMES=['Lyktgången','Blådjupet','Kristallvalvet','Koppargruvan','Ekoklyftan','De glömda valven','Elddjupet','Månstenstunneln','Avgrundens kant','Flöjtens källa'];
+export const COURSE_NAMES=['Lyktornas nedfärd','Färden mot blådjupet','Kristallernas tunnel','Koppargruvans kurvor','Ekoklyftans stup','De glömda spåren','Elddjupets ras','Månstenens mörker','Avgrundens växlar','Färden till flöjtens källa'];
 export const COURSE_COUNT=COURSE_NAMES.length;
 // Profiles change geometry, rhythm and elevation, not just a title or random seed.
 const profiles=[
@@ -103,3 +103,4 @@ export class CartPhysics{
  }
  snapshot(){const sample=this.route.sample(this.s),gap=this.nextGap(),pending=this.pendingFork();return{position:this.status==='falling'?{...this.fallPosition}:add(sample.position,vec(0,Math.max(0,this.jumpHeight),0)),trackPosition:sample.position,tangent:this.status==='falling'?norm(this.fallVelocity):sample.tangent,railTangent:sample.tangent,speed:this.speed,routeId:this.routeId,s:this.s,choice:this.choice,pending,locked:this.locked,jumpHeight:Math.max(0,this.jumpHeight),jumpQueued:this.jumpQueued,nextGap:gap,jumpWarning:!!gap?.warning,jumpWindow:JUMP_WINDOW,canJump:this.status==='run'&&this.jumpHeight===0&&!!gap&&gap.distance>=0&&gap.distance<=JUMP_WINDOW,status:this.status,fallTime:this.fallTime,progress:clamp((this.route.progressStart+this.s)/this.course.length,0,1),respawns:this.respawns,travel:this.travel,checkpoint:this.snapshotCheckpoint()}}
 }
+

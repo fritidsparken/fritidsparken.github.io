@@ -216,11 +216,10 @@ function stepBridge(dt) {
   bridge.stun = Math.max(0, bridge.stun - dt);
   const dx = bridgeAxis + Number(bridgeKeys.has('right')) - Number(bridgeKeys.has('left'));
   const dz = bridgeForward + Number(bridgeKeys.has('forward')) - Number(bridgeKeys.has('back'));
-  const magnitude = Math.max(1, Math.hypot(dx, dz)),
-    ease = 1 - Math.exp(-dt * 24),
+  const ease = 1 - Math.exp(-dt * 30),
     slow = bridge.stun > 0 ? .33 : 1;
-  bridge.travelX += (dx / magnitude - bridge.travelX) * ease;
-  bridge.travelZ += (dz / magnitude - bridge.travelZ) * ease;
+  bridge.travelX += (clamp(dx, -1, 1) - bridge.travelX) * ease;
+  bridge.travelZ += (clamp(dz, -1, 1) - bridge.travelZ) * ease;
   if (!dx && Math.abs(bridge.travelX) < .015) bridge.travelX = 0;
   if (!dz && Math.abs(bridge.travelZ) < .015) bridge.travelZ = 0;
   bridge.d = clamp(bridge.d + bridge.travelZ * speed * dt * slow, 0, course()[1]);
@@ -409,3 +408,4 @@ function advanceRocks(dt, afterCatch = false) {
     playEffect('slam', .65);
   }
 }
+

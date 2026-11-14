@@ -280,8 +280,6 @@ export function createOutroMotion(canvas, options={}) {
     frameCtx.setTransform(1,0,0,1,0,0);frameCtx.globalAlpha=1;frameCtx.globalCompositeOperation='source-over';
     frameCtx.drawImage(source,0,0);
     if(!media?.matches){
-      moveMesh(mesh,scene,time,w,h);
-      for(const triangle of mesh.triangles) paintTriangle(frameCtx,source,mesh.vertices,triangle,w,h);
       paintEnvironment(frameCtx,scene,time,w,h);
     }
     ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -346,3 +344,4 @@ export function createOutroMotion(canvas, options={}) {
   }
   return {show,stop,dispose,resize,update,stats};
 }
+

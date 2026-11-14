@@ -1,13 +1,13 @@
 import {renderCoursePreview} from './course-preview.js?v=next-ride-20261114';
 import * as THREE from './vendor/three.module.js';
-import {createCourse,CartPhysics,COURSE_NAMES,COURSE_COUNT} from './minecart-track.js?v=next-ride-20261114';
+import {createCourse,CartPhysics,COURSE_NAMES,COURSE_COUNT} from './minecart-track.js?v=names-20261114';
 import {buildCave} from './cave-environment.js?v=next-ride-20261114';
 import {buildCart} from './minecart-model.js?v=next-ride-20261114';
 import {buildRails} from './minecart-rails.js?v=next-ride-20261114';
 import {createCartCamera} from './minecart-camera.js?v=next-ride-20261114';
 import {CoinState,buildCoins} from './minecart-coins.js?v=next-ride-20261114';
 import {createCartAudio} from './minecart-audio.js?v=next-ride-20261114';
-import {createOutroMotion} from './outro-motion.js?v=next-ride-20261114';
+import {createOutroMotion} from './outro-motion.js?v=water-20261114';
 const $=id=>document.getElementById(id),reader=window.storyReader($('line'),$('retry'));
 const names=COURSE_NAMES, MAIN_MENU='https://fritidsparken.se/games/prince-of-persia/';
 const opening=[
@@ -50,7 +50,10 @@ function enter(){
  ui('run');last=performance.now();acc=0;$('chapter').textContent='FLÖJTENS EKO · '+(level+1)+' / '+COURSE_COUNT;$('place').textContent=names[level];music(.18);updateHUD(current);
 }
 function tell(lines,end,done){
- ui('story');$('story').classList.toggle('end',end);music(end?.065:.06);
+ ui('story');$('story').classList.toggle('end',end);
+ // Duck before the first voice starts; do not wait for the render-loop fade.
+ if(end) $('score').volume=Math.min($('score').volume,.015);
+ music(end?.015:.06);
  reader.start(lines,done,(cue,index)=>{
   if(cue.image){$('storyArt').src=cue.image;$('storyArt').alt='Navid och Laleh återförenas och hittar hem';$('storyArt').hidden=false;motion.show(cue.image,index).catch?.(()=>{})}
   else{$('storyArt').hidden=true;motion.stop()}
@@ -97,7 +100,7 @@ addEventListener('keydown',e=>{
  if(key==='arrowleft'||key==='a')select(-1);if(key==='arrowright'||key==='d')select(1);if(key===' '&&!e.repeat)physics.jump();if(key==='r'&&!e.repeat){physics.restart();snap();persist()}
 });
 addEventListener('blur',pause);
-document.addEventListener('visibilitychange',()=>{if(document.hidden){pause();sound.setActive(false);$('score').pause()}else if(mode==='story')music(.065)});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){pause();sound.setActive(false);$('score').pause()}else if(mode==='story')music($('story').classList.contains('end')?.015:.06)});
 function updateHUD(s){
  $('distance').value=s.progress;$('speed').textContent=Math.round(s.speed*3.6)+' km/h';
  const score=coinState.summary(time);$('coinCount').textContent=score.displayCourseCount;$('coinTotal').textContent='/ '+score.courseTotal;$('coinHud').style.transform='scale('+score.hudScale+')';
@@ -156,3 +159,4 @@ $('levelSelect').addEventListener('change',async()=>{
  panel('loading',names[level],'Laddar grottan…','Vänta');try{buildLevel();await Promise.all([cave.ready,cart.ready]);await preparePreview();persist();panel('ready',names[level],'Samla mynt. Välj spår före växeln och hoppa vid rälsens avbrott.','Starta färden')}catch(e){console.error(e);panel('error','Grottan kunde inte laddas','Försök igen.','Försök igen')}
 });
 init();
+

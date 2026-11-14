@@ -58,62 +58,62 @@ const PASSAGE_ANCHORS = [{
 // Coordinates are traced on each 1672 × 941 reference plate, at the walking
 // line between the back and front edges of its stonework.
 const ROOMS = [{
-  name: 'Palatspassagen',
+  name: 'Sandstenens port',
   key: '01_palatspassagen',
   line: 'Ta den brutna bron, häv dig upp och gå vidare längs terrassen.',
   scale: 1
 }, {
-  name: 'Rosenterrassen',
+  name: 'Rosornas tak',
   key: '02_rosenterrassen',
   line: 'Hoppa över det fallna murblocket och upp på terrassen.',
   floors: [[0, 748, 650], [809, 1252, 650], [1252, 1672, 507]],
   exit: 1574
 }, {
-  name: 'Vattenpalatset',
+  name: 'Det sjunkna palatset',
   key: '03_vattenpalatset',
   line: 'Korsa kanalerna. Dubbla hoppet för att ta dig över vattenstrålen.',
   floors: [[0, 518, 633], [572, 1135, 633], [1190, 1672, 633]],
   exit: 1588
 }, {
-  name: 'Mosaikgalleriet',
+  name: 'Mosaikens hemlighet',
   key: '04_mosaikgalleriet',
   line: 'Hoppa upp på galleriet och över den brutna valvbågen.',
   floors: [[0, 646, 680], [646, 1150, 544], [1235, 1672, 544]],
   exit: 1595
 }, {
-  name: 'Den gamla akvedukten',
+  name: 'Den glömda vattenvägen',
   key: '05_akvedukten',
   line: 'Korsa de tre brospannen högt över floden.',
   floors: [[0, 478, 575], [552, 1078, 575], [1152, 1672, 575]],
   exit: 1595
 }, {
-  name: 'De hängande trädgårdarna',
+  name: 'Trädgårdarnas höjder',
   key: '06_hangande_tradgardar',
   line: 'Klättra förbi fontänen och hoppa över rännan.',
   floors: [[0, 638, 702], [638, 1232, 486], [1289, 1672, 486]],
   extras: [[1232, 1289, 525]],
   exit: 1592
 }, {
-  name: 'Stjärngården',
+  name: 'Stjärnornas gård',
   key: '07_stjarngarden',
   line: 'Följ stjärnljuset genom astronomens gård.',
   floors: [[0, 901, 629], [965, 1672, 629]],
   exit: 1560
 }, {
-  name: 'Klocktornets hjärta',
+  name: 'Tidens klocktorn',
   key: '08_klocktornet',
   line: 'Häv dig upp till urverket och ta den östra utgången.',
   floors: [[0, 776, 664], [776, 1288, 481], [1370, 1672, 481]],
   extras: [[1288, 1370, 511]],
   exit: 1570
 }, {
-  name: 'Kungabron',
+  name: 'Kungarnas bro',
   key: '09_kungabron',
   line: 'Samla båda kungasigillen och gå in i det upplysta valvet till höger.',
   floors: [[0, 507, 476], [572, 1195, 476], [1247, 1672, 476]],
   exit: 1558
 }, {
-  name: 'Solporten',
+  name: 'Solportens skugga',
   key: '10_solporten',
   line: 'Nå den öppna porten med solsigillet.',
   floors: [[0, 600, 612], [654, 1060, 612], [1060, 1672, 516, 499]],
@@ -121,7 +121,7 @@ const ROOMS = [{
 }];
 ROOMS.splice(6, 1);
 ROOMS.push({
-  name: 'Solväktarens sal',
+  name: 'Solväktarens sigill',
   key: 'guardianRoom',
   line: 'Undvik näven. Hoppa över stötvågen och ta solsigillet på armbandet.',
   floors: [[0, 1672, 690]],
@@ -389,3 +389,4 @@ function advanceCubes(game, dt, oldX, oldY) {
     }
   }
 }
+

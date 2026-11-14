@@ -206,11 +206,14 @@ function resetBridgeStick() {
 const jStick = $('bridgeStick');
 function steerBridge(e) {
   const box = jStick.getBoundingClientRect(),
-    x = (e.clientX - box.left - box.width / 2) / (box.width * .38),
-    y = (box.top + box.height / 2 - e.clientY) / (box.height * .38);
-  const n = Math.max(1, Math.hypot(x, y));
-  bridgeAxis = x / n;
-  bridgeForward = -y / n;
+    x = (e.clientX - box.left - box.width / 2) / (box.width * .30),
+    y = (e.clientY - box.top - box.height / 2) / (box.height * .30);
+  const axis = value => {
+    const amount = Math.min(1, Math.abs(value));
+    return amount <= .08 ? 0 : Math.sign(value) * (amount - .08) / .92;
+  };
+  bridgeAxis = axis(x);
+  bridgeForward = axis(y);
   jStick.firstElementChild.style.transform = 'translate(' + bridgeAxis * box.width * .25 + 'px,' + bridgeForward * box.height * .25 + 'px)';
 }
 jStick.onpointerdown = e => {
@@ -244,3 +247,4 @@ function jungleKey(code) {
     Space: 'jump'
   }[code];
 }
+

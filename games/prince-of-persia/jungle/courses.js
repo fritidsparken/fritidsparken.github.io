@@ -10,16 +10,16 @@ const bridgeArt = Object.fromEntries(Object.entries(JUNGLE_ART).map(([key, url])
 }));
 // Each course has its own rhythm. L/R obstacles leave the opposite half open.
 const jungleCourses = [
-  ['Ormbunksstigen', 190, 3.25, 'soil', 'gap logL gap logR gap pillar', .13],
-  ['Rotstigen', 216, 3.35, 'soil', 'logL logR log logL gap logR', .38],
-  ['Jadefloden', 232, 3.4, 'soil', 'gap pillarR gapL log gapR gap', .23],
-  ['Den dränkta gården', 248, 3.45, 'stone', 'pillarL gapR pillar logL pillarR gap', .28],
-  ['Lyktgrottan', 264, 3.55, 'soil', 'log gapL logR logL gap log', .47],
-  ['Ockraravinen', 280, 3.62, 'stone', 'gapL pillarR gap pillarL log gapR', .59],
-  ['Den gamla akvedukten', 298, 3.68, 'stone', 'pillar gapR gapL pillarR gap pillarL', .27],
-  ['Bambudalen', 312, 3.76, 'soil', 'logR log gapL logL gap logR', .62],
-  ['Bärnstensgrottan', 332, 3.86, 'stone', 'pillarL gap pillarR log gapL pillar', .43],
-  ['Soltemplets flykt', 360, 4.0, 'soil', 'gap logL pillarR gapL log pillar gapR logR', .54]
+  ['Ormbunkarnas stig', 190, 3.25, 'soil', 'gap logL gap logR gap pillar', .13],
+  ['Rötternas labyrint', 216, 3.35, 'soil', 'logL logR log logL gap logR', .38],
+  ['Jadeflodens språng', 232, 3.4, 'soil', 'gap pillarR gapL log gapR gap', .23],
+  ['Den dränkta ruinen', 248, 3.45, 'stone', 'pillarL gapR pillar logL pillarR gap', .28],
+  ['Lyktornas grotta', 264, 3.55, 'soil', 'log gapL logR logL gap log', .47],
+  ['Ockraravinens bråddjup', 280, 3.62, 'stone', 'gapL pillarR gap pillarL log gapR', .59],
+  ['Akveduktens spillror', 298, 3.68, 'stone', 'pillar gapR gapL pillarR gap pillarL', .27],
+  ['Bambuskogens flykt', 312, 3.76, 'soil', 'logR log gapL logL gap logR', .62],
+  ['Bärnstenens valv', 332, 3.86, 'stone', 'pillarL gap pillarR log gapL pillar', .43],
+  ['Jakten mot soltemplet', 360, 4.0, 'soil', 'gap logL pillarR gapL log pillar gapR logR', .54]
 ];
 const bridge = {
     active: false,
@@ -215,3 +215,4 @@ function buildCourse() {
     rocks
   };
 }
+
