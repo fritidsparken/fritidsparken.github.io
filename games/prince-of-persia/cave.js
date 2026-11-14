@@ -98,6 +98,11 @@ $('go').onclick=async()=>{
   if(!seen)tell(opening,false,()=>{seen=true;persist();enter()});else enter();
  }catch(e){console.error(e);panel('error','Grottan kunde inte laddas','Ett spelmaterial kunde inte laddas. Försök igen.','Försök igen')}
 };
+// Suppress Safari's repeated-tap zoom even while a control is disabled.
+for (const pad of document.querySelectorAll('#controls .pad')) {
+ pad.addEventListener('touchend', event => event.preventDefault(), {passive:false});
+ pad.addEventListener('dblclick', event => event.preventDefault());
+}
 for(const [id,side]of [['left',-1],['right',1]])$(id).addEventListener('pointerdown',e=>{e.preventDefault();select(side)});
 $('jump').addEventListener('pointerdown',e=>{e.preventDefault();if(mode==='run'){sound.resume();physics.jump();updateHUD(physics.snapshot())}});
 addEventListener('keydown',e=>{
