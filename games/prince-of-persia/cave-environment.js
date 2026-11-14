@@ -131,6 +131,8 @@ export function buildCave(T,scene,course,level=0,previewOnly=false){
  if(theme===3){for(let z=minZ+30;z<maxZ-20;z+=75){const r=row(z),x=r.left+2,y=height(x,z,r);const wheel=addMesh(new T.TorusGeometry(2.7,.22,8,30),metal);wheel.position.set(x,y+3,z);wheel.rotation.y=Math.PI/2;for(let j=0;j<8;j++){const spoke=addMesh(new T.BoxGeometry(.14,5.1,.14),wood);spoke.position.copy(wheel.position);spoke.rotation.x=j*Math.PI/4}const axle=addMesh(new T.CylinderGeometry(.3,.3,1.7,10),metal);axle.rotation.z=Math.PI/2;axle.position.copy(wheel.position)}}
  function update(time,cartPosition){updateDoor(cartPosition);const selected=torchPositions.map(p=>({p,d:p.distanceToSquared(new T.Vector3(cartPosition.x,cartPosition.y,cartPosition.z))})).sort((a,b)=>a.d-b.d).slice(0,lights.length);selected.forEach((item,i)=>{lights[i].position.copy(item.p);lights[i].intensity=90+Math.sin(time*7+i)*3+Math.sin(time*11+i*2)*2})}
  function dispose(){scene.remove(root);for(const g of geometries)g.dispose();for(const m of materials)m.dispose();for(const t of textures)t.dispose()}
- return {root,update,dispose,ready:Promise.all(pending),door:doorGroup,doorLeaves,passage,setPreview,pits,groundHeight:(x,z)=>height(x,z,row(z))};
+ function roofHeight(x,z){const r=row(z),a=Math.acos(Math.max(-1,Math.min(1,(x-r.mid)/((r.right-r.left)*.5+.4)))),n=noise(a*5,z)+.24*Math.sin(a*17+z*.73)+.12*Math.sin(a*31-z*1.67);return height(r.mid,z,r)-.6+Math.sin(a)*(10.6+chapter*.6+1.6*Math.sin(z*.031)+.7*Math.cos(z*.117))+n*.5;}
+ return {root,update,dispose,roofHeight,ready:Promise.all(pending),door:doorGroup,doorLeaves,passage,setPreview,pits,groundHeight:(x,z)=>height(x,z,row(z))};
 }
+
 

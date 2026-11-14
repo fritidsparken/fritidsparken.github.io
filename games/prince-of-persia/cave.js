@@ -1,9 +1,9 @@
 import {renderCoursePreview} from './course-preview.js?v=next-ride-20261114';
 import * as THREE from './vendor/three.module.js';
 import {createCourse,CartPhysics,COURSE_NAMES,COURSE_COUNT} from './minecart-track.js?v=names-20261114';
-import {buildCave} from './cave-environment.js?v=palace-arrows-open-20261114';
+import {buildCave} from './cave-environment.js?v=ceiling-signs-20261114';
 import {buildCart} from './minecart-model.js?v=next-ride-20261114';
-import {buildRails} from './minecart-rails.js?v=palace-arrows-open-20261114';
+import {buildRails} from './minecart-rails.js?v=ceiling-signs-20261114';
 import {createCartCamera} from './minecart-camera.js?v=next-ride-20261114';
 import {CoinState,buildCoins} from './minecart-coins.js?v=next-ride-20261114';
 import {createCartAudio} from './minecart-audio.js?v=next-ride-20261114';
@@ -32,13 +32,19 @@ const sound=createCartAudio(),motion=createOutroMotion($('outroCanvas'),{imageEl
 const STEP=1/90,pos=new THREE.Vector3(),tan=new THREE.Vector3(),orientation=new THREE.Quaternion(),targetQ=new THREE.Quaternion(),forward=new THREE.Vector3(0,0,1);
 let previewTarget;
 async function preparePreview(){if(level===COURSE_COUNT-1){previewTarget?.dispose();const texture=await new THREE.TextureLoader().loadAsync('echo-art/finale-1.webp');texture.colorSpace=THREE.SRGBColorSpace;texture.repeat.set(.45,1);texture.offset.set(.55,0);previewTarget={dispose:()=>texture.dispose()};cave.setPreview(texture);return;}previewTarget?.dispose();previewTarget=await renderCoursePreview(THREE,renderer,{createCourse,buildCave,buildRails,buildCart,createCartCamera},level);cave.setPreview(previewTarget.texture);}
-let lamp,lampTarget,notified=0,musicTarget=0,endingTimer=0;
+let lamp,lampTarget,notified=0,musicTarget=.06,endingTimer=0;
 function totalCoins(){return Object.values(coinBank).reduce((n,ids)=>n+(Array.isArray(ids)?new Set(ids).size:0),0)}
 function persist(){
  if(coinState)coinBank[level]=coinState.exportIds();
  try{localStorage.setItem(KEY,JSON.stringify({level,unlocked,seen,completed,outro,coins:coinBank,cp:physics?.snapshotCheckpoint()}));localStorage.setItem('lostWorlds.cave','1')}catch{}
 }
 function music(volume){musicTarget=volume;if(volume>0)$('score').play().catch(()=>{})}
+$('score').volume=.06;
+music(.06);
+function unlockCaveSound(){sound.resume();if(musicTarget>0)music(musicTarget)}
+document.addEventListener('pointerdown',unlockCaveSound,{capture:true});
+document.addEventListener('keydown',unlockCaveSound,{capture:true});
+
 function ui(state){
  mode=state;$('menu').hidden=!['loading','ready','pause','error'].includes(state);
  $('story').hidden=state!=='story'&&state!=='fading';$('hud').hidden=state!=='run';$('controls').hidden=state!=='run';$('notice').hidden=true;
@@ -77,7 +83,7 @@ async function advance(){
 function snap(){followCamera?.reset();current=physics.snapshot();previous=current;orientation.setFromUnitVectors(forward,new THREE.Vector3(current.tangent.x,current.tangent.y,current.tangent.z).normalize());acc=0;lastRespawns=current.respawns;distance=0}
 function buildLevel(cp){
  $('levelSelect').value=level;previewTarget?.dispose();previewTarget=null;coins?.dispose();cave?.dispose();rails?.dispose();course=createCourse(level);physics=new CartPhysics(course);if(cp)physics.restoreCheckpoint(cp);
- cave=buildCave(THREE,scene,course,level);rails=buildRails(THREE,scene,course);coinState=new CoinState(course,Array.isArray(coinBank[level])?coinBank[level]:[]);coins=buildCoins(THREE,scene,course,coinState);
+ cave=buildCave(THREE,scene,course,level);rails=buildRails(THREE,scene,course,cave.roofHeight);coinState=new CoinState(course,Array.isArray(coinBank[level])?coinBank[level]:[]);coins=buildCoins(THREE,scene,course,coinState);
  doorSounded=false;snap();lastCP=JSON.stringify(physics.snapshotCheckpoint());
 }
 function select(side){if(mode!=='run')return;sound.resume();physics.choose(side);updateHUD(physics.snapshot())}
@@ -146,7 +152,7 @@ async function init(){
   const requested=arrival.has('stage')?Number(arrival.get('stage')):NaN;
   const selected=arrival.get('from')==='menu'&&Number.isInteger(requested)&&requested>=0&&requested<=unlocked;
   if(selected){level=requested;completed=outro=false;if(level>0)seen=true}
-  buildLevel(arrived&&!resumeArrival||selected?null:saved.cp);await Promise.all([cave.ready,cart.ready]);await preparePreview();resize();addEventListener('resize',resize);persist();$('score').volume=0;
+  buildLevel(arrived&&!resumeArrival||selected?null:saved.cp);await Promise.all([cave.ready,cart.ready]);await preparePreview();resize();addEventListener('resize',resize);persist();
   if(completed)showEndScreen(false);else panel('ready','Flöjtens eko','Tio grottor. En väg hem. Vagnen kör automatiskt. Samla mynt, välj spår och hoppa när rälsen bryts.','Starta färden');
   if(arrived){history.replaceState(null,'',location.pathname);$('go').onclick()}else if(selected){history.replaceState(null,'',location.pathname);enter()}
   last=performance.now();requestAnimationFrame(frame);
@@ -159,5 +165,6 @@ $('levelSelect').addEventListener('change',async()=>{
  panel('loading',names[level],'Laddar grottan…','Vänta');try{buildLevel();await Promise.all([cave.ready,cart.ready]);await preparePreview();persist();panel('ready',names[level],'Samla mynt. Välj spår före växeln och hoppa vid rälsens avbrott.','Starta färden')}catch(e){console.error(e);panel('error','Grottan kunde inte laddas','Försök igen.','Försök igen')}
 });
 init();
+
 
 
