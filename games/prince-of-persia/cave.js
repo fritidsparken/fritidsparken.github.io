@@ -53,7 +53,7 @@ function ui(state){
 }
 function panel(state,title,desc,button){ui(state);$('title').textContent=title;$('desc').textContent=desc;$('go').textContent=button;$('go').disabled=state==='loading';$('levelSelect').disabled=['loading','error'].includes(state)}
 function enter(){
- ui('run');last=performance.now();acc=0;$('chapter').textContent='FLÖJTENS VÄG · '+(level+1)+' / '+COURSE_COUNT;$('place').textContent=names[level];music(.18);updateHUD(current);
+ ui('run');last=performance.now();acc=0;$('chapter').textContent='JAKTEN PÅ FLÖJTENS EKO · '+(level+1)+' / '+COURSE_COUNT;$('place').textContent=names[level];music(.18);updateHUD(current);
 }
 function tell(lines,end,done){
  ui('story');$('story').classList.toggle('end',end);
@@ -153,7 +153,7 @@ async function init(){
   const selected=arrival.get('from')==='menu'&&Number.isInteger(requested)&&requested>=0&&requested<=unlocked;
   if(selected){level=requested;completed=outro=false;if(level>0)seen=true}
   buildLevel(arrived&&!resumeArrival||selected?null:saved.cp);await Promise.all([cave.ready,cart.ready]);await preparePreview();resize();addEventListener('resize',resize);persist();
-  if(completed)showEndScreen(false);else if(!selected&&!arrived)panel('ready','Flöjtens väg','Tio grottor. En väg hem. Vagnen kör automatiskt. Samla mynt, välj spår och hoppa när rälsen bryts.','Starta färden');
+  if(completed)showEndScreen(false);else if(!selected&&!arrived)panel('ready','Jakten på flöjtens eko','Tio grottor. En väg hem. Vagnen kör automatiskt. Samla mynt, välj spår och hoppa när rälsen bryts.','Starta färden');
   if(arrived){history.replaceState(null,'',location.pathname);$('go').onclick()}else if(selected){history.replaceState(null,'',location.pathname);enter()}
   last=performance.now();requestAnimationFrame(frame);
  }catch(e){console.error(e);panel('error','Grottan kunde inte öppnas',renderer?'Ett spelmaterial kunde inte laddas. Kontrollera anslutningen och försök igen.':'Den här banan behöver WebGL 2. Kontrollera webbläsarens grafikstöd och försök igen.','Försök igen')}

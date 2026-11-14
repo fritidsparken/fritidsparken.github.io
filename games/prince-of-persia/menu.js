@@ -88,9 +88,9 @@ function refreshMenu() {
   let caveOpen=true;
   try {caveOpen ||= localStorage.getItem('lostWorlds.cave')==='1'||!!JSON.parse(localStorage.getItem('lostWorlds.moon.v2'))?.finished} catch {}
   $('caveChoice').disabled=!caveOpen;
-  $('caveState').textContent=caveOpen?'Värld 4 · Tio banor':'Låst · Klara Månens djup';
+  $('caveState').textContent=caveOpen?'Värld 4 · Tio banor':'Låst · Klara Månens hemliga vatten';
   $('moonChoice').disabled = !moonOpen;
-  $('moonState').textContent = moonOpen ? 'Värld 3 · Tio banor' : 'Låst · Klara Djungelns jakt';
+  $('moonState').textContent = moonOpen ? 'Värld 3 · Tio banor' : 'Låst · Klara Djungelns förlorade spår';
   $('moonChoice').setAttribute('aria-pressed', String(moonSelected));
   $('palacePick').hidden = jungleSelected || moonSelected || caveSelected;
   $('moonPick').hidden=!moonSelected; $('cavePick').hidden=!caveSelected;
@@ -99,8 +99,8 @@ function refreshMenu() {
   $('bridgePreview').textContent = bridge.resume ? 'Fortsätt i djungeln' : 'Provspela djungeln';
   $('palaceState').textContent = journey ? 'Värld 1 · Bana ' + (route.index + 1) + ' · ' + ROOMS[route.index].name : 'Värld 1 · Tio banor';
   $('jungleChoice').disabled = !jungleOpen;
-  $('jungleState').textContent = jungleOpen ? 'Värld 2 · Tio banor' : 'Låst · Klara Solrikets hemlighet';
-  $('playWorld').textContent = caveSelected ? 'Spela Flöjtens väg' : moonSelected ? 'Spela Månens djup' : jungleSelected ? bridge.resume ? 'Fortsätt jakten' : 'Spela vald bana' : $('palaceStage').value === 'resume' ? 'Fortsätt spela' : 'Spela vald bana';
+  $('jungleState').textContent = jungleOpen ? 'Värld 2 · Tio banor' : 'Låst · Klara Solportens hemlighet';
+  $('playWorld').textContent = caveSelected ? 'Spela Jakten på flöjtens eko' : moonSelected ? 'Spela Månens hemliga vatten' : jungleSelected ? bridge.resume ? 'Fortsätt jakten' : 'Spela vald bana' : $('palaceStage').value === 'resume' ? 'Fortsätt spela' : 'Spela vald bana';
   $('playWorld').disabled = !ready;
   $('resetWorld').hidden = !journey || jungleSelected || moonSelected || caveSelected;
   $('palaceChoice').setAttribute('aria-pressed', String(!jungleSelected && !moonSelected && !caveSelected));

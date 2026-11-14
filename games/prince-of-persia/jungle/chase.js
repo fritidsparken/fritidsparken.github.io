@@ -117,7 +117,7 @@ function startBridge(afterIntro = false) {
   if (!jungleOpen || Number($('jungleStage').value) > jungleRecord.next) return;
   if (!afterIntro && ready && !bridge.resume && !Number($('jungleStage').value)) {
     if (!open3D()) {
-      alert('Djungelns jakt behöver WebGL.');
+      alert('Djungelns förlorade spår behöver WebGL.');
       return;
     }
     beginStory(true);
@@ -125,7 +125,7 @@ function startBridge(afterIntro = false) {
   }
   if (!ready) return;
   if (!open3D()) {
-    alert('Djungelns jakt behöver WebGL. Aktivera grafikacceleration i webbläsaren och öppna spelet igen.');
+    alert('Djungelns förlorade spår behöver WebGL. Aktivera grafikacceleration i webbläsaren och öppna spelet igen.');
     return;
   }
   if (!bridge.resume || bridge.done) resetBridge(Number($('jungleStage').value) || 0);
@@ -187,7 +187,7 @@ function finishChase() {
   if (last) unlockMoon();
   $('chaseTitle').textContent = last ? 'Ut ur Soltemplet' : course()[0] + ' klar';
   $('chaseResult').textContent = bridge.total + ' av ' + bridge.coins.length + ' solmynt · Personbästa ' + jungleRecord.best[bridge.level];
-  $('nextChase').textContent = last ? 'Vidare till Månens djup' : 'Nästa · ' + jungleCourses[bridge.level + 1][0];
+  $('nextChase').textContent = last ? 'Vidare till Månens hemliga vatten' : 'Nästa · ' + jungleCourses[bridge.level + 1][0];
   $('bridgeEnd').hidden = true;
   const completedLevel=bridge.level;
   setTimeout(()=>{if(!bridge.active||!bridge.done||bridge.level!==completedLevel)return;if(last)location.assign('moon.html?from=jungle');else replayCourse(completedLevel+1);},650);
