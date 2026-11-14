@@ -1,9 +1,9 @@
 import {renderCoursePreview} from './course-preview.js?v=next-ride-20261114';
 import * as THREE from './vendor/three.module.js';
-import {createCourse,CartPhysics,COURSE_NAMES,COURSE_COUNT} from './minecart-track.js?v=safe-forks-20261114';
+import {createCourse,CartPhysics,COURSE_NAMES,COURSE_COUNT} from './minecart-track.js?v=early-choice-20261114';
 import {buildCave} from './cave-environment.js?v=no-beams-20261114';
 import {buildCart} from './minecart-model.js?v=next-ride-20261114';
-import {buildRails} from './minecart-rails.js?v=larger-route-signs-20261114';
+import {buildRails} from './minecart-rails.js?v=early-choice-20261114';
 import {createCartCamera} from './minecart-camera.js?v=next-ride-20261114';
 import {CoinState,buildCoins} from './minecart-coins.js?v=next-ride-20261114';
 import {createCartAudio} from './minecart-audio.js?v=next-ride-20261114';
@@ -98,6 +98,7 @@ $('go').onclick=async()=>{
   if(!seen)tell(opening,false,()=>{seen=true;persist();enter()});else enter();
  }catch(e){console.error(e);panel('error','Grottan kunde inte laddas','Ett spelmaterial kunde inte laddas. Försök igen.','Försök igen')}
 };
+document.addEventListener('touchend', event => { if(mode==='run' && event.cancelable) event.preventDefault(); }, {passive:false, capture:true});
 // Suppress Safari's repeated-tap zoom even while a control is disabled.
 for (const pad of document.querySelectorAll('#controls .pad')) {
  pad.addEventListener('touchend', event => event.preventDefault(), {passive:false});
@@ -115,8 +116,8 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){pause();so
 function updateHUD(s){
  $('distance').value=s.progress;$('speed').textContent=Math.round(s.speed*3.6)+' km/h';
  const score=coinState.summary(time);$('coinCount').textContent=score.displayCourseCount;$('coinTotal').textContent='/ '+score.courseTotal;$('coinHud').style.transform='scale('+score.hudScale+')';
- for(const [id,side]of [['left',-1],['right',1]]){$(id).classList.toggle('selected',s.choice===side);$(id).setAttribute('aria-pressed',String(s.choice===side))}
- $('jump').disabled=!s.canJump||s.jumpQueued;$('jump').classList.toggle('ready',s.canJump&&!s.jumpQueued);$('jump').classList.toggle('queued',s.jumpQueued);$('jumpLabel').textContent=s.jumpQueued?'Hopp valt':'Hoppa';
+ for(const [id,side]of [['left',-1],['right',1]]){const chosen=s.choice===side;$(id).classList.toggle('selected',chosen);$(id).setAttribute('aria-pressed',String(chosen));$(id).querySelector('small').textContent=chosen?'VALD ✓':(side===-1?'Vänster':'Höger')}
+ $('jump').setAttribute('aria-disabled',String(!s.canJump||s.jumpQueued));$('jump').classList.toggle('ready',s.canJump&&!s.jumpQueued);$('jump').classList.toggle('queued',s.jumpQueued);$('jumpLabel').textContent=s.jumpQueued?'Hopp valt':'Hoppa';
  const route=course.routeMap.get(s.routeId),fork=route?.fork,chosen=fork&&s.choice?(s.choice===fork.safeSide?fork.safeRoute:fork.deadRoute):null;rails.highlight(s.pending?chosen:null);
  if(s.nextGap&&s.nextGap.distance>=0&&s.canJump&&s.status==='run'){
   $('notice').hidden=false;$('notice').classList.toggle('urgent',s.canJump);$('notice').textContent=s.jumpQueued?'HOPP VALT ✓':s.canJump?'HOPPA NU!':'HOPP OM '+Math.max(0,Math.ceil(s.nextGap.distance))+' M';

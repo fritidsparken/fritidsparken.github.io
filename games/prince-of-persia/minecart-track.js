@@ -66,7 +66,7 @@ export class CartPhysics{
  restart(count=false){this.routeId=this.checkpoint.routeId;this.s=this.checkpoint.s;this.status='run';this.speed=0;this.choice=0;this.locked=false;this.jumpHeight=0;this.jumpVelocity=0;this.jumpQueued=false;this.fallTime=0;this.fallVelocity=vec();this.fallPosition=null;this.distanceSinceReset=0;if(count)this.respawns++;return this.snapshot()}
  snapshotCheckpoint(){return {...this.checkpoint}}
  restoreCheckpoint(cp){if(!cp||typeof cp.routeId!=='string')return false;const r=this.course.routeMap.get(cp.routeId);if(!r||r.kind==='dead')return false;const at=Number(cp.s)||0;const valid=r.kind==='main'&&at===0||r.gaps.some(g=>Math.abs(at-(g.end+12))<.001);if(!valid)return false;this.checkpoint={routeId:r.id,s:at};this.restart(false);return true}
- pendingFork(){const r=this.route;if(this.status!=='run'||!r.fork)return null;const distance=r.length-this.s;return distance<=48?{...r.fork,distance,choice:this.choice,defaultSide:null}:null}
+ pendingFork(){const r=this.route;if(this.status!=='run'||!r.fork)return null;const distance=r.length-this.s;return {...r.fork,distance,choice:this.choice,defaultSide:null}}
  nextGap(){
   let route=this.route,at=this.s,ahead=0;
   // Include the next already-determined rail segment, so a warning does not pop

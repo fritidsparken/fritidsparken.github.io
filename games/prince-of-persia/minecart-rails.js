@@ -21,7 +21,7 @@ export function buildRails(THREE,scene,course,roofHeight=null){
   }
   warningSigns.push({routeId:route.id,s,gapStart:gap.start,distance:gap.start-s,object:sign});
  }
- for(const route of course.routes)if(route.fork)warning(route,{start:route.length},60,route.fork.safeSide);
+ for(const route of course.routes)if(route.fork){const firstGap=route.gaps[0];const signAt=Math.max(0,Math.min(route.length-60,firstGap ? firstGap.start-48 : route.length-60));warning(route,{start:route.length},route.length-signAt,route.fork.safeSide);}
  const lipMaterial=iron;
  for(const route of course.routes){
   const vertices=[],indices=[],ties=[];
