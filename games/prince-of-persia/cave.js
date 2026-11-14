@@ -34,7 +34,8 @@ function supported(pit,at,lane){
  if(at<=pit.start||at>=pit.end)return true;
  return pit.pads.some(p=>((at-p.at)/pit.halfLength)**2+((lane-p.lane)/pit.radius)**2<=1);
 }
-function fallBack(){recovery=.58;notice=1.5;$('copy').textContent='Tillbaka vid senaste fästet';$('copy').hidden=false}
+let falling=false;
+function fallBack(drop=false){falling=drop;recovery=.72;notice=1.5;$('copy').textContent='Tillbaka vid senaste fästet';$('copy').hidden=false}
 const key='lostWorlds.cave.v1';
 let saved={};try{saved=JSON.parse(localStorage.getItem(key))||{}}catch{}
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -51,7 +52,7 @@ function snapCamera(){cameraZ=z;cameraX=x*.52;capture(previousPose);capture(pose
 
 function persist(){try{localStorage.setItem(key,JSON.stringify({level,cp:checkpoint,introSeen:introSeen?'brage':false,completed,outroPending}));localStorage.setItem('lostWorlds.cave','1')}catch{}}
 function clearInput(){held.clear();stickX=stickY=0;wantJump=false}
-function reset(){const pit=crossings[level];if(checkpoint>pit.start-2&&checkpoint<pit.end+1)checkpoint=Math.max(0,pit.start-5);z=checkpoint;x=height=vy=speed=stride=recovery=0;snapCamera();clearInput()}
+function reset(){const pit=crossings[level];if(checkpoint>pit.start-2&&checkpoint<pit.end+1)checkpoint=Math.max(0,pit.start-5);z=checkpoint;x=height=vy=speed=stride=recovery=0;falling=false;snapCamera();clearInput()}
 function ui(state){
   mode=state;$('menu').hidden=!['loading','ready','pause','finished','error'].includes(state);
   $('story').hidden=state!=='story';$('hud').hidden=state!=='run';$('touch').hidden=state!=='run';
@@ -112,7 +113,7 @@ function update(dt){
  const old=z;z+=speed*dt;stride+=speed*dt*.15;
  cameraZ+=(z-cameraZ)*(1-Math.exp(-dt*6));cameraX+=(x*.52-cameraX)*(1-Math.exp(-dt*5));
  const pit=crossings[level];
- if(!height&&!supported(pit,z,x)){fallBack();return}
+ if(!height&&!supported(pit,z,x)){fallBack(true);return}
  if(z>=pit.end+1 && checkpoint<pit.end+1){checkpoint=pit.end+1;persist()}
  const bed=beds[level];
  if(Math.abs(z-bed.at)<.82 && Math.abs(x-bed.lane)<.42 && height<.7){fallBack();return}
@@ -155,29 +156,53 @@ function drawBed(bed){
  for(let i=-2;i<=2;i++){const lx=i*21;ctx.fillStyle='#c0aa85';ctx.beginPath();ctx.moveTo(lx-5,0);ctx.lineTo(lx,-(4+31*k));ctx.lineTo(lx+5,0);ctx.fill()}
  ctx.restore();
 }
+function groundPoint(at,lane,depth=0){
+ const p=project(at);
+ return [sidePos(lane,p.scale),p.y+depth*p.scale];
+}
+function polygon(points,fill){
+ ctx.beginPath();points.forEach((p,i)=>ctx[i?'lineTo':'moveTo'](...p));ctx.closePath();
+ if(fill){ctx.fillStyle=fill;ctx.fill()}
+}
+function pitOutline(pit){
+ return [groundPoint(Math.max(pit.start,viewZ-19),-1.96),groundPoint(pit.end,-1.96),groundPoint(pit.end,1.96),groundPoint(Math.max(pit.start,viewZ-19),1.96)];
+}
 function drawCrossing(pit){
- if(pit.end<viewZ-17)return;
- const near=project(pit.start),far=project(pit.end);
- ctx.beginPath();
- for(const [j,p,l] of [[0,near,-1.96],[1,far,-1.96],[2,far,1.96],[3,near,1.96]])ctx[j?'lineTo':'moveTo'](sidePos(l,p.scale),p.y);
- ctx.closePath();ctx.save();ctx.clip();
- const shade=ctx.createLinearGradient(0,far.y,0,near.y);
- shade.addColorStop(0,'#57463c');shade.addColorStop(.18,'#241f25');shade.addColorStop(.72,'#101117');shade.addColorStop(1,'#332d31');
- ctx.fillStyle=shade;ctx.fillRect(0,far.y,960,near.y-far.y);
- for(const pad of [...pit.pads].reverse()){
-  if(pad.at<viewZ-17)continue;
-  const p=project(pad.at),cx=sidePos(pad.lane,p.scale),rx=177*pit.radius*p.scale,ry=(project(pad.at-pit.halfLength).y-project(pad.at+pit.halfLength).y)/2;
-  const shaft=ctx.createLinearGradient(cx-rx,0,cx+rx,0);shaft.addColorStop(0,'#4c3930');shaft.addColorStop(.35,'#806650');shaft.addColorStop(1,'#28252a');
-  ctx.fillStyle=shaft;ctx.fillRect(cx-rx,p.y,rx*2,near.y-p.y);
-  ctx.beginPath();ctx.ellipse(cx,p.y,rx,ry,0,0,Math.PI*2);ctx.fillStyle='#ae9778';ctx.fill();
-  ctx.save();ctx.clip();const stone=art.rock;ctx.globalAlpha=.64;ctx.drawImage(stone,stone.width*.28,stone.height*.50,stone.width*.43,stone.height*.17,cx-rx,p.y-ry,rx*2,ry*2);ctx.restore();
+ if(pit.end<viewZ-19)return;
+ const edge=pitOutline(pit);
+ polygon(edge,'#030407');
+ // The lip lies in the gravel plane. Only the inside face descends.
+ for(const side of [-1,1]){
+  const near=groundPoint(Math.max(pit.start,viewZ-19),side*1.96);
+  const far=groundPoint(pit.end,side*1.96);
+  const farBottom=groundPoint(pit.end,side*1.96,50);
+  polygon([near,far,farBottom,[near[0],near[1]+100]],side<0?'#2d251f':'#17171a');
+  ctx.strokeStyle='#8a7761';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(...near);ctx.lineTo(...far);ctx.stroke();
  }
- ctx.restore();
+}
+function drawPillar(pit,pad){
+ if(pad.at+pit.halfLength<viewZ-19)return;
+ const top=[];
+ for(let i=0;i<32;i++){
+  const a=i*Math.PI/16;
+  top.push(groundPoint(Math.max(viewZ-19,pad.at+Math.sin(a)*pit.halfLength),pad.lane+Math.cos(a)*pit.radius));
+ }
+ ctx.save();polygon(pitOutline(pit));ctx.clip();
+ const left=top.reduce((a,b)=>a[0]<b[0]?a:b),right=top.reduce((a,b)=>a[0]>b[0]?a:b);
+ const depth=160*project(pad.at).scale;
+ const shade=ctx.createLinearGradient(left[0],0,right[0],0);shade.addColorStop(0,'#3c3029');shade.addColorStop(.35,'#65513f');shade.addColorStop(1,'#0b0d10');
+ polygon([left,right,[right[0],right[1]+depth],[left[0],left[1]+depth]],shade);
+ polygon(top,'#a18b70');
+ ctx.save();ctx.clip();
+ const minY=Math.min(...top.map(p=>p[1])),maxY=Math.max(...top.map(p=>p[1]));
+ const stone=art['cave'+level];
+ ctx.drawImage(stone,stone.width*.3,stone.height*.78,stone.width*.4,stone.height*.12,left[0],minY,right[0]-left[0],Math.max(1,maxY-minY));
+ ctx.restore();ctx.restore();
 }
 function drawPlayer(){
  const {z,x,height,vy,stride}=pose;
- const p=project(z),s=p.scale,xx=sidePos(x,s),bottom=p.y-height*50*s;
- ctx.fillStyle='rgba(9,13,17,.38)';ctx.beginPath();ctx.ellipse(xx,p.y,(27-height*3)*s,6*s,0,0,Math.PI*2);ctx.fill();
+ const p=project(z),s=p.scale,xx=sidePos(x,s),bottom=p.y-height*50*s+(falling?((.72-recovery)/.72)**2*240*s:0);
+ if(!falling){ctx.fillStyle='rgba(9,13,17,.38)';ctx.beginPath();ctx.ellipse(xx,p.y,(27-height*3)*s,6*s,0,0,Math.PI*2);ctx.fill()}
  const h=151*s,w=h*290/300;
  if(height>0){const im=art['jump'+(vy>3?0:vy>0?1:vy>-3?2:3)];ctx.drawImage(im,xx-w/2,bottom-h,w,h)}
  else{const frame=Math.floor(stride*40)%40;ctx.drawImage(art['run-steady'],frame%8*200,Math.floor(frame/8)*210,200,210,xx-w/2,bottom-h,w,h)}
@@ -193,16 +218,26 @@ function drawGoal(){
  }
  ctx.restore();
 }
-// Sparse seams on the cave floor give nearby obstacles a shared reference for depth.
-function floorDetails(){
- const first=Math.max(0,Math.ceil((viewZ-16)/4));
- for(let i=first;i*4<Math.min(passages[level][1],viewZ+90);i++){
-  const at=i*4,p=project(at),pit=crossings[level];
-  if(at>pit.start&&at<pit.end)continue;
-  const lane=Math.sin(i*37.2+level)*1.58,xx=sidePos(lane,p.scale),w=(8+6*Math.cos(i))*p.scale;
-  ctx.strokeStyle='rgba(72,57,49,.24)';ctx.lineWidth=Math.max(.5,p.scale);
-  ctx.beginPath();ctx.moveTo(xx-w,p.y);ctx.lineTo(xx,p.y-1.2*p.scale);ctx.lineTo(xx+w,p.y);ctx.stroke();
+// A perspective texture plane shares the exact depth and lateral transform of every obstacle.
+function drawGround(bottom){
+ const texture=art['cave'+level],tileDepth=15,tileWidth=5;
+ const upper=horizon+9;
+ for(let y=upper;y<bottom;y+=2){
+  const scale=(y-horizon)/(feet-horizon);
+  const at=viewZ+23/scale-23;
+  const sy=texture.height*(.75+(((at%tileDepth)+tileDepth)%tileDepth)/tileDepth*.21);
+  const texHeight=Math.min(3,texture.height-sy);
+  const step=tileWidth*177*scale;
+  const origin=sidePos(0,scale);
+  const begin=Math.floor((-800-origin)/step);
+  for(let i=begin;origin+i*step<1760;i++){
+   ctx.drawImage(texture,texture.width*.15,sy,texture.width*.7,texHeight,origin+i*step,y,step+.5,2.1);
+  }
  }
+ // Atmospheric fading only at the horizon.
+ const haze=ctx.createLinearGradient(0,upper,0,upper+45);
+ haze.addColorStop(0,'#20252ddd');haze.addColorStop(1,'#20252d00');
+ ctx.fillStyle=haze;ctx.fillRect(-800,upper,2560,45);
 }
 function render(){
  const w=canvas.clientWidth,h=canvas.clientHeight,dpr=Math.min(devicePixelRatio||1,2);
@@ -221,10 +256,13 @@ function render(){
  if(outroPending||completed)return;
  ctx.setTransform(v*dpr,0,0,v*dpr,ox*dpr,oy*dpr);
  if(!art["run-steady"])return;
- floorDetails();drawGoal();drawCrossing(crossings[level]);
- const obstacles=traps[level];for(let i=obstacles.length-1;i>=0;i--)if(obstacles[i][0]>=pose.z)drawObstacle(...obstacles[i]);
- if(beds[level].at>=pose.z)drawBed(beds[level]);
- drawPlayer();if(beds[level].at<pose.z)drawBed(beds[level]);for(let i=obstacles.length-1;i>=0;i--)if(obstacles[i][0]<pose.z)drawObstacle(...obstacles[i]);
+ drawGround((h-oy)/v+2);drawGoal();
+ const pit=crossings[level];drawCrossing(pit);
+ const objects=traps[level].map(item=>({at:item[0],draw:()=>drawObstacle(...item)}));
+ for(const pad of pit.pads)objects.push({at:pad.at,draw:()=>drawPillar(pit,pad)});
+ objects.push({at:beds[level].at,draw:()=>drawBed(beds[level])});
+ objects.push({at:pose.z,draw:drawPlayer});
+ objects.sort((a,b)=>b.at-a.at).forEach(o=>o.draw());
  if(recovery>0){ctx.fillStyle='rgba(63,25,22,'+Math.min(.38,recovery)+')';ctx.fillRect(0,0,960,540)}
 }
 function frame(now){
