@@ -9,14 +9,16 @@ export function buildRails(THREE,scene,course,roofHeight=null){
   const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=256;const c=canvas.getContext('2d');c.fillStyle='#092b32';c.fillRect(0,0,1024,256);c.strokeStyle='#f5ca68';c.lineWidth=12;c.strokeRect(9,9,1006,238);c.fillStyle='#f8deb0';c.textAlign='center';c.font='bold 82px system-ui';c.fillText(side?(side<0?'← VÄNSTER':'HÖGER →'):'HOPP OM '+distance+' m',512,115);c.font='bold 48px system-ui';c.fillStyle='#a0f3ec';c.fillText(side?'KOM IHÅG VÄGEN':'VAR REDO ATT HOPPA ↑',512,192);const t=new THREE.CanvasTexture(canvas);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;warningTextures.push(t);return t;
  }
  function warning(route,gap,distance,side=0){const s=Math.max(0,gap.start-distance),actual=Math.round(gap.start-s),sample=route.sample(s),p=new THREE.Vector3(sample.position.x,sample.position.y,sample.position.z),t=new THREE.Vector3(sample.tangent.x,0,sample.tangent.z).normalize(),r=new THREE.Vector3().crossVectors(up,t).normalize();const sign=new THREE.Group();sign.name=(side?'Early track arrow ':'Jump warning ')+actual+' metres';sign.position.copy(p);sign.rotation.y=Math.atan2(t.x,t.z);group.add(sign);
-  // Compact sign hangs beside the centreline, above the camera corridor.
-  const sideOffset=3.5,anchor=p.clone().addScaledVector(r,sideOffset);
-  const ceiling=roofHeight?roofHeight(anchor.x,anchor.z)-p.y:9;
-  const signY=ceiling-.85;
-  const width=side?2.4:3.2, height=side?.63:.84;
-  const rim=new THREE.Mesh(new THREE.BoxGeometry(width,height,.10),new THREE.MeshStandardMaterial({color:0x51483a,metalness:.3,roughness:.85}));rim.position.set(sideOffset,signY,0);sign.add(rim);
-  const face=new THREE.Mesh(new THREE.PlaneGeometry(width*.94,height*.85),new THREE.MeshBasicMaterial({map:jumpSignTexture(actual,side),toneMapped:false}));face.rotation.y=Math.PI;face.position.set(sideOffset,signY,-.06);sign.add(face);
-  for(const offset of [-width*.36,width*.36]){const hanger=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,.70,6),iron);hanger.position.set(sideOffset+offset,ceiling-.2,0);sign.add(hanger)}
+  if (!side) {
+   const rim=new THREE.Mesh(new THREE.BoxGeometry(5.9,1.52,.16),new THREE.MeshStandardMaterial({color:0x685431,metalness:.7,roughness:.43}));rim.position.y=4.7;sign.add(rim);
+   const face=new THREE.Mesh(new THREE.PlaneGeometry(5.65,1.35),new THREE.MeshBasicMaterial({map:jumpSignTexture(actual),toneMapped:false}));face.rotation.y=Math.PI;face.position.set(0,4.7,-.09);sign.add(face);
+   for(const edge of [-1,1]){const post=new THREE.Mesh(new THREE.CylinderGeometry(.085,.13,4.85,8),new THREE.MeshStandardMaterial({color:0x8d7958,metalness:.4,roughness:.75}));post.position.set(edge*3,2.4,0);sign.add(post)}
+  } else {
+   const ceiling=roofHeight?roofHeight(p.x,p.z)-p.y:9, width=3.6, height=.945, signY=ceiling-.85;
+   const rim=new THREE.Mesh(new THREE.BoxGeometry(width,height,.10),new THREE.MeshStandardMaterial({color:0x51483a,metalness:.3,roughness:.85}));rim.position.set(0,signY,0);sign.add(rim);
+   const face=new THREE.Mesh(new THREE.PlaneGeometry(width*.94,height*.85),new THREE.MeshBasicMaterial({map:jumpSignTexture(actual,side),toneMapped:false}));face.rotation.y=Math.PI;face.position.set(0,signY,-.06);sign.add(face);
+   for(const offset of [-width*.36,width*.36]){const hanger=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,.70,6),iron);hanger.position.set(offset,ceiling-.2,0);sign.add(hanger)}
+  }
   warningSigns.push({routeId:route.id,s,gapStart:gap.start,distance:gap.start-s,object:sign});
  }
  for(const route of course.routes)if(route.fork)warning(route,{start:route.length},60,route.fork.safeSide);
