@@ -48,6 +48,12 @@ async function boot(saved={},options={}){
  const g=await boot({stage:9,finished:true},{navigationThrows:true});assert.equal(g.get('transitioning'),false);assert.equal(g.els.get('go').textContent,'Till värld 4');g.els.get('go').onclick();assert.equal(g.calls.navigation.length,0);assert.equal(g.get('transitioning'),false);
  console.log('PASS navigation failure offers retry without forcing reload loop');
 }
+// A menu-selected chapter starts at its own first checkpoint, even after finishing the world.
+{
+ const g=await boot({stage:9,unlocked:9,finished:true,introPlayed:true,cp:2},{search:'?from=menu&stage=2'});
+ assert.equal(g.get('stage'),2);assert.equal(g.get('finished'),false);assert.equal(g.get('game.checkpoint'),0);assert.equal(g.calls.navigation.length,0);
+ console.log('PASS main menu selection starts the chosen unlocked chapter at its beginning');
+}
 // Every chapter has coins positioned above actual floors with stable IDs.
 for(let stage=0;stage<10;stage++){
  const g=await boot({stage,unlocked:9,introPlayed:true});const count=g.get('coins.length');assert(count>=3,`Level${stage+1} needs reachable coins`);

@@ -276,7 +276,7 @@ loadSoundEffects();
 Promise.all([...chapters.map(r=>r.key),'span','crusher','warden','idle','climb','run','jumpSoft','jumpStride','jumpTuck'].map(async id=>{
   const image=new Image();image.src=PALACE_ART[id] || "moon-art/"+id+".webp";await image.decode();images[id]=image;
 })).then(()=>{
-  loaded=true;enter(saved.cp,true);
+  loaded=true;const selecting=new URLSearchParams(location.search).has('stage');enter(selecting?0:saved.cp,!selecting);
   stop(finished?'Månporten är öppen':'Månens akvedukt',finished?'Du har klarat värld III.':'Led vattnet genom palatset. Styr med pilarna och hoppa med mellanslag eller hoppknappen.',finished?'Till värld 4':'Spela');
   el('go').disabled=false;requestAnimationFrame(animate);
 }).catch(()=>{stop('Palatset kunde inte öppnas','Kontrollera anslutningen och försök igen.','Försök igen');el('go').disabled=false});
