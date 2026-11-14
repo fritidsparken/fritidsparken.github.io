@@ -27,10 +27,37 @@
     window.dispatchEvent(new Event('fp-daily-update'));
   }
   window.FPDaily={record};
-  const style=document.createElement('link');style.rel='stylesheet';style.href='/css/daily-challenge.css?v=1';document.head.append(style);
-  if(!document.getElementById('standardHome'))return;
-  const section=document.createElement('section'); section.className='fp-daily'; section.setAttribute('aria-labelledby','fp-daily-title');
-  document.getElementById('standardHome').prepend(section);
+  const style=document.createElement('link');style.rel='stylesheet';style.href='/css/daily-challenge.css?v=dropdown-2';document.head.append(style);
+  const grid=document.querySelector('.std-categories');
+  const rankingToggle=grid?.querySelector('[data-ranking-toggle]');
+  if(!grid || !rankingToggle)return;
+  const toggle=document.createElement('button');
+  toggle.type='button'; toggle.className='fp-daily-toggle'; toggle.style.setProperty('--tile','#fff0cb');
+  toggle.setAttribute('aria-controls','fp-daily-panel'); toggle.setAttribute('aria-expanded','false');
+  toggle.innerHTML='<svg class="std-icon" viewBox="0 0 100 100" aria-hidden="true"><rect x="17" y="20" width="66" height="65" rx="12" fill="#efbd54"/><rect x="22" y="31" width="56" height="49" rx="7" fill="#fff7dc"/><path d="M18 33h64V26a8 8 0 0 0-8-8H26a8 8 0 0 0-8 8Z" fill="#ed8e53"/><path d="M35 13v14M65 13v14" stroke="#835643" stroke-width="6" stroke-linecap="round"/><path d="m50 38 5.4 10.9 12 1.8-8.7 8.5 2 12-10.7-5.7-10.7 5.7 2-12-8.7-8.5 12-1.8Z" fill="#efb329"/></svg><span>Dagens utmaning</span>';
+  rankingToggle.after(toggle);
+  const section=document.createElement('section'); section.id='fp-daily-panel'; section.className='fp-daily'; section.hidden=true; section.setAttribute('aria-labelledby','fp-daily-title');
+  grid.append(section);
+  function position(){
+    const width=Math.min(560,grid.clientWidth-16);
+    const left=Math.max(8,Math.min(toggle.offsetLeft,grid.clientWidth-width-8));
+    section.style.setProperty('--fp-daily-left',left+'px');
+    section.style.setProperty('--fp-daily-top',(toggle.offsetTop+toggle.offsetHeight+6)+'px');
+  }
+  function show(open){section.hidden=!open;toggle.setAttribute('aria-expanded',String(open));if(open)position();}
+  toggle.addEventListener('click',()=>{
+    const open=section.hidden;
+    if(open && !document.getElementById('fp-ranking')?.hidden)rankingToggle.click();
+    show(open);
+    if(open && matchMedia('(max-width: 1100px)').matches)requestAnimationFrame(()=>{
+      const tile=toggle.getBoundingClientRect(),panel=section.getBoundingClientRect();
+      if(panel.bottom>(window.visualViewport?.height||innerHeight)-8 || tile.top<0)toggle.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});
+    });
+  });
+  rankingToggle.addEventListener('click',()=>show(false));
+  window.addEventListener('resize',()=>{if(!section.hidden)position();});
+  document.addEventListener('click',e=>{if(!section.hidden && !section.contains(e.target) && !toggle.contains(e.target))show(false);});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape' && !section.hidden){show(false);toggle.focus();}});
   function render(){
     const date=today(), data=read(), current=data[date]||{}, list=tasks(date), done=list.filter(t=>(Number(current[t.id])||0)>=t.target).length;
     const totals=Object.keys(data).filter(d=>/^\d{4}-\d{2}-\d{2}$/.test(d)).reduce((a,d)=>{ const all=tasks(d); const count=all.filter(t=>(Number((data[d]||{})[t.id])||0)>=t.target).length; a.stars+=count; if(count===3)a.trophies++; return a; },{stars:0,trophies:0});
@@ -39,3 +66,4 @@
   }
   render();window.addEventListener('pageshow',render);window.addEventListener('focus',render);window.addEventListener('storage',render); window.addEventListener('fp-daily-update',render);setInterval(render,60000);
 })();
+
