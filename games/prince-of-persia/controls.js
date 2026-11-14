@@ -233,7 +233,7 @@ for (const kind of ['pointerup', 'pointercancel', 'lostpointercapture']) {
 }
 $('bridgeJump').onpointerdown = e => {
   e.preventDefault();
-  if (bridge.jumps === 0) bridgeJump();
+  bridgeJump();
 };
 for (const el of document.querySelectorAll('.jumpPair button,#stick,#bridgeStick,#bridgeJump,#bridgeDouble')) {
   for (const kind of ['contextmenu', 'selectstart', 'dragstart']) el.addEventListener(kind, e => e.preventDefault());

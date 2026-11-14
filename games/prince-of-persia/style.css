@@ -1042,6 +1042,11 @@ button,button *,#stick,#stick span {
 /* Touch controls remain above the jungle rendering layers. */
 #bridgeStick, #bridgeJump, #bridgePause { z-index: 5; }
 #bridgeStick span { pointer-events: none; }
+/* Align the jungle controls and keep them above the phone's lower edge. */
+@media (any-pointer: coarse) {
+  #bridgeStick, #bridgeJump { bottom: max(34px, calc(env(safe-area-inset-bottom) + 16px)); width: clamp(65px,15vmin,94px); }
+}
+
 @media (any-pointer: coarse) { #bridgeJump { right: max(20px, env(safe-area-inset-right)); } }
 
 #titleMenu .menu-options { position: fixed; top: calc(max(8px, env(safe-area-inset-top)) + 52px); right: max(8px, env(safe-area-inset-right)); z-index: 10; color: white; }
