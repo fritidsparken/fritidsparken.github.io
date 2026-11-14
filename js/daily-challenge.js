@@ -27,14 +27,14 @@
     window.dispatchEvent(new Event('fp-daily-update'));
   }
   window.FPDaily={record};
-  const style=document.createElement('link');style.rel='stylesheet';style.href='/css/daily-challenge.css?v=dropdown-2';document.head.append(style);
+  const style=document.createElement('link');style.rel='stylesheet';style.href='/css/daily-challenge.css?v=label-3';document.head.append(style);
   const grid=document.querySelector('.std-categories');
   const rankingToggle=grid?.querySelector('[data-ranking-toggle]');
   if(!grid || !rankingToggle)return;
   const toggle=document.createElement('button');
   toggle.type='button'; toggle.className='fp-daily-toggle'; toggle.style.setProperty('--tile','#fff0cb');
   toggle.setAttribute('aria-controls','fp-daily-panel'); toggle.setAttribute('aria-expanded','false');
-  toggle.innerHTML='<svg class="std-icon" viewBox="0 0 100 100" aria-hidden="true"><rect x="17" y="20" width="66" height="65" rx="12" fill="#efbd54"/><rect x="22" y="31" width="56" height="49" rx="7" fill="#fff7dc"/><path d="M18 33h64V26a8 8 0 0 0-8-8H26a8 8 0 0 0-8 8Z" fill="#ed8e53"/><path d="M35 13v14M65 13v14" stroke="#835643" stroke-width="6" stroke-linecap="round"/><path d="m50 38 5.4 10.9 12 1.8-8.7 8.5 2 12-10.7-5.7-10.7 5.7 2-12-8.7-8.5 12-1.8Z" fill="#efb329"/></svg><span>Dagens utmaning</span>';
+  toggle.innerHTML='<svg class="std-icon" viewBox="0 0 100 100" aria-hidden="true"><rect x="17" y="20" width="66" height="65" rx="12" fill="#efbd54"/><rect x="22" y="31" width="56" height="49" rx="7" fill="#fff7dc"/><path d="M18 33h64V26a8 8 0 0 0-8-8H26a8 8 0 0 0-8 8Z" fill="#ed8e53"/><path d="M35 13v14M65 13v14" stroke="#835643" stroke-width="6" stroke-linecap="round"/><path d="m50 38 5.4 10.9 12 1.8-8.7 8.5 2 12-10.7-5.7-10.7 5.7 2-12-8.7-8.5 12-1.8Z" fill="#efb329"/></svg><span class="fp-daily-label"><span>Dagens</span><span>utmaning</span></span>';
   rankingToggle.after(toggle);
   const section=document.createElement('section'); section.id='fp-daily-panel'; section.className='fp-daily'; section.hidden=true; section.setAttribute('aria-labelledby','fp-daily-title');
   grid.append(section);
@@ -66,4 +66,5 @@
   }
   render();window.addEventListener('pageshow',render);window.addEventListener('focus',render);window.addEventListener('storage',render); window.addEventListener('fp-daily-update',render);setInterval(render,60000);
 })();
+
 

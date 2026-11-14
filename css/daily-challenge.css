@@ -9,3 +9,8 @@ body.std-design .std-categories > .fp-daily .fp-daily-cards{grid-template-column
 body.std-design .std-categories > .fp-daily .fp-daily-card{padding:9px 12px}
 body.std-design .std-categories > .fp-daily .fp-daily-icon{width:40px;height:40px;font-size:1.35rem}
 @media(max-height:500px) and (orientation:landscape){body.std-design .std-categories > .fp-daily{padding:12px;max-height:calc(100dvh - 20px)}body.std-design .std-categories > .fp-daily .fp-daily-cards{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:8px}body.std-design .std-categories > .fp-daily .fp-daily-card{padding:7px;gap:6px}body.std-design .std-categories > .fp-daily .fp-daily-head p{display:none}body.std-design .std-categories > .fp-daily .fp-daily-footer{margin-top:7px}}
+
+
+/* Dela ikonens namn mellan orden, aldrig inne i ett ord. */
+body.std-design .std-categories > button > .fp-daily-label{display:flex;flex-direction:column;justify-content:center;gap:0;hyphens:none;overflow-wrap:normal;word-break:normal}
+body.std-design .std-categories > button > .fp-daily-label > span{white-space:nowrap}
