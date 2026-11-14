@@ -1,12 +1,12 @@
 import * as THREE from './vendor/three.module.js';
-import {createCourse,CartPhysics,COURSE_NAMES,COURSE_COUNT} from './minecart-track.js?v=world-picker-20261114';
-import {buildCave} from './cave-environment.js?v=world-picker-20261114';
-import {buildCart} from './minecart-model.js?v=world-picker-20261114';
-import {buildRails} from './minecart-rails.js?v=world-picker-20261114';
-import {createCartCamera} from './minecart-camera.js?v=world-picker-20261114';
-import {CoinState,buildCoins} from './minecart-coins.js?v=world-picker-20261114';
-import {createCartAudio} from './minecart-audio.js?v=world-picker-20261114';
-import {createOutroMotion} from './outro-motion.js?v=world-picker-20261114';
+import {createCourse,CartPhysics,COURSE_NAMES,COURSE_COUNT} from './minecart-track.js?v=deep-ride-20261114';
+import {buildCave} from './cave-environment.js?v=deep-ride-20261114';
+import {buildCart} from './minecart-model.js?v=deep-ride-20261114';
+import {buildRails} from './minecart-rails.js?v=deep-ride-20261114';
+import {createCartCamera} from './minecart-camera.js?v=deep-ride-20261114';
+import {CoinState,buildCoins} from './minecart-coins.js?v=deep-ride-20261114';
+import {createCartAudio} from './minecart-audio.js?v=deep-ride-20261114';
+import {createOutroMotion} from './outro-motion.js?v=deep-ride-20261114';
 const $=id=>document.getElementById(id),reader=window.storyReader($('line'),$('retry'));
 const names=COURSE_NAMES, MAIN_MENU='https://fritidsparken.se/games/prince-of-persia/';
 const opening=[
@@ -101,7 +101,7 @@ function updateHUD(s){
  for(const [id,side]of [['left',-1],['right',1]]){$(id).classList.toggle('selected',s.choice===side);$(id).setAttribute('aria-pressed',String(s.choice===side))}
  $('jump').disabled=!s.canJump||s.jumpQueued;$('jump').classList.toggle('ready',s.canJump&&!s.jumpQueued);$('jump').classList.toggle('queued',s.jumpQueued);$('jumpLabel').textContent=s.jumpQueued?'Hopp valt':'Hoppa';
  const route=course.routeMap.get(s.routeId),fork=route?.fork,chosen=fork&&s.choice?(s.choice===fork.safeSide?fork.safeRoute:fork.deadRoute):null;rails.highlight(s.pending?chosen:null);
- if(s.nextGap&&s.nextGap.distance>=0&&s.nextGap.distance<=40&&s.status==='run'){
+ if(s.nextGap&&s.nextGap.distance>=0&&s.canJump&&s.status==='run'){
   $('notice').hidden=false;$('notice').classList.toggle('urgent',s.canJump);$('notice').textContent=s.jumpQueued?'HOPP VALT ✓':s.canJump?'HOPPA NU!':'HOPP OM '+Math.max(0,Math.ceil(s.nextGap.distance))+' M';
  }else if(notified>0){$('notice').hidden=false;$('notice').textContent='Tillbaka vid checkpoint'}else $('notice').hidden=true;
 }

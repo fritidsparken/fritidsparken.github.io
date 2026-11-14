@@ -3,21 +3,20 @@
 export function createCartCamera(THREE, camera) {
   const offset = new THREE.Vector3(), target = new THREE.Vector3();
   const frozenPosition = new THREE.Vector3(), aim = new THREE.Vector3();
+  const frozenRotation = new THREE.Quaternion();
   let falling = false, initialized = false;
   return {
     reset() { falling = false; initialized = false; },
     update(position, orientation, status, dt, portrait = false) {
       if (status === 'falling' && !falling && initialized) {
-        frozenPosition.copy(camera.position);
+        frozenPosition.copy(camera.position);frozenRotation.copy(camera.quaternion);
         camera.getWorldDirection(aim).multiplyScalar(8).add(camera.position);
         falling = true;
       }
       if (status !== 'falling') falling = false;
       if (falling) {
         camera.position.copy(frozenPosition);
-        target.copy(position).add(new THREE.Vector3(0, 1.15, 0));
-        aim.lerp(target, 1 - Math.exp(-dt * 7));
-        camera.lookAt(aim);
+        camera.quaternion.copy(frozenRotation);
       } else {
         offset.set(0, portrait ? 3.8 : 3.6, portrait ? -8.3 : -6.8).applyQuaternion(orientation);
         camera.position.copy(position).add(offset);

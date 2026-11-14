@@ -55,7 +55,9 @@ export function buildCave(T,scene,course,level=0){
  }
  function instance(geo,mat,list,name){
   // Spatial batches prevent a distant end of a 1km route keeping every rock visible.
-  const buckets=new Map();for(const p of list){const key=Math.floor(p.z/55);if(!buckets.has(key))buckets.set(key,[]);buckets.get(key).push(p)}
+  const buckets=new Map();for(const p of list){
+   const radius=Math.max(p.sx,p.sy,p.sz)*1.5;
+   if(routes.some(r=>{const q=onRoute(r,p.z);return q&&Math.abs(p.x-q.x)<2.4+radius&&p.y-radius<q.y+4.5&&p.y+radius>q.y-.4}))continue;const key=Math.floor(p.z/55);if(!buckets.has(key))buckets.set(key,[]);buckets.get(key).push(p)}
   const collection=new T.Group();collection.name=name;root.add(collection);
   for(const points of buckets.values()){const mesh=new T.InstancedMesh(geo,mat,points.length);mesh.name=name;for(let i=0;i<points.length;i++){const p=points[i];transform.position.set(p.x,p.y,p.z);transform.rotation.set(p.rot||0,p.rot||0,0);transform.scale.set(p.sx,p.sy,p.sz);transform.updateMatrix();mesh.setMatrixAt(i,transform.matrix)}mesh.instanceMatrix.needsUpdate=true;mesh.receiveShadow=true;mesh.castShadow=true;mesh.computeBoundingSphere();collection.add(mesh)}return collection;
  }
@@ -70,6 +72,8 @@ export function buildCave(T,scene,course,level=0){
  }
  for(const g of gapHoles){const dir=new T.Vector3(g.b.x-g.a.x,0,g.b.z-g.a.z).normalize(),side=new T.Vector3(dir.z,0,-dir.x);for(const end of [g.a,g.b]){const mesh=addMesh(new T.BoxGeometry(g.halfWidth*2,18,.7),shadowRock);mesh.position.set(end.x,end.y-9,end.z);mesh.rotation.y=Math.atan2(dir.x,dir.z)}}
  for(const g of gapHoles){const d=new T.Vector3(g.b.x-g.a.x,0,g.b.z-g.a.z).normalize(),side=new T.Vector3(d.z,0,-d.x),rim=[];for(const end of [g.a,g.b])for(const x of [-5.1,-4.2,-3.3,-2.3,2.3,3.3,4.2,5.1])rim.push({x:end.x+side.x*x,y:end.y-.16,z:end.z+side.z*x,sx:.42,sy:.32,sz:.48,rot:x});instance(rockGeo,boulderMat,rim,'Fractured jump lip stones')}
+ // Leaning mine supports look threatening but stay above the cart clearance.
+ for(let z=35;z<maxZ-35;z+=85){const q=onRoute(routes.find(r=>r.kind!=='dead'&&onRoute(r,z))||routes[0],z);if(!q)continue;const beam=addMesh(new T.BoxGeometry(8,.35,.4),wood);beam.position.set(q.x,q.y+6,z);beam.rotation.z=.11*Math.sin(z);beam.name='Overhead damaged support';}
  const hemi=new T.HemisphereLight(0xbac5d4,palette.fill,.95);root.add(hemi);const ambient=new T.AmbientLight(palette.fill,.18);root.add(ambient);
  // Closely spaced fixtures create persistent parallax and successive pools of cave light.
  for(let z=minZ+14,i=0;z<maxZ-10;z+=18,i++){const r=row(z);for(const side of [-1,1]){const x=(side<0?r.left:r.right)-side*1.5,y=height(x,z,r)+2.6;torchPositions.push(new T.Vector3(x,y,z));
@@ -107,6 +111,10 @@ export function buildCave(T,scene,course,level=0){
  for(const side of [-1,1])passageMesh(new T.BoxGeometry(.55,9.5,18),boulderMat,side*3.85,4.7,9.2);
  passageMesh(new T.BoxGeometry(8.2,.55,18),boulderMat,0,9.45,9.2);
  passageMesh(new T.BoxGeometry(8.2,9.8,.5),shadowRock,0,4.8,18.4);
+ const previewMap=texture(level<9?'cave'+((level+1)%5):'finale-1',false);
+ const previewMat=new T.MeshBasicMaterial({map:previewMap,side:T.DoubleSide,toneMapped:false});materials.push(previewMat);
+ const preview=passageMesh(new T.PlaneGeometry(7.4,4.16),previewMat,0,3.8,17.9);preview.name='Preview of next cave';preview.rotation.y=Math.PI;
+ passage.userData.nextLevel=level<9?level+1:null;
  for(const z of [4.8,10.8,16.8])passageMesh(arch(7.2,9.1,.23),gold,0,0,z);
  const thresholdGlow=material({color:0xe3b95c,emissive:0xffba52,emissiveIntensity:.6,roughness:.45,metalness:.4});
  for(const side of [-1,1])passageMesh(new T.BoxGeometry(.06,.018,17),thresholdGlow,side*2.9,.015,9);

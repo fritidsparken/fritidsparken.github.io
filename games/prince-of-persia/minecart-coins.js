@@ -6,10 +6,10 @@ export const PICKUP_TIMING=Object.freeze({attract:.20,liftEnd:.43,arrival:.80,sp
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 const validId=id=>typeof id==='string'&&/^cave-coin-v1\/[0-9]+\/(?:main|safe)-[0-9]+\/[0-9]+$/.test(id);
 const copy=p=>({x:p.x,y:p.y,z:p.z});
-export function createCoinLayout(course){
+export function createCoinLayout(course,decoys=false){
  const coins=[];
  for(const route of course.routes){
-  if(route.kind==='dead')continue;
+  if((route.kind==='dead')!==decoys)continue;
   // Keep coins before/after hazards clear of the jump marker and landing area.
   for(let base=12,index=0;base<route.length-12;base+=12,index++){
    const s=base+3.4*Math.sin((course.level+1)*83+index*19+route.id.length*11);
@@ -61,6 +61,7 @@ export class CoinState{
  }
 }
 export function buildCoins(T,scene,course,state){
+ const renderCoins=[...state.coins,...createCoinLayout(course,true)];
  const root=new T.Group();root.name='Gold sun-coins';scene.add(root);
  const geometry=[],materials=[];
  const mat=opts=>{const m=new T.MeshStandardMaterial(opts);materials.push(m);return m};
@@ -71,7 +72,7 @@ export function buildCoins(T,scene,course,state){
  const sun=new T.ExtrudeGeometry(shape,{depth:.013,bevelEnabled:true,bevelSize:.005,bevelThickness:.004,bevelSegments:1,steps:1});geometry.push(sun);
  const parts=[{geo:disc,mat:[edge,gold,gold],z:0},{geo:rim,mat:shine,z:.042},{geo:rim,mat:shine,z:-.042},{geo:sun,mat:shine,z:.043},{geo:sun,mat:shine,z:-.056}];
  const dummy=new T.Object3D(),local=new T.Matrix4(),matrix=new T.Matrix4(),coinMatrix=new T.Matrix4();
- const meshes=parts.map(part=>{const mesh=new T.InstancedMesh(part.geo,part.mat,state.coins.length);mesh.frustumCulled=false;mesh.castShadow=false;root.add(mesh);return mesh});
+ const meshes=parts.map(part=>{const mesh=new T.InstancedMesh(part.geo,part.mat,renderCoins.length);mesh.frustumCulled=false;mesh.castShadow=false;root.add(mesh);return mesh});
  const sparkGeometry=new T.OctahedronGeometry(.045,0);geometry.push(sparkGeometry);
  const sparkleMaterial=new T.MeshBasicMaterial({color:0xfff2ab,transparent:true,depthWrite:false});materials.push(sparkleMaterial);
  const effects=[];
@@ -81,8 +82,8 @@ export function buildCoins(T,scene,course,state){
  }
  const body=new T.Vector3(),target=new T.Vector3(),left=new T.Vector3(),top=new T.Vector3(),world=new T.Vector3();
  function update(time,snapshot,camera,hudNDC={x:.8,y:.85}){
-  for(let i=0;i<state.coins.length;i++){
-   const c=state.coins[i],hidden=state.collected.has(c.id)||Math.abs(c.position.z-snapshot.position.z)>125;
+  for(let i=0;i<renderCoins.length;i++){
+   const c=renderCoins[i],hidden=state.collected.has(c.id)||Math.abs(c.position.z-snapshot.position.z)>125;
    const pulse=1+.025*Math.sin(time*2+c.phase);
    dummy.position.set(c.position.x,c.position.y+Math.sin(time*2+c.phase)*.028,c.position.z);dummy.rotation.set(0,time*1.8+c.phase*.43,0);dummy.scale.setScalar(hidden?0:pulse);dummy.updateMatrix();coinMatrix.copy(dummy.matrix);
    for(let k=0;k<parts.length;k++){local.makeTranslation(0,0,parts[k].z);matrix.multiplyMatrices(coinMatrix,local);meshes[k].setMatrixAt(i,matrix)}
