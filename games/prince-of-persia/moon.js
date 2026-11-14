@@ -31,7 +31,7 @@ picker.onchange=()=>{
   stage=i;finished=false;enter();save(0);
   startPlay();
 };
-// The same treasure painter and pickup choreography as Solportens väg.
+// The same treasure painter and pickup choreography as Solrikets hemlighet.
 // A collected ID survives deaths/checkpoints; revisiting it cannot award it again.
 const validCoinId = id => typeof id === 'string' && /^(?:[0-9]):(?:[0-9]|1[0-9]):[0-9]{1,2}$/.test(id);
 const collectedCoins = new Set(Array.isArray(saved.coins) ? saved.coins.filter(validCoinId) : []);
@@ -82,7 +82,7 @@ function enter(cp=0,resumeBoss=false) {
   game.lips=game.lips.filter(lip=>lip.to<game.floors.length);
   coins=makeMoonCoins(game,stage);route.pickups=[];
   lastDraw='';
-  el('chapter').textContent='MÅNENS AKVEDUKT · '+(stage+1)+' / '+chapters.length;
+  el('chapter').textContent='MÅNENS DJUP · '+(stage+1)+' / '+chapters.length;
   el('name').textContent=room.name;
   el('hint').textContent=warden?.phase==='defeated'?'Porten är öppen. Spring till höger!':room.hint;
 }
@@ -161,7 +161,7 @@ function continueToCave(resume=recoveryHandoff){
   try{location.replace(destination)}
   catch(error){
     try{location.assign(destination)}
-    catch{transitioning=false;stop('Vägen till Flöjtens eko','Tryck för att fortsätta genom porten.','Till värld 4')}
+    catch{transitioning=false;stop('Vägen till Flöjtens väg','Tryck för att fortsätta genom porten.','Till värld 4')}
   }
 }
 function makeMoonCoins(chamber,chapter){
@@ -277,7 +277,7 @@ Promise.all([...chapters.map(r=>r.key),'span','crusher','warden','idle','climb',
   const image=new Image();image.src=PALACE_ART[id] || "moon-art/"+id+".webp";await image.decode();images[id]=image;
 })).then(()=>{
   loaded=true;const selecting=new URLSearchParams(location.search).has('stage');enter(selecting?0:saved.cp,!selecting);
-  if(!(selecting && requestedFromMenu))stop(finished?'Månporten är öppen':'Månens akvedukt',finished?'Du har klarat värld III.':'Led vattnet genom palatset. Styr med pilarna och hoppa med mellanslag eller hoppknappen.',finished?'Till värld 4':'Spela');
+  if(!(selecting && requestedFromMenu))stop(finished?'Månporten är öppen':'Månens djup',finished?'Du har klarat värld III.':'Led vattnet genom palatset. Styr med pilarna och hoppa med mellanslag eller hoppknappen.',finished?'Till värld 4':'Spela');
   el('go').disabled=false;requestAnimationFrame(animate);
   if(selecting && requestedFromMenu)startPlay();else if(new URLSearchParams(location.search).get('from')==='jungle')el('go').onclick();
 }).catch(()=>{stop('Palatset kunde inte öppnas','Kontrollera anslutningen och försök igen.','Försök igen');el('go').disabled=false});
