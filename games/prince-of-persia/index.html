@@ -59,11 +59,13 @@
   #titleMenu h1 { font-size: clamp(20px, 6svh, 25px); line-height: 1; margin: 0 0 7px; }
   #titleMenu .worlds { width: min(44svh, 220px, 100%); grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin: 0 0 8px; }
   #titleMenu .world { position: relative; aspect-ratio: 1; padding: 0; }
-  #titleMenu .world img { width: 100%; height: 100%; max-height: none; margin: 0; object-fit: cover; }
+  #titleMenu .world img { width: 100%; height: 100%; max-height: none; margin: 0; object-fit: contain; background: #171510; }
   #titleMenu .world span { position: absolute; bottom: 0; left: 0; right: 0; min-height: 0; padding: 3px 4px; background: rgba(18, 16, 13, .86); }
   #titleMenu .world b { font-size: clamp(10px, 2.9svh, 13px); line-height: 1.05; }
   #titleMenu .world small { display: none; }
   #titleMenu #palacePick:not([hidden]), #titleMenu #chasePick:not([hidden]), #titleMenu #moonPick:not([hidden]), #titleMenu #cavePick:not([hidden]) { margin: 6px 0; }
+  #titleMenu #palacePick:not([hidden]), #titleMenu #chasePick:not([hidden]), #titleMenu #moonPick:not([hidden]), #titleMenu #cavePick:not([hidden]) { width: min(44svh, 220px, 100%); box-sizing: border-box; }
+  #titleMenu #palaceStage, #titleMenu #jungleStage, #titleMenu #moonStage, #titleMenu #caveStage { flex: 1 1 0; min-width: 0; }
   #titleMenu footer { gap: 10px; }
   #titleMenu footer button { padding: 6px 12px; min-height: 36px; }
   #titleMenu .tools { margin-top: 7px; gap: 14px; }
