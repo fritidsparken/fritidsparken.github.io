@@ -30,11 +30,10 @@ async function boot(saved={},options={}){
  const save=JSON.parse(g.storage.get('lostWorlds.moon.v2'));assert.equal(save.finished,true);assert.equal(g.storage.get('lostWorlds.cave'),'1');
  console.log('PASS defeated boss → actual reachable portal → exactly one automatic cave handoff');
 }
-// Reaching the far right before the third lock breaks cannot skip the boss.
+// Reaching the far wall always starts the next world, including while jumping.
 {
- const g=await boot({stage:9,unlocked:9,introPlayed:true});g.run('startPlay();game.p.x=1602;tick(1/120)');assert.equal(g.calls.navigation.length,0);assert.equal(g.get('finished'),false);
- g.run("warden.hits=new Set(locks);warden.phase='defeated';game.p.ground=false;game.p.y=635;game.p.vy=-20;tick(1/120)");assert.equal(g.calls.navigation.length,1,'Jumping through open portal must count');
- console.log('PASS locked boss blocks exit; jumping through cleared portal finishes');
+ const g=await boot({stage:9,unlocked:9,introPlayed:true});g.run('startPlay();game.p.x=1602;game.p.ground=false;game.p.y=635;game.p.vy=-20;tick(1/120)');assert.equal(g.calls.navigation.length,1,'Reaching the wall must start the next world');
+ console.log('PASS far wall triggers handoff even during boss fight and while jumping');
 }
 {
  const g=await boot({stage:9,finished:true,introPlayed:true});assert.deepEqual(g.calls.navigation,['cave.html?from=aqueduct&resume=1']);assert.equal(g.calls.frames.length,0,'Completed-save handoff does not wait for image downloads');

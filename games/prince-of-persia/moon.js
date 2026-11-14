@@ -136,7 +136,7 @@ function tick(dt) {
     const hits=warden.hits.size;
     stepWarden(warden,dt);
     if(warden.hits.size!==hits)save(game.checkpoint);
-    if(p.dead>0 || warden.phase!=='defeated')return;
+    if(p.dead>0)return;
   }
   // Both ordinary rooms and the cleared boss arena finish at their real exit.
   // A jump across the threshold counts too; requiring one exact grounded frame
