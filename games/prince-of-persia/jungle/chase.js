@@ -215,7 +215,7 @@ function stepBridge(dt) {
   bridge.time += dt;
   bridge.stun = Math.max(0, bridge.stun - dt);
   const dx = bridgeAxis + Number(bridgeKeys.has('right')) - Number(bridgeKeys.has('left'));
-  const dz = bridgeForward + Number(bridgeKeys.has('forward')) - Number(bridgeKeys.has('back'));
+  const dz = 1; // Navid runs automatically; the player steers left/right and jumps.
   const ease = 1 - Math.exp(-dt * 30),
     slow = bridge.stun > 0 ? .33 : 1;
   bridge.travelX += (clamp(dx, -1, 1) - bridge.travelX) * ease;

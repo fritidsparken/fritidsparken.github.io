@@ -198,7 +198,9 @@ $('full').onclick = async () => {
     msg('Helskärm är inte tillgänglig i den här vyn.');
   }
 };
+const bridgeTouches = new Map();
 function resetBridgeStick() {
+  bridgeTouches.clear();
   bridgeAxis = bridgeForward = 0;
   bridgePointer = null;
   $('bridgeStick').firstElementChild.style.transform = '';
@@ -230,6 +232,27 @@ for (const kind of ['pointerup', 'pointercancel', 'lostpointercapture']) {
   jStick.addEventListener(kind, e => {
     if (e.pointerId === bridgePointer) resetBridgeStick();
   });
+}
+function updateBridgeButtons() {
+  let axis = 0;
+  for (const direction of bridgeTouches.values()) axis += direction;
+  bridgeAxis = Math.max(-1, Math.min(1, axis));
+}
+for (const [id, direction] of [['bridgeLeft', -1], ['bridgeRight', 1]]) {
+  const button = $(id);
+  button.addEventListener('pointerdown', event => {
+    event.preventDefault();
+    if (!bridge.active || bridge.done) return;
+    bridgeTouches.set(event.pointerId, direction);
+    button.setPointerCapture(event.pointerId);
+    updateBridgeButtons();
+  });
+  for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+    button.addEventListener(name, event => {
+      bridgeTouches.delete(event.pointerId);
+      updateBridgeButtons();
+    });
+  }
 }
 $('bridgeJump').onpointerdown = e => {
   e.preventDefault();
