@@ -67,6 +67,7 @@ function resetBridge(level = bridge.level) {
     done: false,
     death: 0,
     boostAt: null,
+    pillarTarget: null,
     checkpoint: null,
     checkpointNotice: 0,
     furthest: 0,
@@ -162,6 +163,10 @@ function hideBridge() {
 function bridgeJump() {
   bridge.boostAt = null;
   if (bridge.active && !bridge.done && !bridge.death && bridge.y > -.10 && bridge.jumps < 2 && bridge.stun < .38) {
+    if (bridge.jumps === 0) {
+      const pit = bridge.pits.find(p => bridge.d >= p.start - 2 && bridge.d < p.end);
+      bridge.pillarTarget = pit?.pads.find(p => p.s > bridge.d + .3) || null;
+    }
     const from = bridge.jumps ? flipProgress() : 0;
     bridge.spinFrom = from;
     bridge.spinTo = Math.floor(from) + 1 + (bridge.jumps ? 1 : 0);
@@ -247,6 +252,13 @@ function stepBridge(dt) {
   if (!bridge.onGround && bridge.jumps) bridge.y += supportY(previous.d, previous.x) - supportY(bridge.d, bridge.x);
   bridge.vy -= 12 * dt;
   bridge.y += bridge.vy * dt;
+  // Correct small accumulated timing errors only when landing close to the intended pillar.
+  if (bridge.jumps && bridge.vy <= 0 && oldY >= -.001 && bridge.y <= 0 && bridge.pillarTarget) {
+    const pad = bridge.pillarTarget;
+    const longitudinal = pad.s - bridge.d;
+    const lateral = trailCentre(bridge.d) + bridge.x - trailCentre(pad.s) - pad.x;
+    if (Math.abs(longitudinal) <= 1.2 && Math.abs(lateral) <= pad.r * .9) bridge.d = pad.s;
+  }
   bridge.onGround = bridge.vy <= 0 && oldY >= -.001 && bridge.y <= 0 && groundAt(bridge.d, bridge.x);
   if (bridge.y < -.72) {
     bridge.death = .001;
@@ -257,6 +269,7 @@ function stepBridge(dt) {
   if (bridge.onGround) {
     if (bridge.jumps) playEffect('land', .29);
     bridge.jumps = 0;
+    bridge.pillarTarget = null;
     bridge.y = bridge.vy = 0;
     const step = Math.floor(bridge.phase * 2);
     if (bridge.moving && bridge.step !== step) {
