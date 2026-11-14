@@ -166,8 +166,8 @@ function bridgeJump() {
     bridge.spinFrom = from;
     bridge.spinTo = Math.floor(from) + 1 + (bridge.jumps ? 1 : 0);
     bridge.spinTime = bridge.time;
-    bridge.spinDuration = (4.75 + Math.sqrt(4.75 ** 2 + 24 * Math.max(0, bridge.y))) / 12;
-    bridge.vy = 4.75;
+    bridge.spinDuration = (5.7 + Math.sqrt(5.7 ** 2 + 24 * Math.max(0, bridge.y))) / 12;
+    bridge.vy = 5.7;
     bridge.jumps++;
     actionSound(bridge.jumps === 1 ? 'jump' : 'boost');
   }
@@ -194,7 +194,7 @@ function finishChase() {
 }
 function stepBridge(dt) {
   if (bridge.done) return;
-  const speed = course()[2];
+  const speed = course()[2] * .85;
   if (bridge.death) {
     bridge.death += dt;
     if (bridge.cause === 'pit') bridge.y -= dt * 4;else {
@@ -331,8 +331,8 @@ function bridgeFrame(now) {
   bridgeHandle = requestAnimationFrame(bridgeFrame);
 }
 function spikeHeight(s, time) {
-  const t = (time + s * .19) % 3.1;
-  return .70 * Math.min(clamp((t - .85) / .26, 0, 1), clamp((2.67 - t) / .52, 0, 1));
+  const distance = s - bridge.d;
+  return .70 * Math.min(clamp((10 - distance) / 4, 0, 1), clamp((distance + 2) / 1.5, 0, 1));
 }
 function groundAt(s, x) {
   const pit = bridge.pits.find(p => s > p.start && s < p.end);
@@ -372,7 +372,7 @@ function advanceRocks(dt, afterCatch = false) {
       }
       continue;
     }
-    const speed = course()[2];
+    const speed = course()[2] * .85;
     let velocity = speed * .88;
     if (rock.entering) {
       const slope = -16 / 7 * rock.branch.side * (1 - clamp((rock.s - rock.branch.start) / 7, 0, 1));

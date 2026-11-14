@@ -8,8 +8,8 @@ varying mediump vec3 shadowPoint;varying vec3 wp,norm;varying vec2 tc;varying ve
 void main(){
  vec3 pos=p*scale,nn=n;
  if(tint.a<-.5){
-  float t=mod(seconds+(-1.-tint.a)*.19,3.1);
-  float rise=min(clamp((t-.85)/.26,0.,1.),clamp((2.67-t)/.52,0.,1.));
+  float distance=(-1.-tint.a)-(camera.z-7.);
+  float rise=min(clamp((10.-distance)/4.,0.,1.),clamp((distance+2.)/1.5,0.,1.));
   pos.y-=.70*(1.-rise);
  }
  float si=sin(rot),co=cos(rot);
@@ -433,7 +433,7 @@ function paintBridge() {
     }
   }, w / unit - 110 - 49 / unit, 48);
   brush.restore();
-  const phrase = bridge.death ? bridge.cause === 'pit' ? 'Navid föll ner!' : bridge.cause === 'spikes' ? 'Spikfällan slog upp!' : 'Stenblocket hann ikapp!' : bridge.stun > .12 ? 'Du snubblade!' : bridge.checkpointNotice > bridge.time ? 'Kontrollpunkt ' + (bridge.checkpoint.index + 1) + ' · ' + (bridge.started ? 'Sparad' : 'Fortsätt härifrån') : !bridge.started ? matchMedia('(any-pointer:coarse)').matches ? 'Styr med joysticken · Hoppa med höger tumme' : '↓ Spring mot kameran · ← → Styr · Hoppa med mellanslag · Tryck igen för dubbelhopp' : '';
+  const phrase = bridge.death ? bridge.cause === 'pit' ? 'Navid föll ner!' : bridge.cause === 'spikes' ? 'Spikfällan slog upp!' : 'Stenblocket hann ikapp!' : bridge.stun > .12 ? 'Du snubblade!' : bridge.checkpointNotice > bridge.time ? 'Kontrollpunkt ' + (bridge.checkpoint.index + 1) + ' · ' + (bridge.started ? 'Sparad' : 'Fortsätt härifrån') : !bridge.started ? matchMedia('(any-pointer:coarse)').matches ? 'Springer automatiskt · Styr med pilarna och hoppa' : '↓ Spring mot kameran · ← → Styr · Hoppa med mellanslag · Tryck igen för dubbelhopp' : '';
   if ($('bridgeNote').textContent !== phrase) $('bridgeNote').textContent = phrase;
   updateChaseHud();
 }
