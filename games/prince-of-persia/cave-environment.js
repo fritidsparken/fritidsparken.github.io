@@ -1,5 +1,5 @@
 // Geometry-based cave. The paintings supply surface materials, never a moving backdrop.
-export function buildCave(T,scene,course,level=0){
+export function buildCave(T,scene,course,level=0,previewOnly=false){
  const root=new T.Group();root.name='Cave architecture';scene.add(root);
  const palettes=[{fog:0x211814,rock:0xc4aa84,fill:0x827158,accent:0xffaa43},{fog:0x0c1828,rock:0xa9b8c4,fill:0x405d80,accent:0x309aff},{fog:0x191326,rock:0xafa1bc,fill:0x705384,accent:0xb87dff},{fog:0x23160f,rock:0xb89e84,fill:0x715143,accent:0xff9c40},{fog:0x0b211e,rock:0xb3bdb0,fill:0x427d71,accent:0x56eac5}];
  const theme=level%5,chapter=Math.floor(level/5),palette=palettes[theme],materials=[],geometries=[],textures=[],lights=[],torchPositions=[],pending=[];
@@ -21,7 +21,7 @@ export function buildCave(T,scene,course,level=0){
  function noise(x,z){return Math.sin(x*1.91+z*.627)*.5+Math.sin(x*.79-z*1.31)*.25+Math.cos(x*4.51+z*.347)*.25}
  function rand(i){const n=Math.sin(i*127.1+level*351.77)*43758.5453123;return n-Math.floor(n)}
  const routes=course.routes,points=routes.flatMap(r=>r.points);
- const minZ=Math.min(...points.map(p=>p.z))-22,maxZ=Math.max(...points.map(p=>p.z))+24;
+ const minZ=Math.min(...points.map(p=>p.z))-22,maxZ=previewOnly?95:Math.max(...points.map(p=>p.z))+24;
  function onRoute(route,z){const ps=route.points;if(z<ps[0].z||z>ps[ps.length-1].z)return null;let lo=0,hi=ps.length-1;while(hi-lo>1){const m=(lo+hi)>>1;if(ps[m].z<z)lo=m;else hi=m}const a=ps[lo],b=ps[hi],f=(z-a.z)/Math.max(.0001,b.z-a.z);return {x:a.x+(b.x-a.x)*f,y:a.y+(b.y-a.y)*f,z}}
  const pits=course.pits.map((p,i)=>{const len=20,dir=new T.Vector3(p.direction.x,0,p.direction.z).normalize(),side=new T.Vector3(dir.z,0,-dir.x);return {...p,dir,side,id:i,cx:p.position.x+dir.x*len*.5,cz:p.position.z+dir.z*len*.5,rx:p.width*.5,rz:len*.5}});
  const gapHoles=[];for(const r of routes)for(const g of r.gaps||[]){const a=r.sample(g.start).position,b=r.sample(g.end).position;gapHoles.push({a,b,halfWidth:5.4})}
@@ -70,8 +70,14 @@ export function buildCave(T,scene,course,level=0){
  const rim=[];for(let j=0;j<n;j++){const a=j/n*Math.PI*2,rad=pitRadius(p,a),u=Math.cos(a)*p.rx*rad,v=Math.sin(a)*p.rz*rad;rim.push({x:p.cx+p.side.x*u+p.dir.x*v,y:p.position.y-.2,z:p.cz+p.side.z*u+p.dir.z*v,sx:.5+rand(j+12)*.5,sy:.35+rand(j+22)*.4,sz:.55+rand(j+32)*.7,rot:j*.72})}instance(rockGeo,boulderMat,rim,'Broken natural chasm rim');
  const bottom=addMesh(new T.CircleGeometry(p.rx*2,40),material({color:0x020307,roughness:1,side:T.DoubleSide}));bottom.rotation.x=-Math.PI/2;bottom.position.set(p.cx,p.position.y-p.depth,p.cz);
  }
- for(const g of gapHoles){const dir=new T.Vector3(g.b.x-g.a.x,0,g.b.z-g.a.z).normalize(),side=new T.Vector3(dir.z,0,-dir.x);for(const end of [g.a,g.b]){const mesh=addMesh(new T.BoxGeometry(g.halfWidth*2,18,.7),shadowRock);mesh.position.set(end.x,end.y-9,end.z);mesh.rotation.y=Math.atan2(dir.x,dir.z)}}
- for(const g of gapHoles){const d=new T.Vector3(g.b.x-g.a.x,0,g.b.z-g.a.z).normalize(),side=new T.Vector3(d.z,0,-d.x),rim=[];for(const end of [g.a,g.b])for(const x of [-5.1,-4.2,-3.3,-2.3,2.3,3.3,4.2,5.1])rim.push({x:end.x+side.x*x,y:end.y-.16,z:end.z+side.z*x,sx:.42,sy:.32,sz:.48,rot:x});instance(rockGeo,boulderMat,rim,'Fractured jump lip stones')}
+ const black= new T.MeshBasicMaterial({color:0x000000,side:T.DoubleSide,fog:false});materials.push(black);
+ for(const g of gapHoles){const dx=g.b.x-g.a.x,dz=g.b.z-g.a.z,len=Math.hypot(dx,dz),dir=new T.Vector3(dx/len,0,dz/len),side=new T.Vector3(dir.z,0,-dir.x),mid=new T.Vector3((g.a.x+g.b.x)/2,(g.a.y+g.b.y)/2,(g.a.z+g.b.z)/2),depth=65;
+  for(const end of [g.a,g.b]){const m=addMesh(new T.BoxGeometry(g.halfWidth*2,depth,.35),black);m.position.set(end.x,end.y-depth/2,end.z);m.rotation.y=Math.atan2(dir.x,dir.z)}
+  for(const sign of [-1,1]){const a=new T.Vector3(g.a.x,g.a.y,g.a.z).addScaledVector(side,sign*g.halfWidth),b=new T.Vector3(g.b.x,g.b.y,g.b.z).addScaledVector(side,sign*g.halfWidth);const m=addMesh(geometry([a.x,a.y,a.z,b.x,b.y,b.z,a.x,a.y-depth,a.z,b.x,b.y-depth,b.z],null,null,[0,2,1,1,2,3]),black);m.name='Black sloping jump pit wall';}
+  const bottom=addMesh(new T.PlaneGeometry(g.halfWidth*2,len+2),black);bottom.rotation.x=-Math.PI/2;bottom.rotation.z=-Math.atan2(dir.x,dir.z);bottom.position.copy(mid);bottom.position.y-=depth;
+  const rim=[];for(let z=0;z<=len;z+=.85)for(const sign of [-1,1]){const k=z/len;rim.push({x:g.a.x+dir.x*z+side.x*sign*(g.halfWidth-.1),y:g.a.y+(g.b.y-g.a.y)*k-.1,z:g.a.z+dir.z*z+side.z*sign*(g.halfWidth-.1),sx:.65+rand(z)*.35,sy:.45,sz:.65,rot:z});}
+  for(const end of [g.a,g.b])for(const x of [-5.1,-4.2,-3.3,-2.3,2.3,3.3,4.2,5.1])rim.push({x:end.x+side.x*x,y:end.y-.16,z:end.z+side.z*x,sx:.55,sy:.4,sz:.58,rot:x});instance(rockGeo,boulderMat,rim,'Rock rim around black jump pit');
+ }
  // Leaning mine supports look threatening but stay above the cart clearance.
  for(let z=35;z<maxZ-35;z+=85){const q=onRoute(routes.find(r=>r.kind!=='dead'&&onRoute(r,z))||routes[0],z);if(!q)continue;const beam=addMesh(new T.BoxGeometry(8,.35,.4),wood);beam.position.set(q.x,q.y+6,z);beam.rotation.z=.11*Math.sin(z);beam.name='Overhead damaged support';}
  const hemi=new T.HemisphereLight(0xbac5d4,palette.fill,.95);root.add(hemi);const ambient=new T.AmbientLight(palette.fill,.18);root.add(ambient);
@@ -111,9 +117,9 @@ export function buildCave(T,scene,course,level=0){
  for(const side of [-1,1])passageMesh(new T.BoxGeometry(.55,9.5,18),boulderMat,side*3.85,4.7,9.2);
  passageMesh(new T.BoxGeometry(8.2,.55,18),boulderMat,0,9.45,9.2);
  passageMesh(new T.BoxGeometry(8.2,9.8,.5),shadowRock,0,4.8,18.4);
- const previewMap=texture(level<9?'cave'+((level+1)%5):'finale-1',false);
- const previewMat=new T.MeshBasicMaterial({map:previewMap,side:T.DoubleSide,toneMapped:false});materials.push(previewMat);
- const preview=passageMesh(new T.PlaneGeometry(7.4,4.16),previewMat,0,3.8,17.9);preview.name='Preview of next cave';preview.rotation.y=Math.PI;
+ const previewMat=new T.MeshBasicMaterial({color:0xffffff,side:T.DoubleSide,toneMapped:false});materials.push(previewMat);
+ const preview=passageMesh(new T.PlaneGeometry(7.4,4.16),previewMat,0,3.8,12.5);preview.name='Actual next-course start';preview.rotation.y=Math.PI;preview.visible=false;
+ function setPreview(map){previewMat.map=map;previewMat.needsUpdate=true;preview.visible=true;}
  passage.userData.nextLevel=level<9?level+1:null;
  for(const z of [4.8,10.8,16.8])passageMesh(arch(7.2,9.1,.23),gold,0,0,z);
  const thresholdGlow=material({color:0xe3b95c,emissive:0xffba52,emissiveIntensity:.6,roughness:.45,metalness:.4});
@@ -125,5 +131,5 @@ export function buildCave(T,scene,course,level=0){
  if(theme===3){for(let z=minZ+30;z<maxZ-20;z+=75){const r=row(z),x=r.left+2,y=height(x,z,r);const wheel=addMesh(new T.TorusGeometry(2.7,.22,8,30),metal);wheel.position.set(x,y+3,z);wheel.rotation.y=Math.PI/2;for(let j=0;j<8;j++){const spoke=addMesh(new T.BoxGeometry(.14,5.1,.14),wood);spoke.position.copy(wheel.position);spoke.rotation.x=j*Math.PI/4}const axle=addMesh(new T.CylinderGeometry(.3,.3,1.7,10),metal);axle.rotation.z=Math.PI/2;axle.position.copy(wheel.position)}}
  function update(time,cartPosition){updateDoor(cartPosition);const selected=torchPositions.map(p=>({p,d:p.distanceToSquared(new T.Vector3(cartPosition.x,cartPosition.y,cartPosition.z))})).sort((a,b)=>a.d-b.d).slice(0,lights.length);selected.forEach((item,i)=>{lights[i].position.copy(item.p);lights[i].intensity=90+Math.sin(time*7+i)*3+Math.sin(time*11+i*2)*2})}
  function dispose(){scene.remove(root);for(const g of geometries)g.dispose();for(const m of materials)m.dispose();for(const t of textures)t.dispose()}
- return {root,update,dispose,ready:Promise.all(pending),door:doorGroup,doorLeaves,passage,pits,groundHeight:(x,z)=>height(x,z,row(z))};
+ return {root,update,dispose,ready:Promise.all(pending),door:doorGroup,doorLeaves,passage,setPreview,pits,groundHeight:(x,z)=>height(x,z,row(z))};
 }

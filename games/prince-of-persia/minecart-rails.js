@@ -14,7 +14,7 @@ export function buildRails(THREE,scene,course){
   for(const side of [-1,1]){const post=new THREE.Mesh(new THREE.CylinderGeometry(.085,.13,4.85,8),new THREE.MeshStandardMaterial({color:0x8d7958,metalness:.4,roughness:.75}));post.position.set(side*3,2.4,0);sign.add(post)}
   warningSigns.push({routeId:route.id,s,gapStart:gap.start,distance:gap.start-s,object:sign});
  }
- const lipMaterial=new THREE.MeshStandardMaterial({color:0xffd877,emissive:0xff9e28,emissiveIntensity:1.6,metalness:.4,roughness:.4});
+ const lipMaterial=iron;
  for(const route of course.routes){
   const vertices=[],indices=[],ties=[];
   const basis=s=>{const a=route.sample(s),p=new THREE.Vector3(a.position.x,a.position.y,a.position.z),t=new THREE.Vector3(a.tangent.x,a.tangent.y,a.tangent.z).normalize(),r=new THREE.Vector3().crossVectors(up,t).normalize(),n=new THREE.Vector3().crossVectors(t,r).normalize();return {p,t,r,n}};
@@ -27,10 +27,8 @@ export function buildRails(THREE,scene,course){
   const sleepers=new THREE.InstancedMesh(new THREE.BoxGeometry(2.16,.12,.23),wood,ties.length);ties.forEach((b,i)=>{dummy.position.copy(b.p).addScaledVector(b.n,.025);dummy.quaternion.setFromUnitVectors(forward,b.t);dummy.updateMatrix();sleepers.setMatrixAt(i,dummy.matrix)});sleepers.receiveShadow=true;group.add(sleepers);
   for(const gap of route.gaps||[]){warning(route,gap,32);
    // Torn rail tips protrude a little over the lip, leaving the centre of the gap open.
-   for(const side of [-1,1]){const b=basis(gap.start-.25),tip=new THREE.Mesh(new THREE.BoxGeometry(.10,.14,1.5),iron);tip.name="Bent broken rail tip";tip.position.copy(b.p).addScaledVector(b.r,side*.78).addScaledVector(b.t,.5).addScaledVector(b.n,.20);tip.quaternion.setFromUnitVectors(forward,b.t);tip.rotateY(side*.17);tip.rotateX(-side*.08);group.add(tip)}
-   // Three luminous chevrons lead into the take-off edge. They sit in the rails' own plane.
-   for(const back of [10,6,2]){const b=basis(Math.max(0,gap.start-back));for(const side of [-1,1]){const chevron=new THREE.Mesh(new THREE.BoxGeometry(.1,.035,1.15),lipMaterial);chevron.position.copy(b.p).addScaledVector(b.r,side*.30).addScaledVector(b.n,.175);chevron.quaternion.setFromUnitVectors(forward,b.t);chevron.rotateY(side*.62);group.add(chevron)}}
-   for(const s of [gap.start-.2,gap.end+.2]){const b=basis(s);for(const side of [-1,1]){const marker=new THREE.Mesh(new THREE.BoxGeometry(.28,.075,1.1),lipMaterial);marker.position.copy(b.p).addScaledVector(b.r,side*1.14).addScaledVector(b.n,.12);marker.quaternion.setFromUnitVectors(forward,b.t);group.add(marker)}}
+   for(const side of [-1,1]){const b=basis(gap.start-.35),path=new THREE.CatmullRomCurve3([new THREE.Vector3(0,0,-.4),new THREE.Vector3(0,.02,.1),new THREE.Vector3(side*.14,.08,.55),new THREE.Vector3(side*.30,-.13,1.05)]),shape=new THREE.Shape();shape.moveTo(-.045,-.055);shape.lineTo(.045,-.055);shape.lineTo(.045,.055);shape.lineTo(-.045,.055);shape.closePath();const tip=new THREE.Mesh(new THREE.ExtrudeGeometry(shape,{steps:12,bevelEnabled:false,extrudePath:path}),iron);tip.name='Bent broken rail tip';tip.position.copy(b.p).addScaledVector(b.r,side*.78).addScaledVector(b.n,.11);tip.quaternion.setFromUnitVectors(forward,b.t);group.add(tip)}
+
   }
 
  }

@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import path from 'node:path';
 const root=path.resolve(new URL('..',import.meta.url).pathname);
-const read=p=>fs.readFileSync(path.join(root,'dist',p.replace(/^current\//,'')),'utf8');
+const read=p=>fs.readFileSync(path.join(root,p.replace(/^current\//,'')),'utf8');
 async function boot(saved={},options={}){
  const calls={navigation:[],chimes:0,frames:[],sounds:[]}, storage=new Map([['lostWorlds.moon.v2',JSON.stringify(saved)]]),els=new Map();
  const ctx=new Proxy({globalAlpha:1,createLinearGradient:()=>({addColorStop(){}}),createRadialGradient:()=>({addColorStop(){}})},{get:(o,k)=>k in o?o[k]:(()=>{})});
@@ -55,6 +55,10 @@ async function boot(saved={},options={}){
  console.log('PASS main menu selection starts the chosen unlocked chapter at its beginning');
 }
 // Every chapter has coins positioned above actual floors with stable IDs.
+{
+ const g=await boot({stage:0,introPlayed:true},{search:'?from=jungle'});assert.equal(g.get('active'),true,'Arrival from jungle automatically starts saved-intro play');
+ console.log('PASS arrival from jungle starts without an extra menu');
+}
 for(let stage=0;stage<10;stage++){
  const g=await boot({stage,unlocked:9,introPlayed:true});const count=g.get('coins.length');assert(count>=3,`Level${stage+1} needs reachable coins`);
  assert(g.get('coins.every(c=>game.all[c.surface]&&c.x>=game.all[c.surface][0]&&c.x<=game.all[c.surface][1]&&Math.abs(c.y-(H(game.all[c.surface],c.x)-84))<1e-8)'));

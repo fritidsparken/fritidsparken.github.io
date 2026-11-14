@@ -1,12 +1,13 @@
+import {renderCoursePreview} from './course-preview.js?v=next-ride-20261114';
 import * as THREE from './vendor/three.module.js';
-import {createCourse,CartPhysics,COURSE_NAMES,COURSE_COUNT} from './minecart-track.js?v=deep-ride-20261114';
-import {buildCave} from './cave-environment.js?v=deep-ride-20261114';
-import {buildCart} from './minecart-model.js?v=deep-ride-20261114';
-import {buildRails} from './minecart-rails.js?v=deep-ride-20261114';
-import {createCartCamera} from './minecart-camera.js?v=deep-ride-20261114';
-import {CoinState,buildCoins} from './minecart-coins.js?v=deep-ride-20261114';
-import {createCartAudio} from './minecart-audio.js?v=deep-ride-20261114';
-import {createOutroMotion} from './outro-motion.js?v=deep-ride-20261114';
+import {createCourse,CartPhysics,COURSE_NAMES,COURSE_COUNT} from './minecart-track.js?v=next-ride-20261114';
+import {buildCave} from './cave-environment.js?v=next-ride-20261114';
+import {buildCart} from './minecart-model.js?v=next-ride-20261114';
+import {buildRails} from './minecart-rails.js?v=next-ride-20261114';
+import {createCartCamera} from './minecart-camera.js?v=next-ride-20261114';
+import {CoinState,buildCoins} from './minecart-coins.js?v=next-ride-20261114';
+import {createCartAudio} from './minecart-audio.js?v=next-ride-20261114';
+import {createOutroMotion} from './outro-motion.js?v=next-ride-20261114';
 const $=id=>document.getElementById(id),reader=window.storyReader($('line'),$('retry'));
 const names=COURSE_NAMES, MAIN_MENU='https://fritidsparken.se/games/prince-of-persia/';
 const opening=[
@@ -29,6 +30,8 @@ let renderer,scene,camera,followCamera,cart,course,physics,cave,rails,coinState,
 let mode='loading',last=0,acc=0,time=0,distance=0,lastCP='',lastRespawns=0,doorSounded=false;
 const sound=createCartAudio(),motion=createOutroMotion($('outroCanvas'),{imageElement:$('storyArt')});
 const STEP=1/90,pos=new THREE.Vector3(),tan=new THREE.Vector3(),orientation=new THREE.Quaternion(),targetQ=new THREE.Quaternion(),forward=new THREE.Vector3(0,0,1);
+let previewTarget;
+async function preparePreview(){previewTarget?.dispose();previewTarget=await renderCoursePreview(THREE,renderer,{createCourse,buildCave,buildRails,buildCart,createCartCamera},level);cave.setPreview(previewTarget.texture);}
 let lamp,lampTarget,notified=0,musicTarget=0,endingTimer=0;
 function totalCoins(){return Object.values(coinBank).reduce((n,ids)=>n+(Array.isArray(ids)?new Set(ids).size:0),0)}
 function persist(){
@@ -66,11 +69,11 @@ $('playAgain').onclick=()=>{
 };
 async function advance(){
  persist();if(level===COURSE_COUNT-1){outro=true;persist();tell(ending,true,happyEnd)}
- else{level++;unlocked=Math.max(unlocked,level);panel('loading','Nästa grotta','Öppnar passagen…','Vänta');buildLevel();await Promise.all([cave.ready,cart.ready]);persist();panel('ready',names[level],'Dörren är öppen. Nästa passage väntar längre in i berget.','Nästa grotta')}
+ else{level++;unlocked=Math.max(unlocked,level);panel('loading','Nästa grotta','Öppnar passagen…','Vänta');buildLevel();await Promise.all([cave.ready,cart.ready]);await preparePreview();persist();enter()}
 }
 function snap(){followCamera?.reset();current=physics.snapshot();previous=current;orientation.setFromUnitVectors(forward,new THREE.Vector3(current.tangent.x,current.tangent.y,current.tangent.z).normalize());acc=0;lastRespawns=current.respawns;distance=0}
 function buildLevel(cp){
- $('levelSelect').value=level;coins?.dispose();cave?.dispose();rails?.dispose();course=createCourse(level);physics=new CartPhysics(course);if(cp)physics.restoreCheckpoint(cp);
+ $('levelSelect').value=level;previewTarget?.dispose();previewTarget=null;coins?.dispose();cave?.dispose();rails?.dispose();course=createCourse(level);physics=new CartPhysics(course);if(cp)physics.restoreCheckpoint(cp);
  cave=buildCave(THREE,scene,course,level);rails=buildRails(THREE,scene,course);coinState=new CoinState(course,Array.isArray(coinBank[level])?coinBank[level]:[]);coins=buildCoins(THREE,scene,course,coinState);
  doorSounded=false;snap();lastCP=JSON.stringify(physics.snapshotCheckpoint());
 }
@@ -140,7 +143,7 @@ async function init(){
   const requested=arrival.has('stage')?Number(arrival.get('stage')):NaN;
   const selected=arrival.get('from')==='menu'&&Number.isInteger(requested)&&requested>=0&&requested<=unlocked;
   if(selected){level=requested;completed=outro=false;if(level>0)seen=true}
-  buildLevel(arrived&&!resumeArrival||selected?null:saved.cp);await Promise.all([cave.ready,cart.ready]);resize();addEventListener('resize',resize);persist();$('score').volume=0;
+  buildLevel(arrived&&!resumeArrival||selected?null:saved.cp);await Promise.all([cave.ready,cart.ready]);await preparePreview();resize();addEventListener('resize',resize);persist();$('score').volume=0;
   if(completed)showEndScreen(false);else panel('ready','Flöjtens eko','Tio grottor. En väg hem. Vagnen kör automatiskt. Samla mynt, välj spår och hoppa när rälsen bryts.','Starta färden');
   if(arrived){history.replaceState(null,'',location.pathname);$('go').onclick()}else if(selected){history.replaceState(null,'',location.pathname);enter()}
   last=performance.now();requestAnimationFrame(frame);
@@ -150,6 +153,6 @@ for(const [i,name] of names.entries()){const option=document.createElement('opti
 $('levelSelect').value=level;
 $('levelSelect').addEventListener('change',async()=>{
  if(coinState)coinBank[level]=coinState.exportIds();level=Number($('levelSelect').value);completed=outro=false;$('endingScreen').hidden=true;clearTimeout(endingTimer);
- panel('loading',names[level],'Laddar grottan…','Vänta');try{buildLevel();await Promise.all([cave.ready,cart.ready]);persist();panel('ready',names[level],'Samla mynt. Välj spår före växeln och hoppa vid rälsens avbrott.','Starta färden')}catch(e){console.error(e);panel('error','Grottan kunde inte laddas','Försök igen.','Försök igen')}
+ panel('loading',names[level],'Laddar grottan…','Vänta');try{buildLevel();await Promise.all([cave.ready,cart.ready]);await preparePreview();persist();panel('ready',names[level],'Samla mynt. Välj spår före växeln och hoppa vid rälsens avbrott.','Starta färden')}catch(e){console.error(e);panel('error','Grottan kunde inte laddas','Försök igen.','Försök igen')}
 });
 init();

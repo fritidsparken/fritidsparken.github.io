@@ -188,8 +188,9 @@ function finishChase() {
   $('chaseTitle').textContent = last ? 'Ut ur Soltemplet' : course()[0] + ' klar';
   $('chaseResult').textContent = bridge.total + ' av ' + bridge.coins.length + ' solmynt · Personbästa ' + jungleRecord.best[bridge.level];
   $('nextChase').textContent = last ? 'Vidare till Månens akvedukt' : 'Nästa · ' + jungleCourses[bridge.level + 1][0];
-  $('bridgeEnd').hidden = false;
-  $('nextChase').focus();
+  $('bridgeEnd').hidden = true;
+  const completedLevel=bridge.level;
+  setTimeout(()=>{if(!bridge.active||!bridge.done||bridge.level!==completedLevel)return;if(last)location.assign('moon.html?from=jungle');else replayCourse(completedLevel+1);},650);
 }
 function stepBridge(dt) {
   if (bridge.done) return;

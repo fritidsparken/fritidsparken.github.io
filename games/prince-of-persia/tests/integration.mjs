@@ -40,12 +40,13 @@ function makeGame(saved,search=''){
   setTimeout(cb,ms){const id=++timerId;timeouts.set(id,{cb,at:clock+ms});return id},clearTimeout:id=>timeouts.delete(id),
   createCartAudio(){return{resume(){calls.resumes++},setActive:v=>calls.active.push(v),update(){calls.audioUpdates++},coin:c=>calls.coinSounds.push(c),door:()=>calls.doors.push(calls.builds.at(-1))}},
   createOutroMotion(){return{show(url,index){calls.motionShows.push({url,index});return Promise.resolve()},stop(){calls.motionStops++},resize(){calls.motionResizes++}}},
+  renderCoursePreview:async()=>({texture:new Three.Texture(),dispose(){}}),
   buildCart(){return{group:new Three.Group(),ready:Promise.resolve(),update(){}}},
   buildRails(){return{highlight:id=>calls.highlights.push(id),dispose(){}}},
   buildCave(T,scene,course,level){calls.builds.push(level);let ready;
    if(rejectNext){rejectNext=false;ready=Promise.reject(new Error('fixture texture load failed'))}
    else if(holdNext){holdNext=false;let resolve,reject;ready=new Promise((yes,no)=>{resolve=yes;reject=no});calls.loads.push({resolve,reject})}
-   else ready=Promise.resolve();return{ready,dispose(){calls.disposes++},update(){}};
+   else ready=Promise.resolve();return{ready,dispose(){calls.disposes++},update(){},setPreview(){}};
   }
  };
  context.window=context;vm.createContext(context);vm.runInContext(storySource,context);vm.runInContext(source,context);
@@ -67,10 +68,10 @@ function makeGame(saved,search=''){
   g.run('draw(1/60,.5)');g.context.innerWidth=390;g.context.innerHeight=844;g.run('resize();draw(1/60,.5)');g.context.innerWidth=844;g.context.innerHeight=390;g.run('resize();draw(1/60,.5)');
   g.driveLevel();await flush();assert.equal(g.run('physics.respawns'),0);
   const bank=JSON.parse(g.memory[KEY]).coins;assert.equal(bank[level].length,createCoinLayout(track.createCourse(level)).length,`all level${level+1} coins persisted`);
-  if(level<9){assert.equal(g.run('mode'),'ready');assert.equal(g.run('level'),level+1);assert.equal(g.calls.builds.length,level+2);await g.e.go.onclick()}else{assert.equal(g.run('mode'),'story');assert.equal(g.run('outro'),true)}
+  if(level<9){assert.equal(g.run('mode'),'run');assert.equal(g.run('level'),level+1);assert.equal(g.calls.builds.length,level+2)}else{assert.equal(g.run('mode'),'story');assert.equal(g.run('outro'),true)}
  }
  assert.deepEqual(g.calls.builds,[0,1,2,3,4,5,6,7,8,9]);assert.deepEqual(g.calls.doors,[0,1,2,3,4,5,6,7,8,9],'door plays once per course, not each render');
- const banks=JSON.parse(g.memory[KEY]).coins;assert.equal(Object.keys(banks).length,10);assert.equal(Object.values(banks).flat().length,1020);assert.equal(new Set(Object.values(banks).flat()).size,1020);assert.equal(g.calls.coinSounds.length,1020);assert.equal(g.run('totalCoins()'),1020);
+ const banks=JSON.parse(g.memory[KEY]).coins;assert.equal(Object.keys(banks).length,10);assert.equal(Object.values(banks).flat().length,Array.from({length:10},(_,i)=>createCoinLayout(track.createCourse(i)).length).reduce((a,b)=>a+b,0));assert.equal(new Set(Object.values(banks).flat()).size,Object.values(banks).flat().length);assert.equal(g.calls.coinSounds.length,Object.values(banks).flat().length);assert.equal(g.run('totalCoins()'),Object.values(banks).flat().length);
  assert.equal(g.run('musicTarget'),.065);assert.equal(g.e.score.paused,false);g.run('for(let i=0;i<30;i++)frame(last+80)');assert(Math.abs(g.e.score.volume-.065)<.005);
  assert.equal(g.calls.plays.at(-1),'reunionVoice');assert.equal(g.e.storyArt.src,'echo-art/finale-1.webp');g.endAudio('reunionVoice');assert.equal(g.calls.plays.at(-1),'melodyVoice');g.endAudio('melodyVoice');assert.equal(g.calls.plays.at(-1),'homeVoice');assert.equal(g.e.storyArt.src,'echo-art/finale-3.webp');
  assert.deepEqual(g.calls.motionShows,[{url:'echo-art/finale-1.webp',index:0},{url:'echo-art/finale-2.webp',index:1},{url:'echo-art/finale-3.webp',index:2}]);const stops=g.calls.motionStops;

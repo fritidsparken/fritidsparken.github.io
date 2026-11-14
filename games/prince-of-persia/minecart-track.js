@@ -36,7 +36,7 @@ function makeRoute(id,kind,from,to,fn){
 }
 export function createCourse(level=0){
  level=clamp(Math.floor(level)||0,0,COURSE_COUNT-1);const cfg={...profiles[level],turn:profiles[level].turn*1.8,wave:profiles[level].wave*.75},phase=level*.71;
- const base=z=>vec(cfg.turn*(Math.sin(z/cfg.wave+phase)-Math.sin(phase))+cfg.secondary*Math.sin(z/(cfg.wave*2.23)),cfg.height*(Math.sin(z/cfg.vertical+phase)-Math.sin(phase))+.40*Math.sin(z/17)-.12*z+8*Math.sin(z/48),z);
+ const base=z=>vec(cfg.turn*(Math.sin(z/cfg.wave+phase)-Math.sin(phase))+cfg.secondary*Math.sin(z/(cfg.wave*2.23)),cfg.height*(Math.sin(z/cfg.vertical+phase)-Math.sin(phase))+.40*Math.sin(z/17)-.19*z+12*Math.sin(z/42),z);
  const routes=[],routeMap=new Map(),junctions=[],pits=[];let cursor=0,progress=0;
  const push=r=>{routes.push(r);routeMap.set(r.id,r);return r};
  const branchFn=(at,side,safe,span,spread)=>z=>{const t=z-at,rise=span*.35,merge=span*.57,offset=t<rise?smooth(t/rise):safe?1-smooth((t-merge)/(span-merge)):1;const p=base(z);p.x-=side*spread*offset;return p};
@@ -56,15 +56,15 @@ export function createCourse(level=0){
  const terminal=push(makeRoute('main-'+cfg.sides.length,'main',cursor,cursor+200+level*4,base));terminal.progressStart=progress;
  addGap(terminal,56,10+level*.3);
  progress+=terminal.length;
- return {level,name:COURSE_NAMES[level],theme:level%5,routes,routeMap,startRoute:'main-0',finish:terminal.sample(terminal.length).position,finishTangent:terminal.sample(terminal.length).tangent,junctions,pits,length:progress,baseSpeed:cfg.speed,maxSpeed:cfg.speed*1.65,minSpeed:cfg.speed*.75,gapCount:cfg.gaps};
+ return {level,name:COURSE_NAMES[level],theme:level%5,routes,routeMap,startRoute:'main-0',finish:terminal.sample(terminal.length).position,finishTangent:terminal.sample(terminal.length).tangent,junctions,pits,length:progress,baseSpeed:cfg.speed,maxSpeed:cfg.speed*2.0,minSpeed:cfg.speed*.75,gapCount:cfg.gaps};
 }
 export class CartPhysics{
- constructor(course){this.course=course;this.checkpoint={routeId:course.startRoute,s:0};this.respawns=0;this.travel=0;this.restart(false)}
+ constructor(course,random=Math.random){this.random=random;this.course=course;this.checkpoint={routeId:course.startRoute,s:0};this.respawns=0;this.travel=0;this.restart(false)}
  get route(){return this.course.routeMap.get(this.routeId)}
  restart(count=false){this.routeId=this.checkpoint.routeId;this.s=this.checkpoint.s;this.status='run';this.speed=0;this.choice=0;this.locked=false;this.jumpHeight=0;this.jumpVelocity=0;this.jumpQueued=false;this.fallTime=0;this.fallVelocity=vec();this.fallPosition=null;this.distanceSinceReset=0;if(count)this.respawns++;return this.snapshot()}
  snapshotCheckpoint(){return {...this.checkpoint}}
  restoreCheckpoint(cp){if(!cp||typeof cp.routeId!=='string')return false;const r=this.course.routeMap.get(cp.routeId);if(!r||r.kind==='dead')return false;const at=Number(cp.s)||0;const valid=r.kind==='main'&&at===0||r.gaps.some(g=>Math.abs(at-(g.end+12))<.001);if(!valid)return false;this.checkpoint={routeId:r.id,s:at};this.restart(false);return true}
- pendingFork(){const r=this.route;if(this.status!=='run'||!r.fork)return null;const distance=r.length-this.s;return distance<=48?{...r.fork,distance,choice:this.choice,defaultSide:-1}:null}
+ pendingFork(){const r=this.route;if(this.status!=='run'||!r.fork)return null;const distance=r.length-this.s;return distance<=48?{...r.fork,distance,choice:this.choice,defaultSide:null}:null}
  nextGap(){
   let route=this.route,at=this.s,ahead=0;
   // Include the next already-determined rail segment, so a warning does not pop
@@ -85,8 +85,8 @@ export class CartPhysics{
   // Automatic forward motion only. Legacy input arguments are intentionally
   // ignored; slopes gently alter the target without a throttle or brake mode.
   const slope=this.route.sample(this.s).tangent.y;
-  const target=this.course.baseSpeed*(1-clamp(slope*2.5,-.65,.25));
-  this.speed+=clamp(target-this.speed,-5*dt,5*dt);
+  const target=this.course.baseSpeed*(1-clamp(slope*3.6,-1.0,.25));
+  this.speed+=clamp(target-this.speed,-7*dt,9*dt);
   const gap=this.nextGap();
   if(this.jumpQueued&&gap&&gap.distance<=1.6&&gap.distance>=-.5){this.jumpQueued=false;this.jumpVelocity=Math.max(5.4,GRAVITY*(gap.length+5)/(2*Math.max(this.speed,6)));this.jumpHeight=.001}
   const ds=this.speed*dt;this.s+=ds;this.travel+=ds;this.distanceSinceReset+=ds;
@@ -95,7 +95,7 @@ export class CartPhysics{
   if(inside&&this.jumpHeight<=.04){const p=r.sample(this.s);this.beginFall(add(p.position,vec(0,Math.max(0,this.jumpHeight),0)),p.tangent,this.jumpVelocity);return}
   if(this.jumpHeight<0){this.jumpHeight=0;this.jumpVelocity=0}
   if(this.jumpHeight===0)for(const g of r.gaps){const at=g.end+12;if(this.s>=at&&this.s<at+2&&(this.checkpoint.routeId!==r.id||this.checkpoint.s<at))this.checkpoint={routeId:r.id,s:at};}
-  if(this.s>=r.length){const overflow=this.s-r.length;if(r.fork){const side=this.choice||-1;this.choice=side;this.routeId=side===r.fork.safeSide?r.fork.safeRoute:r.fork.deadRoute;this.s=overflow;this.locked=true;this.jumpQueued=false}
+  if(this.s>=r.length){const overflow=this.s-r.length;if(r.fork){const side=this.choice||(this.random()<.5?-1:1);this.choice=side;this.routeId=side===r.fork.safeSide?r.fork.safeRoute:r.fork.deadRoute;this.s=overflow;this.locked=true;this.jumpQueued=false}
    else if(r.next){this.routeId=r.next;this.s=overflow;this.checkpoint={routeId:r.next,s:0};this.choice=0;this.locked=false;this.jumpQueued=false}
    else if(r.kind==='dead'){const tip=r.sample(r.length);this.beginFall(tip.position,tip.tangent);return}
    else{this.s=r.length;this.status='finished';this.speed=0}
