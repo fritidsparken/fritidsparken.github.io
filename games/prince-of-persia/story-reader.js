@@ -1,7 +1,7 @@
 "use strict";
 // Each caption owns its audio until playback completes. A suspended page replays the current line.
 function storyReader(caption, retry) {
-  let lines=[], index=-1, complete=null, voice=null, speech=null, serial=0, timer=0;
+  let lines=[], index=-1, complete=null, voice=null, speech=null, serial=0, timer=0, showCue=null;
   const synth=window.speechSynthesis;
   function silence(){
     serial++;clearInterval(timer);timer=0;
@@ -16,7 +16,7 @@ function storyReader(caption, retry) {
   function read(){
     silence();if(index<0||document.hidden)return;
     const cue=lines[index],id=serial;
-    caption.textContent=cue.text;caption.getAnimations?.().forEach(a=>a.cancel());
+    showCue?.(cue,index);caption.textContent=cue.text;caption.getAnimations?.().forEach(a=>a.cancel());
     caption.animate?.([{opacity:0,transform:'translateY(4px)'},{opacity:1,transform:'none'}],{duration:350});
     retry.hidden=true;
     const fail=()=>{if(id===serial){silence();retry.hidden=false}};
@@ -32,9 +32,9 @@ function storyReader(caption, retry) {
     }
     if(!cue.clip){say();return}
     voice=document.getElementById(cue.speaker);
-    if(!voice){say();return}
+    if(!voice){fail();return}
     const clip=voice;
-    const fallback=()=>{if(id!==serial||voice!==clip)return;clip.onended=null;clip.onerror=null;clip.pause();voice=null;clearInterval(timer);if(cue.speaker==='caveVoice')fail();else say()};
+    const fallback=()=>{if(id!==serial||voice!==clip)return;clip.onended=null;clip.onerror=null;clip.pause();voice=null;clearInterval(timer);fail()};
     clip.onended=()=>{if(id===serial)next()};clip.onerror=fallback;
     try{
       clip.currentTime=cue.clip[0];clip.play().catch(fallback);
@@ -44,7 +44,7 @@ function storyReader(caption, retry) {
   retry.onclick=read;
   document.addEventListener('visibilitychange',()=>{if(index>=0){if(document.hidden)silence();else read()}});
   return {
-    start(script,done){silence();lines=script;complete=done;index=-1;next()},
+    start(script,done,onCue){silence();lines=script;complete=done;showCue=onCue;index=-1;next()},
     skip(){if(index<0)return;silence();retry.hidden=true;index=-1;const done=complete;complete=null;done?.()},
     get playing(){return index>=0}
   };
