@@ -392,3 +392,8 @@ body.std-design .std-categories > #fp-ranking .ranking-icon {
 @media (min-width:1440px){
  body.std-design #stdNavigation{justify-content:safe center}
 }
+
+
+/* Ikonraden är sidans navigering; dölj den extra toppmenyn på alla skärmar. */
+body.std-design #stdNavigation,
+body.std-design .std-menu-toggle{display:none!important}
