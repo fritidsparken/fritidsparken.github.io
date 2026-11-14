@@ -929,7 +929,7 @@ html,body {
   transform: scale(1.25);
 }
 
-#palacePick:not([hidden]),#chasePick:not([hidden]) {
+#palacePick:not([hidden]),#chasePick:not([hidden]),#moonPick:not([hidden]),#cavePick:not([hidden]) {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -937,7 +937,7 @@ html,body {
   color: #e0cea8;
 }
 
-#palaceStage,#jungleStage {
+#palaceStage,#jungleStage,#moonStage,#caveStage {
   max-width: 100%;
   background: #211e16;
   color: #f8eccd;
