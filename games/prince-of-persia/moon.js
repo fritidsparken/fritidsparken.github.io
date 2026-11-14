@@ -41,9 +41,11 @@ const menu=el("overlay"), route={
 };
 let coins=[], transitioning=false, recoveryHandoff=false;
 const requestedFromMenu=new URLSearchParams(location.search).get('from')==='menu';
+const arrivedFromJungle=new URLSearchParams(location.search).get('from')==='jungle';
+if(arrivedFromJungle) stage=0;
 let paused=true;
 let warden;
-let game, wave, active = false, finished = Boolean(saved.finished) && !new URLSearchParams(location.search).has('stage'), loaded = false;
+let game, wave, active = false, finished = Boolean(saved.finished) && !new URLSearchParams(location.search).has('stage') && !arrivedFromJungle, loaded = false;
 let side = 0, jump = false, last = 0, acc = 0;
 const keys = new Set();
 function save(cp) {
@@ -272,16 +274,16 @@ function animate(now){
   if(active){acc+=Math.min(.06,(now-last)/1000);while(active && acc>=1/120){acc-=1/120;tick(1/120)}}
   last=now;if(!moonReader.playing)render();requestAnimationFrame(animate);
 }
-introPlayed=Boolean(saved.introPlayed);
+introPlayed=arrivedFromJungle ? false : Boolean(saved.introPlayed);
 if(finished && !requestedFromMenu){continueToCave(true)}else{
 loadSoundEffects();
 Promise.all([...chapters.map(r=>r.key),'span','crusher','warden','idle','climb','run','jumpSoft','jumpStride','jumpTuck'].map(async id=>{
   const image=new Image();image.src=PALACE_ART[id] || "moon-art/"+id+".webp";await image.decode();images[id]=image;
 })).then(()=>{
-  loaded=true;const selecting=new URLSearchParams(location.search).has('stage');enter(selecting?0:saved.cp,!selecting);
+  loaded=true;const selecting=new URLSearchParams(location.search).has('stage');enter(selecting||arrivedFromJungle?0:saved.cp,!selecting&&!arrivedFromJungle);
   if(!(selecting && requestedFromMenu))stop(finished?'Månporten är öppen':'Månens hemliga vatten',finished?'Du har klarat värld III.':'Led vattnet genom palatset. Styr med pilarna och hoppa med mellanslag eller hoppknappen.',finished?'Till värld 4':'Spela');
   el('go').disabled=false;requestAnimationFrame(animate);
-  if(selecting && requestedFromMenu)startPlay();else if(new URLSearchParams(location.search).get('from')==='jungle')el('go').onclick();
+  if(selecting && requestedFromMenu)startPlay();else if(arrivedFromJungle)el('go').onclick();
 }).catch(()=>{stop('Palatset kunde inte öppnas','Kontrollera anslutningen och försök igen.','Försök igen');el('go').disabled=false});
 }
 
