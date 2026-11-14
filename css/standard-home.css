@@ -421,3 +421,21 @@ body.std-design .std-categories > button > span > span{display:block;white-space
  body.std-design .std-categories > button{flex-direction:column;gap:3px;padding:8px 3px}
  body.std-design .std-categories > button > span{font-size:clamp(10px,1.5vw,14px)}
 }
+
+
+/* Samma centrerade struktur i varje kategoriruta på alla skärmstorlekar. */
+body.std-design .std-categories > button{
+ --fp-icon-size:clamp(52px,5vw,70px);--fp-label-size:clamp(10px,.95vw,14px);
+ display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:var(--fp-icon-size) 3.6em;
+ justify-items:center;align-items:center;align-content:center;gap:5px;
+ min-width:0;min-height:0;padding:10px 4px;font-size:var(--fp-label-size);line-height:1.1;text-align:center
+}
+body.std-design .std-categories > button > .std-icon{
+ display:block;width:var(--fp-icon-size);height:var(--fp-icon-size);max-width:100%;margin:0 auto;align-self:center;justify-self:center
+}
+body.std-design .std-categories > button > span{
+ display:flex;align-items:center;justify-content:center;flex-direction:column;
+ width:100%;min-width:0;min-height:0;height:100%;margin:0;text-align:center;font-size:var(--fp-label-size);line-height:1.1
+}
+@media(max-width:1100px){body.std-design .std-categories > button{--fp-icon-size:56px;--fp-label-size:clamp(11px,1.6vw,14px)}}
+@media(max-width:700px){body.std-design .std-categories > button{--fp-icon-size:58px;--fp-label-size:clamp(11px,3.2vw,14px)}}
