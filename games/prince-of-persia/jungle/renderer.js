@@ -179,9 +179,9 @@ function createWorldRenderer(gl) {
     gl.drawArrays(gl.TRIANGLES, 0, m.count);
   }
   const dynamic = gl.createBuffer();
-  function quad(tex, mode, points, color = [1, 1, 1, 1], flipped = false) {
+  function quad(tex, mode, points, color = [1, 1, 1, 1], flipped = false, customUV = null) {
     const data = [],
-      uv = [[0, 1], [1, 1], [1, 0], [0, 0]];
+      uv = customUV || [[0, 1], [1, 1], [1, 0], [0, 0]];
     for (const i of [0, 1, 2, 0, 2, 3]) data.push(...points[i], 0, 0, 1, flipped ? 1 - uv[i][0] : uv[i][0], uv[i][1], ...color);
     use(tex, mode);
     layout(dynamic);
@@ -319,7 +319,18 @@ function createWorldRenderer(gl) {
     gl.clearColor(.49, .57, .47, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.depthMask(false);
-    quad(isCave(bridge.level) ? 'skyline' : 'vista' + bridge.level, 7, [[-1, -1, 0], [1, -1, 0], [1, 1, 0], [-1, 1, 0]]);
+    const backgroundCorners = [[-1, -1, 0], [1, -1, 0], [1, 1, 0], [-1, 1, 0]];
+    let backgroundUV = null;
+    if (bridge.level === 9) {
+      // The panorama is much wider than a phone screen. Crop around the
+      // temple sun instead of squeezing the whole image into the viewport.
+      const art = bridgeArt.vista9;
+      const ratio = art?.naturalWidth && art?.naturalHeight ? art.naturalWidth / art.naturalHeight : 4.02;
+      const span = Math.min(1, (view.w / view.h) / ratio);
+      const left = Math.max(0, Math.min(1 - span, .678 - span / 2));
+      backgroundUV = [[left,1],[left+span,1],[left+span,0],[left,0]];
+    }
+    quad(isCave(bridge.level) ? 'skyline' : 'vista' + bridge.level, 7, backgroundCorners, [1,1,1,1], false, backgroundUV);
     gl.depthMask(true);
     for (const chunk of chunks) {
       if (chunk.lo > cz + 2 || chunk.hi < cz - 68) continue;
