@@ -9,6 +9,27 @@
   <meta name="description" content="Spela The Lost World på Fritidsparken. Hoppa, klättra och övervinn hinder på Solportens väg och i djungeln i ett äventyrsspel.">
 <link rel="canonical" href="https://fritidsparken.se/games/prince-of-persia/">
 <style>@media(min-width:680px){#titleMenu .worlds{grid-template-columns:repeat(2,minmax(0,1fr))}} #titleMenu article{max-height:98dvh;overflow-y:auto}body:has(#titleMenu:not([hidden])) #fp-game-menu-back{display:none!important}#titleMenu .world img{height:clamp(72px,14vw,170px);object-fit:cover}#titleMenu .world span{min-height:44px;text-align:left}
+#titleMenu { align-items: flex-start; padding-top: max(10px, env(safe-area-inset-top)); padding-bottom: 10px; }
+#titleMenu article { margin-top: 0; padding-top: 0; max-height: none; overflow: visible; }
+#titleMenu h1 { font-size: clamp(28px, 5vh, 55px); margin-bottom: .2em; }
+#titleMenu h1 br { display: none; }
+#titleMenu .world img { height: clamp(55px, 16vh, 170px); }
+#titleMenu .worlds { margin-bottom: 8px; gap: 6px; }
+@media (max-height: 520px) {
+  #titleMenu { padding-top: 5px; padding-bottom: 5px; }
+  #titleMenu h1 { font-size: 24px; margin-bottom: 2px; }
+  #titleMenu .world img { height: clamp(38px, 13vh, 65px); }
+  #titleMenu .world { padding-bottom: 3px; }
+  #titleMenu .world img { margin-bottom: 2px; }
+  #titleMenu .world span { min-height: 0; }
+  #titleMenu .world b { font-size: 14px; }
+  #titleMenu .world small { font-size: 10px; }
+  #titleMenu .worlds { margin-bottom: 3px; gap: 4px; }
+  #titleMenu #palacePick:not([hidden]), #titleMenu #chasePick:not([hidden]), #titleMenu #moonPick:not([hidden]), #titleMenu #cavePick:not([hidden]) { margin: 3px 0; }
+  #titleMenu footer button { padding: 6px 12px; }
+  #titleMenu .tools { margin-top: 3px; }
+  #titleMenu #keys { display: none; }
+}
 </style>
 
 </head>
