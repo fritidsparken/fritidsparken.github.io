@@ -1,13 +1,13 @@
 import {renderCoursePreview} from './course-preview.js?v=next-ride-20261114';
 import * as THREE from './vendor/three.module.js';
 import {createCourse,CartPhysics,COURSE_NAMES,COURSE_COUNT} from './minecart-track.js?v=safe-forks-20261114';
-import {buildCave} from './cave-environment.js?v=ceiling-signs-20261114';
+import {buildCave} from './cave-environment.js?v=no-beams-20261114';
 import {buildCart} from './minecart-model.js?v=next-ride-20261114';
 import {buildRails} from './minecart-rails.js?v=larger-route-signs-20261114';
 import {createCartCamera} from './minecart-camera.js?v=next-ride-20261114';
 import {CoinState,buildCoins} from './minecart-coins.js?v=next-ride-20261114';
 import {createCartAudio} from './minecart-audio.js?v=next-ride-20261114';
-import {createOutroMotion} from './outro-motion.js?v=palace-arrows-open-20261114';
+import {createOutroMotion} from './outro-motion.js?v=cloth-water-20261114';
 const $=id=>document.getElementById(id),reader=window.storyReader($('line'),$('retry'));
 const names=COURSE_NAMES, MAIN_MENU='https://fritidsparken.se/games/prince-of-persia/';
 const opening=[

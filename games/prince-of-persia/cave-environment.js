@@ -79,7 +79,7 @@ export function buildCave(T,scene,course,level=0,previewOnly=false){
   for(const end of [g.a,g.b])for(const x of [-5.1,-4.2,-3.3,-2.3,2.3,3.3,4.2,5.1])rim.push({x:end.x+side.x*x,y:end.y-.16,z:end.z+side.z*x,sx:.55,sy:.4,sz:.58,rot:x});instance(rockGeo,boulderMat,rim,'Rock rim around black jump pit');
  }
  // Leaning mine supports look threatening but stay above the cart clearance.
- for(let z=35;z<maxZ-35;z+=85){const q=onRoute(routes.find(r=>r.kind!=='dead'&&onRoute(r,z))||routes[0],z);if(!q)continue;const beam=addMesh(new T.BoxGeometry(8,.35,.4),wood);beam.position.set(q.x,q.y+6,z);beam.rotation.z=.11*Math.sin(z);beam.name='Overhead damaged support';}
+
  const hemi=new T.HemisphereLight(0xbac5d4,palette.fill,.95);root.add(hemi);const ambient=new T.AmbientLight(palette.fill,.18);root.add(ambient);
  // Closely spaced fixtures create persistent parallax and successive pools of cave light.
  for(let z=minZ+14,i=0;z<maxZ-10;z+=18,i++){const r=row(z);for(const side of [-1,1]){const x=(side<0?r.left:r.right)-side*1.5,y=height(x,z,r)+2.6;torchPositions.push(new T.Vector3(x,y,z));

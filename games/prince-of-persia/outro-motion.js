@@ -111,27 +111,16 @@ function makeMesh(scene, columns, rows) {
 }
 
 function moveMesh(mesh, scene, t, w, h) {
-  const motion = scene.people.map(p => ({
-    breath:Math.sin(t * 1.43 + p.phase),
-    sway:Math.sin(t * .71 + p.phase) * .00125,
-    headX:Math.sin(t * .81 + p.phase + .4) * .0011,
-    headY:Math.sin(t * 1.08 + p.phase) * .0008,
-  }));
   for (const v of mesh.vertices) {
-    let dx = 0, dy = 0;
-    for (let i = 0; i < scene.people.length; i++) {
-      const p = scene.people[i], a = v.weights[i], m = motion[i];
-      const rise = smooth((p.anchor[1] - v.y) / .35);
-      // Inside each face all points receive the same rigid translation.
-      const bodyX = m.sway + m.breath * (v.x - p.anchor[0]) * .009;
-      const bodyY = -m.breath * .0025 * rise;
-      dx += ((bodyX * (1 - a.head)) + (m.sway + m.headX) * a.head) * Math.max(a.body, a.head);
-      dy += ((bodyY * (1 - a.head)) + (-m.breath * .0025 + m.headY) * a.head) * Math.max(a.body, a.head);
-      const wave = Math.sin(t * 1.73 + v.y * 10 + p.phase) + .35 * Math.sin(t * 2.6 - v.y * 14);
-      dx += a.cloth * wave * .0041;
-      dy += a.cloth * Math.sin(t * 1.38 + v.x * 11 + p.phase) * .0018;
-    }
-    v.dx = dx * w; v.dy = dy * h;
+    let dx=0, dy=0;
+    scene.people.forEach((person,i)=>{
+      const hem = i===1 ? smooth((v.y - [0.72,0.64,0.67][SCENES.indexOf(scene)]) / .15) : 1;
+      const strength = v.weights[i].cloth * hem;
+      const wind = Math.sin(t*.61 + v.y*8 + person.phase) + .45*Math.sin(t*.397 - v.y*11 + person.phase);
+      dx += strength * wind * .0028;
+      dy += strength * Math.sin(t*.47 + v.x*9 + person.phase) * .0008;
+    });
+    v.dx=dx*w; v.dy=dy*h;
   }
 }
 
@@ -265,6 +254,14 @@ export function createOutroMotion(canvas, options={}) {
     frameCtx.setTransform(1,0,0,1,0,0);frameCtx.globalAlpha=1;frameCtx.globalCompositeOperation='source-over';
     frameCtx.drawImage(source,0,0);
     if(!media?.matches){
+      moveMesh(mesh,scene,time,w,h);
+      scene.people.forEach((person,i)=>{
+        frameCtx.save();
+        pathPolygon(frameCtx,person.cloth,w,h);frameCtx.clip();
+        if(i===1){const hem=[.72,.64,.67][SCENES.indexOf(scene)]*h;frameCtx.beginPath();frameCtx.rect(0,hem,w,h-hem);frameCtx.clip();}
+        for(const triangle of mesh.triangles) if(triangle.some(k=>mesh.vertices[k].weights[i].cloth>0)) paintTriangle(frameCtx,source,mesh.vertices,triangle,w,h);
+        frameCtx.restore();
+      });
       paintEnvironment(frameCtx,scene,time,w,h);
     }
     ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,canvas.width,canvas.height);
