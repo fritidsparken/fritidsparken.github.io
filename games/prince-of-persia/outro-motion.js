@@ -24,7 +24,15 @@ const SCENES = [
         body:[[.59,1],[.60,.79],[.62,.65],[.63,.53],[.59,.50],[.58,.45],[.62,.44],[.68,.47],[.68,.43],[.67,.35],[.69,.26],[.74,.25],[.78,.31],[.79,.41],[.78,.48],[.80,.59],[.82,.78],[.85,1]],
         cloth:[[.77,.47],[.80,.52],[.82,.69],[.86,.93],[.86,1],[.79,1],[.76,.73]] },
     ],
-    water: [ { kind:'pool', polygon:[[.36,.72],[.59,.72],[.60,.91],[.48,.91],[.35,.82]] } ],
+    water: [
+      { kind:'pool', polygon:[[.40,.835],[.47,.82],[.60,.82],[.59,.94],[.48,.91],[.39,.86]] },
+      { kind:'fall', polygon:[[.962,.416],[.968,.416],[.967,.481],[.961,.481]], speed:.5 },
+      { kind:'fall', polygon:[[.981,.422],[.987,.422],[.986,.481],[.980,.481]], speed:.45 },
+      { kind:'fall', polygon:[[.895,.533],[.903,.535],[.904,.625],[.896,.625]], speed:.4 },
+      { kind:'fall', polygon:[[.943,.572],[.950,.572],[.951,.628],[.944,.628]], speed:.5 },
+      { kind:'fall', polygon:[[.991,.575],[.998,.575],[.998,.629],[.991,.629]], speed:.46 },
+      { kind:'fall', polygon:[[.553,.735],[.558,.735],[.558,.771],[.553,.771]], speed:.4 },
+    ],
     lamps:[[.297,.13,.08],[.84,.18,.075],[.423,.43,.04],[.55,.61,.025]],
     dust:40,
   },
@@ -38,8 +46,14 @@ const SCENES = [
         cloth:[[.48,.42],[.46,.55],[.43,.72],[.43,.84],[.49,.84],[.51,.60],[.62,.48],[.67,.64],[.68,.84],[.64,.86],[.59,.58]] },
     ],
     water:[
-      { kind:'fall', polygon:[[.686,.035],[.758,.05],[.79,.13],[.79,.29],[.736,.34],[.707,.23]], speed:.29 },
-      { kind:'fall', polygon:[[.773,.35],[.85,.32],[.914,.48],[.936,.69],[.875,.78],[.775,.67],[.742,.53]], speed:.4 },
+      { kind:'fall', polygon:[[.65,.025],[.686,.028],[.71,.145],[.677,.145]], speed:.35 },
+      { kind:'fall', polygon:[[.616,.12],[.638,.126],[.648,.24],[.622,.24]], speed:.3 },
+      { kind:'fall', polygon:[[.683,.162],[.72,.166],[.749,.28],[.735,.31],[.704,.25]], speed:.36 },
+      { kind:'fall', polygon:[[.61,.257],[.653,.255],[.666,.359],[.618,.359]], speed:.3 },
+      { kind:'fall', polygon:[[.771,.38],[.819,.38],[.847,.53],[.797,.56],[.77,.49]], speed:.4 },
+      { kind:'fall', polygon:[[.877,.461],[.925,.458],[.915,.541],[.866,.542]], speed:.35 },
+      { kind:'fall', polygon:[[.806,.575],[.855,.57],[.876,.685],[.82,.685]], speed:.42 },
+      { kind:'pool', polygon:[[.71,.71],[.95,.70],[.90,.78],[.82,.78],[.75,.745]] },
       { kind:'pool', polygon:[[.84,.77],[.99,.73],[.99,.92],[.94,.91],[.84,.85]] },
     ],
     lamps:[[.115,.13,.08],[.351,.24,.045],[.856,.09,.05],[.966,.21,.045]],
@@ -148,15 +162,30 @@ function paintTriangle(ctx, source, vertices, triangle, w, h) {
   ctx.drawImage(source,left,top,right-left,bottom-top,left,top,right-left,bottom-top); ctx.restore();
 }
 
-function paintEnvironment(ctx, scene, t, w, h) {
+function paintEnvironment(ctx, source, scene, t, w, h) {
   ctx.save(); ctx.globalCompositeOperation='screen';
+    for(const person of scene.people){for(const polygon of [person.body,person.cloth]){ctx.beginPath();ctx.rect(0,0,w,h);polygon.forEach((p,i)=>i?ctx.lineTo(p[0]*w,p[1]*h):ctx.moveTo(p[0]*w,p[1]*h));ctx.closePath();ctx.clip('evenodd');}}
   for (let wi=0;wi<scene.water.length;wi++) {
     const water=scene.water[wi];
     const minX=Math.min(...water.polygon.map(p=>p[0])), maxX=Math.max(...water.polygon.map(p=>p[0]));
     const minY=Math.min(...water.polygon.map(p=>p[1])), maxY=Math.max(...water.polygon.map(p=>p[1]));
     ctx.save();pathPolygon(ctx,water.polygon,w,h);ctx.clip();
     // Exclude both people from every water effect.
-    for(const person of scene.people){for(const polygon of [person.body,person.cloth]){ctx.beginPath();ctx.rect(0,0,w,h);polygon.forEach((p,i)=>i?ctx.lineTo(p[0]*w,p[1]*h):ctx.moveTo(p[0]*w,p[1]*h));ctx.closePath();ctx.clip('evenodd');}}
+
+    // Move the painted reflections themselves, inside the water mask. Smooth
+    // waves have no reset frame; different frequencies avoid a visible loop.
+    ctx.globalCompositeOperation='source-over';
+    const left=minX*w, width=(maxX-minX)*w;
+    for(let y=Math.floor(minY*h);y<maxY*h;y+=2){
+      const ny=y/h, edge=Math.sin(Math.PI*clamp((ny-minY)/(maxY-minY)));
+      const phase=ny*(water.kind==='fall'?130:190)-t*(water.kind==='fall'?5:1.8);
+      const dx=Math.sin(phase)*w*(water.kind==='fall'?.0012:.002);
+      const dy=water.kind==='fall'?Math.sin(phase*.73-t*.9)*h*.004:Math.sin(phase*.61)*h*.0007;
+      ctx.globalAlpha=.72*edge*edge;
+      const sy=clamp(y+dy,0,h-2), sx=clamp(left+dx,0,w-width);
+      ctx.drawImage(source,sx,sy,width,2,left,y,width,2);
+    }
+    ctx.globalAlpha=1;ctx.globalCompositeOperation='screen';
     if (water.kind==='fall') {
       // Fine, differently paced streaks and spray travel down existing water.
       for(let i=0;i<44;i++) {
@@ -164,7 +193,7 @@ function paintEnvironment(ctx, scene, t, w, h) {
         const cycle=(phase+t*(water.speed||.3)*(0.65+seeded(i,7)*.7))%1;
         const y=(minY+cycle*(maxY-minY))*h;
         const length=(.012+seeded(i,21)*.035)*h;
-        const alpha=.08*Math.sin(cycle*Math.PI)*(0.4+seeded(i,19));
+        const alpha=.25*Math.sin(cycle*Math.PI)*(0.4+seeded(i,19));
         ctx.strokeStyle=`rgba(176,245,255,${alpha})`;ctx.lineWidth=.55+seeded(i,34)*.7;
         ctx.beginPath();ctx.moveTo(x,y-length);ctx.quadraticCurveTo(x+Math.sin(t+i)*1.3,y-length*.45,x+Math.sin(t*.8+i),y);ctx.stroke();
       }
@@ -173,7 +202,7 @@ function paintEnvironment(ctx, scene, t, w, h) {
         const phase=(seeded(i,wi+23)+t*(.09+seeded(i,53)*.11))%1;
         const x=(minX+seeded(i,wi+14)*(maxX-minX)+Math.sin(t*.7+i)*.0025)*w;
         const y=(minY+seeded(i,wi+31)*(maxY-minY))*h;
-        const opacity=Math.sin(phase*Math.PI)*.12;
+        const opacity=Math.sin(phase*Math.PI)*.2;
         ctx.strokeStyle=`rgba(166,245,235,${opacity})`;ctx.lineWidth=.7;
         ctx.beginPath();ctx.ellipse(x,y,(.003+phase*.009)*w,(.0004+phase*.0017)*h,0,0,Math.PI*1.7);ctx.stroke();
       }
@@ -262,7 +291,7 @@ export function createOutroMotion(canvas, options={}) {
         for(const triangle of mesh.triangles) if(triangle.some(k=>mesh.vertices[k].weights[i].cloth>0)) paintTriangle(frameCtx,source,mesh.vertices,triangle,w,h);
         frameCtx.restore();
       });
-      paintEnvironment(frameCtx,scene,time,w,h);
+      paintEnvironment(frameCtx,source,scene,time,w,h);
     }
     ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,canvas.width,canvas.height);
     ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(frame,view.x,view.y,view.w,view.h);
@@ -326,5 +355,6 @@ export function createOutroMotion(canvas, options={}) {
   }
   return {show,stop,dispose,resize,update,stats};
 }
+
 
 

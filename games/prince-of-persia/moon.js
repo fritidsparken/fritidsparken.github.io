@@ -12,7 +12,7 @@ try {
   }
 } catch {saved={}}
 let stage = Number.isInteger(saved.stage) ? clamp(saved.stage,0,chapters.length-1) : 0;
-let unlocked=9;
+let unlocked=clamp(saved.progressVersion===1 ? Number(saved.unlocked)||0 : (saved.finished ? chapters.length-1 : stage),0,chapters.length-1);
 const selectedStage=Number(new URLSearchParams(location.search).get('stage'));
 if(new URLSearchParams(location.search).has('stage') && Number.isInteger(selectedStage) && selectedStage>=0 && selectedStage<=unlocked) stage=selectedStage;
 const picker=el('levelSelect');
@@ -49,7 +49,7 @@ let game, wave, active = false, finished = Boolean(saved.finished) && !new URLSe
 let side = 0, jump = false, last = 0, acc = 0;
 const keys = new Set();
 function save(cp) {
-  try {localStorage.setItem(key,JSON.stringify({stage,cp,finished,introPlayed,unlocked,coins:[...collectedCoins],bossHits:warden?[...warden.hits]:[]}))} catch {}
+  try {localStorage.setItem(key,JSON.stringify({progressVersion:1,stage,cp,finished,introPlayed,unlocked,coins:[...collectedCoins],bossHits:warden?[...warden.hits]:[]}))} catch {}
 }
 class MoonChamber extends Chamber {
   fail(cause) {
@@ -286,4 +286,5 @@ Promise.all([...chapters.map(r=>r.key),'span','crusher','warden','idle','climb',
   if(selecting && requestedFromMenu)startPlay();else if(arrivedFromJungle)el('go').onclick();
 }).catch(()=>{stop('Palatset kunde inte öppnas','Kontrollera anslutningen och försök igen.','Försök igen');el('go').disabled=false});
 }
+
 

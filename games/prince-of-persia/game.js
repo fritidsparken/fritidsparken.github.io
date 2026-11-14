@@ -42,6 +42,7 @@ function persist() {
       v: 25,
       ...route.state(),
       palaceMax,
+      progressVersion: 1,
       finished: route.done
     }));
   } catch {}
@@ -131,7 +132,7 @@ $('explore').onclick = () => {
   syncScore();
 };
 const previous = readSave();
-let palaceMax = clamp(Math.max(Number(previous.palaceMax) || 0, Number(previous.room) || 0, Array.isArray(previous.bags) ? previous.bags.reduce((last, bag, i) => bag ? i : last, 0) : 0, previous.finished ? 9 : 0), 0, 9);
+let palaceMax = clamp(Math.max((previous.progressVersion===1 ? Number(previous.palaceMax) : 0) || 0, Number(previous.room) || 0, Array.isArray(previous.bags) ? previous.bags.reduce((last, bag, i) => bag ? i : last, 0) : 0, previous.finished ? 9 : 0), 0, 9);
 route = new PalaceRoute(onEvent, previous.finished ? {
   ...previous,
   room: 9,
@@ -168,3 +169,4 @@ function loadImage(src) {
     im.src = src;
   });
 }
+

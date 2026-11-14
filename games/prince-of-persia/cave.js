@@ -7,7 +7,7 @@ import {buildRails} from './minecart-rails.js?v=early-choice-20261114';
 import {createCartCamera} from './minecart-camera.js?v=next-ride-20261114';
 import {CoinState,buildCoins} from './minecart-coins.js?v=next-ride-20261114';
 import {createCartAudio} from './minecart-audio.js?v=next-ride-20261114';
-import {createOutroMotion} from './outro-motion.js?v=cloth-water-20261114';
+import {createOutroMotion} from './outro-motion.js?v=water-progress-20261114';
 const $=id=>document.getElementById(id),reader=window.storyReader($('line'),$('retry'));
 const names=COURSE_NAMES, MAIN_MENU='https://fritidsparken.se/games/prince-of-persia/';
 const opening=[
@@ -24,7 +24,7 @@ const KEY='lostWorlds.minecart3d.v2',clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 let saved={};try{saved=JSON.parse(localStorage.getItem(KEY))||{}}catch{}
 let level=Number.isInteger(saved.level)?clamp(saved.level,0,COURSE_COUNT-1):0;
 let seen=!!saved.seen,completed=!!saved.completed,outro=!!saved.outro;
-let unlocked=COURSE_COUNT-1;
+let unlocked=clamp(saved.progressVersion===1 ? Number(saved.unlocked)||0 : (saved.completed||saved.outro ? COURSE_COUNT-1 : level),0,COURSE_COUNT-1);
 let coinBank=saved.coins&&typeof saved.coins==='object'?saved.coins:{};
 let renderer,scene,camera,followCamera,cart,course,physics,cave,rails,coinState,coins,previous,current;
 let mode='loading',last=0,acc=0,time=0,distance=0,lastCP='',lastRespawns=0,doorSounded=false;
@@ -36,7 +36,7 @@ let lamp,lampTarget,notified=0,musicTarget=.06,endingTimer=0;
 function totalCoins(){return Object.values(coinBank).reduce((n,ids)=>n+(Array.isArray(ids)?new Set(ids).size:0),0)}
 function persist(){
  if(coinState)coinBank[level]=coinState.exportIds();
- try{localStorage.setItem(KEY,JSON.stringify({level,unlocked,seen,completed,outro,coins:coinBank,cp:physics?.snapshotCheckpoint()}));localStorage.setItem('lostWorlds.cave','1')}catch{}
+ try{localStorage.setItem(KEY,JSON.stringify({progressVersion:1,level,unlocked,seen,completed,outro,coins:coinBank,cp:physics?.snapshotCheckpoint()}));localStorage.setItem('lostWorlds.cave','1')}catch{}
 }
 function music(volume){musicTarget=volume;if(volume>0)$('score').play().catch(()=>{})}
 $('score').volume=.06;
@@ -58,7 +58,7 @@ function enter(){
 function tell(lines,end,done){
  ui('story');$('story').classList.toggle('end',end);
  // Duck before the first voice starts; do not wait for the render-loop fade.
- if(end) $('score').volume=Math.min($('score').volume,.015);
+ if(end) { $('score').volume=Math.min($('score').volume,.015); $('score').currentTime=0; }
  music(end?.015:.06);
  reader.start(lines,done,(cue,index)=>{
   if(cue.image){$('storyArt').src=cue.image;$('storyArt').alt='Navid och Laleh återförenas och hittar hem';$('storyArt').hidden=false;motion.show(cue.image,index).catch?.(()=>{})}
@@ -73,7 +73,7 @@ function showEndScreen(animate=true){
 function happyEnd(){outro=false;completed=true;persist();showEndScreen(true)}
 $('playAgain').onclick=()=>{
  clearTimeout(endingTimer);sound.setActive(false);motion.stop();$('score').pause();
- try{localStorage.setItem(KEY,JSON.stringify({level:0,unlocked,seen:false,completed:false,outro:false,coins:{}}))}catch{}
+ try{localStorage.setItem(KEY,JSON.stringify({progressVersion:1,level:0,unlocked,seen:false,completed:false,outro:false,coins:{}}))}catch{}
  location.href=MAIN_MENU;
 };
 async function advance(){
@@ -82,6 +82,7 @@ async function advance(){
 }
 function snap(){followCamera?.reset();current=physics.snapshot();previous=current;orientation.setFromUnitVectors(forward,new THREE.Vector3(current.tangent.x,current.tangent.y,current.tangent.z).normalize());acc=0;lastRespawns=current.respawns;distance=0}
 function buildLevel(cp){
+ for(const option of $('levelSelect').options) option.disabled=Number(option.value)>unlocked;
  $('levelSelect').value=level;previewTarget?.dispose();previewTarget=null;coins?.dispose();cave?.dispose();rails?.dispose();course=createCourse(level);physics=new CartPhysics(course);if(cp)physics.restoreCheckpoint(cp);
  cave=buildCave(THREE,scene,course,level);rails=buildRails(THREE,scene,course,cave.roofHeight);coinState=new CoinState(course,Array.isArray(coinBank[level])?coinBank[level]:[]);coins=buildCoins(THREE,scene,course,coinState);
  doorSounded=false;snap();lastCP=JSON.stringify(physics.snapshotCheckpoint());
@@ -116,7 +117,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){pause();so
 function updateHUD(s){
  $('distance').value=s.progress;$('speed').textContent=Math.round(s.speed*3.6)+' km/h';
  const score=coinState.summary(time);$('coinCount').textContent=score.displayCourseCount;$('coinTotal').textContent='/ '+score.courseTotal;$('coinHud').style.transform='scale('+score.hudScale+')';
- for(const [id,side]of [['left',-1],['right',1]]){const chosen=s.choice===side;$(id).classList.toggle('selected',chosen);$(id).setAttribute('aria-pressed',String(chosen));$(id).querySelector('small').textContent=chosen?'VALD ✓':(side===-1?'Vänster':'Höger')}
+ for(const [id,side]of [['left',-1],['right',1]]){const chosen=!!s.pending&&s.choice===side;$(id).classList.toggle('selected',chosen);$(id).setAttribute('aria-pressed',String(chosen));$(id).querySelector('small').textContent=chosen?'VALD ✓':(side===-1?'Vänster':'Höger')}
  $('jump').setAttribute('aria-disabled',String(!s.canJump||s.jumpQueued));$('jump').classList.toggle('ready',s.canJump&&!s.jumpQueued);$('jump').classList.toggle('queued',s.jumpQueued);$('jumpLabel').textContent=s.jumpQueued?'Hopp valt':'Hoppa';
  const route=course.routeMap.get(s.routeId),fork=route?.fork,chosen=fork&&s.choice?(s.choice===fork.safeSide?fork.safeRoute:fork.deadRoute):null;rails.highlight(s.pending?chosen:null);
  if(s.nextGap&&s.nextGap.distance>=0&&s.canJump&&s.status==='run'){
@@ -167,10 +168,12 @@ async function init(){
 for(const [i,name] of names.entries()){const option=document.createElement('option');option.value=i;option.textContent=(i+1)+' · '+name;$('levelSelect').append(option)}
 $('levelSelect').value=level;
 $('levelSelect').addEventListener('change',async()=>{
- if(coinState)coinBank[level]=coinState.exportIds();level=Number($('levelSelect').value);completed=outro=false;$('endingScreen').hidden=true;clearTimeout(endingTimer);
+ const requested=Number($('levelSelect').value);if(!Number.isInteger(requested)||requested<0||requested>unlocked)return;
+ if(coinState)coinBank[level]=coinState.exportIds();level=requested;completed=outro=false;$('endingScreen').hidden=true;clearTimeout(endingTimer);
  panel('loading',names[level],'Laddar grottan…','Vänta');try{buildLevel();await Promise.all([cave.ready,cart.ready]);await preparePreview();persist();enter()}catch(e){console.error(e);panel('error','Grottan kunde inte laddas','Försök igen.','Försök igen')}
 });
 init();
+
 
 
 

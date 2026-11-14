@@ -41,7 +41,7 @@ let jungleRecord = {
 try {
   const r = JSON.parse(localStorage.getItem(saveKey));
   if (Number.isInteger(r?.next) && Array.isArray(r.best)) {
-    jungleRecord.next = clamp(r.next, 0, 9);
+    jungleRecord.next = clamp(r.best.reduce((last, score, i) => Number.isInteger(score) && score >= 0 ? Math.max(last, i + 1) : last, 0), 0, 9);
     jungleRecord.best = jungleRecord.best.map((_, i) => Number.isInteger(r.best[i]) ? Math.max(-1, r.best[i]) : -1);
   }
 } catch {}
@@ -215,4 +215,5 @@ function buildCourse() {
     rocks
   };
 }
+
 

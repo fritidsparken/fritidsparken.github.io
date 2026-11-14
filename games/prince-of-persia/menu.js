@@ -20,9 +20,10 @@ const menu = $('titleMenu'),
   theme = $('theme');
 let journey = Boolean(previous.v),
   jungleSelected = false;
-let jungleOpen = true;
+let jungleOpen = Boolean(previous.finished) || jungleRecord.best.some(score => score >= 0);
 try {
-  jungleOpen ||= localStorage.getItem('lostWorlds.jungle') === '1';
+  if(previous.progressVersion===1) jungleOpen ||= localStorage.getItem('lostWorlds.jungle') === '1';
+  else if(!jungleOpen) localStorage.removeItem('lostWorlds.jungle');
 } catch {}
 function unlockJungle() {
   jungleOpen = true;
@@ -30,10 +31,7 @@ function unlockJungle() {
     localStorage.setItem('lostWorlds.jungle', '1');
   } catch {}
 }
-if (jungleOpen) {
-  palaceMax = 9;
-  unlockJungle();
-}
+if (previous.finished) palaceMax = 9;
 theme.volume = .45;
 function playTheme() {
   if (!menu.hidden && !document.hidden) theme.play().catch(() => {});
@@ -73,19 +71,19 @@ const moonNames=['Månskärans tröskel','Den blå cisternens djup','Kedjornas s
 const caveNames=['Lyktornas nedfärd','Färden mot blådjupet','Kristallernas tunnel','Koppargruvans kurvor','Ekoklyftans stup','De glömda spåren','Elddjupets ras','Månstenens mörker','Avgrundens växlar','Färden till flöjtens källa'];
 function fillWorldStages(id,names,saveKey){
  let save={};try{save=JSON.parse(localStorage.getItem(saveKey))||{}}catch{}
- const max=9;
+ const max=Math.min(9,Math.max(0,save.progressVersion===1 ? Number(save.unlocked)||0 : (save.finished||save.completed||save.outro ? 9 : Number(save.stage)||Number(save.level)||0)));
  const picker=$(id);picker.replaceChildren();names.forEach((name,i)=>{const option=document.createElement('option');option.value=i;option.disabled=i>max;option.textContent=(i+1)+'. '+name+(option.disabled?' · låst':'');picker.append(option)});
  picker.value=String(Math.min(9,Math.max(0,Number(save.stage)||Number(save.level)||0)));
 }
 fillWorldStages('moonStage',moonNames,'lostWorlds.moon.v2');fillWorldStages('caveStage',caveNames,'lostWorlds.minecart3d.v2');
-let moonOpen = true;
+let moonOpen = jungleRecord.best[9] >= 0;
 try { moonOpen ||= localStorage.getItem('lostWorlds.moon') === '1'; } catch {}
 function unlockMoon() {
   moonOpen = true;
   try { localStorage.setItem('lostWorlds.moon','1'); } catch {}
 }
 function refreshMenu() {
-  let caveOpen=true;
+  let caveOpen=false;
   try {caveOpen ||= localStorage.getItem('lostWorlds.cave')==='1'||!!JSON.parse(localStorage.getItem('lostWorlds.moon.v2'))?.finished} catch {}
   $('caveChoice').disabled=!caveOpen;
   $('caveState').textContent=caveOpen?'Värld 4 · Tio banor':'Låst · Klara Månens hemliga vatten';
@@ -211,13 +209,13 @@ function fillChaseStages(selected) {
   jungleCourses.forEach(([name], i) => {
     const opt = document.createElement('option');
     opt.value = i;
-    opt.disabled = false;
+    opt.disabled = i > jungleRecord.next;
     opt.textContent = i + 1 + '. ' + name + (opt.disabled ? ' · låst' : '');
     picker.append(opt);
   });
   picker.value = selected;
 }
-jungleRecord.next=9;
+// Stage access follows completed courses, not the mobile test override.
 fillChaseStages(jungleRecord.next);
 $('jungleStage').onchange = () => {
   bridge.resume = false;
@@ -237,5 +235,6 @@ $('bridgePreview').onclick = () => {
   immersiveStart();
   startBridge();
 };
+
 
 
