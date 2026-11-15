@@ -460,21 +460,37 @@ body.std-design .std-categories > :is(button,a[data-origami-link]) > span{
 .std-categories > a[data-origami-link]{font-family:inherit;text-decoration:none;cursor:pointer}
 .std-categories > a[data-origami-link]:focus-visible{outline:3px solid var(--green);outline-offset:3px}
 
-/* Only the artwork moves. The icon viewport, label and tile stay in place. */
+/* Artwork moves continuously inside a fixed, clipped viewport. Labels and tiles stay still. */
 body.std-design .std-categories > :is(button,a[data-origami-link]) > .std-icon{overflow:hidden;contain:paint}
 .std-categories .std-icon-motion{
  transform-box:view-box;transform-origin:50% 52%;
- animation:fp-icon-sway var(--icon-period,4.8s) ease-in-out var(--icon-delay,-1.4s) infinite;
+ animation:fp-icon-dance var(--icon-period,2.9s) ease-in-out var(--icon-delay,-1.4s) infinite;
 }
-.std-categories [data-icon="ball"] .std-icon-motion{animation-name:fp-icon-roll}
-.std-categories :is([data-icon="trophy"],[data-icon="daily"]) .std-icon-motion{animation-name:fp-icon-bob}
-.std-categories :is([data-icon="pencils"],[data-icon="gym"]) .std-icon-motion{animation-name:fp-icon-hop}
-.std-categories :is([data-icon="draw"],[data-icon="tools"]) .std-icon-motion{animation-name:fp-icon-tilt}
+.std-categories [data-icon="ball"] .std-icon-motion{animation-name:fp-icon-ball}
+.std-categories [data-icon="trophy"] .std-icon-motion{animation-name:fp-icon-celebrate}
+.std-categories [data-icon="daily"] .std-icon-motion{animation-name:fp-icon-calendar}
+.std-categories [data-icon="pencils"] .std-icon-motion{animation-name:fp-icon-pencils}
+.std-categories [data-icon="gym"] .std-icon-motion{animation-name:fp-icon-jump}
+.std-categories [data-icon="draw"] .std-icon-motion{animation-name:fp-icon-draw}
+.std-categories [data-icon="tools"] .std-icon-motion{animation-name:fp-icon-tools}
+.std-categories [data-icon="game"] .std-icon-motion{animation-name:fp-icon-game}
 .std-categories [data-icon="origami"] .std-icon-motion{display:block;transform-origin:center;animation-name:fp-icon-glide}
-@keyframes fp-icon-sway{0%,100%{transform:translateY(1px) rotate(-3deg) scale(.94)}50%{transform:translateY(-2px) rotate(3deg) scale(.94)}}
-@keyframes fp-icon-roll{0%,100%{transform:translateY(1px) rotate(-14deg) scale(.93)}50%{transform:translateY(-2px) rotate(14deg) scale(.93)}}
-@keyframes fp-icon-bob{0%,100%{transform:translateY(2px) scale(.94)}50%{transform:translateY(-3px) scale(.97)}}
-@keyframes fp-icon-hop{0%,60%,100%{transform:translateY(2px) scale(.95)}30%{transform:translateY(-3px) scale(.95)}}
-@keyframes fp-icon-tilt{0%,100%{transform:rotate(-4deg) scale(.94)}50%{transform:rotate(4deg) scale(.94)}}
-@keyframes fp-icon-glide{0%,100%{transform:translate(0,1px) rotate(-3deg) scale(.92)}50%{transform:translate(2px,-2px) rotate(3deg) scale(.92)}}
-@media(prefers-reduced-motion:reduce){.std-categories .std-icon-motion{animation:none;transform:none}}
+.std-categories .fp-scissor-blade{transform-box:view-box;transform-origin:48px 54px;animation:fp-scissor-snip 1.15s ease-in-out infinite alternate}
+.std-categories .fp-scissor-blade.second{animation-direction:alternate-reverse}
+.std-categories .fp-pencil{animation:fp-pencil-bounce 1.3s ease-in-out infinite alternate}
+.std-categories .fp-pencil:nth-child(even){animation-direction:alternate-reverse;animation-delay:-.4s}
+.std-categories .fp-drawing-pencil{animation:fp-pencil-sketch 1.25s ease-in-out infinite alternate}
+@keyframes fp-icon-dance{0%,100%{transform:translate(-3px,3px) rotate(-10deg) scale(.84)}50%{transform:translate(3px,-4px) rotate(10deg) scale(.84)}}
+@keyframes fp-icon-ball{0%,100%{transform:translate(-4px,7px) rotate(-35deg) scale(.88,.82)}50%{transform:translate(4px,-9px) rotate(35deg) scale(.86,.93)}}
+@keyframes fp-icon-celebrate{0%,100%{transform:translateY(5px) rotate(-9deg) scale(.84)}50%{transform:translateY(-7px) rotate(9deg) scale(.9)}}
+@keyframes fp-icon-calendar{0%,100%{transform:translateY(4px) rotate(-11deg) scale(.83)}50%{transform:translateY(-5px) rotate(11deg) scale(.87)}}
+@keyframes fp-icon-pencils{0%,100%{transform:translateY(3px) rotate(-8deg) scale(.84)}50%{transform:translateY(-3px) rotate(8deg) scale(.84)}}
+@keyframes fp-icon-jump{0%,100%{transform:translateY(7px) rotate(-7deg) scale(.88,.8)}50%{transform:translateY(-8px) rotate(7deg) scale(.83,.94)}}
+@keyframes fp-icon-draw{0%,100%{transform:translate(-4px,3px) rotate(-7deg) scale(.86)}50%{transform:translate(4px,-3px) rotate(7deg) scale(.86)}}
+@keyframes fp-icon-tools{0%,100%{transform:translateY(3px) rotate(-11deg) scale(.84)}50%{transform:translateY(-5px) rotate(11deg) scale(.84)}}
+@keyframes fp-icon-game{0%,100%{transform:translate(-3px,4px) rotate(-14deg) scale(.86)}50%{transform:translate(3px,-5px) rotate(14deg) scale(.86)}}
+@keyframes fp-icon-glide{0%,100%{transform:translate(-5px,5px) rotate(-10deg) scale(.86)}50%{transform:translate(5px,-6px) rotate(10deg) scale(.9)}}
+@keyframes fp-scissor-snip{from{transform:rotate(-7deg)}to{transform:rotate(7deg)}}
+@keyframes fp-pencil-bounce{from{transform:translateY(4px)}to{transform:translateY(-5px)}}
+@keyframes fp-pencil-sketch{from{transform:translate(-3px,3px)}to{transform:translate(3px,-4px)}}
+@media(prefers-reduced-motion:reduce){.std-categories :is(.std-icon-motion,.fp-scissor-blade,.fp-pencil,.fp-drawing-pencil){animation:none;transform:none}}
