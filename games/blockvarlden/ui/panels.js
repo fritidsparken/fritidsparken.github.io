@@ -180,15 +180,16 @@ export function panels(api){
    show('room',creating?'Skapa en gemensam värld':'Gå med i en värld');
    const form=el('form'),group=el('fieldset');group.className='room-form';
    const name=el('input');name.type='text';name.required=true;name.maxLength=20;
-   name.value=localStorage.getItem('bv-player-name')||'Spelare';name.placeholder='Hitta på ett smeknamn';name.autocomplete='off';
-   const code=el('input');code.type='text';code.required=true;code.minLength=3;code.maxLength=24;
+   name.value='Spelare-'+Array.from(crypto.getRandomValues(new Uint8Array(3)),n=>n.toString(16).padStart(2,'0')).join('').toUpperCase();name.readOnly=true;name.placeholder='Tillfälligt spelarnamn';name.autocomplete='off';
+   const code=el('input');code.type='text';code.required=true;code.minLength=creating?8:3;code.maxLength=24;
    code.pattern='[A-Za-z0-9\\-]{3,24}';code.autocomplete='off';code.spellcheck=false;code.setAttribute('autocapitalize','characters');
-   code.value=creating?'':localStorage.getItem('bv-last-room')||'';
+   code.value=creating?Array.from(crypto.getRandomValues(new Uint8Array(12)),n=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[n%32]).join(''):localStorage.getItem('bv-last-room')||'';
    code.placeholder=creating?'Till exempel KOMPISAR123':'Skriv skaparens kod';
    code.setAttribute('aria-describedby','room-code-help');
-   const hint=el('small',creating?'Välj 3–24 bokstäver, siffror eller bindestreck. Dela sedan koden med dina kompisar.':'Skriv samma kod som den som skapade världen.');hint.id='room-code-help';
-   group.append(field('Smeknamn (använd inte ditt riktiga namn)',name),field(creating?'Välj en egen rumskod':'Rumskod',code),hint);
+   const hint=el('small',creating?'En slumpmässig säker kod är förvald. Välj minst 8 tecken om du ändrar den. Dela sedan koden med dina kompisar.':'Skriv samma kod som den som skapade världen.');hint.id='room-code-help';
+   group.append(field('Tillfälligt spelarnamn (sparas inte)',name),field(creating?'Välj en egen rumskod':'Rumskod',code),hint);
    const privacy=el('p');privacy.append('När ni spelar tillsammans skickas smeknamn, positioner och byggändringar via spelservern. Världar som inte används raderas automatiskt efter 30 dagar. Läs ');const privacyLink=el('a','integritetspolicyn');privacyLink.href='/integritet/';privacyLink.target='_blank';privacyLink.rel='noopener';privacy.append(privacyLink,'. Fråga en vuxen innan du spelar med andra.');group.append(privacy);
+   const notice=el('label');notice.style.cssText='display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.4';const check=el('input');check.type='checkbox';check.required=true;check.style.cssText='min-width:18px;width:18px;margin:4px 0';notice.append(check,el('span','Jag har läst hur Spela tillsammans fungerar och frågat en vuxen.'));group.append(notice);
    let fauna,mode,difficulty;
    if(creating){
     fauna=select([['on','Med djur och varelser'],['off','Utan djur och fiender']],'on');
@@ -204,12 +205,12 @@ export function panels(api){
    form.onsubmit=async e=>{
     e.preventDefault();if(group.disabled)return;
     const value=code.value.trim().toUpperCase(),playerName=name.value.trim();
-    if(!/^[A-Z0-9-]{3,24}$/.test(value)){api.toast('Koden ska ha 3–24 bokstäver, siffror eller bindestreck.');code.focus();return}
+    if(!/^[A-Z0-9-]{3,24}$/.test(value)||(creating&&value.length<8)){api.toast('Koden ska ha '+(creating?'8–24':'3–24')+' bokstäver, siffror eller bindestreck.');code.focus();return}
     if(!playerName){api.toast('Skriv ditt namn så kompisarna känner igen dig.');name.focus();return}
     const options={action,code:value,name:playerName};
     if(creating)options.settings={quiet:fauna.value==='off',mode:mode.value,difficulty:difficulty.value};
     group.disabled=true;$('close').disabled=true;submit.textContent=creating?'Skapar världen …':'Ansluter …';
-    try{await join(options);localStorage.setItem('bv-player-name',playerName);localStorage.setItem('bv-last-room',value)}
+    try{await join(options);localStorage.removeItem('bv-player-name');localStorage.setItem('bv-last-room',value)}
     catch(error){api.toast(error.message||String(error))}
     finally{group.disabled=false;$('close').disabled=false;submit.textContent=creating?'Skapa och spela':'Gå med och spela'}
    };
