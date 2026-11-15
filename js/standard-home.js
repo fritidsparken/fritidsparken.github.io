@@ -209,6 +209,16 @@
   // also covers theme changes from extensions without watching catalog churn.
   new MutationObserver(()=>{if(!document.body.classList.contains('std-design')||presentedSeason!==currentSeason()){drawFilters();draw();}}).observe(document.body,{attributes:true,attributeFilter:['class']});
   drawFilters();draw();
+  // Standalone activity pages submit to the site's existing search and themes.
+  const entry = new URLSearchParams(location.search);
+  if(entry.has('q')){
+    searchInput.value=entry.get('q');search();
+  }
+  const requestedSeason=entry.get('season');
+  if(['standard','christmas','halloween'].includes(requestedSeason)){
+    document.getElementById('seasonPicker').click();
+    document.querySelector(`[data-season-action="${requestedSeason}"]`)?.click();
+  }
 })();
 
 

@@ -3,10 +3,14 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Origamistudion – vik papper steg för steg | Fritidsparken</title>
 <meta name="description" content="Vik papper i din egen takt. Se pappersvikningen från flera vinklar, spela om varje steg och skapa med riktiga papper.">
-<link rel="stylesheet" href="../css/standard-home.css?v=hide-portrait-theme-20261114">
+<link rel="stylesheet" href="../css/standard-home.css?v=category-rows-20261115">
 <link rel="stylesheet" href="../css/visitor-time.css?v=portrait-header-compact-20261115">
-<link rel="stylesheet" href="./css/studio.css?v=1">
-</head><body class="std-design origami-page"><header class="std-header"><div class="std-topbar"><a class="std-brand" href="/" aria-label="Till Fritidsparken"><img src="../assets/fritidsparken-logo.jpg" alt="" width="38" height="38">Fritidsparken.se</a><a class="std-plugg" href="https://pluggparken.se/" aria-label="Till Pluggparken"><img src="../assets/pluggparken-icon.svg" alt="" width="38" height="38"> Pluggparken.se</a><a class="std-header-search" href="/" aria-label="Till Fritidsparkens startsida"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m3 11 9-8 9 8M5 10v11h14V10M9 21v-7h6v7"/></svg></a></div></header>
+<link rel="stylesheet" href="../css/site-header.css?v=1">
+<link rel="stylesheet" href="./css/studio.css?v=shared-banner-2">
+</head><body class="std-design origami-page"><header class="std-header"><div class="std-topbar"><a class="std-brand" href="/" aria-label="Till Fritidsparken"><img src="../assets/fritidsparken-logo.jpg" alt="" width="38" height="38">Fritidsparken.se</a><a class="std-plugg" href="https://pluggparken.se/" aria-label="Till Pluggparken"><img src="../assets/pluggparken-icon.svg" alt="" width="38" height="38"> Pluggparken.se</a><button type="button" class="std-header-search" aria-label="Sök aktiviteter" aria-expanded="false" aria-controls="activitySearchPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></button><div class="std-controls"><button type="button" class="iconbtn" id="theme" aria-label="Byt tema" aria-pressed="false">🌙</button><button type="button" class="iconbtn season-picker" id="seasonPicker" aria-label="Välj tema: Standard, Halloween eller Jul" aria-expanded="false" aria-controls="activitySeasonMenu" title="Välj tema: Standard, Halloween eller Jul"><img src="../assets/fritidsparken-logo.jpg" alt="Fritidsparken"></button></div></div>
+<form class="std-search-panel" id="activitySearchPanel" action="/" role="search" hidden><label for="activitySearch">Sök på Fritidsparken</label><input type="search" id="activitySearch" name="q" placeholder="Sök aktivitet, pyssel eller spel..." autocomplete="off"></form>
+<nav class="std-season-panel" id="activitySeasonMenu" aria-label="Välj säsongstema" hidden><a href="/?season=standard"><img src="../assets/fritidsparken-logo.jpg" alt="">Standard</a><a href="/?season=christmas"><span aria-hidden="true">🎄</span>Jul</a><a href="/?season=halloween"><span aria-hidden="true">🎃</span>Halloween</a></nav>
+</header>
 <main id="main">
   <div class="intro"><div><a class="breadcrumb" href="/">← Fritidsparken</a><p class="eyebrow">ETT PAPPER. MASSOR AV MÖJLIGHETER.</p><h1>Origamistudion</h1><p class="lead">Titta. Vik. Skapa något fint.<br>En vikning i taget, i din egen takt.</p></div><div class="intro-paper" aria-hidden="true"><svg id="hero-paper"></svg><span>Från platt papper till något eget.</span></div></div>
   <div class="gallery-heading"><h2>Vad vill du vika?</h2><span id="model-count"></span></div>
@@ -25,5 +29,6 @@
   <div class="instruction-row"><p id="instruction" aria-live="polite"></p><span id="saving"></span></div>
   <footer class="studio-controls"><button id="back">← Tillbaka</button><button id="replay">↻ Spela om</button><button id="pause" hidden>Pausa</button><button class="primary" id="next">Börja vika →</button></footer>
 </dialog>
+<script src="../js/activity-header.js?v=1"></script>
 <script type="module" src="./js/studio.mjs?v=1"></script><script src="../js/visitor-time.js?v=1"></script>
 </body></html>
