@@ -22,7 +22,7 @@ export function panels(api){
  const q=select(['LOW','MEDIUM','HIGH','ULTRA'].map((v,i)=>[i,v]),s.quality);q.onchange=()=>{s.quality=+q.value;api.configure()};c.append(field('Grafik',q));
  const outfit=select([['skog','Skogsgrön'],['hav','Havsblå'],['lingon','Lingonröd'],['lavendel','Lavendel'],['sailor','Sjömanskläder'],['explorer','Utforskarkläder']],s.outfit);outfit.onchange=()=>{s.outfit=outfit.value;api.configure()};c.append(field('Kläder i tredjeperson',outfit));
  for(const [k,name,min,max,step] of [['fov','Synfält',55,100,1],['sense','Kamerakänslighet',.4,2,.1],['music','Musik',0,1,.05],['effects','Effekter',0,1,.05],['ambience','Omgivning',0,1,.05]]){const n=el('input');n.type='range';Object.assign(n,{min,max,step,value:s[k]});n.oninput=()=>{s[k]=+n.value;api.configure()};c.append(field(name,n))}}
- function pause(){if(!api.meta())return;show('pause','Expeditionen är pausad');const row=el('div');row.className='row';row.append(btn('Fortsätt',close),btn('Helskärm',()=>{api.fullscreen();close()}),btn('Spara',run(async()=>{await api.save();api.toast('Världen sparad')})),btn('Inställningar',settings),btn('Byt spelläge',()=>{api.switchMode();close()}),btn('Till startmenyn',run(async()=>{await api.home();close()})));c.append(row,el('p','Gå med joysticken eller WASD. Dra i spelbilden för att titta runt. Håll Gräv-knappen för att gräva, tryck Bygg för att bygga eller använda ett föremål och Hopp för att hoppa. Knapparna fungerar med mus och touch. Högerklick fungerar också för Bygg. Ctrl springer, mellanslag hoppar och Shift smyger vid kanter. För joysticken helt framåt för att springa. Dubbeltryck Hopp eller mellanslag för att flyga i kreativt läge. E öppnar ryggsäcken. Mushjulet eller 1–9 väljer plats, mittenklick plockar block, Q släpper ett föremål och F5 byter kamera.'))}
+ function pause(){if(!api.meta())return;show('pause','Expeditionen är pausad');const row=el('div');row.className='row';row.append(btn('Fortsätt',close),btn('Helskärm',()=>{api.fullscreen();close()}),btn('Spara',run(async()=>{await api.save();api.toast('Världen sparad')})),btn('Inställningar',settings),btn('Byt spelläge',()=>{api.switchMode();close()}),btn('Till startmenyn',run(async()=>{await api.home();close()})));c.append(row);if(api.shared()&&api.host()){c.append(btn('Radera den delade världen',()=>{if(confirm('Radera den delade världen från servern för alla spelare? Detta kan inte ångras.')){api.deleteShared();api.toast('Raderar den delade världen …')}}))}c.append(el('p','Gå med joysticken eller WASD. Dra i spelbilden för att titta runt. Håll Gräv-knappen för att gräva, tryck Bygg för att bygga eller använda ett föremål och Hopp för att hoppa. Knapparna fungerar med mus och touch. Högerklick fungerar också för Bygg. Ctrl springer, mellanslag hoppar och Shift smyger vid kanter. För joysticken helt framåt för att springa. Dubbeltryck Hopp eller mellanslag för att flyga i kreativt läge. E öppnar ryggsäcken. Mushjulet eller 1–9 väljer plats, mittenklick plockar block, Q släpper ett föremål och F5 byter kamera.'))}
  function pack(){
   const opening=current!=='pack';
   show('pack','Ryggsäcken');
@@ -180,14 +180,15 @@ export function panels(api){
    show('room',creating?'Skapa en gemensam värld':'Gå med i en värld');
    const form=el('form'),group=el('fieldset');group.className='room-form';
    const name=el('input');name.type='text';name.required=true;name.maxLength=20;
-   name.value=localStorage.getItem('bv-player-name')||'';name.placeholder='Ditt namn i spelet';name.autocomplete='nickname';
+   name.value=localStorage.getItem('bv-player-name')||'Spelare';name.placeholder='Hitta på ett smeknamn';name.autocomplete='off';
    const code=el('input');code.type='text';code.required=true;code.minLength=3;code.maxLength=24;
    code.pattern='[A-Za-z0-9\\-]{3,24}';code.autocomplete='off';code.spellcheck=false;code.setAttribute('autocapitalize','characters');
    code.value=creating?'':localStorage.getItem('bv-last-room')||'';
    code.placeholder=creating?'Till exempel KOMPISAR123':'Skriv skaparens kod';
    code.setAttribute('aria-describedby','room-code-help');
    const hint=el('small',creating?'Välj 3–24 bokstäver, siffror eller bindestreck. Dela sedan koden med dina kompisar.':'Skriv samma kod som den som skapade världen.');hint.id='room-code-help';
-   group.append(field('Ditt namn',name),field(creating?'Välj en egen rumskod':'Rumskod',code),hint);
+   group.append(field('Smeknamn (använd inte ditt riktiga namn)',name),field(creating?'Välj en egen rumskod':'Rumskod',code),hint);
+   const privacy=el('p');privacy.append('När ni spelar tillsammans skickas smeknamn, positioner och byggändringar via spelservern. Världar som inte används raderas automatiskt efter 30 dagar. Läs ');const privacyLink=el('a','integritetspolicyn');privacyLink.href='/integritet/';privacyLink.target='_blank';privacyLink.rel='noopener';privacy.append(privacyLink,'. Fråga en vuxen innan du spelar med andra.');group.append(privacy);
    let fauna,mode,difficulty;
    if(creating){
     fauna=select([['on','Med djur och varelser'],['off','Utan djur och fiender']],'on');
