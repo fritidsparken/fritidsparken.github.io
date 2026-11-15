@@ -63,7 +63,6 @@ function wings(body=13,away=false){
 }
 const glider={id:'glidaren',name:'Glidaren',category:'Pappersflygplan',level:'Lätt',minutes:'8–12 min',color:'#70b6c5',paper:A4,materials:'Ett A4-papper. Den lilla fliken låser nosen. Inget lim eller sax.',
   source:source("Fold’N Fly – The Stable",'https://www.foldnfly.com/2.html','Klassisk modell med låsflik'),
-  blender:{base:'./assets/glidaren/',frames:48,fps:24},
   steps:[...starter(),fold('Vik nosen nedåt vid hörnvikningarnas nederkant.',[[-W,-43.5],[W,-43.5]],-1,{tag:'nose'}),
     fold('Vik vänstra hörnet till mittlinjen, 25 mm ovanför spetsen.',toPoint([-W,-43.5],[0,36.5]),1,{tag:'lock-shoulder'}),
     fold('Vik högra hörnet till samma punkt.',toPoint([W,-43.5],[0,36.5]),1,{tag:'lock-shoulder'}),
@@ -89,4 +88,6 @@ const raven={id:'korpen',name:'Korpen',category:'Pappersflygplan',level:'Medel',
     ...wings(13),finish('Korpen är klar! Sikta rakt fram och kasta lugnt.')]
 };
 models.unshift(glider,buzz,raven,plane(true),plane(false));
+// Both renderers share these models and their complete step sequences.
+for(const model of models)model.blender={base:`./assets/${model.id}/`,frames:48,fps:24};
 export const categories=['Alla','Pappersflygplan','Djur','Blommor','Dekorationer','Högtider'];

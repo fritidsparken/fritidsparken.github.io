@@ -1,4 +1,12 @@
-# Aktuellt läge – fler flygplan 2026-11-15
+# Aktuellt läge – två vyer för alla modeller 2026-11-15
+
+Alla tio modeller har nu vanlig SVG-vikvy och Blender 3D, inklusive samtliga fem flygplan, katt, hund, tulpan, hjärta och julgran. Växling mellan vyerna behåller aktuellt viksteg och läget för färdig modell. Blender är standardvy. Färg och kamera är fasta i Blender-vyn; den vanliga vikvyn har kvar sina val.
+
+Varje modell har ett eget redigerbart Blender-projekt, en bild före första vikningen, en bild efter varje steg och ett tvåsekunders videoklipp per steg. Totalt 10 Blender-projekt, 122 videoklipp och 132 stillbilder. Båda vyerna använder samma geometriska viksekvens. Blender-kameran anpassas till hela sekvensen, och kattens och hundens ansikten ritas i slutsteget. Källor, modellnamn och antal steg finns i respektive manifest. Gemensam export, rendering och paketering dokumenteras i `origami/blender/README.md`.
+
+Kontroller: 37 automatiska tester godkända (geometri och fullständig tillgång till alla steg). Alla 122 H.264-klipp verifierade med ffprobe: 640×640, 24 fps, 48 bildrutor, två sekunder, yuv420p. Alla 132 WebP-bilder avkodade och kontrollerade. Båda vyerna och bibehållet steg kontrollerade för samtliga tio modeller i Chrome. Uppspelning kontrollerad med bland annat Klassisk pil, Humlan, katt och hjärta. Mobilens stående 390×844 och liggande 844×390 har ingen extra scroll i studio eller kontrollpanel. Kattens sparade Blender-projekt återöppnades och slutsteget renderades om med exakt samma pixlar (RGB RMS 0). Fysisk provvikning och faktisk iOS-enhet har inte testats.
+
+# Föregående tillägg – fler flygplan 2026-11-15
 
 10 modeller totalt, varav fem pappersflygplan. Tre nya: Glidaren (The Stable), Humlan (The Buzz, liggande A4) och Korpen (Raven). Befintliga modeller och toppbanner behålls.
 

@@ -1,5 +1,5 @@
-import {BlenderPlayer} from './blender-player.mjs';
-import {models,categories} from './models.mjs?v=planes-3';
+import {BlenderPlayer} from './blender-player.mjs?v=all-1';
+import {models,categories} from './models.mjs?v=all-blender-1';
 import {compile} from './geometry.mjs?v=layers-2';
 import {PaperRenderer} from './renderer.mjs?v=layers-2';
 import {loadProgress,saveProgress} from './progress.mjs';
@@ -42,7 +42,7 @@ function update(){
   $('instruction').textContent=preview?'Så ser modellen ut när du är klar.':step===0?current.paper.label+' · Lägg den vita sidan uppåt.':current.steps[step-1].text;
   $('paper').setAttribute('aria-label',preview?'Den färdiga modellen: '+current.name:$('instruction').textContent);
   $('stage-label').textContent=preview||done?'DIN FÄRDIGA MODELL':playing?'TITTA PÅ VIKNINGEN':'VIK I DIN EGEN TAKT';
-  $('stage-hint').textContent=playing?'':preview?'':done?'Fint vikt!':step?'Gör likadant med ditt papper.':'Välj en färg och ta fram ditt papper.';
+  $('stage-hint').textContent=playing?'':preview?'':done?'Fint vikt!':step?'Gör likadant med ditt papper.':is3D?'Ta fram ditt papper.':'Välj en färg och ta fram ditt papper.';
   $('back').disabled=playing||(!preview&&step===0);$('replay').disabled=playing||preview||step===0;$('next').disabled=playing;
   $('next').textContent=preview?'Tillbaka till guiden':done?'Klart! Välj något nytt ✓':step?'Okej, jag är klar →':'Börja vika →';
   $('result').textContent=preview?'Tillbaka till guiden':'Visa färdig modell';

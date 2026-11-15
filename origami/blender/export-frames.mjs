@@ -2,7 +2,10 @@
 import {writeFileSync} from 'node:fs';
 import {models} from '../js/models.mjs';
 import {compile} from '../js/geometry.mjs';
-const model=models.find(m=>m.id==='glidaren'), c=compile(model);
+const id=process.argv[3]||'glidaren';
+const model=models.find(m=>m.id===id);
+if(!model)throw new Error('Unknown model: '+id);
+const c=compile(model);
 const frames=48;
 const ease=t=>{const p=Math.max(0,Math.min(1,(t-.2)/.68));return p*p*(3-2*p);};
 const steps=c.transitions.map((transition,i)=>({

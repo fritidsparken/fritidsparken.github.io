@@ -3,7 +3,8 @@
 node origami/blender/export-frames.mjs /tmp/glidaren-frames.json
 blender -b -t 4 --python origami/blender/render-glidaren.py -- \
   --input /tmp/glidaren-frames.json --out /tmp/glidaren-render
-Use --preview to render just preparation, nose lock and the finished model.
+Use --preview to render preparation, an intermediate state and the finished model.
+The model is selected in export-frames.mjs by its third argument.
 Then encode.py packages the images and clips for the web guide.
 """
 import argparse, json, math, sys, hashlib, shutil
@@ -34,7 +35,10 @@ def material(name,color):
     m=bpy.data.materials.new(name);m.diffuse_color=(*color,1);m.roughness=.82;m.use_nodes=True
     bsdf=m.node_tree.nodes.get('Principled BSDF');bsdf.inputs['Base Color'].default_value=(*color,1);bsdf.inputs['Roughness'].default_value=.82
     return m
-blue=material('Turquoise paper • coloured face',(.24,.55,.61))
+hex_color=data['model']['color'].lstrip('#')
+paper_color=tuple((int(hex_color[i:i+2],16)/255)**1.7 for i in (0,2,4))
+if data['model']['id']=='glidaren':paper_color=(.24,.55,.61)
+blue=material('Coloured paper face',paper_color)
 cream=material('Warm white • reverse face',(.94,.90,.79))
 edge=material('Cut paper edge',(.76,.79,.70))
 ground=material('Sage studio backdrop',(.71,.77,.70))
@@ -49,6 +53,43 @@ scene.world.use_nodes=True;scene.world.node_tree.nodes['Background'].inputs[0].d
 for name,location,power,size in [('Softbox',(-.3,-.2,.65),2,.45),('Fill',(.35,.3,.5),.8,.4)]:
     light=bpy.data.lights.new(name,'AREA');light.energy=power;light.shape='DISK';light.size=size
     ob=bpy.data.objects.new(name,light);scene.collection.objects.link(ob);ob.location=location;ob.rotation_euler=(-ob.location).to_track_quat('-Z','Y').to_euler()
+
+
+# Square models are viewed more directly so faces and petals read clearly.
+# Fit one stable camera to the entire sequence, including lifted corners.
+if data['model']['category']!='Pappersflygplan':
+    camera.location=(0,-.27,.75)
+    camera.rotation_euler=(-camera.location).to_track_quat('-Z','Y').to_euler()
+if data['model']['id']!='glidaren':
+    right=camera.rotation_euler.to_matrix()@Vector((1,0,0))
+    up=camera.rotation_euler.to_matrix()@Vector((0,1,0))
+    min_x=min_y=math.inf;max_x=max_y=-math.inf
+    for step in data['steps']:
+        for state in step['frames']:
+            for panel in state['panels']:
+                for x,y,z in panel['points']:
+                    point=Vector((x/1000,-y/1000,z/1000))
+                    px=point.dot(right);py=point.dot(up)
+                    min_x=min(min_x,px);max_x=max(max_x,px)
+                    min_y=min(min_y,py);max_y=max(max_y,py)
+    camera.location+=right*((min_x+max_x)/2)+up*((min_y+max_y)/2)
+    camera.data.ortho_scale=max(max_x-min_x,max_y-min_y)*1.18
+
+# Real face marks for the cat/dog finish, matching the ordinary guide.
+face_marks=[]
+if data['model'].get('face'):
+    face=data['model']['face'];ink=material('Drawn face',(.025,.05,.04))
+    height=max(p[2] for panel in data['states'][-1]['panels'] for p in panel['points'])/1000+len(data['states'][-1]['panels'])*.00018+.0004
+    for x,y in [(-face['eyes'],face['y']),(face['eyes'],face['y']),(0,face['y']+16)]:
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=24,ring_count=8,radius=.0032,location=(x/1000,-y/1000,height))
+        mark=bpy.context.object;mark.name='Face mark';mark.scale.z=.08;mark.data.materials.append(ink)
+        face_marks.append(mark)
+
+def set_face(visible,frame=None):
+    for mark in face_marks:
+        mark.hide_render=not visible;mark.hide_viewport=not visible
+        if frame is not None:
+            mark.keyframe_insert('hide_render',frame=frame);mark.keyframe_insert('hide_viewport',frame=frame)
 
 
 def geometry(state):
@@ -84,8 +125,9 @@ def render(path,state=None):
     scene.render.filepath=str(path);bpy.ops.render.render(write_still=True)
 
 # State posters give instant back/next/result navigation with no video seeking.
-indices=[0,8,len(data['states'])-1] if args.preview else range(len(data['states']))
+indices=sorted(set([0,min(8,len(data['states'])-1),len(data['states'])-1])) if args.preview else range(len(data['states']))
 for i in indices:
+    set_face(i==len(data['states'])-1)
     obj=make_mesh('Poster paper',data['states'][i]);render(out/f'state-{i:02d}.png')
     bpy.data.objects.remove(obj,do_unlink=True)
 if args.preview:sys.exit(0)
@@ -95,6 +137,7 @@ if args.preview:sys.exit(0)
 timeline=1
 render_cache={}
 for step in data['steps']:
+    set_face(step['kind']=='finish',timeline)
     frames=step['frames'];obj=make_mesh(f"Step {step['number']:02d} — {step['text']}",frames[0])
     obj.shape_key_add(name='Basis')
     for f,state in enumerate(frames):
@@ -109,7 +152,7 @@ for step in data['steps']:
     for f,state in enumerate(frames):
         scene.frame_set(timeline+f)
         path=out/f"step-{step['number']:02d}-{f:03d}.png"
-        fingerprint=hashlib.sha256(json.dumps(state,sort_keys=True).encode()).hexdigest()
+        fingerprint=hashlib.sha256(json.dumps({'state':state,'face':step['kind']=='finish'},sort_keys=True).encode()).hexdigest()
         if fingerprint in render_cache:
             shutil.copyfile(render_cache[fingerprint],path)
             floor.location.z=min(v[2] for v in geometry(state)[0])-.012
@@ -118,5 +161,6 @@ for step in data['steps']:
             render(path,state);render_cache[fingerprint]=path
     timeline+=len(frames)
 scene.frame_start=1;scene.frame_end=timeline-1;scene.frame_set(1)
-bpy.ops.wm.save_as_mainfile(filepath=str(out/'glidaren.blend'),compress=True)
+bpy.ops.wm.save_as_mainfile(filepath=str(out/(data['model']['id']+'.blend')),compress=True)
+(out/'model.json').write_text(json.dumps({'id':data['model']['id'],'name':data['model']['name'],'source':data['model']['source']['url'],'steps':len(data['steps'])}))
 print('BLENDER_BUILD_COMPLETE',out,flush=True)

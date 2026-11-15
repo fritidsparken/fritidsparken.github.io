@@ -16,9 +16,11 @@ export class BlenderPlayer {
   showState(model,index) {
     this.stop();this.video.hidden=true;this.image.hidden=false;
     this.image.src=this.asset(model,'state',index,'webp');
+    this.image.alt=`${model.name} i Blender 3D – ${index===0?'före första vikningen':`efter steg ${index}`}`;
   }
   play(model,index,speed,onDone,onError) {
     this.stop();const ticket=this.ticket,video=this.video;
+    video.setAttribute('aria-label',`${model.name} – viksteg ${index} i Blender 3D`);
     this.image.src=this.asset(model,'state',Math.max(0,index-1),'webp');
     this.image.hidden=false;video.hidden=true;this.status.textContent='Laddar 3D-vikningen…';
     video.muted=true;video.playbackRate=speed;
