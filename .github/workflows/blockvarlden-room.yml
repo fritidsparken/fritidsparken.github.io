@@ -17,6 +17,12 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - name: Check multiplayer and privacy UI JavaScript syntax
+        run: |
+          node --check tools/blockvarlden/server/worker.mjs
+          node --check games/blockvarlden/network/client.js
+          node --check games/blockvarlden/ui/panels.js
+          node --check games/blockvarlden/main.js
       - name: Install WebSocket test dependency
         run: npm install --prefix "$RUNNER_TEMP/room" ws@8.18.3
       - name: Wait for multiplayer protocol 3 deployment
