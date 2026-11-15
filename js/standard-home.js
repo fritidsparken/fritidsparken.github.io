@@ -34,7 +34,7 @@
   const searchIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg>';
   const header = document.createElement('header');
   header.className = 'std-header standard-only';
-  header.innerHTML = `<div class="std-topbar"><a class="std-brand" href="#" data-standard-category="Alla"><img src="./assets/fritidsparken-logo.jpg" alt="" width="38" height="38">Fritidsparken.se</a><a class="std-plugg" href="https://pluggparken.se/"><img src="./assets/pluggparken-icon.svg" alt="" width="38" height="38"> Pluggparken.se</a><button class="std-menu-toggle" aria-expanded="false" aria-controls="stdNavigation" aria-label="Öppna huvudmenyn"><span></span><span></span><span></span></button><nav id="stdNavigation" aria-label="Huvudmeny">${[['Hem','Alla','⌂'],['Skapa','Skapa','✂'],['Pyssel','Pyssel','◉'],['Färglägga','Mandala','✎'],['Fritidsgympa','Fritidsgympa','↗'],['Spel','Spel','⊞'],['Roliga verktyg','Roliga verktyg','⚒']].map(([label,cat,symbol])=>`<button type="button" data-standard-category="${cat}"><span aria-hidden="true">${symbol}</span>${label}</button>`).join('')}</nav><button type="button" class="std-header-search" aria-label="Sök aktiviteter">${searchIcon}</button><div class="std-controls"></div></div>`;
+  header.innerHTML = `<div class="std-topbar"><a class="std-brand" href="/" data-standard-category="Alla"><img src="./assets/fritidsparken-logo.jpg" alt="" width="38" height="38">Fritidsparken.se</a><a class="std-plugg" href="https://pluggparken.se/"><img src="./assets/pluggparken-icon.svg" alt="" width="38" height="38"> Pluggparken.se</a><button class="std-menu-toggle" aria-expanded="false" aria-controls="stdNavigation" aria-label="Öppna huvudmenyn"><span></span><span></span><span></span></button><nav id="stdNavigation" aria-label="Huvudmeny">${[['Hem','Alla','⌂'],['Skapa','Skapa','✂'],['Pyssel','Pyssel','◉'],['Färglägga','Mandala','✎'],['Fritidsgympa','Fritidsgympa','↗'],['Spel','Spel','⊞'],['Roliga verktyg','Roliga verktyg','⚒']].map(([label,cat,symbol])=>`<button type="button" data-standard-category="${cat}"><span aria-hidden="true">${symbol}</span>${label}</button>`).join('')}</nav><button type="button" class="std-header-search" aria-label="Sök aktiviteter">${searchIcon}</button><div class="std-controls"></div></div>`;
   document.body.prepend(header);
   const hero = document.createElement('section');
   hero.className = 'std-hero standard-only';
@@ -44,9 +44,8 @@
   const home = document.createElement('div');
   home.id = 'standardHome';home.className = 'standard-only';
   document.querySelector('.hero').after(home);
-  const categoryPanel = () => `<section class="std-categories" aria-label="Utforska kategorier">${categories.map(([label,cat,symbol],i)=>`<button type="button" ${cat==='ranking'?'data-ranking-toggle aria-controls="fp-ranking" aria-expanded="false"':cat==='origami'?'data-origami-link':`data-standard-category="${cat}"`} style="--tile:${palettes[i]}">${cat==='origami'?'<span class="std-icon" style="display:grid;place-items:center;font-size:44px" aria-hidden="true">🦢</span>':icon(symbol)}<span class="std-category-label">${(label==='How to Draw'?['How to','Draw']:label.split(' ')).map(word=>`<span>${esc(word)}</span>`).join(' ')}</span></button>`).join('')}</section>`;
+  const categoryPanel = () => `<section class="std-categories" aria-label="Utforska kategorier">${categories.map(([label,cat,symbol],i)=>`<${cat==='origami'?'a href="/origami/"':'button type="button"'} ${cat==='ranking'?'data-ranking-toggle aria-controls="fp-ranking" aria-expanded="false"':cat==='origami'?'data-origami-link':`data-standard-category="${cat}"`} style="--tile:${palettes[i]}">${cat==='origami'?'<span class="std-icon" style="display:grid;place-items:center;font-size:44px" aria-hidden="true">🦢</span>':icon(symbol)}<span class="std-category-label">${(label==='How to Draw'?['How to','Draw']:label.split(' ')).map(word=>`<span>${esc(word)}</span>`).join(' ')}</span></${cat==='origami'?'a':'button'}>`).join('')}</section>`;
   const categoryNavigation = document.createElement('div');
-  document.addEventListener('click', e => { if(e.target.closest('[data-origami-link]')) window.location.href='./origami/'; });
   categoryNavigation.innerHTML = categoryPanel();
   home.before(categoryNavigation);
   const ranking = document.getElementById('fp-ranking');
@@ -211,6 +210,8 @@
   drawFilters();draw();
   // Standalone activity pages submit to the site's existing search and themes.
   const entry = new URLSearchParams(location.search);
+  const requestedCategory=entry.get('category');
+  if(categories.some(([,cat])=>cat===requestedCategory)&&!['ranking','origami'].includes(requestedCategory)){navigate(requestedCategory,false);}
   if(entry.has('q')){
     searchInput.value=entry.get('q');search();
   }
