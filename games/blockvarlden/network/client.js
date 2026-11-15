@@ -21,6 +21,7 @@ export async function connect(server,options,api){
    const pending=pendingHarvest.get(m.key);if(pending){clearTimeout(pending.timer);pendingHarvest.delete(m.key);pending.resolve(m.type==='harvest'&&m.id===id)}
   }
   if(m.type==='locked'){locked=m.value;api.status(room,isHost,locked)}
+  if(m.type==='room-deleted'){localStorage.removeItem('bv-owner-'+room);localStorage.removeItem('bv-last-room');errorMessage='Världen har raderats av skaparen.';ws.close();return}
   if(m.type==='leave'){peers.get(m.id)?.dispose();peers.delete(m.id)}
   if(m.type==='pose'&&m.id!==id&&Array.isArray(m.p)&&m.p.length===4&&m.p.every(Number.isFinite)){
    let peer=peers.get(m.id);
@@ -39,6 +40,8 @@ export async function connect(server,options,api){
    return new Promise(resolve=>{const timer=setTimeout(()=>{pendingHarvest.delete(key);resolve(false)},7000);pendingHarvest.set(key,{resolve,timer});send({type:'harvest',key})});
   },
   lock:()=>{if(isHost)send({type:'lock',owner,value:!locked})},
+  deleteRoom:()=>{if(isHost)send({type:'delete-room'})},
+  isHost:()=>isHost,
   frame(dt,p,yaw){
    for(const peer of peers.values()){peer.walk-=dt;peer.play(peer.walk>0?'walk':'idle');peer.mixer.update(dt)}
    if(performance.now()-last<170)return;
