@@ -117,3 +117,12 @@ Origami.me's general catalogue is useful for attribution discovery, but many con
 3. Compare every rendered intermediate state and layer identity with the selected source. Preserve sheet area, connectivity, sides, fold reversibility and order.
 4. Test complete navigation and every source-specific sequence; test final mechanism for planes, frog, spinner and flapping bird. Physical tests have not occurred in this research.
 5. Publish only complete validated activities, and report the actual count without counting this research register as completed activities.
+
+
+## Implementerade flygplanstillägg 2026-11-15
+
+- Glidaren: https://www.foldnfly.com/2.html — A4 stående, nos ned vid skuldrorna, hörnmål 25 mm ovanför nosspetsen, endast exponerad nosflik låser hörnen. Bildens ”square” är en kuvertliknande rektangel; måtten följer den uttryckliga 25 mm-instruktionen.
+- Humlan: https://www.foldnfly.com/3.html — A4 LIGGANDE. Bildernas bredd/höjd är avgörande; stående papper ger fel bakkant. Den översta 13 mm-kanten viks bakåt.
+- Korpen: https://www.foldnfly.com/50.html — dubbla hörnvikningar, lång nedvikt nos, nya hörnvikningar och uppvikt låsflik. Medel i den lokala guiden på grund av tjocka lager.
+
+Alla diagram, filmer, geometrier och svenska instruktioner är självständigt framställda. Källfotografier används endast för granskning och distribueras inte. Glidarens Blender-vy använder samma geometriska viksteg som SVG-vyn, separata fram-/baksidor, 0,11 mm visuell papperstjocklek och lageravstånd. Lageravstånd är en visuell approximation, inte en kollisionssimulering.

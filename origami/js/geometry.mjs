@@ -60,12 +60,13 @@ export function createTransition(state,step) {
   }
   if(step.kind==='turn') {
     const axis=step.axis||[[0,-300],[0,300]],angle=(step.angle??180)*Math.PI/180;
-    return {step,sample(t){return {panels:(t===1?[...state.panels].reverse():state.panels).map(p=>({...p,points:p.points.map(v=>rotatePoint(v,axis,angle*t)),front:t===1?!p.front:p.front})),creases:[]};}};
+    return {step,sample(t){return {panels:(t===1?[...state.panels].reverse():state.panels).map(p=>({...p,points:p.points.map(v=>rotatePoint(v,axis,angle*t)),...(p.layerOffset?{layerOffset:rotatePoint(p.layerOffset,[[0,0,0],[axis[1][0]-axis[0][0],axis[1][1]-axis[0][1],0]],angle*t)}:{}),front:t===1?!p.front:p.front})),creases:[]};}};
   }
   if(step.kind==='open') {
-    return {step,sample(t){return {panels:state.panels.map(p=>{
+    return {step,sample(t){return {panels:state.panels.map((p,i)=>{
       const motion=step.motions.find(m=>matches(p,m.select));
-      return motion?{...p,points:p.points.map(v=>rotatePoint(v,motion.axis,motion.angle*Math.PI/180*t))}:p;
+      const offset=p.layerOffset||[0,0,i*.18];
+      return motion?{...p,points:p.points.map(v=>rotatePoint(v,motion.axis,motion.angle*Math.PI/180*t)),layerOffset:rotatePoint(offset,[[0,0,0],[motion.axis[1][0]-motion.axis[0][0],motion.axis[1][1]-motion.axis[0][1],0]],motion.angle*Math.PI/180*t)}:{...p,layerOffset:offset};
     }),creases:state.creases};}};
   }
   return {step,sample(){return clone(state);}};

@@ -1,3 +1,13 @@
+# Aktuellt läge – fler flygplan 2026-11-15
+
+10 modeller totalt, varav fem pappersflygplan. Tre nya: Glidaren (The Stable), Humlan (The Buzz, liggande A4) och Korpen (Raven). Befintliga modeller och toppbanner behålls.
+
+Glidaren har två jämförbara visningar för samma viksekvens: vanlig SVG-vikvy och en modell byggd och animerad i Blender 4.3.2. Blender-projektet innehåller 15 animerade steg på en 720-bildrutors tidslinje. Publicerade medier: 15 H.264-klipp, 16 WebP-stillbilder, 640×640 och 24 bilder/s. Kameran och färgen är fasta i Blender-vyn. Källprojekt och reproduktionsskript ligger i `origami/blender/`.
+
+Kontroller för detta tillägg: 27 geometriska tester godkända, syntaxkontroll, alla 15 videofiler validerade med ffprobe och samtliga stillbilder verifierade. De tre nya guiderna har navigerats till sista steget i Chrome. Växling mellan visningarna behåller steget. Blender-uppspelning, paus, fortsätt, omspelning och reducerad rörelse kontrollerade. Stående 390×844 och liggande 844×390 har ingen scroll i dialogen eller kontrollpanelen. Ingen fysisk provflygning eller test på faktisk iOS-enhet har genomförts.
+
+## Historik: första arbetsversionen
+
 # Origamistudion – arbetsversion 2026-11-15
 
 Detta är en påbörjad implementation, inte en färdig 48-modellersleverans. Arbetsgrenen ska inte slås ihop till main som om hela uppdraget vore klart.

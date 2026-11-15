@@ -23,7 +23,8 @@ export class PaperRenderer {
     const extent=Math.max(150,Math.max(maxX-minX,maxY-minY)*1.35),cx=(minX+maxX)/2,cy=(minY+maxY)/2;
     this.svg.setAttribute('viewBox',`${cx-extent/2} ${cy-extent/2} ${extent} ${extent}`);
     const paths=state.panels.map((p,i)=>{
-      const points=p.points.map(v=>this.project(v,i)),depth=p.points.reduce((s,v)=>s+v[2],0)/points.length+i*.12;
+      const offset=p.layerOffset||[0,0,i*.12];
+      const points=p.points.map(v=>this.project(v.map((n,j)=>n+offset[j]))),depth=p.points.reduce((s,v)=>s+v[2],0)/points.length+offset[2];
       let winding=0;points.forEach((v,j)=>{const q=points[(j+1)%points.length];winding+=v[0]*q[1]-q[0]*v[1];});
       // Winding follows the actual rotating paper normal; double-sided material.
       const front=(winding>=0)===(model?.paper.front!==false);

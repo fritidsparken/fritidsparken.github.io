@@ -47,3 +47,19 @@ test('selected layer folds do not move cat ears',()=>{
 test('no empty folds silently pass',()=>{
   assert.throws(()=>createTransition(initialState(models[0]),{kind:'fold',text:'outside paper',line:[[1000,0],[1000,1]],side:-1}),/does not move/);
 });
+
+test('Glidaren locks only its exposed nose flap, keeping both shoulders still',()=>{
+  const c=compile(models.find(m=>m.id==='glidaren'));
+  const shoulders=state=>state.panels.filter(p=>p.tags.includes('lock-shoulder'));
+  assert.deepEqual(shoulders(c.states[7]),shoulders(c.states[8]));
+  const moved=c.states[8].panels.filter(p=>p.tags.includes('nose')&&!p.tags.includes('lock-shoulder'));
+  assert.ok(moved.some(p=>p.points.some(v=>Math.abs(v[0])<1e-6&&Math.abs(v[1]-22.2934656)<1e-5)));
+});
+test('wing layers rotate with the opened wings, rather than reversing exposed surfaces',()=>{
+  const c=compile(models.find(m=>m.id==='glidaren'));
+  const final=c.states.at(-1).panels;
+  assert.ok(final.filter(p=>p.tags.includes('wing-right')).some(p=>p.layerOffset[2]<-.1));
+  assert.ok(final.filter(p=>p.tags.includes('wing-right')).every(p=>p.layerOffset[2]<=1e-8));
+  assert.ok(final.filter(p=>p.tags.includes('wing-left')).every(p=>p.layerOffset[2]>=-1e-8));
+  for(const p of final)assert.ok(p.layerOffset.every(Number.isFinite));
+});

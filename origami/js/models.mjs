@@ -47,5 +47,46 @@ function plane(narrow) {
   steps.push(finish('Ditt plan är klart! Prova ett mjukt kast.'));
   return {id:narrow?'klassisk-pil':'breda-vingar',name:narrow?'Klassisk pil':'Breda vingar',category:'Pappersflygplan',level:'Lätt',minutes:'6–10 min',color:narrow?'#78b5d3':'#a7a1d4',paper:{width:210,height:297,front:false,label:'A4 · 21 × 29,7 cm'},materials:'Ett A4-papper. Inget lim och ingen sax.',source:source(narrow?"Fold’N Fly – Basic Dart":"Fold’N Fly – The Basic",`https://www.foldnfly.com/${narrow?1:0}.html`,'Klassisk pappersflygplansmodell'),steps};
 }
-models.unshift(plane(true),plane(false));
+// Corner folds use the perpendicular bisector of the corner and its target.
+// This keeps the actual A4 sheet intact, including the small locking flap.
+const A4={width:210,height:297,front:false,label:'A4 · 21 × 29,7 cm'};
+const H=148.5,W=105;
+function toPoint(a,b){const m=[(a[0]+b[0])/2,(a[1]+b[1])/2],dx=b[0]-a[0],dy=b[1]-a[1];return [[m[0]+dy,m[1]-dx],[m[0]-dy,m[1]+dx]];}
+function starter(w=W,h=H){return [fold('Vik papperet på mitten längs mittlinjen.',[[0,-h],[0,h]],-1),unfold,fold('Vik vänstra övre hörnet till mittlinjen.',[[0,-h],[-w,-h+w]],1),fold('Vik högra övre hörnet till mittlinjen.',[[0,-h],[w,-h+w]],-1)];}
+function wings(body=13,away=false){
+  const axis=[[-body,-H],[-body,H]],mirror=axis.map(([x,y])=>[-x,y]);
+  return [fold(away?'Vik ihop planet bakåt längs mittlinjen.':'Vik ihop planet längs mittlinjen.',[[0,-H],[0,H]],-1,{tag:'right',direction:away?-1:1}),
+    fold(`Vik ned första vingen. Lämna en ${body} mm hög kropp.`,axis,1,{select:{has:'right'},tag:'wing-right'}),turn,
+    fold('Vik andra vingen lika stor som den första.',mirror,-1,{select:{not:'right'},tag:'wing-left'}),
+    {kind:'open',text:'Öppna vingarna halvvägs, lika mycket på båda sidor.',motions:[{select:{has:'wing-right'},axis:mirror,angle:90},{select:{has:'wing-left'},axis:mirror,angle:-90}]},
+    {kind:'turn',text:'Vrid planet så att vingarna ligger vågrätt.',axis:mirror,angle:90}];
+}
+const glider={id:'glidaren',name:'Glidaren',category:'Pappersflygplan',level:'Lätt',minutes:'8–12 min',color:'#70b6c5',paper:A4,materials:'Ett A4-papper. Den lilla fliken låser nosen. Inget lim eller sax.',
+  source:source("Fold’N Fly – The Stable",'https://www.foldnfly.com/2.html','Klassisk modell med låsflik'),
+  blender:{base:'./assets/glidaren/',frames:48,fps:24},
+  steps:[...starter(),fold('Vik nosen nedåt vid hörnvikningarnas nederkant.',[[-W,-43.5],[W,-43.5]],-1,{tag:'nose'}),
+    fold('Vik vänstra hörnet till mittlinjen, 25 mm ovanför spetsen.',toPoint([-W,-43.5],[0,36.5]),1,{tag:'lock-shoulder'}),
+    fold('Vik högra hörnet till samma punkt.',toPoint([W,-43.5],[0,36.5]),1,{tag:'lock-shoulder'}),
+    fold('Vik den lilla spetsen uppåt över flikarna för att låsa dem.',[[-W,41.8967328],[W,41.8967328]],1,{select:{has:'nose',not:'lock-shoulder'}}),
+    ...wings(13,true),finish('Glidaren är klar! Håll under nosen och kasta mjukt.')]
+};
+const buzz={id:'humlan',name:'Humlan',category:'Pappersflygplan',level:'Medel',minutes:'8–12 min',color:'#e9b34e',paper:{width:297,height:210,front:false,label:'A4 liggande · 29,7 × 21 cm'},materials:'Ett A4-papper, liggande. Vik den korta noskanten bakåt. Inget lim eller sax.',
+  source:source("Fold’N Fly – The Buzz",'https://www.foldnfly.com/3.html'),
+  steps:[...starter(148.5,105),fold('Vik nosspetsen till hörnvikningarnas nederkant.',[[-148.5,-30.75],[148.5,-30.75]],-1),
+    fold('Vik vänstra sneda kanten in till mittlinjen.',[[0,-105],[-148.5,-105+148.5*(1+Math.SQRT2)]],1),
+    fold('Vik högra sneda kanten in till mittlinjen.',[[0,-105],[148.5,-105+148.5*(1+Math.SQRT2)]],-1),
+    fold('Vik nosens översta 13 mm bakåt.',[[-148.5,-17.75],[148.5,-17.75]],-1,{direction:-1}),
+    ...wings(13),finish('Humlan är klar! Prova ett lugnt kast och se hur den glider.')]
+};
+const raven={id:'korpen',name:'Korpen',category:'Pappersflygplan',level:'Medel',minutes:'10–15 min',color:'#a2a5d3',paper:A4,materials:'Ett A4-papper. Pressa de tjocka nosvecken noggrant. Inget lim eller sax.',
+  source:source("Fold’N Fly – Raven",'https://www.foldnfly.com/50.html'),
+  steps:[...starter(),fold('Vik vänstra sneda kanten till mitten en gång till.',[[0,-H],[-W,-H+W*(1+Math.SQRT2)]],1),
+    fold('Vik högra sneda kanten till mitten en gång till.',[[0,-H],[W,-H+W*(1+Math.SQRT2)]],-1),
+    fold('Vik nosen nedåt, nästan till nederkanten.',[[-W,-10],[W,-10]],-1,{tag:'nose'}),
+    fold('Vik det nya vänstra hörnet till mitten.',[[0,-10],[-W,95]],1),
+    fold('Vik det nya högra hörnet till mitten.',[[0,-10],[W,95]],-1),
+    fold('Vik den centrala spetsen upp till planets framkant.',[[-W,59.25],[W,59.25]],1,{select:{has:'nose'}}),
+    ...wings(13),finish('Korpen är klar! Sikta rakt fram och kasta lugnt.')]
+};
+models.unshift(glider,buzz,raven,plane(true),plane(false));
 export const categories=['Alla','Pappersflygplan','Djur','Blommor','Dekorationer','Högtider'];
