@@ -7,8 +7,8 @@
   const originalDraw = draw, originalFilters = drawFilters;
   const legacyTop = document.querySelector('.topin');
   const controls = ['theme','seasonPicker','halloweenSound'].map(id => document.getElementById(id));
-  const palettes = ['#dcf2d6','#ffe5c6','#fff0b6','#ffdeea','#d4efff','#d7f2df','#e9dfff','#e1e4ff','#ffdeeb','#d2f4ee'];
-  const categories = [['Topplistan','ranking','trophy'],['Skapa','Skapa','scissors'],['Pyssel','Pyssel','palette'],['Färglägga','Mandala','pencils'],['Klippdockor','Klippdockor','dolls'],['How to Draw','Rita steg-för-steg','draw'],['Rastlekar','Rast','ball'],['Fritidsgympa','Fritidsgympa','gym'],['Spel','Spel','game'],['Roliga verktyg','Roliga verktyg','tools']];
+  const palettes = ['#dcf2d6','#ffe5c6','#fff0b6','#ffdeea','#d4efff','#d7f2df','#e9dfff','#e1e4ff','#ffdeeb','#d2f4ee','#e6f5da'];
+  const categories = [['Topplistan','ranking','trophy'],['Skapa','Skapa','scissors'],['Pyssel','Pyssel','palette'],['Färglägga','Mandala','pencils'],['Klippdockor','Klippdockor','dolls'],['How to Draw','Rita steg-för-steg','draw'],['Rastlekar','Rast','ball'],['Fritidsgympa','Fritidsgympa','gym'],['Spel','Spel','game'],['Roliga verktyg','Roliga verktyg','tools'],['Origami','origami','origami']];
   let iconId = 0, browseAll = false;
   function icon(kind) {
     const id = 'std-icon-' + (++iconId);
@@ -44,8 +44,9 @@
   const home = document.createElement('div');
   home.id = 'standardHome';home.className = 'standard-only';
   document.querySelector('.hero').after(home);
-  const categoryPanel = () => `<section class="std-categories" aria-label="Utforska kategorier">${categories.map(([label,cat,symbol],i)=>`<button type="button" ${cat==='ranking'?'data-ranking-toggle aria-controls="fp-ranking" aria-expanded="false"':`data-standard-category="${cat}"`} style="--tile:${palettes[i]}">${icon(symbol)}<span class="std-category-label">${(label==='How to Draw'?['How to','Draw']:label.split(' ')).map(word=>`<span>${esc(word)}</span>`).join(' ')}</span></button>`).join('')}</section>`;
+  const categoryPanel = () => `<section class="std-categories" aria-label="Utforska kategorier">${categories.map(([label,cat,symbol],i)=>`<button type="button" ${cat==='ranking'?'data-ranking-toggle aria-controls="fp-ranking" aria-expanded="false"':cat==='origami'?'data-origami-link':`data-standard-category="${cat}"`} style="--tile:${palettes[i]}">${cat==='origami'?'<span class="std-icon" style="display:grid;place-items:center;font-size:44px" aria-hidden="true">🦢</span>':icon(symbol)}<span class="std-category-label">${(label==='How to Draw'?['How to','Draw']:label.split(' ')).map(word=>`<span>${esc(word)}</span>`).join(' ')}</span></button>`).join('')}</section>`;
   const categoryNavigation = document.createElement('div');
+  document.addEventListener('click', e => { if(e.target.closest('[data-origami-link]')) window.location.href='./origami/'; });
   categoryNavigation.innerHTML = categoryPanel();
   home.before(categoryNavigation);
   const ranking = document.getElementById('fp-ranking');
