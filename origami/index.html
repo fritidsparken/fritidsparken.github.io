@@ -16,14 +16,14 @@
 <link rel="stylesheet" href="../css/standard-home.css?v=seo-links-20261115">
 <link rel="stylesheet" href="../css/visitor-time.css?v=portrait-header-compact-20261115">
 <link rel="stylesheet" href="../css/site-header.css?v=1">
-<link rel="stylesheet" href="./css/studio.css?v=all-blender-1">
+<link rel="stylesheet" href="./css/studio.css?v=foldable-flight-1">
 </head><body class="std-design origami-page"><header class="std-header"><div class="std-topbar"><a class="std-brand" href="/" aria-label="Till Fritidsparken"><img src="../assets/fritidsparken-logo.jpg" alt="" width="38" height="38">Fritidsparken.se</a><a class="std-plugg" href="https://pluggparken.se/" aria-label="Till Pluggparken"><img src="../assets/pluggparken-icon.svg" alt="" width="38" height="38"> Pluggparken.se</a><button type="button" class="std-header-search" aria-label="Sök aktiviteter" aria-expanded="false" aria-controls="activitySearchPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></button><div class="std-controls"><button type="button" class="iconbtn" id="theme" aria-label="Byt tema" aria-pressed="false">🌙</button><button type="button" class="iconbtn season-picker" id="seasonPicker" aria-label="Välj tema: Standard, Halloween eller Jul" aria-expanded="false" aria-controls="activitySeasonMenu" title="Välj tema: Standard, Halloween eller Jul"><img src="../assets/fritidsparken-logo.jpg" alt="Fritidsparken"></button></div></div>
 <form class="std-search-panel" id="activitySearchPanel" action="/" role="search" hidden><label for="activitySearch">Sök på Fritidsparken</label><input type="search" id="activitySearch" name="q" placeholder="Sök aktivitet, pyssel eller spel..." autocomplete="off"></form>
 <nav class="std-season-panel" id="activitySeasonMenu" aria-label="Välj säsongstema" hidden><a href="/?season=standard"><img src="../assets/fritidsparken-logo.jpg" alt="">Standard</a><a href="/?season=christmas"><span aria-hidden="true">🎄</span>Jul</a><a href="/?season=halloween"><span aria-hidden="true">🎃</span>Halloween</a></nav>
 </header>
 <main id="main">
   <div class="intro"><div><a class="breadcrumb" href="/">← Fritidsparken</a><p class="eyebrow">ETT PAPPER. MASSOR AV MÖJLIGHETER.</p><h1>Origamistudion</h1><p class="lead">Titta. Vik. Skapa något fint.<br>En vikning i taget, i din egen takt.</p></div><div class="intro-paper" aria-hidden="true"><svg id="hero-paper"></svg><span>Från platt papper till något eget.</span></div></div>
-  <p class="new-planes">Alla modeller har två visningar! Växla mellan <strong>vanlig vikvy</strong> och <strong>Blender 3D</strong> i varje guide.</p>
+  <p class="new-planes">Nytt: <strong>Vapor och Arrowhead!</strong> Vik med <strong>vanlig vikvy</strong> eller <strong>Blender 3D</strong>. På de nya planen och Glidaren kan du också välja <strong>Se planet flyga</strong>.</p>
   <div class="gallery-heading"><h2>Vad vill du vika?</h2><span id="model-count"></span></div>
   <nav class="filters" id="categories" aria-label="Välj origamikategori"></nav>
   <div class="model-grid" id="models"></div>
@@ -40,12 +40,18 @@
   <header class="studio-heading"><div><p class="eyebrow" id="studio-category"></p><h2 id="studio-title"></h2></div><span id="step-count"></span><button class="icon-button" id="close" aria-label="Stäng vikguiden">✕</button></header>
   <div class="step-track" id="step-track" aria-hidden="true"></div>
   <div class="studio-body">
-    <div class="paper-stage"><span class="stage-label" id="stage-label">DITT PAPPER</span><svg id="paper" role="img" aria-label="Papperet visas före första vikningen"></svg><div id="blender-stage" class="blender-stage" hidden><img alt="Pappersmodellen byggd i Blender" decoding="async"><video muted playsinline preload="none" disablepictureinpicture aria-label="Viksteget renderat i Blender" hidden></video><span role="status"></span></div><span class="stage-hint" id="stage-hint"></span></div>
+    <div class="paper-stage"><span class="stage-label" id="stage-label">DITT PAPPER</span><svg id="paper" role="img" aria-label="Papperet visas före första vikningen"></svg><div id="blender-stage" class="blender-stage" hidden><img alt="Pappersmodellen byggd i Blender" decoding="async"><video muted playsinline preload="none" disablepictureinpicture aria-label="Viksteget renderat i Blender" hidden></video><span role="status"></span></div><span class="stage-hint" id="stage-hint"></span><button id="flight-launch" class="flight-launch" hidden>✈ Se planet flyga</button></div>
     <aside class="studio-options"><div class="option-group render-choice" id="render-choice" hidden><span class="option-label">Jämför visning</span><div class="views" id="render-modes"><button data-render="svg" aria-pressed="false">Vikvy</button><button data-render="blender" aria-pressed="true">Blender 3D</button></div><p id="render-note">Samma viksteg, med ljus, skuggor och papperslager. Fast färg och kameravinkel.</p></div><div class="option-group" id="color-options"><span class="option-label">Pappersfärg</span><div class="swatches" id="swatches"></div></div><label class="option-group"><span class="option-label">Hastighet</span><select id="speed"><option value="0.5">Långsamt · 0,5×</option><option value="1" selected>Lagom · 1×</option><option value="1.5">Snabbt · 1,5×</option></select></label><div class="option-group" id="view-options"><span class="option-label">Kameravinkel</span><div class="views" id="views"><button data-view="angle" aria-pressed="true">Sned</button><button data-view="top" aria-pressed="false">Ovanifrån</button><button data-view="side" aria-pressed="false">Från sidan</button></div></div><label class="motion-setting"><input id="less-motion" type="checkbox"> Visa utan rörelse</label><p id="material"></p><a id="source" target="_blank" rel="noopener noreferrer">Vikmodellens källa ↗</a><button class="quiet-button" id="result">Visa färdig modell</button><button class="quiet-button" id="restart">↺ Börja om</button></aside>
   </div>
   <div class="instruction-row"><p id="instruction" aria-live="polite"></p><span id="saving"></span></div>
   <footer class="studio-controls"><button id="back">← Tillbaka</button><button id="replay">↻ Spela om</button><button id="pause" hidden>Pausa</button><button class="primary" id="next">Börja vika →</button></footer>
 </dialog>
+<dialog id="flight-dialog" aria-labelledby="flight-title">
+  <header class="flight-heading"><div><p class="eyebrow">FRÅN PAPPER TILL FLYGTUR</p><h2 id="flight-title">Planet i luften</h2></div><button id="flight-close" class="icon-button" aria-label="Stäng flyganimationen">✕</button></header>
+  <video id="flight-video" controls muted playsinline preload="none" disablepictureinpicture></video>
+  <p id="flight-status" role="status"></p>
+  <footer class="flight-footer"><p>En animerad flygtur. Prova själv med ditt vikta plan!</p><button id="flight-replay" class="quiet-button">↻ Flyg igen</button><button id="flight-return" class="quiet-button">Tillbaka till vikningen</button></footer>
+</dialog>
 <script src="../js/activity-header.js?v=1"></script>
-<script type="module" src="./js/studio.mjs?v=all-blender-1"></script><script src="../js/visitor-time.js?v=1"></script>
+<script type="module" src="./js/studio.mjs?v=foldable-flight-1"></script><script src="../js/visitor-time.js?v=1"></script>
 </body></html>

@@ -63,3 +63,16 @@ test('wing layers rotate with the opened wings, rather than reversing exposed su
   assert.ok(final.filter(p=>p.tags.includes('wing-left')).every(p=>p.layerOffset[2]>=-1e-8));
   for(const p of final)assert.ok(p.layerOffset.every(Number.isFinite));
 });
+
+test('Arrowhead pocket opens and closes over the tip without replacing any paper',()=>{
+  const model=models.find(m=>m.id==='arrowhead'),c=compile(model),i=model.steps.findIndex(s=>s.kind==='tuck');
+  const before=c.states[i],after=c.states[i+1],t=c.transitions[i];
+  const cap=p=>['band','nose','back-tip'].every(tag=>p.tags.includes(tag))&&!p.tags.includes('corner');
+  assert.equal(before.panels.filter(cap).length,2,'Center crease divides the cap into two connected halves');
+  assert.ok(after.panels.at(-1).tags.includes('band'));
+  assert.ok(cap(after.panels.at(-1)),'Closing cap sits over the inserted front layers');
+  const byId=new Map(before.panels.map(p=>[p.id,p]));
+  for(const p of after.panels)p.points.forEach((v,i)=>v.forEach((n,j)=>close(n,byId.get(p.id).points[i][j],'Flat tuck retains crease geometry')));
+  assert.ok(t.sample(.35).panels.find(cap).points.some(v=>v[2]>20),'Pocket visibly opens');
+  for(const p of t.sample(.35).panels.filter(p=>!p.tags.includes('back-tip')))assert.deepEqual(p.points,byId.get(p.id).points,'Outer wings stay still');
+});

@@ -1,4 +1,14 @@
-# Aktuellt läge – två vyer för alla modeller 2026-11-15
+# Aktuellt tillägg – Foldable Flight och flygfilmer 2026-11-15
+
+Vapor (21 steg) och Arrowhead (24 steg), efter Kyle Boyers Foldable Flight-guider, har lagts till med egna svenska instruktioner, A4-geometri och Blender-projekt. Totalt finns nu tolv modeller, varav sju flygplan. Alla har både vanlig vikvy och Blender 3D. Källor och anpassningar dokumenteras i `origami-flight-sources.md`.
+
+Vapor, Arrowhead och Glidaren har varsin sammanhängande 12-sekunders flyganimation, byggd i Blender med samma färdiga pappersmesh som vikguiden. Knappen **Se planet flyga** öppnar en separat spelare med omspelning och återgång till samma viksteg. Filmerna är illustrerade flygrörelser, inte aerodynamiska simuleringar. De redigerbara flygscenerna sparas tillsammans med vikprojekten.
+
+Arrowheads mittveck, yttre kantvikningar och ficklåsning finns med. Fickan öppnas och stängs kring befintliga veck; slutlig lagerordning lägger kappan över spetsarna. Panelernas yta och kantlängder bevaras. Elastisk böjning vid verklig instoppning är förenklad. Fysisk provvikning och provflygning har inte genomförts.
+
+Kontroller för detta tillägg: 47 automatiska tester godkända. Nya stegfilmer och stillbilder avkodade och formatkontrollerade. De tre flygfilmernas mesher jämfördes mot vikprojektens slutmesher i Blender: samma vertexantal och maximal koordinatskillnad 0 efter orientering. Båda nya guiderna har navigerats till slutet i Chrome; fickstegets video, vybyte, flygning, omspelning, Escape och återgång till samma steg är kontrollerade. Flygdialogen ryms utan intern scroll i stående 390×844 och liggande 844×390. Faktisk iOS-enhet är inte testad.
+
+# Föregående tillägg – två vyer för alla modeller 2026-11-15
 
 Alla tio modeller har nu vanlig SVG-vikvy och Blender 3D, inklusive samtliga fem flygplan, katt, hund, tulpan, hjärta och julgran. Växling mellan vyerna behåller aktuellt viksteg och läget för färdig modell. Blender är standardvy. Färg och kamera är fasta i Blender-vyn; den vanliga vikvyn har kvar sina val.
 

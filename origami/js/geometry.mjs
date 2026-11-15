@@ -34,7 +34,7 @@ export function initialState(model) {
   return {panels:[{id:'paper',points,tags:[],front:model.paper.front!==false}],creases:[]};
 }
 function matches(panel,selection) {
-  return !selection || ((!selection.has||panel.tags.includes(selection.has))&&(!selection.not||!panel.tags.includes(selection.not)));
+  return !selection || ((!selection.has||panel.tags.includes(selection.has))&&(!selection.all||selection.all.every(tag=>panel.tags.includes(tag)))&&(!selection.not||!panel.tags.includes(selection.not)));
 }
 function splitFold(state,step) {
   const fixed=[],moving=[];
@@ -61,6 +61,25 @@ export function createTransition(state,step) {
   if(step.kind==='turn') {
     const axis=step.axis||[[0,-300],[0,300]],angle=(step.angle??180)*Math.PI/180;
     return {step,sample(t){return {panels:(t===1?[...state.panels].reverse():state.panels).map(p=>({...p,points:p.points.map(v=>rotatePoint(v,axis,angle*t)),...(p.layerOffset?{layerOffset:rotatePoint(p.layerOffset,[[0,0,0],[axis[1][0]-axis[0][0],axis[1][1]-axis[0][1],0]],angle*t)}:{}),front:t===1?!p.front:p.front})),creases:[]};}};
+  }
+  if(step.kind==='tuck') {
+    // Open the folded pocket, guide the existing tip inside, then close the cap.
+    // Each paper panel rotates rigidly about its existing hinge; no new paper is made.
+    const cap=state.panels.filter(p=>matches(p,step.cap.select));
+    if(!cap.length)throw new Error('Pocket cap selection is empty');
+    const capIds=new Set(cap.map(p=>p.id));
+    const smooth=x=>{x=Math.max(0,Math.min(1,x));return x*x*(3-2*x);};
+    return {step,sample(t){
+      const lift=smooth(t/.3)*(1-smooth((t-.4)/.35));
+      const mouth=smooth(t/.22)*(1-smooth((t-.7)/.3));
+      const order=t<.5?state.panels:[...state.panels.filter(p=>!capIds.has(p.id)),...cap];
+      return {panels:order.map(p=>{
+        let points=p.points;
+        if(capIds.has(p.id))points=points.map(v=>rotatePoint(v,step.cap.axis,step.cap.angle*Math.PI/180*mouth));
+        if(matches(p,step.flap.select))points=points.map(v=>rotatePoint(v,step.flap.axis,step.flap.angle*Math.PI/180*lift));
+        return {...p,points};
+      }),creases:state.creases};
+    }};
   }
   if(step.kind==='open') {
     return {step,sample(t){return {panels:state.panels.map((p,i)=>{

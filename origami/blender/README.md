@@ -10,8 +10,19 @@ blender -b -t 3 --python-exit-code 1 --python "$PWD/origami/blender/render-glida
 python origami/blender/encode.py /tmp/katt-render origami/assets/katt
 ```
 
-Renderingsskriptets historiska filnamn är kvar, men modellen väljs av JSON-indata. Standardmodell vid export utan modell-id är Glidaren. Python-paketeringen behöver Pillow och ffmpeg. `--preview` på renderingsskriptet gör granskningsbilder utan att bygga hela animationen. Full körning sparar projektet i renderingsmappen; paketeringen kopierar det hit.
+Renderingsskriptets historiska filnamn är kvar, men modellen väljs av JSON-indata. Standardmodell vid export utan modell-id är Glidaren. Python-paketeringen behöver Pillow och ffmpeg. `--preview` på renderingsskriptet gör granskningsbilder utan att bygga hela animationen. `--samples 8` ger snabbare kantutjämning; standard är 16 sampel. Arrowhead använder 8, övriga publicerade modeller 16. Full körning sparar projektet i renderingsmappen; paketeringen kopierar det hit.
 
 Webbformat: en WebP-bild före första steget och efter varje steg, samt ett H.264-klipp per steg, 640×640, 24 fps och två sekunder. Endast aktuellt steg laddas. Det är förhandsrenderad Blender-animation, inte Blender eller WebGL som körs i besökarens webbläsare. Kamera och färg är fasta i denna vy. Den vanliga SVG-vikvyn delar exakt samma vikgeometri och behåller färg- och kameravalen. Växling mellan vyerna behåller aktuellt steg.
 
 Kameran är fast under varje guide och anpassad till hela viksekvensens utsträckning. Fyrkantiga modeller visas mer ovanifrån så ansikten och former blir tydliga. Kattens och hundens ritade ansikten visas på slutsteget. Varje modell har källhänvisning i sin `manifest.json` och i guiden; egna geometrier och renderade bilder används. Fysisk provvikning och provflygning har inte genomförts.
+
+## Flyganimation
+
+`render-flight.py` öppnar modellens färdiga `.blend`, hämtar det utvärderade slutstegets mesh och animerar samma geometri genom en egenbyggd Blender-miljö. En analytisk flygbana och kamera ger en sammanhängande 12-sekunders tagning, 30 fps och 960×540. Det är en illustrerad flygtur, inte en aerodynamisk beräkning eller utlovad kastlängd. Vingformen morfas inte under flygningen.
+
+```sh
+blender -b -t 4 --python-exit-code 1 --python "$PWD/origami/blender/render-flight.py" -- --model "$PWD/origami/blender/glidaren.blend" --out /tmp/glidaren-flight
+python origami/blender/encode-flight.py /tmp/glidaren-flight origami/assets/glidaren
+```
+
+`--preview` renderar fem kontrollbilder. Paketeringen sparar `flight.mp4`, `flight.webp` och `flight.json` i modellens mediemapp samt det redigerbara `glidaren-flight.blend` här. Besökaren startar filmen med **Se planet flyga**; stängning återgår till samma viksteg.

@@ -1,3 +1,4 @@
+import {foldableModels} from './foldable-models.mjs?v=1';
 // Authored millimetre geometry. Sources document the folding method, not artwork.
 const R=150/Math.sqrt(2);
 const square={width:150,height:150,front:false,outline:[[0,-R],[R,0],[0,R],[-R,0]],label:'Kvadrat · 15 × 15 cm'};
@@ -87,7 +88,8 @@ const raven={id:'korpen',name:'Korpen',category:'Pappersflygplan',level:'Medel',
     fold('Vik den centrala spetsen upp till planets framkant.',[[-W,59.25],[W,59.25]],1,{select:{has:'nose'}}),
     ...wings(13),finish('Korpen är klar! Sikta rakt fram och kasta lugnt.')]
 };
-models.unshift(glider,buzz,raven,plane(true),plane(false));
+models.unshift(...foldableModels,glider,buzz,raven,plane(true),plane(false));
 // Both renderers share these models and their complete step sequences.
 for(const model of models)model.blender={base:`./assets/${model.id}/`,frames:48,fps:24};
+for(const model of models)if(['glidaren','vapor','arrowhead'].includes(model.id))model.flight={video:`./assets/${model.id}/flight.mp4`,poster:`./assets/${model.id}/flight.webp`,duration:12};
 export const categories=['Alla','Pappersflygplan','Djur','Blommor','Dekorationer','Högtider'];

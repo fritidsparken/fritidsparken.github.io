@@ -23,3 +23,14 @@ for(const model of models) {
     assert.ok(existsSync(new URL(`../origami/blender/${model.id}.blend`,import.meta.url)),'Editable Blender source exists');
   });
 }
+
+for(const model of models.filter(m=>m.flight)) {
+  test(`${model.id}: flight is packaged with matching Blender source`,()=>{
+    const dir=new URL(`../origami/assets/${model.id}/`,import.meta.url);
+    const info=JSON.parse(readFileSync(new URL('flight.json',dir),'utf8'));
+    assert.equal(info.frames/info.fps,model.flight.duration);
+    assert.equal(readFileSync(new URL('flight.mp4',dir)).toString('ascii',4,8),'ftyp');
+    assert.equal(readFileSync(new URL('flight.webp',dir)).toString('ascii',8,12),'WEBP');
+    assert.ok(existsSync(new URL(`../origami/blender/${model.id}-flight.blend`,import.meta.url)));
+  });
+}

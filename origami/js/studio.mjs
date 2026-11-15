@@ -1,6 +1,7 @@
+import {FlightPlayer} from './flight-player.mjs';
 import {BlenderPlayer} from './blender-player.mjs?v=all-1';
-import {models,categories} from './models.mjs?v=all-blender-1';
-import {compile} from './geometry.mjs?v=layers-2';
+import {models,categories} from './models.mjs?v=foldable-flight-1';
+import {compile} from './geometry.mjs?v=pocket-1';
 import {PaperRenderer} from './renderer.mjs?v=layers-2';
 import {loadProgress,saveProgress} from './progress.mjs';
 const $=id=>document.getElementById(id),svgNS='http://www.w3.org/2000/svg';
@@ -11,6 +12,8 @@ const compiled=m=>{if(!cache.has(m.id))cache.set(m.id,compile(m));return cache.g
 let current=null,step=0,raf=0,playing=false,paused=false,preview=false,elapsed=0,last=0,speed=1,opener=null,paintState=null;
 const renderer=new PaperRenderer($('paper'));
 const blender=new BlenderPlayer($('blender-stage'));
+const flight=new FlightPlayer($('flight-dialog'));
+$('flight-launch').onclick=()=>{stop();render(preview?compiled(current).states.at(-1):compiled(current).states[step]);update();flight.open(current,$('flight-launch'));};
 let renderMode='svg';
 function bannerSize(){document.documentElement.style.setProperty('--banner-height',Math.ceil(document.querySelector('.std-header').getBoundingClientRect().height)+'px');}
 new ResizeObserver(bannerSize).observe(document.querySelector('.std-header'));bannerSize();
@@ -35,6 +38,7 @@ function stop(){blender.stop();cancelAnimationFrame(raf);raf=0;playing=false;pau
 function render(state,progress=1){paintState=state;if(renderMode==='blender'){blender.showState(current,preview?current.steps.length:step);return;}renderer.draw(state,{step:preview?null:current.steps[step-1],progress,model:current,finished:preview||step===current.steps.length});}
 function save(){const ok=saveProgress(current.id,step,renderer.color);$('saving').textContent=ok?'Sparas bara på den här enheten.':'Sparning är inte tillgänglig i den här webbläsaren.';}
 function update(){
+  $('flight-launch').hidden=!current.flight;
   const is3D=renderMode==='blender';$('paper').toggleAttribute('hidden',is3D);$('blender-stage').hidden=!is3D;$('render-choice').hidden=!current.blender;$('color-options').hidden=is3D;$('view-options').hidden=is3D;$('render-note').hidden=!is3D;$('studio').classList.toggle('blender-mode',is3D);
   $('render-modes').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.render===renderMode)));
   const done=step===current.steps.length;

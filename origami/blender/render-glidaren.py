@@ -14,14 +14,14 @@ from mathutils import Vector
 
 p=argparse.ArgumentParser()
 p.add_argument('--input',required=True);p.add_argument('--out',required=True)
-p.add_argument('--preview',action='store_true')
+p.add_argument('--preview',action='store_true');p.add_argument('--samples',choices=['8','16','32'],default='16')
 args=p.parse_args(sys.argv[sys.argv.index('--')+1:])
 data=json.loads(Path(args.input).read_text());out=Path(args.out);out.mkdir(parents=True,exist_ok=True)
 bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
 scene=bpy.context.scene;scene.render.engine='BLENDER_WORKBENCH'
 scene.render.resolution_x=640;scene.render.resolution_y=640;scene.render.resolution_percentage=100
 scene.render.image_settings.file_format='PNG';scene.render.image_settings.color_mode='RGB'
-scene.render.fps=data['fps'];scene.display.render_aa='16'
+scene.render.fps=data['fps'];scene.display.render_aa=args.samples
 sh=scene.display.shading;sh.light='STUDIO';sh.studiolight_rotate_z=.6
 sh.studiolight_rotate_z=.3;sh.studio_light='paint.sl';sh.shadow_intensity=.18
 sh.color_type='MATERIAL';sh.show_shadows=True;sh.show_cavity=True;sh.cavity_type='BOTH'
@@ -161,6 +161,9 @@ for step in data['steps']:
             render(path,state);render_cache[fingerprint]=path
     timeline+=len(frames)
 scene.frame_start=1;scene.frame_end=timeline-1;scene.frame_set(1)
+for step in reversed(data['model']['steps']):
+    if step['kind']=='turn' and step.get('angle')==90 and step.get('axis'):
+        a,b=step['axis'];scene['flight_forward_xy']=[a[0]-b[0],b[1]-a[1]];break
 bpy.ops.wm.save_as_mainfile(filepath=str(out/(data['model']['id']+'.blend')),compress=True)
 (out/'model.json').write_text(json.dumps({'id':data['model']['id'],'name':data['model']['name'],'source':data['model']['source']['url'],'steps':len(data['steps'])}))
 print('BLENDER_BUILD_COMPLETE',out,flush=True)
