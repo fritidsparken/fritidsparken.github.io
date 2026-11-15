@@ -19,7 +19,11 @@ center=Vector(tuple((min(v.co[i] for v in mesh.vertices)+max(v.co[i] for v in me
 forward_xy=scene.get('flight_forward_xy',[0,1])
 heading=Matrix.Rotation(math.atan2(forward_xy[0],forward_xy[1]),3,'Z')
 for v in mesh.vertices:v.co=heading@(v.co-center)
-bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
+# Selection-based deletion skips hidden folding objects. Their visibility keys
+# would otherwise make old steps flash on the ground during the flight timeline.
+for ob in list(bpy.data.objects):
+ bpy.data.objects.remove(ob,do_unlink=True)
+assert not scene.objects, 'The flight must start with an empty scene'
 scene.animation_data_clear();scene.frame_start=1;scene.frame_end=360;scene.render.fps=30
 scene.render.engine='BLENDER_WORKBENCH';scene.display.render_aa=a.samples
 scene.render.resolution_x=960;scene.render.resolution_y=540;scene.render.resolution_percentage=100

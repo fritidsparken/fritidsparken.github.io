@@ -459,3 +459,22 @@ body.std-design .std-categories > :is(button,a[data-origami-link]) > span{
 /* Real category links retain the same presentation as category buttons. */
 .std-categories > a[data-origami-link]{font-family:inherit;text-decoration:none;cursor:pointer}
 .std-categories > a[data-origami-link]:focus-visible{outline:3px solid var(--green);outline-offset:3px}
+
+/* Only the artwork moves. The icon viewport, label and tile stay in place. */
+body.std-design .std-categories > :is(button,a[data-origami-link]) > .std-icon{overflow:hidden;contain:paint}
+.std-categories .std-icon-motion{
+ transform-box:view-box;transform-origin:50% 52%;
+ animation:fp-icon-sway var(--icon-period,4.8s) ease-in-out var(--icon-delay,-1.4s) infinite;
+}
+.std-categories [data-icon="ball"] .std-icon-motion{animation-name:fp-icon-roll}
+.std-categories :is([data-icon="trophy"],[data-icon="daily"]) .std-icon-motion{animation-name:fp-icon-bob}
+.std-categories :is([data-icon="pencils"],[data-icon="gym"]) .std-icon-motion{animation-name:fp-icon-hop}
+.std-categories :is([data-icon="draw"],[data-icon="tools"]) .std-icon-motion{animation-name:fp-icon-tilt}
+.std-categories [data-icon="origami"] .std-icon-motion{display:block;transform-origin:center;animation-name:fp-icon-glide}
+@keyframes fp-icon-sway{0%,100%{transform:translateY(1px) rotate(-3deg) scale(.94)}50%{transform:translateY(-2px) rotate(3deg) scale(.94)}}
+@keyframes fp-icon-roll{0%,100%{transform:translateY(1px) rotate(-14deg) scale(.93)}50%{transform:translateY(-2px) rotate(14deg) scale(.93)}}
+@keyframes fp-icon-bob{0%,100%{transform:translateY(2px) scale(.94)}50%{transform:translateY(-3px) scale(.97)}}
+@keyframes fp-icon-hop{0%,60%,100%{transform:translateY(2px) scale(.95)}30%{transform:translateY(-3px) scale(.95)}}
+@keyframes fp-icon-tilt{0%,100%{transform:rotate(-4deg) scale(.94)}50%{transform:rotate(4deg) scale(.94)}}
+@keyframes fp-icon-glide{0%,100%{transform:translate(0,1px) rotate(-3deg) scale(.92)}50%{transform:translate(2px,-2px) rotate(3deg) scale(.92)}}
+@media(prefers-reduced-motion:reduce){.std-categories .std-icon-motion{animation:none;transform:none}}

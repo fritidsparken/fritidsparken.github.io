@@ -1,6 +1,6 @@
 import {FlightPlayer} from './flight-player.mjs';
 import {BlenderPlayer} from './blender-player.mjs?v=all-1';
-import {models,categories} from './models.mjs?v=foldable-flight-1';
+import {models,categories} from './models.mjs?v=flight-clean-2';
 import {compile} from './geometry.mjs?v=pocket-1';
 import {PaperRenderer} from './renderer.mjs?v=layers-2';
 import {loadProgress,saveProgress} from './progress.mjs';

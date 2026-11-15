@@ -26,3 +26,5 @@ python origami/blender/encode-flight.py /tmp/glidaren-flight origami/assets/glid
 ```
 
 `--preview` renderar fem kontrollbilder. Paketeringen sparar `flight.mp4`, `flight.webp` och `flight.json` i modellens mediemapp samt det redigerbara `glidaren-flight.blend` här. Besökaren startar filmen med **Se planet flyga**; stängning återgår till samma viksteg.
+
+Flygscenen töms uttryckligen på alla objekt, inklusive dolda viksteg med synlighetsnycklar. Annars kan gamla papperspaneler blinka på marken. Kontrollera efter rendering med `blender -b --python-exit-code 1 --python "$PWD/origami/blender/validate-flight.py"`; den jämför slutmeshen och kontrollerar samma synliga objekt i alla 360 bildrutor.
