@@ -2,6 +2,8 @@ import {skateRoute} from './skate-room.mjs';
 export {SkateRoom} from './skate-room.mjs';
 const origins=new Set(['https://fritidsparken.se','https://www.fritidsparken.se']);
 const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const ROOM_TTL=30*24*60*60*1000; // Rensa världar som inte används på 30 dagar.
+
 const legacySettingsCell=r=>r.x===999999&&r.y===79&&r.z===999999&&(r.id===1||r.id===2);
 export const normalizeRoomCode=value=>String(value||'').trim().toUpperCase();
 export const validRoomCode=value=>/^[A-Z0-9-]{3,24}$/.test(value);
@@ -46,10 +48,12 @@ export class Room {
    owner=await this.ctx.blockConcurrencyWhile(async()=>{
     if(await this.ctx.storage.get('owner'))return null;
     const token=crypto.randomUUID();let s={};try{s=JSON.parse(req.headers.get('X-Settings')||'{}')}catch{}
-    await this.ctx.storage.put({owner:token,settings:settingsFrom(s)});return token;
+    await this.ctx.storage.put({owner:token,settings:settingsFrom(s),lastActivity:Date.now()});await this.ctx.storage.setAlarm(Date.now()+ROOM_TTL);return token;
    });
    if(!owner)return socketError('Koden används redan. Välj en annan kod eller gå med i världen.');
   }
+  // Gamla rum med tidigare serverversion får en städfrist från första återbesöket.
+  if(!(await this.ctx.storage.get('lastActivity'))){await this.ctx.storage.put('lastActivity',Date.now());await this.ctx.storage.setAlarm(Date.now()+ROOM_TTL)}
   const settings=await this.settings();
   if(req.headers.get('X-Protocol')!=='3'&&settings.mode==='survival')return socketError('Ladda om Blockvärlden för att gå med i den här överlevnadsvärlden.');
   const pair=new WebSocketPair(),ws=pair[1],id=crypto.randomUUID();
@@ -67,7 +71,7 @@ export class Room {
   if(!peer.joined){
    if(m.type!=='join')return ws.close(1008,'Join required');
    if(await this.ctx.storage.get('locked')&&m.owner!==await this.ctx.storage.get('owner')){ws.send(JSON.stringify({type:'error',message:'Världen är låst. Be skaparen att öppna den.'}));return ws.close(1008,'Locked')}
-   peer.joined=true;peer.name=playerName(m.name);peer.host=m.owner===await this.ctx.storage.get('owner');ws.serializeAttachment(peer);
+   await this.touch();peer.joined=true;peer.name=playerName(m.name);peer.host=m.owner===await this.ctx.storage.get('owner');ws.serializeAttachment(peer);
    const settings=await this.settings();let cells=[];
    for(const r of this.sql.exec('SELECT x,y,z,id FROM blocks')){if(legacySettingsCell(r))continue;cells.push([r.x,r.y,r.z,r.id]);if(cells.length===500){ws.send(JSON.stringify({type:'cells',cells}));cells=[]}}
    // Compatibility snapshot for older clients; new clients receive authoritative settings separately.
@@ -77,6 +81,11 @@ export class Room {
    ws.send(JSON.stringify({type:'ready',cells,settings}));
    for(const other of this.ctx.getWebSockets()){const p=other.deserializeAttachment();if(other!==ws&&p?.joined&&p.p)ws.send(JSON.stringify({type:'pose',id:p.id,name:p.name,p:p.p}))}
    return ws.send(JSON.stringify({type:'joined',settings,host:peer.host}));
+  }
+  if(m.type==='delete-room'&&peer.host){
+   this.broadcast({type:'room-deleted'});
+   for(const socket of this.ctx.getWebSockets())try{socket.close(1000,'World deleted')}catch{}
+   await this.ctx.storage.deleteAlarm();await this.ctx.storage.deleteAll();return;
   }
   if(m.type==='lock'&&peer.host){await this.ctx.storage.put('locked',!!m.value);this.broadcast({type:'locked',value:!!m.value});return}
   const now=Date.now();if(now-(peer.window||0)>1000){peer.window=now;peer.count=0}
@@ -89,14 +98,16 @@ export class Room {
    if(typeof m.key!=='string'||!/^(-?\d{1,7}),(-?\d{1,7})$/.test(m.key))return;
    const [x,z]=m.key.split(',').map(Number);if(Math.abs(x)>1e6||Math.abs(z)>1e6||m.key!==x+','+z)return;
    if([...this.sql.exec('SELECT key FROM harvested WHERE key=?',m.key)].length){ws.send(JSON.stringify({type:'harvest-denied',key:m.key}));return}
-   this.sql.exec('INSERT OR IGNORE INTO harvested VALUES(?)',m.key);this.broadcast({type:'harvest',key:m.key,id:peer.id});return;
+   this.sql.exec('INSERT OR IGNORE INTO harvested VALUES(?)',m.key);await this.touch();this.broadcast({type:'harvest',key:m.key,id:peer.id});return;
   }
   if(m.type!=='edit'||!Array.isArray(m.cell)||m.cell.length!==4||!m.cell.every(Number.isSafeInteger))return;
   const [x,y,z,id]=m.cell;
   if(Math.abs(x)>1e6||Math.abs(z)>1e6||y<1||y>=80||id<0||id>144)return;
   if(x===999999&&y===79&&z===999999)return;
-  this.sql.exec('INSERT OR REPLACE INTO blocks VALUES(?,?,?,?)',x,y,z,id);
+  this.sql.exec('INSERT OR REPLACE INTO blocks VALUES(?,?,?,?)',x,y,z,id);await this.touch();
   this.broadcast({type:'edit',cell:m.cell});
  }
+ async touch(){const previous=await this.ctx.storage.get('lastActivity')||0;if(Date.now()-previous>60*60*1000){await this.ctx.storage.put('lastActivity',Date.now());await this.ctx.storage.setAlarm(Date.now()+ROOM_TTL)}}
+ async alarm(){const last=await this.ctx.storage.get('lastActivity')||0;const remaining=last+ROOM_TTL-Date.now();if(remaining>0){await this.ctx.storage.setAlarm(Date.now()+remaining);return}for(const ws of this.ctx.getWebSockets())try{ws.close(1000,'Expired world')}catch{}await this.ctx.storage.deleteAlarm();await this.ctx.storage.deleteAll()}
  webSocketClose(ws){const peer=ws.deserializeAttachment();if(peer?.joined)this.broadcast({type:'leave',id:peer.id})}
 }
