@@ -8,7 +8,7 @@ const legacySettingsCell=r=>r.x===999999&&r.y===79&&r.z===999999&&(r.id===1||r.i
 export const normalizeRoomCode=value=>String(value||'').trim().toUpperCase();
 export const validRoomCode=value=>/^[A-Z0-9-]{3,24}$/.test(value);
 const settingsFrom=value=>({quiet:value?.quiet===true,mode:value?.mode==='survival'?'survival':'creative',difficulty:['Lätt','Normal','Utmanande'].includes(value?.difficulty)?value.difficulty:'Lätt'});
-const playerName=value=>String(value||'Spelare').replace(/[\u0000-\u001f\u007f]/g,'').trim().slice(0,20)||'Spelare';
+const playerName=value=>{const s=String(value||'Spelare').replace(/[\u0000-\u001f\u007f]/g,'').trim().slice(0,20);return /@|https?:|www\.|\d{7,}/i.test(s)?'Spelare':s||'Spelare'};
 function socketError(message){const pair=new WebSocketPair();pair[1].accept();pair[1].send(JSON.stringify({type:'error',message}));pair[1].close(1008,'Room unavailable');return new Response(null,{status:101,webSocket:pair[0]})}
 export default {
  async fetch(request,env){
@@ -23,6 +23,7 @@ export default {
   try{rawCode=decodeURIComponent(rawCode)}catch{return new Response('Invalid code',{status:400})}
   const code=path==='/create'?Array.from(crypto.getRandomValues(new Uint8Array(8)),b=>alphabet[b%32]).join(''):normalizeRoomCode(rawCode);
   if(!validRoomCode(code))return new Response('Invalid code',{status:400});
+  if(create&&code.length<8)return socketError('Nya världar behöver en rumskod med minst åtta tecken.');
   const settings=settingsFrom({quiet:url.searchParams.get('quiet')==='1',mode:url.searchParams.get('mode'),difficulty:url.searchParams.get('difficulty')});
   return env.ROOMS.get(env.ROOMS.idFromName(code)).fetch(request,{headers:{Upgrade:'websocket','X-Code':code,'X-Create':String(create),'X-Settings':JSON.stringify(settings),'X-Protocol':url.searchParams.get('v')==='3'?'3':'1'}});
  }
