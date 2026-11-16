@@ -1,0 +1,38 @@
+name: Assemble verified origami media
+on:
+  push:
+    branches: [work/origami-40]
+    paths: ['.github/workflows/origami-assemble.yml']
+permissions:
+  contents: write
+  actions: read
+jobs:
+  assemble:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/origami-40
+          sparse-checkout: |
+            origami
+            tests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 43941176068
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          pattern: origami-*
+          path: origami
+          merge-multiple: true
+      - name: Verify all 52 complete guides
+        run: node --test tests/origami-geometry.test.mjs tests/origami-renderer.test.mjs tests/origami-assets.test.mjs
+      - name: Save rendered assets to the work branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add origami/assets origami/blender/*.blend
+          git commit -m 'Assemble all 40 new Blender origami guides'
+          git pull --rebase origin work/origami-40
+          git push origin HEAD:work/origami-40
