@@ -13,7 +13,7 @@ export class PaperRenderer {
     svg.replaceChildren(defs);this.shadows=el('g',{filter:`url(#${this.id}-shadow)`,opacity:.18});this.paper=el('g');this.guides=el('g');this.decor=el('g');svg.append(this.shadows,this.paper,this.guides,this.decor);
   }
   project(p,layer=0){
-    const pitch=this.view==='top'?0:.43,yaw=this.view==='side'?.55:0;
+    const pitch=this.orbit?.pitch??(this.view==='top'?0:.43),yaw=this.orbit?.yaw??(this.view==='side'?.55:0);
     const x=p[0]*Math.cos(yaw)+p[2]*Math.sin(yaw),z=-p[0]*Math.sin(yaw)+p[2]*Math.cos(yaw)+layer*.08;
     return [x,p[1]*Math.cos(pitch)-z*Math.sin(pitch),z*Math.cos(pitch)+p[1]*Math.sin(pitch)];
   }
@@ -24,7 +24,7 @@ export class PaperRenderer {
     this.svg.setAttribute('viewBox',`${cx-extent/2} ${cy-extent/2} ${extent} ${extent}`);
     const paths=state.panels.map((p,i)=>{
       const offset=p.layerOffset||[0,0,i*.12];
-      const points=p.points.map(v=>this.project(v.map((n,j)=>n+offset[j]))),depth=p.points.reduce((s,v)=>s+v[2],0)/points.length+offset[2];
+      const points=p.points.map(v=>this.project(v.map((n,j)=>n+offset[j]))),depth=points.reduce((s,v)=>s+v[2],0)/points.length;
       let winding=0;points.forEach((v,j)=>{const q=points[(j+1)%points.length];winding+=v[0]*q[1]-q[0]*v[1];});
       // Winding follows the actual rotating paper normal; double-sided material.
       const front=(winding>=0)===(model?.paper.front!==false);
@@ -50,7 +50,7 @@ export class PaperRenderer {
         this.guides.append(el('path',{d:`M${p[0]} ${p[1]} Q${cx+dx/l*45} ${cy+dy/l*45} ${q[0]} ${q[1]}`,fill:'none',stroke:'#ffda82','stroke-width':3,'stroke-linecap':'round','marker-end':`url(#${this.id}-arrow)`}));
       }
     }
-    if(finished&&model?.face) {
+    if(finished&&model?.face&&(!this.orbit||Math.cos(this.orbit.pitch)*Math.cos(this.orbit.yaw)>0)) {
       const face=model.face;
       const mark=(x,y,r)=>{const p=this.project([x,y,2]);this.decor.append(el('circle',{cx:p[0],cy:p[1],r,fill:'#293b34'}));};
       if(face.marks){

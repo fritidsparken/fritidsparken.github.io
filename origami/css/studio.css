@@ -131,3 +131,5 @@ body.origami-page.dark .new-planes{background:var(--paper);color:var(--ink);bord
 #flight-dialog[open]{display:flex;flex-direction:column;gap:5px}
 #flight-video{min-height:0;flex:1;max-height:calc(100dvh - var(--banner-height,70px) - 170px)}
 @media(max-height:600px) and (orientation:landscape){#flight-video{max-height:calc(100dvh - var(--banner-height,70px) - 120px)}.flight-footer p{display:none}}
+
+#paper[tabindex]{cursor:grab}#paper[tabindex]:active{cursor:grabbing}.studio-toolbar{flex-wrap:wrap}#automatic[aria-pressed="true"]{background:#f0d68d;color:#183b2e}

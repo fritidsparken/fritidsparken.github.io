@@ -2,13 +2,14 @@ import {FlightPlayer} from './flight-player.mjs';
 import {BlenderPlayer} from './blender-player.mjs?v=all-1';
 import {models,categories} from './models.mjs?v=40-projects-1';
 import {compile} from './geometry.mjs?v=paper-40-1';
-import {PaperRenderer} from './renderer.mjs?v=marks-40-1';
+import {PaperRenderer} from './renderer.mjs?v=orbit-1';
 import {loadProgress,saveProgress} from './progress.mjs';
 const $=id=>document.getElementById(id),svgNS='http://www.w3.org/2000/svg';
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
 const colors=[['Honung','#edb852'],['Himmel','#78b5d3'],['Ros','#e58f9f'],['Lavendel','#a7a1d4'],['Salvia','#83b28b']];
 const cache=new Map();
 const compiled=m=>{if(!cache.has(m.id))cache.set(m.id,compile(m));return cache.get(m.id);};
+let automatic=false,autoTimer=0;
 let current=null,step=0,raf=0,playing=false,paused=false,preview=false,elapsed=0,last=0,speed=1,opener=null,paintState=null;
 const renderer=new PaperRenderer($('paper'));
 const blender=new BlenderPlayer($('blender-stage'));
@@ -34,19 +35,19 @@ function gallery(category='Alla') {
     const r=new PaperRenderer(svg,{thumbnail:true});r.color=m.color;r.view=m.category==='Pappersflygplan'?'side':'angle';r.draw(compiled(m).states.at(-1),{model:m,finished:true});
   }
 }
-function stop(){blender.stop();cancelAnimationFrame(raf);raf=0;playing=false;paused=false;$('pause').hidden=true;}
-function render(state,progress=1){paintState=state;if(renderMode==='blender'){blender.showState(current,preview?current.steps.length:step);return;}renderer.draw(state,{step:preview?null:current.steps[step-1],progress,model:current,finished:preview||step===current.steps.length});}
+function stop(keepAuto=false){clearTimeout(autoTimer);if(!keepAuto)automatic=false;blender.stop();cancelAnimationFrame(raf);raf=0;playing=false;paused=false;$('pause').hidden=true;}
+function render(state,progress=1){paintState=state;renderer.orbit=(preview||step===current.steps.length)&&!playing?orbit:null;if(renderMode==='blender'&&!renderer.orbit){blender.showState(current,preview?current.steps.length:step);return;}renderer.draw(state,{step:preview?null:current.steps[step-1],progress,model:current,finished:preview||step===current.steps.length});}
 function save(){const ok=saveProgress(current.id,step,renderer.color);$('saving').textContent=ok?'Sparas bara på den här enheten.':'Sparning är inte tillgänglig i den här webbläsaren.';}
 function update(){
   $('flight-launch').hidden=!current.flight;
-  const is3D=renderMode==='blender';$('paper').toggleAttribute('hidden',is3D);$('blender-stage').hidden=!is3D;$('render-choice').hidden=!current.blender;$('color-options').hidden=is3D;$('view-options').hidden=is3D;$('studio').classList.toggle('blender-mode',is3D);
+  const finished=(preview||step===current.steps.length)&&!playing;const is3D=renderMode==='blender'&&!finished;$('automatic').textContent=automatic?'■ Stoppa auto':'▶ Vik automatiskt';$('automatic').setAttribute('aria-pressed',String(automatic));$('paper').style.touchAction=finished?'none':'';$('paper').toggleAttribute('hidden',is3D);$('blender-stage').hidden=!is3D;$('render-choice').hidden=!current.blender;$('color-options').hidden=is3D;$('view-options').hidden=is3D;$('studio').classList.toggle('blender-mode',is3D);
   $('render-modes').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.render===renderMode)));
   const done=step===current.steps.length;
   $('step-count').textContent=preview?'Färdig modell':step===0?'Förbered':`Steg ${step} av ${current.steps.length}`;
   $('instruction').textContent=preview?'Så ser modellen ut när du är klar.':step===0?current.paper.label+(current.paper.front?' · Lägg den färgade sidan uppåt.':' · Lägg den vita sidan uppåt.'):current.steps[step-1].text;
   $('paper').setAttribute('aria-label',preview?'Den färdiga modellen: '+current.name:$('instruction').textContent);
   $('stage-label').textContent=preview||done?'DIN FÄRDIGA MODELL':playing?'TITTA PÅ VIKNINGEN':'VIK I DIN EGEN TAKT';
-  $('stage-hint').textContent=playing?'':preview?'':done?'Fint vikt!':step?'Gör likadant med ditt papper.':is3D?'Ta fram ditt papper.':'Välj en färg och ta fram ditt papper.';
+  $('stage-hint').textContent=finished?'Dra för att snurra · piltangenter fungerar också':playing?'':preview?'':done?'Fint vikt!':step?'Gör likadant med ditt papper.':is3D?'Ta fram ditt papper.':'Välj en färg och ta fram ditt papper.';
   $('back').disabled=playing||(!preview&&step===0);$('replay').disabled=playing||preview||step===0;$('next').disabled=playing;
   $('next').textContent=preview?'Tillbaka till guiden':done?'Klart! Välj något nytt ✓':step?'Okej, jag är klar →':'Börja vika →';
   $('result').textContent=preview?'Tillbaka till guiden':'Visa färdig modell';
@@ -56,11 +57,11 @@ function update(){
 }
 function showStep(){stop();preview=false;render(compiled(current).states[step]);update();}
 function animate(){
-  stop();preview=false;elapsed=0;last=0;
-  if(reduced.matches||$('less-motion').checked){render(compiled(current).states[step]);save();update();return;}
+  stop(true);preview=false;elapsed=0;last=0;
+  if(reduced.matches||$('less-motion').checked){finish();return;}
   playing=true;update();$('pause').textContent='Pausa';
   if(renderMode==='blender'){
-    blender.play(current,step,speed,()=>{stop();render(compiled(current).states[step]);save();update();},()=>{renderMode='svg';animate();$('saving').textContent='3D-klippet kunde inte laddas. Vikvyn visas istället.';});
+    blender.play(current,step,speed,()=>finish(),()=>{renderMode='svg';animate();$('saving').textContent='3D-klippet kunde inte laddas. Vikvyn visas istället.';});
     return;
   }
   const transition=compiled(current).transitions[step-1];
@@ -70,10 +71,18 @@ function animate(){
     if(!paused&&!document.hidden)elapsed+=(now-last)*speed;last=now;
     const t=Math.min(1,elapsed/2200),p=Math.min(1,Math.max(0,(t-.20)/.68)),e=p*p*(3-2*p);
     render(transition.sample(e),p);
-    if(t<1)raf=requestAnimationFrame(frame);else{stop();render(compiled(current).states[step]);save();update();}
+    if(t<1)raf=requestAnimationFrame(frame);else finish();
   }
   raf=requestAnimationFrame(frame);
 }
+function finish(){stop(true);if(step===current.steps.length)automatic=false;render(compiled(current).states[step]);save();update();if(automatic)autoTimer=setTimeout(()=>{if(document.hidden){finish();return;}step++;animate();},1000/speed);}
+$('automatic').onclick=()=>{if(automatic){stop();render(compiled(current).states[step]);update();return;}automatic=true;setPanel('paper');preview=false;if(step===current.steps.length)step=0;if(playing){update();return;}step++;animate();};
+const orbit={yaw:0,pitch:.43};let drag=null;
+$('paper').setAttribute('tabindex','0');
+$('paper').addEventListener('pointerdown',e=>{if(!renderer.orbit)return;drag=[e.clientX,e.clientY];$('paper').setPointerCapture(e.pointerId);});
+$('paper').addEventListener('pointermove',e=>{if(!drag||!renderer.orbit)return;orbit.yaw+=(e.clientX-drag[0])*.012;orbit.pitch+=(e.clientY-drag[1])*.012;drag=[e.clientX,e.clientY];render(paintState);});
+for(const type of ['pointerup','pointercancel','lostpointercapture'])$('paper').addEventListener(type,()=>drag=null);
+$('paper').addEventListener('keydown',e=>{if(!renderer.orbit||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();orbit.yaw+=e.key==='ArrowLeft'?-.15:e.key==='ArrowRight'?.15:0;orbit.pitch+=e.key==='ArrowUp'?-.15:e.key==='ArrowDown'?.15:0;render(paintState);});
 let activePanel='paper';
 function setPanel(panel){
   activePanel=panel;
@@ -85,7 +94,7 @@ function setPanel(panel){
 }
 $('settings-toggle').onclick=()=>{stop();setPanel(activePanel==='settings'?'paper':'settings');if(current){render(preview?compiled(current).states.at(-1):compiled(current).states[step]);update();}};
 $('info-toggle').onclick=()=>{stop();setPanel(activePanel==='info'?'paper':'info');if(current){render(preview?compiled(current).states.at(-1):compiled(current).states[step]);update();}};
-function open(model,button){stop();setPanel('paper');opener=button;current=model;renderMode=model.blender?'blender':'svg';preview=false;const saved=loadProgress(model.id,model.steps.length+1);step=saved?.step||0;renderer.color=saved?.color||model.color;renderer.view='angle';buildSwatches();
+function open(model,button){stop();setPanel('paper');opener=button;orbit.yaw=0;orbit.pitch=.43;current=model;renderMode=model.blender?'blender':'svg';preview=false;const saved=loadProgress(model.id,model.steps.length+1);step=saved?.step||0;renderer.color=saved?.color||model.color;renderer.view='angle';buildSwatches();
   $('views').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view==='angle')));
   $('studio-title').textContent=model.name;$('studio-category').textContent=model.category+' · '+model.level;$('material').textContent=model.materials;
   $('source').href=model.source.url;$('source').title=model.source.designer;$('studio').showModal();document.body.style.overflow='hidden';showStep();$('next').focus();
