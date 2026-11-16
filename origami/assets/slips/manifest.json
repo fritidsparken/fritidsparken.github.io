@@ -1,0 +1,19 @@
+{
+  "model": "Slips",
+  "source": "https://www.haradaeigo.com/origami/en/m/necktie/",
+  "tool": "Blender 4.3.2",
+  "engine": "Workbench",
+  "resolution": [
+    640,
+    640
+  ],
+  "fps": 24,
+  "framesPerStep": 48,
+  "steps": 9,
+  "paperThicknessMm": 0.11,
+  "generatedBy": [
+    "export-frames.mjs",
+    "render-glidaren.py",
+    "encode.py"
+  ]
+}

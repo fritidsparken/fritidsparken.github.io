@@ -1,0 +1,19 @@
+{
+  "model": "Pappersljus",
+  "source": "https://en.origami-club.com/xmas/candle2/zu.html",
+  "tool": "Blender 4.3.2",
+  "engine": "Workbench",
+  "resolution": [
+    640,
+    640
+  ],
+  "fps": 24,
+  "framesPerStep": 48,
+  "steps": 11,
+  "paperThicknessMm": 0.11,
+  "generatedBy": [
+    "export-frames.mjs",
+    "render-glidaren.py",
+    "encode.py"
+  ]
+}

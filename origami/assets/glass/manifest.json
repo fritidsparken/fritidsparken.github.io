@@ -1,0 +1,19 @@
+{
+  "model": "Glasstrut",
+  "source": "https://www.pinkstripeysocks.com/2016/03/how-to-fold-origami-ice-cream-cones.html",
+  "tool": "Blender 4.3.2",
+  "engine": "Workbench",
+  "resolution": [
+    640,
+    640
+  ],
+  "fps": 24,
+  "framesPerStep": 48,
+  "steps": 14,
+  "paperThicknessMm": 0.11,
+  "generatedBy": [
+    "export-frames.mjs",
+    "render-glidaren.py",
+    "encode.py"
+  ]
+}

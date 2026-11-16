@@ -1,0 +1,19 @@
+{
+  "model": "Fluga",
+  "source": "https://origami.guide/origami-animals/origami-insects/origami-fly/",
+  "tool": "Blender 4.3.2",
+  "engine": "Workbench",
+  "resolution": [
+    640,
+    640
+  ],
+  "fps": 24,
+  "framesPerStep": 48,
+  "steps": 16,
+  "paperThicknessMm": 0.11,
+  "generatedBy": [
+    "export-frames.mjs",
+    "render-glidaren.py",
+    "encode.py"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "model": "Pappersdrake",
+  "source": "https://origami.guide/beginner-origami/origami-folding-techniques/origami-kite-fold/",
+  "tool": "Blender 4.3.2",
+  "engine": "Workbench",
+  "resolution": [
+    640,
+    640
+  ],
+  "fps": 24,
+  "framesPerStep": 48,
+  "steps": 6,
+  "paperThicknessMm": 0.11,
+  "generatedBy": [
+    "export-frames.mjs",
+    "render-glidaren.py",
+    "encode.py"
+  ]
+}

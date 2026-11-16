@@ -1,0 +1,19 @@
+{
+  "model": "Enkel fjäril",
+  "source": "https://www.enchantedlearning.com/crafts/butterfly/origami/",
+  "tool": "Blender 4.3.2",
+  "engine": "Workbench",
+  "resolution": [
+    640,
+    640
+  ],
+  "fps": 24,
+  "framesPerStep": 48,
+  "steps": 7,
+  "paperThicknessMm": 0.11,
+  "generatedBy": [
+    "export-frames.mjs",
+    "render-glidaren.py",
+    "encode.py"
+  ]
+}
