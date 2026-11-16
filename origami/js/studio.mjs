@@ -1,6 +1,6 @@
 import {FlightPlayer} from './flight-player.mjs';
-import {BlenderPlayer} from './blender-player.mjs?v=all-1';
-import {models,categories} from './models.mjs?v=40-projects-1';
+import {BlenderPlayer} from './blender-player.mjs?v=continuous-1';
+import {models,categories} from './models.mjs?v=flight-fix-3';
 import {compile} from './geometry.mjs?v=paper-40-1';
 import {PaperRenderer} from './renderer.mjs?v=orbit-1';
 import {loadProgress,saveProgress} from './progress.mjs';
@@ -61,6 +61,7 @@ function animate(){
   if(reduced.matches||$('less-motion').checked){finish();return;}
   playing=true;update();$('pause').textContent='Pausa';
   if(renderMode==='blender'){
+    if(automatic){blender.playAll(current,step,speed,n=>{step=n;update();},()=>{step=current.steps.length;finish();},()=>{stop();render(compiled(current).states[step]);update();$('stage-hint').textContent='Hela filmen kunde inte laddas. Försök igen.';});return;}
     blender.play(current,step,speed,()=>finish(),()=>{renderMode='svg';animate();$('saving').textContent='3D-klippet kunde inte laddas. Vikvyn visas istället.';});
     return;
   }
@@ -94,7 +95,7 @@ function setPanel(panel){
 }
 $('settings-toggle').onclick=()=>{stop();setPanel(activePanel==='settings'?'paper':'settings');if(current){render(preview?compiled(current).states.at(-1):compiled(current).states[step]);update();}};
 $('info-toggle').onclick=()=>{stop();setPanel(activePanel==='info'?'paper':'info');if(current){render(preview?compiled(current).states.at(-1):compiled(current).states[step]);update();}};
-function open(model,button){stop();setPanel('paper');opener=button;orbit.yaw=0;orbit.pitch=.43;current=model;renderMode=model.blender?'blender':'svg';preview=false;const saved=loadProgress(model.id,model.steps.length+1);step=saved?.step||0;renderer.color=saved?.color||model.color;renderer.view='angle';buildSwatches();
+function open(model,button){stop();setPanel('paper');opener=button;orbit.yaw=0;orbit.pitch=.43;current=model;if(model.blender)blender.preload(model).catch(()=>{});renderMode=model.blender?'blender':'svg';preview=false;const saved=loadProgress(model.id,model.steps.length+1);step=saved?.step||0;renderer.color=saved?.color||model.color;renderer.view='angle';buildSwatches();
   $('views').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view==='angle')));
   $('studio-title').textContent=model.name;$('studio-category').textContent=model.category+' · '+model.level;$('material').textContent=model.materials;
   $('source').href=model.source.url;$('source').title=model.source.designer;$('studio').showModal();document.body.style.overflow='hidden';showStep();$('next').focus();

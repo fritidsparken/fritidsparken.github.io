@@ -1,0 +1,52 @@
+name: Build continuous origami and repair flight shadows
+on:
+  push:
+    branches: [work/origami-continuous]
+    paths: ['.github/workflows/origami-continuous.yml']
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/origami-continuous
+          sparse-checkout: |
+            origami
+            tests
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg python3-pil xvfb libxrender1 libxi6 libxxf86vm1 libxfixes3 libxkbcommon0 libegl1 libgl1 libsm6
+      - name: Load verified Blender
+        run: |
+          curl -fL --retry 4 --retry-all-errors --retry-delay 10 https://download.blender.org/release/Blender4.3/blender-4.3.2-linux-x64.tar.xz -o "$RUNNER_TEMP/blender.tar.xz"
+          echo "4da1c956673c0485e63054e563ee69198cc8f80d8157dd7592dffc8a6a5592e6  $RUNNER_TEMP/blender.tar.xz" | sha256sum -c -
+          mkdir "$RUNNER_TEMP/blender"
+          tar -xf "$RUNNER_TEMP/blender.tar.xz" --strip-components=1 -C "$RUNNER_TEMP/blender"
+      - name: Build all continuous folding films
+        run: python3 origami/blender/continuous.py
+      - name: Render three flights without unstable shadow volumes
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          for model in vapor arrowhead glidaren; do
+            xvfb-run -a "$RUNNER_TEMP/blender/blender" -b -t 4 --python-exit-code 1 --python "$PWD/origami/blender/repair-flight-shadows.py" -- "$PWD/origami/blender/$model-flight.blend" "$RUNNER_TEMP/$model-flight"
+            cp "origami/assets/$model/flight.json" "$RUNNER_TEMP/$model-flight/flight.json"
+            python3 origami/blender/encode-flight.py "$RUNNER_TEMP/$model-flight" "origami/assets/$model"
+          done
+      - run: node --test tests/origami-geometry.test.mjs tests/origami-renderer.test.mjs tests/origami-assets.test.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: continuous-and-flight
+          path: |
+            origami/assets/*/continuous.mp4
+            origami/assets/*/flight.mp4
+            origami/assets/*/flight.webp
+            origami/blender/*-flight.blend
+      - name: Save verified media
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add origami/assets origami/blender
+          git commit -m 'Build continuous folding films and remove flashing flight shadows'
+          git push origin HEAD:work/origami-continuous

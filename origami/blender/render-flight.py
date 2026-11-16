@@ -28,7 +28,7 @@ scene.animation_data_clear();scene.frame_start=1;scene.frame_end=360;scene.rende
 scene.render.engine='BLENDER_WORKBENCH';scene.display.render_aa=a.samples
 scene.render.resolution_x=960;scene.render.resolution_y=540;scene.render.resolution_percentage=100
 scene.render.image_settings.file_format='PNG';scene.render.image_settings.color_mode='RGB';scene.view_settings.view_transform='Standard'
-sh=scene.display.shading;sh.light='STUDIO';sh.studio_light='paint.sl';sh.studiolight_rotate_z=.3;sh.color_type='MATERIAL';sh.show_shadows=True;sh.shadow_intensity=.25;sh.show_cavity=True;sh.cavity_type='BOTH';sh.curvature_ridge_factor=1.1;sh.curvature_valley_factor=1.0;sh.show_specular_highlight=True
+sh=scene.display.shading;sh.light='STUDIO';sh.studio_light='paint.sl';sh.studiolight_rotate_z=.3;sh.color_type='MATERIAL';sh.show_shadows=False;sh.shadow_intensity=.25;sh.show_cavity=True;sh.cavity_type='BOTH';sh.curvature_ridge_factor=1.1;sh.curvature_valley_factor=1.0;sh.show_specular_highlight=True
 sh.background_type='WORLD';scene.world.color=(.68,.83,.87)
 plane=bpy.data.objects.new('Finished folded paper — unchanged geometry',mesh);scene.collection.objects.link(plane)
 plane.rotation_mode='QUATERNION'

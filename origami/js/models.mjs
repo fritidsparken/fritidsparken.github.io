@@ -97,5 +97,5 @@ models.unshift(...foldableModels,glider,buzz,raven,plane(true),plane(false));
 models.unshift(...animalsProjects,...facesProjects,...practicalProjects,...decorProjects,...objectsProjects);
 // Both renderers share these models and their complete step sequences.
 for(const model of models)model.blender={base:`./assets/${model.id}/`,frames:48,fps:24};
-for(const model of models)if(['glidaren','vapor','arrowhead'].includes(model.id))model.flight={video:`./assets/${model.id}/flight.mp4?v=2`,poster:`./assets/${model.id}/flight.webp?v=2`,duration:12};
+for(const model of models)if(['glidaren','vapor','arrowhead'].includes(model.id))model.flight={video:`./assets/${model.id}/flight.mp4?v=3`,poster:`./assets/${model.id}/flight.webp?v=3`,duration:12};
 export const categories=['Alla','Pappersflygplan','Djur','Blommor','Dekorationer','Högtider','Saker & leksaker'];

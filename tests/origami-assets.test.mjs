@@ -10,6 +10,7 @@ for(const model of models) {
     const dir=new URL(`../origami/${model.blender.base}`,import.meta.url);
     const manifest=JSON.parse(readFileSync(new URL('manifest.json',dir),'utf8'));
     assert.equal(manifest.steps,model.steps.length);
+    assert.equal(readFileSync(new URL('continuous.mp4',dir)).toString('ascii',4,8),'ftyp','Continuous autoplay film exists');
     assert.equal(manifest.model,model.name);
     assert.equal(manifest.fps,model.blender.fps);
     assert.equal(manifest.framesPerStep,model.blender.frames);
