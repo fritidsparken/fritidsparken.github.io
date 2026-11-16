@@ -76,3 +76,16 @@ test('Arrowhead pocket opens and closes over the tip without replacing any paper
   assert.ok(t.sample(.35).panels.find(cap).points.some(v=>v[2]>20),'Pocket visibly opens');
   for(const p of t.sample(.35).panels.filter(p=>!p.tags.includes('back-tip')))assert.deepEqual(p.points,byId.get(p.id).points,'Outer wings stay still');
 });
+
+test('in-plane rotations preserve the visible paper face and layer order',()=>{
+ const state=createTransition(initialState(models.find(m=>m.id==='katt')),{kind:'fold',line:[[0,-200],[0,200]],side:1}).sample(1);
+ const turned=createTransition(state,{kind:'turn',axis:[[0,0,0],[0,0,1]],angle:180}).sample(1);
+ assert.deepEqual(turned.panels.map(p=>[p.id,p.front]),state.panels.map(p=>[p.id,p.front]));
+ turned.panels.forEach((p,i)=>p.points.forEach((v,j)=>{close(v[0],-state.panels[i].points[j][0],'turn x');close(v[1],-state.panels[i].points[j][1],'turn y');}));
+});
+test('standing name-card layers rotate with the lifted paper',()=>{
+ const m=models.find(m=>m.id==='namnskylt'),c=compile(m),i=m.steps.findIndex(s=>s.kind==='fold'&&s.angle===120),f=m.steps[i];
+ const axis=[[0,0,0],[f.line[1][0]-f.line[0][0],f.line[1][1]-f.line[0][1],0]],state=c.states[i+1];
+ assert.ok(state.panels.some(p=>Math.abs(p.layerOffset?.[1]||0)>.01));
+ for(const p of state.panels.filter(p=>p.points.some(v=>Math.abs(v[2])>1e-6))){const back=rotatePoint(p.layerOffset,axis,-120*Math.PI/180*f.side*(f.direction??1));close(back[0],0,'offset x');close(back[1],0,'offset y');}
+});

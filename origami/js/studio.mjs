@@ -93,8 +93,8 @@ function open(model,button){stop();setPanel('paper');opener=button;current=model
 function close(){stop();$('studio').close();document.body.style.overflow='';const id=current?.id;const category=$('categories').querySelector('[aria-pressed=true]')?.textContent||'Alla';gallery(category);document.querySelector(`[data-model="${id}"]`)?.focus();}
 $('close').onclick=close;$('studio').addEventListener('cancel',e=>{e.preventDefault();close();});
 $('next').onclick=()=>{if(playing)return;setPanel('paper');if(preview){showStep();return;}if(step===current.steps.length){close();return;}step++;animate();};
-$('back').onclick=()=>{if(playing)return;if(preview){showStep();return;}step=Math.max(0,step-1);showStep();save();};
-$('replay').onclick=()=>{if(step&&!playing&&!preview)animate();};
+$('back').onclick=()=>{if(playing)return;setPanel('paper');if(preview){showStep();return;}step=Math.max(0,step-1);showStep();save();};
+$('replay').onclick=()=>{if(step&&!playing&&!preview){setPanel('paper');animate();}};
 $('pause').onclick=()=>{paused=!paused;if(renderMode==='blender')blender.pause(paused);last=0;$('pause').textContent=paused?'Fortsätt':'Pausa';};
 $('restart').onclick=()=>{setPanel('paper');step=0;showStep();save();};
 $('result').onclick=()=>{stop();setPanel('paper');preview=!preview;render(preview?compiled(current).states.at(-1):compiled(current).states[step]);update();};
