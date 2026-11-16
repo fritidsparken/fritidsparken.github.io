@@ -12,7 +12,7 @@ python origami/blender/encode.py /tmp/katt-render origami/assets/katt
 
 Renderingsskriptets historiska filnamn är kvar, men modellen väljs av JSON-indata. Standardmodell vid export utan modell-id är Glidaren. Python-paketeringen behöver Pillow och ffmpeg. `--preview` på renderingsskriptet gör granskningsbilder utan att bygga hela animationen. `--samples 8` ger snabbare kantutjämning; standard är 16 sampel. De 40 nya modellerna och Arrowhead använder 8 sampel; övriga tidigare modeller 16. Full körning sparar projektet i renderingsmappen; paketeringen kopierar det hit.
 
-Webbformat: en WebP-bild före första steget och efter varje steg, samt ett H.264-klipp per steg, 640×640, 24 fps och två sekunder. Endast aktuellt steg laddas. Det är förhandsrenderad Blender-animation, inte Blender eller WebGL som körs i besökarens webbläsare. Kamera och färg är fasta i denna vy. Den vanliga SVG-vikvyn delar exakt samma vikgeometri och behåller färg- och kameravalen. Växling mellan vyerna behåller aktuellt steg.
+Webbformat: en WebP-bild före första steget och efter varje steg, samt ett H.264-klipp per steg, 640×640, 24 fps och två sekunder. Manuell uppspelning laddar aktuellt steg. `python3 origami/blender/continuous.py` sammanfogar stegklippen utan omkodning till `continuous.mp4` per modell. Hela den valda modellens film förladdas när guiden öppnas. Automatisk vikning använder samma video och blob-URL genom samtliga steg, utan byten till stillbilder. Det är förhandsrenderad Blender-animation, inte Blender eller WebGL som körs i besökarens webbläsare. Kamera och färg är fasta i denna vy. Den vanliga SVG-vikvyn delar exakt samma vikgeometri och behåller färg- och kameravalen. Växling mellan vyerna behåller aktuellt steg.
 
 Kameran är fast under varje guide och anpassad till hela viksekvensens utsträckning. Fyrkantiga modeller visas mer ovanifrån så ansikten och former blir tydliga. Kattens och hundens ritade ansikten visas på slutsteget. Varje modell har källhänvisning i sin `manifest.json` och i guiden; egna geometrier och renderade bilder används. Fysisk provvikning och provflygning har inte genomförts.
 
@@ -32,3 +32,5 @@ Flygscenen töms uttryckligen på alla objekt, inklusive dolda viksteg med synli
 ## 40 nya projekt
 
 52 guider totalt. De nya projekten finns i `../js/projects/` med källor och variantbeskrivningar i `../../docs/origami-projects/`. Båda vyerna använder samma geometri. Ritade detaljer visas på slutsteget. Materialrutan anger när sax, penna, tejp eller klistermärke behövs.
+
+Flygfilmerna använder inte Workbench-skuggvolymer: de kan korsa kameran och bilda stora blinkande grå polygoner. `repair-flight-shadows.py` stänger av effekten i befintliga scener och renderar om alla 360 bildrutor med oförändrad geometri, flygbana och kamera.

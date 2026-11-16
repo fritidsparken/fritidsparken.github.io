@@ -1,3 +1,9 @@
+# Sammanhängande automatisk vikning och skuggfix, 2026-11-16
+
+Alla 52 guider har en sammanhängande Blender-film som laddas helt innan automatisk uppspelning. Samma video behålls mellan vikstegen. Längd och bildruteantal kontrollerade för samtliga 52 filmer. Chrome-kontroll: samma blob-URL genom flera steg, hela filmen buffrad, paus/fortsätt, stopp, omstart och automatisk övergång till snurrbar slutmodell. 170 automatiska tester godkända.
+
+Den stora grå polygonen i flygfilmerna kommer från Workbench-skuggvolymer. Effekten stängs av i samtliga tre flygscener; flygbana, kamera och pappersgeometri behålls.
+
 # Aktuellt tillägg – 40 nya guider och vikfönster utan scroll, 2026-11-16
 
 40 nya individuella projekt: åtta djur, åtta djuransikten, åtta praktiska papperssaker, åtta dekorationer och åtta saker/leksaker. Totalt 52 guider. Alla har vanlig SVG-vikvy och en egen Blender-modell med samma geometriska viksteg. De nya guiderna omfattar 488 steg. Källor, material, variantval och förenklingar finns i `origami-projects/`. Geometri, svenska instruktioner och bilder är egenproducerade.
