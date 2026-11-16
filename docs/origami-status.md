@@ -1,4 +1,16 @@
-# Aktuellt tillägg – Foldable Flight och flygfilmer 2026-11-15
+# Aktuellt tillägg – 40 nya guider och vikfönster utan scroll, 2026-11-16
+
+40 nya individuella projekt: åtta djur, åtta djuransikten, åtta praktiska papperssaker, åtta dekorationer och åtta saker/leksaker. Totalt 52 guider. Alla har vanlig SVG-vikvy och en egen Blender-modell med samma geometriska viksteg. De nya guiderna omfattar 488 steg. Källor, material, variantval och förenklingar finns i `origami-projects/`. Geometri, svenska instruktioner och bilder är egenproducerade.
+
+Vikfönstret har fast höjd inom den tillgängliga skärmen. Vikningen, instruktionen och navigeringen ryms tillsammans. Inställningar och material/källor visas i separata paneler i samma fönster; navigeringen ligger kvar. Tillbaka, Spela om, Nästa, Börja om och Visa färdig modell återgår till själva vikningen. Det går att växla mellan Vikvy och Blender utan att förlora steget. Flygspelaren anpassar också sin höjd.
+
+Kontrollerad skärmpassning i Chrome med 320×568, 390×844, 667×375, 844×390 och 1280×800: ingen intern scroll i vikdialogen eller inställningspanelen. Även materialrutan med lång titel och flygspelaren har kontrollerats på liten mobil. Det är webbläsarbaserad responsiv kontroll, inte test på en fysisk iPhone.
+
+170 automatiska tester godkända (geometri, SVG-rendering och fullständiga matchande mediefiler för samtliga 52 guider). Alla 488 nya H.264-klipp verifierade: 640×640, 24 fps, 48 bildrutor, två sekunder och yuv420p. Alla 528 nya WebP-bilder avkodade. 40 redigerbara Blender-projekt finns i `origami/blender/`. Slutbilderna för alla 40 granskade tillsammans; representativa guider i samtliga grupper kontrollerade i båda vyerna i Chrome. Valens och namnskyltens Blender-uppspelning kontrollerad. Mobilbild: `origami-projects/mobile-dialog.jpg`.
+
+Geometritesterna kontrollerar: vikgeometri, bevarad pappersyta/panellängd, lagerordning efter rotation och SVG-rendering inklusive ritade detaljer. Den stående namnskylten behåller lageravstånd genom en delvis öppen vikning. Fysisk provvikning har inte genomförts; matematisk geometri är ingen generell kollisionssimulering.
+
+# Föregående tillägg – Foldable Flight och flygfilmer 2026-11-15
 
 Vapor (21 steg) och Arrowhead (24 steg), efter Kyle Boyers Foldable Flight-guider, har lagts till med egna svenska instruktioner, A4-geometri och Blender-projekt. Totalt finns nu tolv modeller, varav sju flygplan. Alla har både vanlig vikvy och Blender 3D. Källor och anpassningar dokumenteras i `origami-flight-sources.md`.
 
