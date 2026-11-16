@@ -34,7 +34,7 @@ export function initialState(model) {
   return {panels:[{id:'paper',points,tags:[],front:model.paper.front!==false}],creases:[]};
 }
 function matches(panel,selection) {
-  return !selection || ((!selection.has||panel.tags.includes(selection.has))&&(!selection.all||selection.all.every(tag=>panel.tags.includes(tag)))&&(!selection.not||!panel.tags.includes(selection.not)));
+  return !selection || ((!selection.has||panel.tags.includes(selection.has))&&(!selection.all||selection.all.every(tag=>panel.tags.includes(tag)))&&(!selection.none||selection.none.every(tag=>!panel.tags.includes(tag)))&&(!selection.not||!panel.tags.includes(selection.not)));
 }
 function splitFold(state,step) {
   const fixed=[],moving=[];
@@ -50,17 +50,22 @@ function splitFold(state,step) {
 }
 export function createTransition(state,step) {
   if(step.kind==='fold') {
-    const {fixed,moving}=splitFold(state,step),angle=(step.angle??180)*Math.PI/180*step.side*(step.direction??1);
+    const partial=step.angle!=null&&Math.abs(step.angle%180)>EPS;
+    const input=partial?{...state,panels:state.panels.map((p,i)=>({...p,layerOffset:p.layerOffset||[0,0,i*.18]}))}:state;
+    const {fixed,moving}=splitFold(input,step),angle=(step.angle??180)*Math.PI/180*step.side*(step.direction??1);
+    const offsetAxis=[[0,0,0],[step.line[1][0]-step.line[0][0],step.line[1][1]-step.line[0][1],0]];
     return {step,sample(t){
-      const rotated=moving.map(p=>({...p,points:p.points.map(v=>rotatePoint(v,step.line,angle*t)),front:t===1&&!step.angle?!p.front:p.front}));
+      const rotated=moving.map(p=>({...p,points:p.points.map(v=>rotatePoint(v,step.line,angle*t)),front:t===1&&!step.angle?!p.front:p.front,...(partial?{layerOffset:rotatePoint(p.layerOffset,offsetAxis,angle*t)}:{})}));
       // Paper is stacked bottom to top. Valley folds reverse moving layer order.
-      const panels=t===1?(step.direction===-1?[...rotated.reverse(),...fixed]:[...fixed,...rotated.reverse()]):[...fixed,...rotated];
+      const panels=t===1&&!partial?(step.direction===-1?[...rotated.reverse(),...fixed]:[...fixed,...rotated.reverse()]):[...fixed,...rotated];
       return {panels,creases:state.creases};
     }};
   }
   if(step.kind==='turn') {
     const axis=step.axis||[[0,-300],[0,300]],angle=(step.angle??180)*Math.PI/180;
-    return {step,sample(t){return {panels:(t===1?[...state.panels].reverse():state.panels).map(p=>({...p,points:p.points.map(v=>rotatePoint(v,axis,angle*t)),...(p.layerOffset?{layerOffset:rotatePoint(p.layerOffset,[[0,0,0],[axis[1][0]-axis[0][0],axis[1][1]-axis[0][1],0]],angle*t)}:{}),front:t===1?!p.front:p.front})),creases:[]};}};
+    const offsetAxis=[[0,0,0],[axis[1][0]-axis[0][0],axis[1][1]-axis[0][1],(axis[1][2]||0)-(axis[0][2]||0)]];
+    const inverted=rotatePoint([0,0,1],offsetAxis,angle)[2]<-EPS;
+    return {step,sample(t){return {panels:(t===1&&inverted?[...state.panels].reverse():state.panels).map(p=>({...p,points:p.points.map(v=>rotatePoint(v,axis,angle*t)),...(p.layerOffset?{layerOffset:rotatePoint(p.layerOffset,offsetAxis,angle*t)}:{}),front:t===1&&inverted?!p.front:p.front})),creases:[]};}};
   }
   if(step.kind==='tuck') {
     // Open the folded pocket, guide the existing tip inside, then close the cap.

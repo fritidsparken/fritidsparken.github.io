@@ -53,7 +53,12 @@ export class PaperRenderer {
     if(finished&&model?.face) {
       const face=model.face;
       const mark=(x,y,r)=>{const p=this.project([x,y,2]);this.decor.append(el('circle',{cx:p[0],cy:p[1],r,fill:'#293b34'}));};
-      mark(-face.eyes,face.y,3.2);mark(face.eyes,face.y,3.2);mark(0,face.y+16,3.5);
+      if(face.marks){
+        for(const m of face.marks){
+          const points=m.points||Array.from({length:48},(_,i)=>[m.x+m.rx*Math.cos(i*Math.PI/24),m.y+m.ry*Math.sin(i*Math.PI/24)]);
+          this.decor.append(el('polygon',{points:points.map(([x,y])=>this.project([x,y,2]).slice(0,2).join(',')).join(' '),fill:m.fill||'#293b34'}));
+        }
+      } else {mark(-face.eyes,face.y,3.2);mark(face.eyes,face.y,3.2);mark(0,face.y+16,3.5);}
     }
   }
 }

@@ -55,3 +55,79 @@ body.origami-page.dark .new-planes{background:var(--paper);color:var(--ink);bord
 #flight-status{min-height:16px;margin:6px 0;color:#d4dfc5;font-size:11px;text-align:center}.flight-footer{display:flex;align-items:center;justify-content:flex-end;gap:9px}.flight-footer p{margin:0 auto 0 0;color:#c4d5ba;font-size:12px}.flight-footer button{flex:none}
 @media(max-width:600px) and (orientation:portrait){.flight-launch{font-size:10px;padding:8px 10px;top:8px;right:8px}#flight-dialog{padding:12px}.flight-heading h2{font-size:21px}.flight-footer{flex-wrap:wrap;justify-content:center}.flight-footer p{flex:1 0 100%;text-align:center;margin:0 0 4px;font-size:11px}.flight-footer button{min-height:36px}}
 @media(max-height:520px) and (orientation:landscape){.flight-launch{font-size:9px;padding:6px 9px;top:6px;right:6px}#flight-dialog{padding:10px}.flight-heading{margin-bottom:5px}.flight-heading h2{font-size:18px}.flight-heading .eyebrow{display:none}.flight-heading .icon-button{height:28px;width:28px}.flight-footer p{font-size:10px}#flight-video{max-height:calc(100dvh - var(--banner-height,70px) - 130px)}#flight-status{min-height:12px;font-size:10px;margin:4px 0}.flight-footer button{min-height:28px;font-size:10px}}
+
+/* A fixed-height guide: optional controls replace the stage instead of scrolling. */
+#studio{overflow:hidden}
+#studio[open]{gap:8px}
+.studio-toolbar{display:flex;align-items:center;gap:8px;flex:none;min-width:0}
+.studio-toolbar .render-choice{flex-direction:row;align-items:center;gap:8px;margin-right:auto}
+.studio-toolbar .option-label{white-space:nowrap}
+.studio-toolbar .quiet-button{white-space:nowrap}
+#studio .studio-body{display:flex;min-height:0;overflow:hidden}
+#studio .paper-stage{flex:1;width:100%;min-height:0}
+#studio .studio-options{width:100%;overflow:hidden;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 20px;align-content:center;padding:10px 18px;background:#214936;border-radius:14px}
+#studio .studio-options .option-group{gap:5px;min-width:0}
+#studio .studio-options #view-options{grid-column:auto;flex-direction:column;align-items:stretch}
+#studio .studio-options .motion-setting{grid-column:auto;justify-content:flex-start}
+#studio .studio-options .views{flex-wrap:wrap}
+#studio .studio-options .swatches{flex-wrap:nowrap}
+#studio .studio-options :is(#result,#restart){align-self:center}
+#studio .studio-info{width:100%;padding:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px;background:#214936;border-radius:14px;min-height:0;overflow:hidden}
+#studio .studio-info h3{margin:0;font-size:18px}
+#studio #material{display:block;font-size:14px;max-width:660px}
+#studio #source{display:inline;font-size:12px}
+#studio .studio-controls{flex-wrap:nowrap}
+#studio .studio-controls button.primary{min-width:0}
+#studio .instruction-row{min-height:0;gap:3px}
+#studio #instruction{max-width:950px;font-size:clamp(12px,1.35vw,16px)}
+#studio #saving{display:none}
+@media(max-width:600px) and (orientation:portrait){
+ #studio{padding:10px;gap:7px!important}
+ #studio .studio-heading h2{font-size:18px}
+ #studio .studio-heading .eyebrow{font-size:8px;letter-spacing:.5px}
+ .studio-toolbar{gap:5px;flex-wrap:wrap}
+ .studio-toolbar .render-choice{width:100%;flex:none;margin:0;justify-content:space-between}
+ .studio-toolbar .render-choice .option-label{font-size:10px}
+ .studio-toolbar>.quiet-button{flex:1;min-height:32px;font-size:11px}
+ .studio-toolbar .render-choice .views{flex:1;max-width:220px}
+ #studio .studio-options{grid-template-columns:1fr 1fr;padding:10px;gap:12px}
+ #studio .studio-options #view-options{grid-column:1/-1}
+ #studio .studio-options .motion-setting{grid-column:1/-1}
+ #studio .studio-controls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}
+ #studio .studio-controls .primary{grid-column:1/-1;width:100%;min-height:40px}
+ #studio .studio-controls button{min-height:36px;padding:6px 8px;font-size:11px}
+ #studio .studio-info{padding:12px;gap:9px}
+ #studio #material{font-size:12px}
+ #studio #source{font-size:11px}
+}
+@media(max-height:600px) and (orientation:landscape){
+ #studio{padding:7px 10px;gap:5px!important;inset:calc(var(--banner-height,58px) + 3px) 5px 3px;height:calc(100dvh - var(--banner-height,58px) - 6px)}
+ #studio .studio-heading{min-height:28px;gap:9px}
+ #studio .studio-heading h2{font-size:16px}
+ #studio .studio-heading .eyebrow{display:none}
+ #studio .icon-button{width:28px;height:28px}
+ #studio .studio-toolbar{gap:6px}
+ #studio .studio-toolbar .option-label{display:none}
+ #studio .studio-toolbar .render-choice{gap:0;flex-direction:row;flex:1;margin-right:auto}
+ #studio .studio-toolbar .render-choice .views{max-width:220px;width:100%;flex:1}
+ #studio .studio-toolbar .views button,#studio .studio-toolbar>.quiet-button{min-height:28px;padding:4px 10px;font-size:10px}
+ #studio .studio-options{grid-template-columns:repeat(3,minmax(0,1fr));padding:6px 10px;gap:6px 12px;align-content:center}
+ #studio .studio-options .option-label{font-size:9px}
+ #studio .studio-options .option-group{gap:3px}
+ #studio .studio-options :is(.views button,.quiet-button,select){font-size:10px;min-height:27px;padding:4px 6px}
+ #studio .studio-options .motion-setting{font-size:10px;min-height:22px}
+ #studio .studio-options #view-options{grid-column:auto}
+ #studio .studio-options .swatches button{width:22px;height:22px}
+ #studio .studio-info{padding:6px 14px;gap:5px}
+ #studio .studio-info h3{font-size:14px}
+ #studio #material{font-size:12px;line-height:1.35}
+ #studio #source{font-size:10px}
+ #studio #instruction{font-size:12px;line-height:1.25}
+ #studio .studio-controls button{min-height:32px;padding:5px 12px;font-size:11px}
+ #studio .stage-label,#studio .stage-hint{display:none}
+ #studio .flight-launch{padding:5px 9px;font-size:10px}
+}
+#flight-dialog{overflow:hidden;max-height:calc(100dvh - var(--banner-height,70px) - 14px)}
+#flight-dialog[open]{display:flex;flex-direction:column;gap:5px}
+#flight-video{min-height:0;flex:1;max-height:calc(100dvh - var(--banner-height,70px) - 170px)}
+@media(max-height:600px) and (orientation:landscape){#flight-video{max-height:calc(100dvh - var(--banner-height,70px) - 120px)}.flight-footer p{display:none}}

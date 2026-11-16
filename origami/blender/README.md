@@ -10,7 +10,7 @@ blender -b -t 3 --python-exit-code 1 --python "$PWD/origami/blender/render-glida
 python origami/blender/encode.py /tmp/katt-render origami/assets/katt
 ```
 
-Renderingsskriptets historiska filnamn är kvar, men modellen väljs av JSON-indata. Standardmodell vid export utan modell-id är Glidaren. Python-paketeringen behöver Pillow och ffmpeg. `--preview` på renderingsskriptet gör granskningsbilder utan att bygga hela animationen. `--samples 8` ger snabbare kantutjämning; standard är 16 sampel. Arrowhead använder 8, övriga publicerade modeller 16. Full körning sparar projektet i renderingsmappen; paketeringen kopierar det hit.
+Renderingsskriptets historiska filnamn är kvar, men modellen väljs av JSON-indata. Standardmodell vid export utan modell-id är Glidaren. Python-paketeringen behöver Pillow och ffmpeg. `--preview` på renderingsskriptet gör granskningsbilder utan att bygga hela animationen. `--samples 8` ger snabbare kantutjämning; standard är 16 sampel. De 40 nya modellerna och Arrowhead använder 8 sampel; övriga tidigare modeller 16. Full körning sparar projektet i renderingsmappen; paketeringen kopierar det hit.
 
 Webbformat: en WebP-bild före första steget och efter varje steg, samt ett H.264-klipp per steg, 640×640, 24 fps och två sekunder. Endast aktuellt steg laddas. Det är förhandsrenderad Blender-animation, inte Blender eller WebGL som körs i besökarens webbläsare. Kamera och färg är fasta i denna vy. Den vanliga SVG-vikvyn delar exakt samma vikgeometri och behåller färg- och kameravalen. Växling mellan vyerna behåller aktuellt steg.
 
@@ -28,3 +28,7 @@ python origami/blender/encode-flight.py /tmp/glidaren-flight origami/assets/glid
 `--preview` renderar fem kontrollbilder. Paketeringen sparar `flight.mp4`, `flight.webp` och `flight.json` i modellens mediemapp samt det redigerbara `glidaren-flight.blend` här. Besökaren startar filmen med **Se planet flyga**; stängning återgår till samma viksteg.
 
 Flygscenen töms uttryckligen på alla objekt, inklusive dolda viksteg med synlighetsnycklar. Annars kan gamla papperspaneler blinka på marken. Kontrollera efter rendering med `blender -b --python-exit-code 1 --python "$PWD/origami/blender/validate-flight.py"`; den jämför slutmeshen och kontrollerar samma synliga objekt i alla 360 bildrutor.
+
+## 40 nya projekt
+
+52 guider totalt. De nya projekten finns i `../js/projects/` med källor och variantbeskrivningar i `../../docs/origami-projects/`. Båda vyerna använder samma geometri. Ritade detaljer visas på slutsteget. Materialrutan anger när sax, penna, tejp eller klistermärke behövs.

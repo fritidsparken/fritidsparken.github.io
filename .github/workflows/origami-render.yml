@@ -1,0 +1,105 @@
+name: Build 40 origami Blender guides
+on:
+  push:
+    branches: [work/origami-40]
+    paths:
+      - 'origami/js/projects/**'
+      - 'origami/js/geometry.mjs'
+      - 'origami/blender/*.py'
+      - 'origami/blender/*.mjs'
+      - '.github/workflows/origami-render.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  catalogue:
+    runs-on: ubuntu-24.04
+    outputs:
+      models: ${{ steps.models.outputs.models }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            origami/js
+            tests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --test tests/origami-geometry.test.mjs tests/origami-renderer.test.mjs
+      - id: models
+        run: |
+          node --input-type=module -e 'import {models} from "./origami/js/models.mjs"; console.log("models="+JSON.stringify(models.slice(0,40).map(m=>m.id)))' >> "$GITHUB_OUTPUT"
+  render:
+    needs: catalogue
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        model: ${{ fromJSON(needs.catalogue.outputs.models) }}
+    env:
+      MODEL: ${{ matrix.model }}
+      LIBGL_ALWAYS_SOFTWARE: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            origami/js
+            origami/blender
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install rendering dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg python3-pil xvfb libxrender1 libxi6 libxxf86vm1 libxfixes3 libxkbcommon0 libegl1 libgl1 libsm6
+      - name: Get verified Blender 4.3.2
+        run: |
+          curl -fL --retry 3 https://download.blender.org/release/Blender4.3/blender-4.3.2-linux-x64.tar.xz -o "$RUNNER_TEMP/blender.tar.xz"
+          echo "4da1c956673c0485e63054e563ee69198cc8f80d8157dd7592dffc8a6a5592e6  $RUNNER_TEMP/blender.tar.xz" | sha256sum -c -
+          mkdir "$RUNNER_TEMP/blender"
+          tar -xf "$RUNNER_TEMP/blender.tar.xz" --strip-components=1 -C "$RUNNER_TEMP/blender"
+      - name: Render every folding step and save editable Blender model
+        run: |
+          node origami/blender/export-frames.mjs "$RUNNER_TEMP/model.json" "$MODEL"
+          xvfb-run -a "$RUNNER_TEMP/blender/blender" -b -t 2 --python-exit-code 1 --python "$PWD/origami/blender/render-glidaren.py" -- --input "$RUNNER_TEMP/model.json" --out "$RUNNER_TEMP/render" --samples 8
+          python3 origami/blender/encode.py "$RUNNER_TEMP/render" "origami/assets/$MODEL"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: origami-${{ matrix.model }}
+          path: |
+            origami/assets/${{ matrix.model }}/
+            origami/blender/${{ matrix.model }}.blend
+          retention-days: 14
+          if-no-files-found: error
+  assemble:
+    needs: render
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/origami-40
+          sparse-checkout: |
+            origami
+            tests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: origami-*
+          path: origami
+          merge-multiple: true
+      - name: Verify all 52 complete guides
+        run: node --test tests/origami-geometry.test.mjs tests/origami-renderer.test.mjs tests/origami-assets.test.mjs
+      - name: Save rendered assets to the work branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add origami/assets origami/blender/*.blend
+          git commit -m 'Build all 40 new Blender origami guides'
+          git pull --rebase origin work/origami-40
+          git push origin HEAD:work/origami-40

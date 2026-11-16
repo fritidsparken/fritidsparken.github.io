@@ -7,7 +7,7 @@ const close=(a,b,label)=>assert.ok(Math.abs(a-b)<1e-6,`${label}: ${a} ≠ ${b}`)
 const lengths=p=>p.points.map((v,i)=>Math.hypot(...v.map((x,j)=>x-p.points[(i+1)%p.points.length][j])));
 for(const model of models){
   test(`${model.id}: every animation preserves paper area and panel edge lengths`,()=>{
-    const result=compile(model),expected=model.paper.width*model.paper.height;
+    const result=compile(model),expected=model.paper.area??model.paper.width*model.paper.height;
     close(area(initialState(model)),expected,'initial sheet');
     for(const [i,t] of result.transitions.entries()) {
       const start=t.sample(0);close(area(start),expected,`start ${i}`);

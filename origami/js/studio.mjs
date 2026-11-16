@@ -1,8 +1,8 @@
 import {FlightPlayer} from './flight-player.mjs';
 import {BlenderPlayer} from './blender-player.mjs?v=all-1';
-import {models,categories} from './models.mjs?v=flight-clean-2';
-import {compile} from './geometry.mjs?v=pocket-1';
-import {PaperRenderer} from './renderer.mjs?v=layers-2';
+import {models,categories} from './models.mjs?v=40-projects-1';
+import {compile} from './geometry.mjs?v=paper-40-1';
+import {PaperRenderer} from './renderer.mjs?v=marks-40-1';
 import {loadProgress,saveProgress} from './progress.mjs';
 const $=id=>document.getElementById(id),svgNS='http://www.w3.org/2000/svg';
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
@@ -39,11 +39,11 @@ function render(state,progress=1){paintState=state;if(renderMode==='blender'){bl
 function save(){const ok=saveProgress(current.id,step,renderer.color);$('saving').textContent=ok?'Sparas bara på den här enheten.':'Sparning är inte tillgänglig i den här webbläsaren.';}
 function update(){
   $('flight-launch').hidden=!current.flight;
-  const is3D=renderMode==='blender';$('paper').toggleAttribute('hidden',is3D);$('blender-stage').hidden=!is3D;$('render-choice').hidden=!current.blender;$('color-options').hidden=is3D;$('view-options').hidden=is3D;$('render-note').hidden=!is3D;$('studio').classList.toggle('blender-mode',is3D);
+  const is3D=renderMode==='blender';$('paper').toggleAttribute('hidden',is3D);$('blender-stage').hidden=!is3D;$('render-choice').hidden=!current.blender;$('color-options').hidden=is3D;$('view-options').hidden=is3D;$('studio').classList.toggle('blender-mode',is3D);
   $('render-modes').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.render===renderMode)));
   const done=step===current.steps.length;
   $('step-count').textContent=preview?'Färdig modell':step===0?'Förbered':`Steg ${step} av ${current.steps.length}`;
-  $('instruction').textContent=preview?'Så ser modellen ut när du är klar.':step===0?current.paper.label+' · Lägg den vita sidan uppåt.':current.steps[step-1].text;
+  $('instruction').textContent=preview?'Så ser modellen ut när du är klar.':step===0?current.paper.label+(current.paper.front?' · Lägg den färgade sidan uppåt.':' · Lägg den vita sidan uppåt.'):current.steps[step-1].text;
   $('paper').setAttribute('aria-label',preview?'Den färdiga modellen: '+current.name:$('instruction').textContent);
   $('stage-label').textContent=preview||done?'DIN FÄRDIGA MODELL':playing?'TITTA PÅ VIKNINGEN':'VIK I DIN EGEN TAKT';
   $('stage-hint').textContent=playing?'':preview?'':done?'Fint vikt!':step?'Gör likadant med ditt papper.':is3D?'Ta fram ditt papper.':'Välj en färg och ta fram ditt papper.';
@@ -74,19 +74,30 @@ function animate(){
   }
   raf=requestAnimationFrame(frame);
 }
-function open(model,button){stop();opener=button;current=model;renderMode=model.blender?'blender':'svg';preview=false;const saved=loadProgress(model.id,model.steps.length+1);step=saved?.step||0;renderer.color=saved?.color||model.color;renderer.view='angle';buildSwatches();
+let activePanel='paper';
+function setPanel(panel){
+  activePanel=panel;
+  document.querySelector('.paper-stage').hidden=panel!=='paper';
+  $('studio-settings').hidden=panel!=='settings';$('studio-info').hidden=panel!=='info';
+  for(const [id,name] of [['settings','Inställningar'],['info','Material & källa']]){
+    const button=$(id+'-toggle');button.setAttribute('aria-expanded',String(panel===id));button.textContent=panel===id?'Till vikningen':name;
+  }
+}
+$('settings-toggle').onclick=()=>{stop();setPanel(activePanel==='settings'?'paper':'settings');if(current){render(preview?compiled(current).states.at(-1):compiled(current).states[step]);update();}};
+$('info-toggle').onclick=()=>{stop();setPanel(activePanel==='info'?'paper':'info');if(current){render(preview?compiled(current).states.at(-1):compiled(current).states[step]);update();}};
+function open(model,button){stop();setPanel('paper');opener=button;current=model;renderMode=model.blender?'blender':'svg';preview=false;const saved=loadProgress(model.id,model.steps.length+1);step=saved?.step||0;renderer.color=saved?.color||model.color;renderer.view='angle';buildSwatches();
   $('views').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view==='angle')));
   $('studio-title').textContent=model.name;$('studio-category').textContent=model.category+' · '+model.level;$('material').textContent=model.materials;
   $('source').href=model.source.url;$('source').title=model.source.designer;$('studio').showModal();document.body.style.overflow='hidden';showStep();$('next').focus();
 }
 function close(){stop();$('studio').close();document.body.style.overflow='';const id=current?.id;const category=$('categories').querySelector('[aria-pressed=true]')?.textContent||'Alla';gallery(category);document.querySelector(`[data-model="${id}"]`)?.focus();}
 $('close').onclick=close;$('studio').addEventListener('cancel',e=>{e.preventDefault();close();});
-$('next').onclick=()=>{if(playing)return;if(preview){showStep();return;}if(step===current.steps.length){close();return;}step++;animate();};
+$('next').onclick=()=>{if(playing)return;setPanel('paper');if(preview){showStep();return;}if(step===current.steps.length){close();return;}step++;animate();};
 $('back').onclick=()=>{if(playing)return;if(preview){showStep();return;}step=Math.max(0,step-1);showStep();save();};
 $('replay').onclick=()=>{if(step&&!playing&&!preview)animate();};
 $('pause').onclick=()=>{paused=!paused;if(renderMode==='blender')blender.pause(paused);last=0;$('pause').textContent=paused?'Fortsätt':'Pausa';};
-$('restart').onclick=()=>{step=0;showStep();save();};
-$('result').onclick=()=>{stop();preview=!preview;render(preview?compiled(current).states.at(-1):compiled(current).states[step]);update();};
+$('restart').onclick=()=>{setPanel('paper');step=0;showStep();save();};
+$('result').onclick=()=>{stop();setPanel('paper');preview=!preview;render(preview?compiled(current).states.at(-1):compiled(current).states[step]);update();};
 $('speed').onchange=e=>{speed=Number(e.target.value);blender.setSpeed(speed);};
 $('render-modes').onclick=e=>{const b=e.target.closest('[data-render]');if(!b||b.dataset.render===renderMode)return;stop();renderMode=b.dataset.render;render(preview?compiled(current).states.at(-1):compiled(current).states[step]);update();};
 $('less-motion').checked=reduced.matches;
@@ -101,4 +112,4 @@ reduced.addEventListener('change',()=>{if(playing&&reduced.matches){stop();rende
 gallery();
 const requested=new URLSearchParams(location.search).get('model');
 if(requested){const model=models.find(m=>m.id===requested);if(model)open(model,document.querySelector(`[data-model="${model.id}"]`));}
-const hero=new PaperRenderer($('hero-paper'),{thumbnail:true}),heroModel=models[0];hero.color='#edb852';hero.view='side';hero.draw(compiled(heroModel).states.at(-1),{model:heroModel,finished:true});
+const hero=new PaperRenderer($('hero-paper'),{thumbnail:true}),heroModel=models.find(m=>m.id==='glidaren');hero.color='#edb852';hero.view='side';hero.draw(compiled(heroModel).states.at(-1),{model:heroModel,finished:true});

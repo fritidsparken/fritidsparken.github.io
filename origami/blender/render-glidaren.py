@@ -47,7 +47,7 @@ floor=bpy.context.object;floor.name='Shadow-catching backdrop';floor.data.materi
 bpy.ops.object.camera_add(location=(.24,-.46,.64))
 camera=bpy.context.object;camera.name='Folding camera';target=Vector((0,-.015,.015))
 camera.rotation_euler=(target-camera.location).to_track_quat('-Z','Y').to_euler()
-camera.data.type='ORTHO';camera.data.ortho_scale=.44;camera.data.lens=50
+camera.data.type='ORTHO';camera.data.ortho_scale=.44;camera.data.lens=50;camera.data.clip_start=.01;camera.data.clip_end=5
 scene.camera=camera
 scene.world.use_nodes=True;scene.world.node_tree.nodes['Background'].inputs[0].default_value=(.8,.9,1,1);scene.world.node_tree.nodes['Background'].inputs[1].default_value=.5
 for name,location,power,size in [('Softbox',(-.3,-.2,.65),2,.45),('Fill',(.35,.3,.5),.8,.4)]:
@@ -80,10 +80,18 @@ face_marks=[]
 if data['model'].get('face'):
     face=data['model']['face'];ink=material('Drawn face',(.025,.05,.04))
     height=max(p[2] for panel in data['states'][-1]['panels'] for p in panel['points'])/1000+len(data['states'][-1]['panels'])*.00018+.0004
-    for x,y in [(-face['eyes'],face['y']),(face['eyes'],face['y']),(0,face['y']+16)]:
-        bpy.ops.mesh.primitive_uv_sphere_add(segments=24,ring_count=8,radius=.0032,location=(x/1000,-y/1000,height))
-        mark=bpy.context.object;mark.name='Face mark';mark.scale.z=.08;mark.data.materials.append(ink)
-        face_marks.append(mark)
+    if face.get('marks'):
+        for i,mark in enumerate(face['marks']):
+            points=mark.get('points') or [(mark['x']+mark['rx']*math.cos(j*math.pi/24),mark['y']+mark['ry']*math.sin(j*math.pi/24)) for j in range(48)]
+            mesh=bpy.data.meshes.new('Pen mark');mesh.from_pydata([(x/1000,-y/1000,height+i*.0002) for x,y in points],[],[tuple(range(len(points)))]);mesh.update()
+            ob=bpy.data.objects.new('Drawn face mark',mesh);scene.collection.objects.link(ob)
+            color=mark.get('fill','#293b34').lstrip('#');rgb=tuple((int(color[j:j+2],16)/255)**1.7 for j in (0,2,4))
+            mesh.materials.append(material('Pen ink',rgb));face_marks.append(ob)
+    else:
+        for x,y in [(-face['eyes'],face['y']),(face['eyes'],face['y']),(0,face['y']+16)]:
+            bpy.ops.mesh.primitive_uv_sphere_add(segments=24,ring_count=8,radius=.0032,location=(x/1000,-y/1000,height))
+            mark=bpy.context.object;mark.name='Face mark';mark.scale.z=.08;mark.data.materials.append(ink)
+            face_marks.append(mark)
 
 def set_face(visible,frame=None):
     for mark in face_marks:
@@ -113,7 +121,7 @@ def geometry(state):
 def make_mesh(name,state):
     v,f,m=geometry(state);mesh=bpy.data.meshes.new(name);mesh.from_pydata(v,[],f);mesh.update()
     obj=bpy.data.objects.new(name,mesh);scene.collection.objects.link(obj)
-    for mat in [blue,cream,edge]:mesh.materials.append(mat)
+    for mat in ([cream,blue,edge] if data['model']['paper'].get('front',False) else [blue,cream,edge]):mesh.materials.append(mat)
     for polygon,mat in zip(mesh.polygons,m):polygon.material_index=mat
     return obj
 
