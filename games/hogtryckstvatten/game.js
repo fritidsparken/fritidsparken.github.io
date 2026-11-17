@@ -56,6 +56,7 @@ function rotationNotice(){return typeof matchMedia==='function'&&matchMedia('(or
 function resize(){const b=canvas.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);canvas.width=Math.max(1,Math.round(b.width*d));canvas.height=Math.max(1,Math.round(b.height*d));last=null;}
 window.addEventListener('resize',()=>{release();resize()});new ResizeObserver(resize).observe($('playArea'));resize();
 function washBounds(){
+ if(levels[level].id==='house')return {x:275,y:350,w:650,h:465};
  const points=polygons().flat(),xs=points.map(p=>p[0]*W),ys=points.map(p=>p[1]*H),pad=levels[level].id==='house'?2:28;
  const x=Math.max(1,Math.min(...xs)-pad),y=Math.max(1,Math.min(...ys)-pad);
  return {x,y,w:Math.min(W-1,Math.max(...xs)+pad)-x,h:Math.min(H-1,Math.max(...ys)+pad)-y};
