@@ -5,56 +5,13 @@ const sample=document.createElement('canvas');sample.width=200;sample.height=113
 const levels=window.WASH_LEVELS,KEY='fp-pressure-wash-v1';let save={best:{},tool:0,sound:true},stored=null;
 try{stored=JSON.parse(localStorage.getItem(KEY));if(stored&&typeof stored==='object')save={...save,...stored,best:stored.best||{}}}catch{}
 const kit=[{name:'Standard',symbol:'💧',radius:25,power:1,need:0,desc:'En stadig stråle för ditt första uppdrag.'},{name:'Bredstråle',symbol:'💦',radius:41,power:.9,need:1,desc:'Bredare stråle för stora ytor.'},{name:'Turbomunstycke',symbol:'🌀',radius:48,power:1.5,need:3,desc:'Mer kraft mot envis smuts.'},{name:'Regnbågskraft',symbol:'🌈',radius:62,power:1.8,need:6,desc:'Din starkaste tvätt. Ett färgglatt vattenmoln!'}];
-let level=0,img=null,character=new Image(),ready=false,playing=false,done=false,elapsed=0,percent=0,initial=1,holding=false,last=null,aim={x:950,y:480},particles=[],clock=performance.now(),lastMeasure=0,lastSave=0,highlight=0,transform={s:1,x:0,y:0},audio=null,noise=null,gain=null,muted=save.sound===false,keys=new Set(),toastTime=0;
+let level=0,img=null,ready=false,playing=false,done=false,elapsed=0,percent=0,initial=1,holding=false,last=null,aim={x:950,y:480},particles=[],clock=performance.now(),lastMeasure=0,lastSave=0,highlight=0,transform={s:1,x:0,y:0},audio=null,noise=null,gain=null,muted=save.sound===false,keys=new Set(),toastTime=0;
 let currentSnapshot=null,loadedToken=0;const images=new Map();
-character.src='assets/character-body.webp';
-const gun=new Image();gun.src='assets/gun-hand.webp';
+
 let menuPage=0, cameraX=800, pointerScreen=null;
-// Shared transform drives both the articulated washer and the water origin.
-function nozzlePose(px,py,tx,ty,width,anchor,tip){const dx=tx-px,dy=ty-py,angle=Math.atan2(dy,dx)-Math.asin(Math.max(-1,Math.min(1,(tip.y-anchor.y)*width/Math.max(1,Math.hypot(dx,dy))))),c=Math.cos(angle),s=Math.sin(angle);const lx=(tip.x-anchor.x)*width,ly=(tip.y-anchor.y)*width;return {angle,x:px+c*lx-s*ly,y:py+s*lx+c*ly}}
-// Two-bone arms: fixed limb lengths, continuous elbow bend and shared torso anchors.
-let rigAngle=0,rigLean=0,sprayAim={x:950,y:480};
-function armJoint(a,b,l1,l2){
- const dx=b.x-a.x,dy=b.y-a.y,d=Math.max(.0001,Math.hypot(dx,dy));
- const reach=Math.min(l1+l2-.001,Math.max(Math.abs(l1-l2)+.001,d));
- const along=(l1*l1-l2*l2+reach*reach)/(2*reach),bend=Math.sqrt(Math.max(0,l1*l1-along*along));
- return {x:a.x+dx/d*along-dy/d*bend,y:a.y+dy/d*along+dx/d*bend};
-}
-function sleeve(a,b,width,dark=false){
- const dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy);
- ctx.save();ctx.translate(a.x,a.y);ctx.rotate(Math.atan2(dy,dx));
- const g=ctx.createLinearGradient(0,-width/2,0,width/2);
- g.addColorStop(0,dark?'#9c292b':'#d95049');g.addColorStop(.4,dark?'#bd3e39':'#cf423b');g.addColorStop(1,'#812428');
- ctx.lineCap='round';ctx.strokeStyle='#79282a';ctx.lineWidth=width+2;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(len,0);ctx.stroke();
- ctx.strokeStyle=g;ctx.lineWidth=width;ctx.stroke();
- ctx.strokeStyle='rgba(255,153,128,.2)';ctx.lineWidth=width*.06;ctx.beginPath();ctx.moveTo(width*.15,-width*.26);ctx.lineTo(len-width*.1,-width*.26);ctx.stroke();ctx.restore();
-}
-function drawArm(shoulder,wrist,h,dark){const e=armJoint(shoulder,wrist,h*.115,h*.125);sleeve(shoulder,e,h*.068,dark);sleeve(e,wrist,h*.059,dark);}
-function drawWasher(charX,charY,charW,charH,target,dt){
- const k=charH/1480,hip={x:charX+300*k,y:charY+870*k};
- const desired=Math.atan2(target.y-(charY+620*k),target.x-(charX+430*k));
- rigAngle+=Math.atan2(Math.sin(desired-rigAngle),Math.cos(desired-rigAngle))*(1-Math.exp(-14*dt));
- rigLean+=(Math.max(-.055,Math.min(.055,rigAngle*.045))-rigLean)*(1-Math.exp(-8*dt));
- const bodyPoint=(x,y)=>({x:hip.x+((x-300)*Math.cos(rigLean)-(y-870)*Math.sin(rigLean))*k,y:hip.y+((x-300)*Math.sin(rigLean)+(y-870)*Math.cos(rigLean))*k});
- const near=bodyPoint(405,585),far=bodyPoint(355,595);
- const pivot={x:near.x+Math.cos(rigAngle)*charH*.13,y:near.y+charH*.065+Math.sin(rigAngle)*charH*.13};
- const gunW=charH*.43,anchor={x:.16,y:.24},tip={x:.9503,y:.1068};
- const pose=nozzlePose(pivot.x,pivot.y,target.x,target.y,gunW,anchor,tip);
- const cuff=(x,y)=>({x:pivot.x+((x-anchor.x)*Math.cos(pose.angle)-(y-anchor.y)*Math.sin(pose.angle))*gunW,y:pivot.y+((x-anchor.x)*Math.sin(pose.angle)+(y-anchor.y)*Math.cos(pose.angle))*gunW});
- drawArm(far,cuff(.066,.14),charH,true);
- if(character.complete&&character.naturalWidth){
- // Legs remain planted. The torso turns about the hips, carrying the shoulders.
- ctx.save();ctx.beginPath();ctx.rect(charX,charY+870*k,charW,charH-870*k);ctx.clip();ctx.drawImage(character,charX,charY,charW,charH);ctx.restore();
- ctx.save();ctx.translate(hip.x,hip.y);ctx.rotate(rigLean);ctx.scale(k,k);ctx.translate(-300,-870);
- // Exclude the baked-in near sleeve and loose hose; both are articulated below.
- ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(1080,0);ctx.lineTo(1080,500);ctx.lineTo(415,540);ctx.lineTo(368,615);ctx.lineTo(390,710);ctx.lineTo(455,850);ctx.lineTo(455,870);ctx.lineTo(0,870);ctx.closePath();ctx.clip();ctx.drawImage(character,0,0,1080,1480);ctx.restore();
- }
- const hose={x:charX+530*k,y:charY+870*k},end=cuff(.32,.27);
- ctx.lineCap='round';ctx.strokeStyle='#32363a';ctx.lineWidth=charH*.021;ctx.beginPath();ctx.moveTo(hose.x,hose.y);ctx.bezierCurveTo(hose.x+charH*.04,hose.y-charH*.08,end.x-charH*.04,end.y+charH*.18,end.x,end.y);ctx.stroke();ctx.strokeStyle='#7b8188';ctx.lineWidth=charH*.009;ctx.stroke();
- drawArm(near,cuff(.16,.24),charH,false);
- if(gun.complete&&gun.naturalWidth){ctx.save();ctx.translate(pivot.x,pivot.y);ctx.rotate(pose.angle);ctx.drawImage(gun,-anchor.x*gunW,-anchor.y*gunW,gunW,gunW*gun.naturalHeight/gun.naturalWidth);ctx.restore();}
- return pose;
-}
+// Single atlas rig owns both hands, torso and nozzle origin.
+const washerRig=new window.WasherRig();let sprayAim={x:950,y:480};
+function drawWasher(x,y,w,h,target,dt){return washerRig.draw(ctx,x,y,h,target,dt,holding&&playing)}
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(save))}catch{}}
 function golds(){return levels.filter(l=>Number.isFinite(save.best[l.id])&&save.best[l.id]<=l.goal).length}
 function unlocked(i){return i===0||Number.isFinite(save.best[levels[i-1].id])}
@@ -70,7 +27,7 @@ function makeDirt(){seed=12345+level*923;dc.clearRect(0,0,W,H);dc.save();polyPat
  for(let i=0;i<520;i++){let x=rand()*W,y=rand()*H;dc.strokeStyle=`rgba(37,48,17,${.06+rand()*.23})`;dc.lineWidth=1+rand()*5;dc.beginPath();dc.moveTo(x,y);dc.lineTo(x+rand()*7,y+20+rand()*80);dc.stroke()}dc.restore();initial=mass();}
 function mass(){sc.clearRect(0,0,200,113);sc.drawImage(dirt,0,0,200,113);let sum=0;const data=sc.getImageData(0,0,200,113).data;for(let i=3;i<data.length;i+=4)sum+=data[i];return sum}
 function measure(){percent=Math.min(100,Math.max(0,100*(1-mass()/initial)));if(percent>=98.4&&!done)finish();$('fill').style.width=percent+'%';$('progressLabel').textContent=`${levels[level].label}: ${Math.floor(percent)}% rent`}
-async function load(i,resume=false){const token=++loadedToken;playing=false;holding=false;ready=false;$('loading').hidden=false;if($('panel').open)$('panel').close();try{const im=await getImage(levels[i].id);if(token!==loadedToken)return;level=i;cameraX=800;pointerScreen=null;img=im;elapsed=0;percent=0;done=false;makeDirt();
+async function load(i,resume=false){const token=++loadedToken;playing=false;holding=false;ready=false;$('loading').hidden=false;if($('panel').open)$('panel').close();try{const [im]=await Promise.all([getImage(levels[i].id),window.WasherRig.ready]);if(token!==loadedToken)return;level=i;cameraX=800;pointerScreen=null;img=im;elapsed=0;percent=0;done=false;makeDirt();
  if(resume&&save.active?.id===levels[i].id){elapsed=Number(save.active.elapsed)||0;const snap=new Image();await new Promise(resolve=>{snap.onload=()=>{dc.clearRect(0,0,W,H);dc.drawImage(snap,0,0,W,H);resolve()};snap.onerror=resolve;snap.src=save.active.mask});}
  ready=true;measure();$('levelName').textContent=levels[i].name;$('target').textContent=`★ Tidsmål ${time(levels[i].goal)}`;$('hint').style.opacity=1;$('hint').textContent=innerHeight>innerWidth?'Tvätta vid skärmkanten för att flytta vyn':'Håll in och dra för att tvätta';updateTool();$('loading').hidden=true;if(!done){playing=true;clock=performance.now()}if(i+1<levels.length)getImage(levels[i+1].id).catch(()=>{});
  }catch{$('loading').hidden=true;openPanel('<h2>Bilden kunde inte laddas</h2><p>Kontrollera anslutningen och försök igen.</p><div class="actions"><button class="primary" data-retry="'+i+'">Försök igen</button></div>')}}
@@ -94,7 +51,7 @@ function render(now){const wallDt=Math.max(0,(now-clock)/1000),dt=Math.min(.04,w
  if(highlight>0){highlight-=dt;ctx.save();ctx.globalAlpha=.35+.15*Math.sin(now/140);ctx.globalCompositeOperation='source-over';ctx.drawImage(dirt,0,0);ctx.restore();sc.clearRect(0,0,200,113);sc.drawImage(dirt,0,0,200,113);const pix=sc.getImageData(0,0,200,113).data;ctx.strokeStyle='#ffe341';ctx.lineWidth=3;for(let y=0;y<113;y+=7)for(let x=0;x<200;x+=7)if(pix[(y*200+x)*4+3]>45){ctx.beginPath();ctx.arc(x*8,y*H/113,13,0,Math.PI*2);ctx.stroke()}}
  if(playing&&!done){elapsed+=wallDt;const speed=420*dt;if(keys.has('ArrowLeft'))aim.x-=speed;if(keys.has('ArrowRight'))aim.x+=speed;if(keys.has('ArrowUp'))aim.y-=speed;if(keys.has('ArrowDown'))aim.y+=speed;aim.x=Math.max(0,Math.min(W,aim.x));aim.y=Math.max(0,Math.min(H,aim.y));const follow=1-Math.exp(-24*dt);sprayAim.x+=(aim.x-sprayAim.x)*follow;sprayAim.y+=(aim.y-sprayAim.y)*follow;if(holding){wash(dt,sprayAim);$('hint').style.opacity=0}if(now-lastMeasure>250){measure();lastMeasure=now}if(now-lastSave>5000){snapshot();lastSave=now}}
  ctx.save();ctx.scale(1,scaleX/scaleY);const artAim={x:sprayAim.x,y:sprayAim.y*scaleY/scaleX};
- const charH=portrait?180:620,charW=character.naturalWidth?charH*character.naturalWidth/character.naturalHeight:300,charX=-ox/scale+10,charY=H*scaleY/scaleX-charH-(portrait?160:20)/transform.sx;
+ const charH=portrait?240:540,charW=charH*400/1024,charX=-ox/scale+10,charY=H*scaleY/scaleX-charH-(portrait?160:20)/transform.sx;
  const pose=drawWasher(charX,charY,charW,charH,artAim,dt);
  if(holding&&playing){const sx=pose.x,sy=pose.y;const radius=tool().radius*1.25;let grad=ctx.createLinearGradient(sx,sy,artAim.x,artAim.y);grad.addColorStop(0,'#e2ffffdd');grad.addColorStop(1,save.tool===3?'#9df9ff88':'#a5edff99');ctx.fillStyle=grad;const a=Math.atan2(artAim.y-sy,artAim.x-sx),nx=-Math.sin(a)*radius*.6,ny=Math.cos(a)*radius*.6;ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(artAim.x+nx,artAim.y+ny);ctx.quadraticCurveTo(artAim.x+Math.cos(a)*radius,artAim.y+Math.sin(a)*radius,artAim.x-nx,artAim.y-ny);ctx.closePath();ctx.fill();ctx.strokeStyle='#f0ffffbb';ctx.lineWidth=3;for(let j=0;j<9;j++){ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(artAim.x+(Math.random()-.5)*radius,artAim.y+(Math.random()-.5)*radius);ctx.stroke()}}
  ctx.restore();
@@ -111,3 +68,4 @@ $('closePanel').onclick=()=>ready&&!done?resume():menu();$('panel').addEventList
 document.addEventListener('visibilitychange',()=>{if(document.hidden){snapshot();release();keys.clear();if(playing)pause()}});window.addEventListener('pagehide',snapshot);
 updateTool();getImage('house').then(im=>{if(!img)img=im}).catch(()=>{});openPanel(`<div class="welcome"><div class="big">💦</div><h2>Lite smuts.<br>Massor av tvättglädje.</h2><p>${levels.length} soliga uppdrag väntar. Håll in och dra över smutsen – se färgerna komma fram! Slå tidsmålen för att låsa upp bättre munstycken.</p><div class="actions"><button class="primary" data-start>${save.active?'Fortsätt tvätta':'Nu gör vi rent!'} →</button><button class="secondary" data-menu>Välj uppdrag</button></div><p><small>Mus eller finger · Pilar + mellanslag · Sparas på denna enhet</small></p></div>`);requestAnimationFrame(render);
 })();
+
