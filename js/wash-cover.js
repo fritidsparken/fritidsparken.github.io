@@ -91,7 +91,8 @@ window.fpDrawWashCover=async function(){
   const c=document.createElement('canvas');c.width=1280;c.height=720;
   const ctx=c.getContext('2d');ctx.drawImage(background,0,0,1280,720);
   const rig=new window.WasherRig(); let tip;
-  for(let i=0;i<40;i++)tip=rig.draw(ctx,20,306,295,{x:770,y:300},.016,true);
+  for(let i=0;i<40;i++)rig.pose({x:(770-20)/(295/1024),y:(300-306)/(295/1024)},.016,true);
+  tip=rig.draw(ctx,20,306,295,{x:770,y:300},.016,true);
   ctx.save();ctx.lineCap='round';
   const x=tip.x,y=tip.y,ex=765,ey=299;
   const beam=ctx.createLinearGradient(x,y,ex,ey);
