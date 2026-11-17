@@ -34,14 +34,37 @@ function makeDirt(){seed=12345+level*923;dc.clearRect(0,0,W,H);surface.width=W;s
  for(let i=0;i<520;i++){let x=rand()*W,y=rand()*H;dc.strokeStyle=`rgba(37,48,17,${.06+rand()*.23})`;dc.lineWidth=1+rand()*5;dc.beginPath();dc.moveTo(x,y);dc.lineTo(x+rand()*7,y+20+rand()*80);dc.stroke()}dc.globalCompositeOperation='destination-in';dc.drawImage(surface,0,0);dc.restore();initial=mass();}
 function mass(layer=dirt){sc.clearRect(0,0,200,113);sc.drawImage(layer,0,0,200,113);let sum=0;const data=sc.getImageData(0,0,200,113).data;for(let i=3;i<data.length;i+=4)sum+=data[i];return sum}
 function updateStage(){$('hint').textContent='Håll in och dra för att tvätta bort smutsen.';}
+let hintRegions=[];
 function remainingPixels(makeGlow=false){
  const image=dc.getImageData(0,0,W,H),pixels=image.data;let remaining=false;
+ const cell=32,cols=Math.ceil(W/cell),rows=Math.ceil(H/cell);
+ const grid=makeGlow?new Uint8Array(cols*rows):null;
  for(let i=0;i<pixels.length;i+=4){
   const dirty=pixels[i+3]>0;
-  if(dirty)remaining=true;
+  if(dirty){
+   remaining=true;
+   if(grid){const p=i/4,x=p%W,y=Math.floor(p/W);grid[Math.floor(y/cell)*cols+Math.floor(x/cell)]=1;}
+  }
   if(makeGlow){pixels[i]=190;pixels[i+1]=244;pixels[i+2]=255;pixels[i+3]=dirty?210:0;}
  }
- if(makeGlow){if(glow.width!==W||glow.height!==H){glow.width=W;glow.height=H}glowContext.putImageData(image,0,0)}
+ if(makeGlow){
+  if(glow.width!==W||glow.height!==H){glow.width=W;glow.height=H}
+  glowContext.putImageData(image,0,0);hintRegions=[];
+  for(let n=0;n<grid.length;n++){
+   if(!grid[n])continue;
+   grid[n]=0;const queue=[n];let minX=cols,minY=rows,maxX=0,maxY=0;
+   for(let j=0;j<queue.length;j++){
+    const k=queue[j],x=k%cols,y=Math.floor(k/cols);
+    minX=Math.min(minX,x);maxX=Math.max(maxX,x);minY=Math.min(minY,y);maxY=Math.max(maxY,y);
+    for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
+     const nx=x+dx,ny=y+dy;
+     if(nx<0||ny<0||nx>=cols||ny>=rows)continue;
+     const next=ny*cols+nx;if(grid[next]){grid[next]=0;queue.push(next)}
+    }
+   }
+   hintRegions.push({x:(minX+maxX+1)*cell/2,y:(minY+maxY+1)*cell/2,rx:(maxX-minX+1)*cell/2,ry:(maxY-minY+1)*cell/2});
+  }
+ }
  return remaining;
 }
 function measure(){
@@ -128,6 +151,16 @@ function render(now){
   if(highlight>0){highlight-=dt;ctx.save();ctx.globalAlpha=.65;ctx.drawImage(glow,0,0);ctx.restore();}
   particles=particles.filter(p=>p.life>0);for(const p of particles){p.life-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;if(!p.bubble)p.vy+=350*dt;ctx.globalAlpha=Math.max(0,p.life/p.max);ctx.fillStyle=p.bubble?'#f8fdff':'#ceefff';ctx.beginPath();ctx.arc(p.x,p.y,p.bubble?5:2.5,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;
   ctx.restore();
+  if(highlight>0){
+   ctx.save();
+   for(const h of hintRegions){
+    const x=ox+h.x*scale,y=oy+h.y*scale,rx=Math.max(17,h.rx*scale+9),ry=Math.max(17,h.ry*scale+9);
+    ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);
+    ctx.strokeStyle='#fff';ctx.lineWidth=7;ctx.stroke();
+    ctx.strokeStyle='#ff007a';ctx.lineWidth=4;ctx.stroke();
+   }
+   ctx.restore();
+  }
   const a=layout.actor;ctx.save();ctx.beginPath();ctx.rect(a.x,a.y,a.w,a.h);ctx.clip();const charH=a.h*.96;const target={x:ox+sprayAim.x*scale,y:oy+sprayAim.y*scale};const pose=drawWasher(a.x,a.y+a.h-charH,charH*.4,charH,target,dt);ctx.restore();
   if(holding&&playing&&pointerValid){ctx.save();ctx.beginPath();ctx.rect(0,0,b.width,b.height);ctx.clip();ctx.strokeStyle='#c8f4ff95';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(pose.x,pose.y);ctx.lineTo(target.x,target.y);ctx.stroke();ctx.restore();}
  }
@@ -140,7 +173,7 @@ function pause(){snapshot();openPanel('<div class="welcome"><div class="big">�
 function resume(){if(!ready||done){menu();return}$('panel').close();playing=true;clock=performance.now();canvas.focus({preventScroll:true})}
 $('panelBody').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-page'))return menu(+b.dataset.page);if(b.hasAttribute('data-level')){const i=+b.dataset.level;if(unlocked(i))load(i,save.active?.id===levels[i].id);return}if(b.hasAttribute('data-retry'))return load(+b.dataset.retry);if(b.hasAttribute('data-menu'))return menu();if(b.hasAttribute('data-tools'))return toolsMenu();if(b.hasAttribute('data-resume'))return resume();if(b.hasAttribute('data-start')){const i=levels.findIndex(l=>l.id===save.active?.id);return load(i<0?0:i,i>=0)}if(b.hasAttribute('data-restart'))return openPanel('<h2>Börja om uppdraget?</h2><p>Smutsen och tiden på den här banan börjar om. Dina rekord och verktyg finns kvar.</p><div class="actions"><button class="secondary" data-resume>Fortsätt</button><button class="primary" data-confirm-restart>Börja om</button></div>');if(b.hasAttribute('data-confirm-restart')){delete save.active;persist();return load(level)}if(b.hasAttribute('data-tool')){const i=+b.dataset.tool;if(golds()>=kit[i].need){save.tool=i;persist();updateTool();toast(kit[i].name+' valt');ready&&!done?resume():toolsMenu()}}});
 function closePanel(){release();$('panel').close();if(ready){playing=!done;clock=performance.now();canvas.focus({preventScroll:true});}else{const i=levels.findIndex(l=>l.id===save.active?.id);return load(i<0?0:i,i>=0);}}
-$('closePanel').onclick=closePanel;$('panel').addEventListener('cancel',e=>{e.preventDefault();closePanel()});$('levels').onclick=()=>menu(Math.floor(level/6));$('tools').onclick=toolsMenu;$('pause').onclick=pause;$('reveal').onclick=()=>{if(!ready)return;highlight=4;remainingPixels(true);toast('Smutsen som finns kvar lyser upp')};$('sound').onclick=()=>{muted=!muted;save.sound=!muted;persist();initAudio();audio?.resume();updateTool()};
+$('closePanel').onclick=closePanel;$('panel').addEventListener('cancel',e=>{e.preventDefault();closePanel()});$('levels').onclick=()=>menu(Math.floor(level/6));$('tools').onclick=toolsMenu;$('pause').onclick=pause;$('reveal').onclick=()=>{if(!ready)return;highlight=4;remainingPixels(true);toast('Rosa ringar visar smutsen som finns kvar')};$('sound').onclick=()=>{muted=!muted;save.sound=!muted;persist();initAudio();audio?.resume();updateTool()};
 document.addEventListener('visibilitychange',()=>{if(document.hidden){snapshot();release();keys.clear();if(playing)pause()}});window.addEventListener('pagehide',snapshot);
 updateTool();openPanel(`<div class="welcome"><div class="big">💦</div><h2>Lite smuts.<br>Massor av tvättglädje.</h2><p>${levels.length} soliga uppdrag väntar. Spruta bort smutsen med högtryckstvätten! Slå tidsmålen för att låsa upp bättre munstycken.</p><div class="actions"><button class="primary" data-start>${save.active?'Fortsätt tvätta':'Nu gör vi rent!'} →</button><button class="secondary" data-menu>Välj uppdrag</button></div><p><small>Mus eller finger · Pilar + mellanslag · Sparas på denna enhet</small></p></div>`);requestAnimationFrame(render);
 })();
