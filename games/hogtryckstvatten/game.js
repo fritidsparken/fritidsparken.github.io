@@ -12,6 +12,49 @@ const gun=new Image();gun.src='assets/gun-hand.webp';
 let menuPage=0, cameraX=800, pointerScreen=null;
 // Shared transform drives both the articulated washer and the water origin.
 function nozzlePose(px,py,tx,ty,width,anchor,tip){const dx=tx-px,dy=ty-py,angle=Math.atan2(dy,dx)-Math.asin(Math.max(-1,Math.min(1,(tip.y-anchor.y)*width/Math.max(1,Math.hypot(dx,dy))))),c=Math.cos(angle),s=Math.sin(angle);const lx=(tip.x-anchor.x)*width,ly=(tip.y-anchor.y)*width;return {angle,x:px+c*lx-s*ly,y:py+s*lx+c*ly}}
+// Two-bone arms: fixed limb lengths, continuous elbow bend and shared torso anchors.
+let rigAngle=0,rigLean=0,sprayAim={x:950,y:480};
+function armJoint(a,b,l1,l2){
+ const dx=b.x-a.x,dy=b.y-a.y,d=Math.max(.0001,Math.hypot(dx,dy));
+ const reach=Math.min(l1+l2-.001,Math.max(Math.abs(l1-l2)+.001,d));
+ const along=(l1*l1-l2*l2+reach*reach)/(2*reach),bend=Math.sqrt(Math.max(0,l1*l1-along*along));
+ return {x:a.x+dx/d*along-dy/d*bend,y:a.y+dy/d*along+dx/d*bend};
+}
+function sleeve(a,b,width,dark=false){
+ const dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy);
+ ctx.save();ctx.translate(a.x,a.y);ctx.rotate(Math.atan2(dy,dx));
+ const g=ctx.createLinearGradient(0,-width/2,0,width/2);
+ g.addColorStop(0,dark?'#9c292b':'#d95049');g.addColorStop(.4,dark?'#bd3e39':'#cf423b');g.addColorStop(1,'#812428');
+ ctx.lineCap='round';ctx.strokeStyle='#79282a';ctx.lineWidth=width+2;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(len,0);ctx.stroke();
+ ctx.strokeStyle=g;ctx.lineWidth=width;ctx.stroke();
+ ctx.strokeStyle='rgba(255,153,128,.2)';ctx.lineWidth=width*.06;ctx.beginPath();ctx.moveTo(width*.15,-width*.26);ctx.lineTo(len-width*.1,-width*.26);ctx.stroke();ctx.restore();
+}
+function drawArm(shoulder,wrist,h,dark){const e=armJoint(shoulder,wrist,h*.115,h*.125);sleeve(shoulder,e,h*.068,dark);sleeve(e,wrist,h*.059,dark);}
+function drawWasher(charX,charY,charW,charH,target,dt){
+ const k=charH/1480,hip={x:charX+300*k,y:charY+870*k};
+ const desired=Math.atan2(target.y-(charY+620*k),target.x-(charX+430*k));
+ rigAngle+=Math.atan2(Math.sin(desired-rigAngle),Math.cos(desired-rigAngle))*(1-Math.exp(-14*dt));
+ rigLean+=(Math.max(-.055,Math.min(.055,rigAngle*.045))-rigLean)*(1-Math.exp(-8*dt));
+ const bodyPoint=(x,y)=>({x:hip.x+((x-300)*Math.cos(rigLean)-(y-870)*Math.sin(rigLean))*k,y:hip.y+((x-300)*Math.sin(rigLean)+(y-870)*Math.cos(rigLean))*k});
+ const near=bodyPoint(405,585),far=bodyPoint(355,595);
+ const pivot={x:near.x+Math.cos(rigAngle)*charH*.13,y:near.y+charH*.065+Math.sin(rigAngle)*charH*.13};
+ const gunW=charH*.43,anchor={x:.16,y:.24},tip={x:.9503,y:.1068};
+ const pose=nozzlePose(pivot.x,pivot.y,target.x,target.y,gunW,anchor,tip);
+ const cuff=(x,y)=>({x:pivot.x+((x-anchor.x)*Math.cos(pose.angle)-(y-anchor.y)*Math.sin(pose.angle))*gunW,y:pivot.y+((x-anchor.x)*Math.sin(pose.angle)+(y-anchor.y)*Math.cos(pose.angle))*gunW});
+ drawArm(far,cuff(.066,.14),charH,true);
+ if(character.complete&&character.naturalWidth){
+ // Legs remain planted. The torso turns about the hips, carrying the shoulders.
+ ctx.save();ctx.beginPath();ctx.rect(charX,charY+870*k,charW,charH-870*k);ctx.clip();ctx.drawImage(character,charX,charY,charW,charH);ctx.restore();
+ ctx.save();ctx.translate(hip.x,hip.y);ctx.rotate(rigLean);ctx.scale(k,k);ctx.translate(-300,-870);
+ // Exclude the baked-in near sleeve and loose hose; both are articulated below.
+ ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(1080,0);ctx.lineTo(1080,500);ctx.lineTo(415,540);ctx.lineTo(368,615);ctx.lineTo(390,710);ctx.lineTo(455,850);ctx.lineTo(455,870);ctx.lineTo(0,870);ctx.closePath();ctx.clip();ctx.drawImage(character,0,0,1080,1480);ctx.restore();
+ }
+ const hose={x:charX+530*k,y:charY+870*k},end=cuff(.32,.27);
+ ctx.lineCap='round';ctx.strokeStyle='#32363a';ctx.lineWidth=charH*.021;ctx.beginPath();ctx.moveTo(hose.x,hose.y);ctx.bezierCurveTo(hose.x+charH*.04,hose.y-charH*.08,end.x-charH*.04,end.y+charH*.18,end.x,end.y);ctx.stroke();ctx.strokeStyle='#7b8188';ctx.lineWidth=charH*.009;ctx.stroke();
+ drawArm(near,cuff(.16,.24),charH,false);
+ if(gun.complete&&gun.naturalWidth){ctx.save();ctx.translate(pivot.x,pivot.y);ctx.rotate(pose.angle);ctx.drawImage(gun,-anchor.x*gunW,-anchor.y*gunW,gunW,gunW*gun.naturalHeight/gun.naturalWidth);ctx.restore();}
+ return pose;
+}
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(save))}catch{}}
 function golds(){return levels.filter(l=>Number.isFinite(save.best[l.id])&&save.best[l.id]<=l.goal).length}
 function unlocked(i){return i===0||Number.isFinite(save.best[levels[i-1].id])}
@@ -40,7 +83,7 @@ function finish(){done=true;playing=false;holding=false;percent=100;dc.clearRect
 function initAudio(){if(audio)return;try{audio=new(window.AudioContext||window.webkitAudioContext)();let b=audio.createBuffer(1,audio.sampleRate*2,audio.sampleRate);let d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*.25;noise=audio.createBufferSource();noise.buffer=b;noise.loop=true;let filter=audio.createBiquadFilter();filter.type='lowpass';filter.frequency.value=1600;gain=audio.createGain();gain.gain.value=0;noise.connect(filter).connect(gain).connect(audio.destination);noise.start()}catch{}}
 function setNoise(on){if(gain)gain.gain.setTargetAtTime(on&&!muted?.22:0,audio.currentTime,.06)}
 function chime(){if(muted||!audio)return;[523,659,784,1046].forEach((f,i)=>{const o=audio.createOscillator(),g=audio.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(.12,audio.currentTime+i*.12);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+i*.12+.6);o.connect(g).connect(audio.destination);o.start(audio.currentTime+i*.12);o.stop(audio.currentTime+i*.12+.7)})}
-function wash(dt){const k=tool(),p=aim,r=k.radius*1.25;dc.save();dc.globalCompositeOperation='destination-out';const from=last||p,dist=Math.hypot(p.x-from.x,p.y-from.y),steps=Math.max(1,Math.ceil(dist/(r*.25)));for(let n=0;n<=steps;n++){const x=from.x+(p.x-from.x)*n/steps,y=from.y+(p.y-from.y)*n/steps;const g=dc.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,`rgba(0,0,0,${Math.min(.85,dt*12*k.power)})`);g.addColorStop(.65,`rgba(0,0,0,${Math.min(.65,dt*8*k.power)})`);g.addColorStop(1,'transparent');dc.fillStyle=g;dc.fillRect(x-r,y-r,2*r,2*r)}dc.restore();last={...p};for(let n=0;n<6;n++)particles.push({x:p.x+(Math.random()-.5)*r,y:p.y+(Math.random()-.5)*r,vx:(Math.random()-.5)*260,vy:-50-Math.random()*160,life:.3+Math.random()*.3,max:.6});}
+function wash(dt,p=aim){const k=tool(),r=k.radius*1.25;dc.save();dc.globalCompositeOperation='destination-out';const from=last||p,dist=Math.hypot(p.x-from.x,p.y-from.y),steps=Math.max(1,Math.ceil(dist/(r*.25)));for(let n=0;n<=steps;n++){const x=from.x+(p.x-from.x)*n/steps,y=from.y+(p.y-from.y)*n/steps;const g=dc.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,`rgba(0,0,0,${Math.min(.85,dt*12*k.power)})`);g.addColorStop(.65,`rgba(0,0,0,${Math.min(.65,dt*8*k.power)})`);g.addColorStop(1,'transparent');dc.fillStyle=g;dc.fillRect(x-r,y-r,2*r,2*r)}dc.restore();last={...p};for(let n=0;n<6;n++)particles.push({x:p.x+(Math.random()-.5)*r,y:p.y+(Math.random()-.5)*r,vx:(Math.random()-.5)*260,vy:-50-Math.random()*160,life:.3+Math.random()*.3,max:.6});}
 function resize(){canvas.width=Math.round(innerWidth*Math.min(devicePixelRatio,2));canvas.height=Math.round(innerHeight*Math.min(devicePixelRatio,2));}
 window.addEventListener('resize',resize);resize();
 function render(now){const wallDt=Math.max(0,(now-clock)/1000),dt=Math.min(.04,wallDt);clock=now;const cw=canvas.width,ch=canvas.height;ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cw,ch);const portrait=innerHeight>innerWidth;const scale=Math.max(cw/W,ch/H),scaleX=scale,scaleY=scale,dpr=cw/innerWidth,viewW=cw/scale;
@@ -49,17 +92,10 @@ function render(now){const wallDt=Math.max(0,(now-clock)/1000),dt=Math.min(.04,w
  if(holding&&pointerScreen){aim.x=(pointerScreen.x-transform.x)/transform.sx;aim.y=(pointerScreen.y-transform.y)/transform.sy;}
  if(img){ctx.save();ctx.translate(ox,oy);ctx.scale(scale,scale);ctx.drawImage(img,0,0,W,H);ctx.save();ctx.globalCompositeOperation='multiply';ctx.drawImage(dirt,0,0);ctx.restore();
  if(highlight>0){highlight-=dt;ctx.save();ctx.globalAlpha=.35+.15*Math.sin(now/140);ctx.globalCompositeOperation='source-over';ctx.drawImage(dirt,0,0);ctx.restore();sc.clearRect(0,0,200,113);sc.drawImage(dirt,0,0,200,113);const pix=sc.getImageData(0,0,200,113).data;ctx.strokeStyle='#ffe341';ctx.lineWidth=3;for(let y=0;y<113;y+=7)for(let x=0;x<200;x+=7)if(pix[(y*200+x)*4+3]>45){ctx.beginPath();ctx.arc(x*8,y*H/113,13,0,Math.PI*2);ctx.stroke()}}
- if(playing&&!done){elapsed+=wallDt;const speed=420*dt;if(keys.has('ArrowLeft'))aim.x-=speed;if(keys.has('ArrowRight'))aim.x+=speed;if(keys.has('ArrowUp'))aim.y-=speed;if(keys.has('ArrowDown'))aim.y+=speed;aim.x=Math.max(0,Math.min(W,aim.x));aim.y=Math.max(0,Math.min(H,aim.y));if(holding){wash(dt);$('hint').style.opacity=0}if(now-lastMeasure>250){measure();lastMeasure=now}if(now-lastSave>5000){snapshot();lastSave=now}}
- ctx.save();ctx.scale(1,scaleX/scaleY);const artAim={x:aim.x,y:aim.y*scaleY/scaleX};
- // Body stays fixed; hands, gun and nozzle rotate as one articulated layer.
+ if(playing&&!done){elapsed+=wallDt;const speed=420*dt;if(keys.has('ArrowLeft'))aim.x-=speed;if(keys.has('ArrowRight'))aim.x+=speed;if(keys.has('ArrowUp'))aim.y-=speed;if(keys.has('ArrowDown'))aim.y+=speed;aim.x=Math.max(0,Math.min(W,aim.x));aim.y=Math.max(0,Math.min(H,aim.y));const follow=1-Math.exp(-24*dt);sprayAim.x+=(aim.x-sprayAim.x)*follow;sprayAim.y+=(aim.y-sprayAim.y)*follow;if(holding){wash(dt,sprayAim);$('hint').style.opacity=0}if(now-lastMeasure>250){measure();lastMeasure=now}if(now-lastSave>5000){snapshot();lastSave=now}}
+ ctx.save();ctx.scale(1,scaleX/scaleY);const artAim={x:sprayAim.x,y:sprayAim.y*scaleY/scaleX};
  const charH=portrait?180:620,charW=character.naturalWidth?charH*character.naturalWidth/character.naturalHeight:300,charX=-ox/scale+10,charY=H*scaleY/scaleX-charH-(portrait?160:20)/transform.sx;
- if(character.complete&&character.naturalWidth)ctx.drawImage(character,charX,charY,charW,charH);
- const pivot={x:charX+charW*.467,y:charY+charH*.448};
- const distance=Math.hypot(artAim.x-pivot.x,artAim.y-pivot.y);
- const gunW=Math.min(charH*.65,Math.max(35,distance*.85));
- const anchor={x:.1105,y:.1381},tip={x:.9503,y:.1068};
- const pose=nozzlePose(pivot.x,pivot.y,artAim.x,artAim.y,gunW,anchor,tip);
- if(gun.complete&&gun.naturalWidth){ctx.save();ctx.translate(pivot.x,pivot.y);ctx.rotate(pose.angle);ctx.drawImage(gun,-anchor.x*gunW,-anchor.y*gunW,gunW,gunW*gun.naturalHeight/gun.naturalWidth);ctx.restore()}
+ const pose=drawWasher(charX,charY,charW,charH,artAim,dt);
  if(holding&&playing){const sx=pose.x,sy=pose.y;const radius=tool().radius*1.25;let grad=ctx.createLinearGradient(sx,sy,artAim.x,artAim.y);grad.addColorStop(0,'#e2ffffdd');grad.addColorStop(1,save.tool===3?'#9df9ff88':'#a5edff99');ctx.fillStyle=grad;const a=Math.atan2(artAim.y-sy,artAim.x-sx),nx=-Math.sin(a)*radius*.6,ny=Math.cos(a)*radius*.6;ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(artAim.x+nx,artAim.y+ny);ctx.quadraticCurveTo(artAim.x+Math.cos(a)*radius,artAim.y+Math.sin(a)*radius,artAim.x-nx,artAim.y-ny);ctx.closePath();ctx.fill();ctx.strokeStyle='#f0ffffbb';ctx.lineWidth=3;for(let j=0;j<9;j++){ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(artAim.x+(Math.random()-.5)*radius,artAim.y+(Math.random()-.5)*radius);ctx.stroke()}}
  ctx.restore();
  particles=particles.filter(p=>p.life>0);for(const p of particles){p.life-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=450*dt;ctx.fillStyle=`rgba(225,254,255,${Math.max(0,p.life/p.max)})`;ctx.beginPath();ctx.arc(p.x,p.y,2.5,0,Math.PI*2);ctx.fill()}
