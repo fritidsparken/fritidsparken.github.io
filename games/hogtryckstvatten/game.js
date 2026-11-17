@@ -1,7 +1,8 @@
 (()=>{'use strict';
 const $=id=>document.getElementById(id), canvas=$('scene'),ctx=canvas.getContext('2d');
-let W=1600,H=900,houseWide=null;
+let W=1600,H=900,houseWide=null,backdropImage=null;
 const surface=document.createElement('canvas');const surfaceContext=surface.getContext('2d');
+const foreground=document.createElement('canvas');const foregroundContext=foreground.getContext('2d');
 const dirt=document.createElement('canvas');dirt.width=W;dirt.height=H;const dc=dirt.getContext('2d',{willReadFrequently:true});
 const glow=document.createElement('canvas');const glowContext=glow.getContext('2d');
 const sample=document.createElement('canvas');sample.width=200;sample.height=113;const sc=sample.getContext('2d',{willReadFrequently:true});
@@ -32,6 +33,19 @@ let seed=1;function rand(){seed=(seed*1664525+1013904223)>>>0;return seed/429496
 function makeDirt(){seed=12345+level*923;dc.clearRect(0,0,W,H);surface.width=W;surface.height=H;surfaceContext.fillStyle='#fff';for(const region of regions()){polyPath(surfaceContext,region);surfaceContext.fill('evenodd')}dc.save();dc.fillStyle='rgba(67,65,24,.75)';dc.fillRect(0,0,W,H);
  for(let i=0;i<9000;i++){const x=rand()*W,y=rand()*H,r=1+rand()*24;dc.fillStyle=`rgba(${25+rand()*40|0},${35+rand()*43|0},${10+rand()*20|0},${.08+rand()*.22})`;dc.beginPath();dc.ellipse(x,y,r,r*(.4+rand()),0,0,Math.PI*2);dc.fill()}
  for(let i=0;i<520;i++){let x=rand()*W,y=rand()*H;dc.strokeStyle=`rgba(37,48,17,${.06+rand()*.23})`;dc.lineWidth=1+rand()*5;dc.beginPath();dc.moveTo(x,y);dc.lineTo(x+rand()*7,y+20+rand()*80);dc.stroke()}dc.globalCompositeOperation='destination-in';dc.drawImage(surface,0,0);dc.restore();initial=mass();}
+function makeForeground(){
+ if(!backdropImage)return;
+ foreground.width=W;foreground.height=H;
+ foregroundContext.drawImage(img,0,0,W,H);
+ foregroundContext.globalCompositeOperation='destination-in';
+ foregroundContext.drawImage(surface,0,0);
+ foregroundContext.globalCompositeOperation='source-over';
+ // Water and other scenery inside an object stay visible without becoming washable.
+ for(const polygon of levels[level].displayPolygons||[]){
+  foregroundContext.save();polyPath(foregroundContext,[polygon]);foregroundContext.clip();
+  foregroundContext.drawImage(img,0,0,W,H);foregroundContext.restore();
+ }
+}
 function mass(layer=dirt){sc.clearRect(0,0,200,113);sc.drawImage(layer,0,0,200,113);let sum=0;const data=sc.getImageData(0,0,200,113).data;for(let i=3;i<data.length;i+=4)sum+=data[i];return sum}
 function updateStage(){$('hint').textContent='Håll in och dra för att tvätta bort smutsen.';}
 let hintRegions=[];
@@ -74,7 +88,7 @@ function measure(){
  if(!done)percent=Math.min(percent,99.9);
  $('fill').style.width=percent+'%';$('progressLabel').textContent=`Rent: ${Math.floor(percent)}%`;
 }
-async function load(i,resume=false){const token=++loadedToken;playing=false;holding=false;ready=false;$('loading').hidden=false;if($('panel').open)$('panel').close();try{const [im,wide]=await Promise.all([getImage(levels[i].id),levels[i].id==='house'?getImage('house-wide'):Promise.resolve(null),window.WasherRig.ready]);if(token!==loadedToken)return;level=i;houseWide=wide;W=im.naturalWidth;H=im.naturalHeight;dirt.width=W;dirt.height=H;cameraX=800;pointerScreen=null;img=im;elapsed=0;percent=0;done=false;last=null;particles=[];aim={x:800,y:450};sprayAim={...aim};makeDirt();
+async function load(i,resume=false){const token=++loadedToken;playing=false;holding=false;ready=false;$('loading').hidden=false;if($('panel').open)$('panel').close();try{const [im,wide,backdrop]=await Promise.all([getImage(levels[i].id),levels[i].id==='house'?getImage('house-wide'):Promise.resolve(null),levels[i].backdrop?getImage(levels[i].backdrop):Promise.resolve(null),window.WasherRig.ready]);if(token!==loadedToken)return;level=i;houseWide=wide;backdropImage=backdrop;W=im.naturalWidth;H=im.naturalHeight;dirt.width=W;dirt.height=H;cameraX=800;pointerScreen=null;img=im;elapsed=0;percent=0;done=false;last=null;particles=[];aim={x:800,y:450};sprayAim={...aim};makeDirt();makeForeground();
  sc.clearRect(0,0,200,113);sc.drawImage(dirt,0,0,200,113);areaMask=sc.getImageData(0,0,200,113).data;
  if(resume&&save.active?.id===levels[i].id&&save.active.mask&&save.active.version===(levels[i].id==='house'?8:7)){elapsed=Number(save.active.elapsed)||0;const snap=new Image();await new Promise(resolve=>{snap.onload=()=>{dc.clearRect(0,0,W,H);dc.drawImage(snap,0,0,W,H);resolve()};snap.onerror=resolve;snap.src=save.active.mask});}
  ready=true;measure();$('levelName').textContent=levels[i].name;$('target').textContent=`★ Tidsmål ${time(levels[i].goal)}`;$('hint').style.opacity=1;updateStage();updateTool();$('loading').hidden=true;if(!done){playing=true;clock=performance.now()}if(i+1<levels.length)getImage(levels[i+1].id).catch(()=>{});
@@ -124,6 +138,15 @@ function sceneLayout(cw,ch,insets){
  return {s,x:target.x-bounds.x*s,y:target.y-bounds.y*s,portrait,actor,target,bounds};
 }
 function drawScenery(layout,cw,ch){
+ if(backdropImage){
+  const scale=Math.max(cw/backdropImage.naturalWidth,ch/backdropImage.naturalHeight),bw=backdropImage.naturalWidth*scale,bh=backdropImage.naturalHeight*scale;
+  ctx.drawImage(backdropImage,(cw-bw)/2,(ch-bh)/2,bw,bh);
+  const t=layout.target,rx=Math.max(8,t.w*.45),ry=Math.max(4,t.h*.025);
+  ctx.save();ctx.translate(t.x+t.w/2,t.y+t.h-28*layout.s);ctx.scale(rx,ry);
+  const shade=ctx.createRadialGradient(0,0,0,0,0,1);shade.addColorStop(0,'rgba(35,30,45,.23)');shade.addColorStop(.45,'rgba(35,30,45,.12)');shade.addColorStop(1,'rgba(35,30,45,0)');
+  ctx.fillStyle=shade;ctx.fillRect(-1,-1,2,2);ctx.restore();
+  ctx.drawImage(foreground,layout.x,layout.y,W*layout.s,H*layout.s);return;
+ }
  // Fill the outer screen with adjoining scenery, never stretching the wash image.
  if(levels[level].id==='house'){const b=layout.background;const picture=layout.portrait?img:houseWide;if(b.y>0)ctx.drawImage(picture,0,0,picture.width,30,0,0,cw,b.y+1);if(b.y+b.h<ch)ctx.drawImage(picture,0,picture.height-40,picture.width,40,0,b.y+b.h-1,cw,ch-(b.y+b.h)+1);ctx.drawImage(picture,b.x,b.y,b.w,b.h);return;}
  const {s,x,y}=layout;
