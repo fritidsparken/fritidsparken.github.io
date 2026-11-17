@@ -83,23 +83,49 @@ function wash(dt,p=aim){
 }
 function resize(){const b=canvas.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);canvas.width=Math.max(1,Math.round(b.width*d));canvas.height=Math.max(1,Math.round(b.height*d));last=null;}
 window.addEventListener('resize',()=>{release();resize()});new ResizeObserver(resize).observe($('playArea'));resize();
-function sceneLayout(cw,ch){
- const portrait=cw<ch,dock=portrait?Math.min(130,ch*.25):Math.min(135,cw*.16),aw=portrait?cw:cw-dock,ah=portrait?ch-dock:ch;
- const s=Math.min(aw/W,ah/H),x=(portrait?0:dock)+(aw-W*s)/2,y=(ah-H*s)/2;
- return {s,x,y,dock,portrait,actor:portrait?{x:8,y:ch-dock,w:Math.min(170,cw*.45),h:dock}:{x:0,y:Math.max(0,ch-dock*1.7),w:dock,h:Math.min(ch,dock*1.7)}};
+function washBounds(){
+ const points=levels[level].polygons.flat(),xs=points.map(p=>p[0]*W),ys=points.map(p=>p[1]*H),pad=28;
+ const x=Math.max(1,Math.min(...xs)-pad),y=Math.max(1,Math.min(...ys)-pad);
+ return {x,y,w:Math.min(W-1,Math.max(...xs)+pad)-x,h:Math.min(H-1,Math.max(...ys)+pad)-y};
+}
+function sceneLayout(cw,ch,insets){
+ const portrait=cw<ch,bounds=washBounds();
+ const top=insets?.top??(portrait?205:ch<550?120:195),bottom=insets?.bottom??(portrait?ch-255:ch<550?ch-105:ch-155);
+ const usable=Math.max(50,bottom-top),actorH=portrait?Math.min(115,usable*.3):Math.min(340,ch*.45),actorW=actorH*.72;
+ const actor={x:6,y:Math.max(top,bottom-actorH),w:actorW,h:actorH};
+ const left=portrait?12:actor.x+actor.w+12,right=cw-12,low=portrait?actor.y-12:bottom;
+ const s=Math.max(.01,Math.min((right-left)/bounds.w,Math.max(40,low-top)/bounds.h));
+ const target={x:left+(right-left-bounds.w*s)/2,y:top+(Math.max(40,low-top)-bounds.h*s)/2,w:bounds.w*s,h:bounds.h*s};
+ return {s,x:target.x-bounds.x*s,y:target.y-bounds.y*s,portrait,actor,target,bounds};
+}
+function drawScenery(layout,cw,ch){
+ // Keep the complete washable object undistorted. Extend only surrounding scenery
+ // to the screen edges, with matching shared edges and no separate image panel.
+ const b=layout.bounds,t=layout.target,sx=[0,b.x,b.x+b.w,W],sy=[0,b.y,b.y+b.h,H],dx=[0,t.x,t.x+t.w,cw],dy=[0,t.y,t.y+t.h,ch];
+ for(let row=0;row<3;row++)for(let col=0;col<3;col++){
+  if(dx[col+1]>dx[col]&&dy[row+1]>dy[row])ctx.drawImage(img,sx[col],sy[row],sx[col+1]-sx[col],sy[row+1]-sy[row],dx[col],dy[row],dx[col+1]-dx[col],dy[row+1]-dy[row]);
+ }
+}
+function uiInsets(rect){
+ const bottomOf=id=>$(id).getBoundingClientRect().bottom-rect.top;
+ const topOf=id=>$(id).getBoundingClientRect().top-rect.top;
+ const header=document.querySelector('header').getBoundingClientRect();
+ const footer=document.querySelector('footer').getBoundingClientRect();
+ return {top:Math.max(header.bottom-rect.top,bottomOf('mission'))+10,bottom:Math.min(footer.top-rect.top,topOf('hint'),topOf('toast'))-10};
 }
 function render(now){
  const wallDt=Math.max(0,(now-clock)/1000),dt=Math.min(.04,wallDt);clock=now;
- const b=canvas.getBoundingClientRect(),dpr=canvas.width/Math.max(1,b.width),layout=sceneLayout(b.width,b.height),{s:scale,x:ox,y:oy}=layout;
+ const b=canvas.getBoundingClientRect(),dpr=canvas.width/Math.max(1,b.width),layout=sceneLayout(b.width,b.height,uiInsets(b)),{s:scale,x:ox,y:oy}=layout;
  transform={sx:scale,sy:scale,x:ox,y:oy};ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,b.width,b.height);
  if(img){
+  drawScenery(layout,b.width,b.height);
   if(playing&&!done){elapsed+=wallDt;const speed=420*dt;if(keys.has('ArrowLeft'))aim.x-=speed;if(keys.has('ArrowRight'))aim.x+=speed;if(keys.has('ArrowUp'))aim.y-=speed;if(keys.has('ArrowDown'))aim.y+=speed;aim.x=Math.max(0,Math.min(W,aim.x));aim.y=Math.max(0,Math.min(H,aim.y));const follow=1-Math.exp(-24*dt);sprayAim.x+=(aim.x-sprayAim.x)*follow;sprayAim.y+=(aim.y-sprayAim.y)*follow;if(holding&&pointerValid)wash(dt,sprayAim);if(now-lastMeasure>200){measure();lastMeasure=now}if(now-lastSave>7000){snapshot();lastSave=now}}
-  ctx.save();ctx.translate(ox,oy);ctx.scale(scale,scale);ctx.beginPath();ctx.rect(0,0,W,H);ctx.clip();ctx.drawImage(img,0,0,W,H);ctx.save();ctx.globalCompositeOperation='multiply';ctx.drawImage(dirt,0,0);ctx.restore();ctx.drawImage(foam,0,0);
+  ctx.save();ctx.translate(ox,oy);ctx.scale(scale,scale);ctx.beginPath();ctx.rect(layout.bounds.x,layout.bounds.y,layout.bounds.w,layout.bounds.h);ctx.clip();ctx.save();ctx.globalCompositeOperation='multiply';ctx.drawImage(dirt,0,0);ctx.restore();ctx.drawImage(foam,0,0);
   if(highlight>0){highlight-=dt;sc.clearRect(0,0,200,113);sc.drawImage(phase==='foam'?foam:dirt,0,0,200,113);const pix=sc.getImageData(0,0,200,113).data;ctx.strokeStyle='#ffc400';ctx.lineWidth=3/Math.max(.4,scale);for(let y=3;y<113;y+=8)for(let x=3;x<200;x+=8){const needed=phase==='foam'?pix[(y*200+x)*4+3]<200:pix[(y*200+x)*4+3]>40;if(needed){if(areaMask&&areaMask[(y*200+x)*4+3]>128){ctx.beginPath();ctx.arc(x*8,y*H/113,10,0,Math.PI*2);ctx.stroke()}}}}
   particles=particles.filter(p=>p.life>0);for(const p of particles){p.life-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;if(!p.bubble)p.vy+=350*dt;ctx.globalAlpha=Math.max(0,p.life/p.max);ctx.fillStyle=p.bubble?'#f8fdff':'#ceefff';ctx.beginPath();ctx.arc(p.x,p.y,p.bubble?5:2.5,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;
   if(ready&&!done&&!$('panel').open){ctx.strokeStyle='#ffffffcc';ctx.lineWidth=1.5/scale;ctx.beginPath();ctx.arc(aim.x,aim.y,brushRadius(),0,Math.PI*2);ctx.stroke();}ctx.restore();
   const a=layout.actor;ctx.save();ctx.beginPath();ctx.rect(a.x,a.y,a.w,a.h);ctx.clip();const charH=a.h*.96;const target={x:ox+sprayAim.x*scale,y:oy+sprayAim.y*scale};const pose=drawWasher(a.x,a.y+a.h-charH,charH*.4,charH,target,dt);ctx.restore();
-  if(holding&&playing&&pointerValid){ctx.save();ctx.beginPath();ctx.rect(ox,oy,W*scale,H*scale);ctx.clip();ctx.strokeStyle=phase==='foam'?'#f6faffb0':'#c8f4ff95';ctx.lineWidth=phase==='foam'?7:4;ctx.beginPath();ctx.moveTo(pose.x,pose.y);ctx.lineTo(target.x,target.y);ctx.stroke();ctx.restore();}
+  if(holding&&playing&&pointerValid){ctx.save();ctx.beginPath();ctx.rect(0,0,b.width,b.height);ctx.clip();ctx.strokeStyle=phase==='foam'?'#f6faffb0':'#c8f4ff95';ctx.lineWidth=phase==='foam'?7:4;ctx.beginPath();ctx.moveTo(pose.x,pose.y);ctx.lineTo(target.x,target.y);ctx.stroke();ctx.restore();}
  }
  $('timer').textContent=time(elapsed);setNoise(holding&&playing);if(toastTime>0){toastTime-=dt;if(toastTime<=0){$('toast').textContent='';$('toast').style.opacity=0}}requestAnimationFrame(render);
 }
