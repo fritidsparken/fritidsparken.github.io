@@ -1,6 +1,7 @@
 (()=>{'use strict';
 const $=id=>document.getElementById(id), canvas=$('scene'),ctx=canvas.getContext('2d');
 let W=1600,H=900,houseWide=null;
+const surface=document.createElement('canvas');const surfaceContext=surface.getContext('2d');
 const dirt=document.createElement('canvas');dirt.width=W;dirt.height=H;const dc=dirt.getContext('2d',{willReadFrequently:true});
 const sample=document.createElement('canvas');sample.width=200;sample.height=113;const sc=sample.getContext('2d',{willReadFrequently:true});
 let areaMask=null,pointerValid=true;
@@ -23,21 +24,22 @@ function stars(i,t){return t<=levels[i].goal?3:t<=levels[i].goal*1.6?2:1}
 function toast(s){$('toast').textContent=s;$('toast').style.opacity=1;toastTime=3}
 function getImage(id){if(images.has(id))return images.get(id);const p=new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=`assets/${id==='house'?'house-portrait-v2':id==='house-wide'?'house-wide-v2':id}.webp`});images.set(id,p);p.catch(()=>images.delete(id));return p}
 const housePolygons=[[[.280,.330],[.791,.324],[.791,.549],[.582,.549],[.470,.563],[.280,.566]],[[.578,.453],[.695,.406],[.791,.453],[.791,.554],[.582,.555]]];
-function polygons(){return levels[level].id==='house'?housePolygons:levels[level].polygons;}
-function polyPath(c){c.beginPath();for(const p of polygons()){p.forEach(([x,y],i)=>i?c.lineTo(x*W,y*H):c.moveTo(x*W,y*H));c.closePath()}}
+function regions(){return levels[level].id==='house'?housePolygons.map(p=>[p]):levels[level].regions||levels[level].polygons.map(p=>[p]);}
+function polygons(){return regions().map(r=>r[0]);}
+function polyPath(c,paths=polygons()){c.beginPath();for(const p of paths){p.forEach(([x,y],i)=>i?c.lineTo(x*W,y*H):c.moveTo(x*W,y*H));c.closePath()}}
 let seed=1;function rand(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}
-function makeDirt(){seed=12345+level*923;dc.clearRect(0,0,W,H);dc.save();polyPath(dc);dc.clip();dc.fillStyle='rgba(67,65,24,.75)';dc.fillRect(0,0,W,H);
+function makeDirt(){seed=12345+level*923;dc.clearRect(0,0,W,H);surface.width=W;surface.height=H;surfaceContext.fillStyle='#fff';for(const region of regions()){polyPath(surfaceContext,region);surfaceContext.fill('evenodd')}dc.save();dc.fillStyle='rgba(67,65,24,.75)';dc.fillRect(0,0,W,H);
  for(let i=0;i<9000;i++){const x=rand()*W,y=rand()*H,r=1+rand()*24;dc.fillStyle=`rgba(${25+rand()*40|0},${35+rand()*43|0},${10+rand()*20|0},${.08+rand()*.22})`;dc.beginPath();dc.ellipse(x,y,r,r*(.4+rand()),0,0,Math.PI*2);dc.fill()}
- for(let i=0;i<520;i++){let x=rand()*W,y=rand()*H;dc.strokeStyle=`rgba(37,48,17,${.06+rand()*.23})`;dc.lineWidth=1+rand()*5;dc.beginPath();dc.moveTo(x,y);dc.lineTo(x+rand()*7,y+20+rand()*80);dc.stroke()}dc.restore();initial=mass();}
+ for(let i=0;i<520;i++){let x=rand()*W,y=rand()*H;dc.strokeStyle=`rgba(37,48,17,${.06+rand()*.23})`;dc.lineWidth=1+rand()*5;dc.beginPath();dc.moveTo(x,y);dc.lineTo(x+rand()*7,y+20+rand()*80);dc.stroke()}dc.globalCompositeOperation='destination-in';dc.drawImage(surface,0,0);dc.restore();initial=mass();}
 function mass(layer=dirt){sc.clearRect(0,0,200,113);sc.drawImage(layer,0,0,200,113);let sum=0;const data=sc.getImageData(0,0,200,113).data;for(let i=3;i<data.length;i+=4)sum+=data[i];return sum}
 function updateStage(){$('hint').textContent='Håll in och dra för att tvätta bort smutsen.';}
 function measure(){percent=Math.min(100,Math.max(0,100*(1-mass()/initial)));if(percent>=98.4&&!done)finish();$('fill').style.width=percent+'%';$('progressLabel').textContent=`Rent: ${Math.floor(percent)}%`;}
 async function load(i,resume=false){const token=++loadedToken;playing=false;holding=false;ready=false;$('loading').hidden=false;if($('panel').open)$('panel').close();try{const [im,wide]=await Promise.all([getImage(levels[i].id),levels[i].id==='house'?getImage('house-wide'):Promise.resolve(null),window.WasherRig.ready]);if(token!==loadedToken)return;level=i;houseWide=wide;W=im.naturalWidth;H=im.naturalHeight;dirt.width=W;dirt.height=H;cameraX=800;pointerScreen=null;img=im;elapsed=0;percent=0;done=false;last=null;particles=[];aim={x:800,y:450};sprayAim={...aim};makeDirt();
  sc.clearRect(0,0,200,113);sc.drawImage(dirt,0,0,200,113);areaMask=sc.getImageData(0,0,200,113).data;
- if(resume&&save.active?.id===levels[i].id&&save.active.mask&&save.active.version>=6){elapsed=Number(save.active.elapsed)||0;const snap=new Image();await new Promise(resolve=>{snap.onload=()=>{dc.clearRect(0,0,W,H);dc.drawImage(snap,0,0,W,H);resolve()};snap.onerror=resolve;snap.src=save.active.mask});}
+ if(resume&&save.active?.id===levels[i].id&&save.active.mask&&save.active.version===7){elapsed=Number(save.active.elapsed)||0;const snap=new Image();await new Promise(resolve=>{snap.onload=()=>{dc.clearRect(0,0,W,H);dc.drawImage(snap,0,0,W,H);resolve()};snap.onerror=resolve;snap.src=save.active.mask});}
  ready=true;measure();$('levelName').textContent=levels[i].name;$('target').textContent=`★ Tidsmål ${time(levels[i].goal)}`;$('hint').style.opacity=1;updateStage();updateTool();$('loading').hidden=true;if(!done){playing=true;clock=performance.now()}if(i+1<levels.length)getImage(levels[i+1].id).catch(()=>{});
  }catch{$('loading').hidden=true;openPanel('<h2>Bilden kunde inte laddas</h2><p>Kontrollera anslutningen och försök igen.</p><div class="actions"><button class="primary" data-retry="'+i+'">Försök igen</button></div>')}}
-function snapshot(){if(!ready||done)return;save.active={version:6,id:levels[level].id,elapsed,mask:dirt.toDataURL('image/png')};persist()}
+function snapshot(){if(!ready||done)return;save.active={version:7,id:levels[level].id,elapsed,mask:dirt.toDataURL('image/png')};persist()}
 function updateTool(){tool();updateStage();$('sound').textContent=muted?'♫':'♪';$('sound').setAttribute('aria-label',muted?'Slå på ljud':'Stäng av ljud')}
 function openPanel(html){holding=false;last=null;playing=false;setNoise(false);$('panelBody').innerHTML=html;if(!$('panel').open)$('panel').showModal()}
 function menu(page=menuPage){menuPage=Math.max(0,Math.min(Math.ceil(levels.length/6)-1,page));snapshot();openPanel(`<h2>Välj ditt nästa uppdrag</h2><p>Gör allt rent för att öppna nästa bana. Klara tidsmålet för tre stjärnor och nya tillbehör.</p><div class="cards">${levels.slice(menuPage*6,menuPage*6+6).map((l,n)=>{const i=menuPage*6+n;const best=save.best[l.id];return `<button class="card" data-level="${i}" ${!unlocked(i)?'disabled':''}><img src="assets/${l.id==='house'?'house-portrait-v2':l.id}.webp" alt="${l.name}" loading="lazy"><span class="copy"><strong>${unlocked(i)?'':'🔒 '}${l.name}</strong><small>★ ${time(l.goal)} ${Number.isFinite(best)?'· Bäst '+time(best):''}</small><span class="stars">${Number.isFinite(best)?'★'.repeat(stars(i,best))+'☆'.repeat(3-stars(i,best)):unlocked(i)?'Redo att tvätta':'Klara föregående bana'}</span></span></button>`}).join('')}</div><div class="actions"><button class="secondary" data-page="${menuPage-1}" ${menuPage===0?'disabled':''}>← Föregående</button><span>Sida ${menuPage+1} / ${Math.ceil(levels.length/6)}</span><button class="secondary" data-page="${menuPage+1}" ${menuPage>=Math.ceil(levels.length/6)-1?'disabled':''}>Nästa →</button></div>`)}
