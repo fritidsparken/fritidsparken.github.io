@@ -94,8 +94,8 @@ function sceneLayout(cw,ch,insets){
  const portrait=cw<ch,bounds=washBounds();
  const top=insets?.top??(portrait?104:ch<550?64:128),bottom=insets?.bottom??ch-(portrait?104:ch<550?84:120);
  const usable=Math.max(60,bottom-top);
- const actorH=portrait?Math.min(185,usable*.32):Math.min(520,usable*.98),actorW=actorH*.68;
- const actor={x:0,y:bottom-actorH,w:actorW,h:actorH};
+ const actorH=portrait?Math.min(185,usable*.32):Math.min(620,ch*.8),actorW=actorH*.68;
+ const actor={x:0,y:portrait?bottom-actorH:ch-actorH*.88,w:actorW,h:actorH};
  const left=portrait?10:actorW+8,right=cw-10,low=portrait?actor.y-8:bottom;
  const s=Math.min((right-left)/bounds.w,Math.max(40,low-top)/bounds.h);
  const target={x:left+(right-left-bounds.w*s)/2,y:top+(low-top-bounds.h*s)/2,w:bounds.w*s,h:bounds.h*s};
