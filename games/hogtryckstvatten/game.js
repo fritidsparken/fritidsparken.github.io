@@ -102,10 +102,16 @@ function sceneLayout(cw,ch,insets){
  return {s,x:target.x-bounds.x*s,y:target.y-bounds.y*s,portrait,actor,target,bounds};
 }
 function drawScenery(layout,cw,ch){
- // One uniform transform for the entire original image: no sliced or stretched scenery.
- const {s,x,y}=layout,horizon=Math.max(0,Math.min(ch,y+H*s*.64));
- const sky=ctx.createLinearGradient(0,0,0,ch);sky.addColorStop(0,'#78cdf2');sky.addColorStop(Math.max(.01,Math.min(.99,horizon/ch)),'#d1eff9');sky.addColorStop(1,'#719d42');ctx.fillStyle=sky;ctx.fillRect(0,0,cw,ch);
- ctx.drawImage(img,x,y,W*s,H*s);
+ // Fill the outer screen with adjoining scenery, never stretching the wash image.
+ const {s,x,y}=layout;
+ function segments(start,length,screen,edge){
+  const out=[{at:start,size:length*s,src:0,len:length,flip:false}],step=edge*s;
+  for(let at=start-step,n=0;at+step>0;at-=step,n++)out.push({at,size:step,src:0,len:edge,flip:n%2===0});
+  for(let at=start+length*s,n=0;at<screen;at+=step,n++)out.push({at,size:step,src:length-edge,len:edge,flip:n%2===0});
+  return out;
+ }
+ const xs=segments(x,W,cw,100),ys=segments(y,H,ch,60);
+ for(const row of ys)for(const col of xs){ctx.save();ctx.translate(col.at+(col.flip?col.size:0),row.at+(row.flip?row.size:0));ctx.scale(col.flip?-1:1,row.flip?-1:1);ctx.drawImage(img,col.src,row.src,col.len,row.len,0,0,col.size,row.size);ctx.restore();}
 }
 function uiInsets(rect){
  const header=document.querySelector('header').getBoundingClientRect(),footer=document.querySelector('footer').getBoundingClientRect();
