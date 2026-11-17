@@ -1,3 +1,5 @@
-# Pågående arbete – publicera inte
+# Utkast – inväntar godkännande
 
-Bildfiler och omslagsbild har avsiktligt inte lagts i grenen eftersom de kräver godkännande. Kontrollera varje bild och dess koordinater i levels.js innan bilderna läggs till och grenen kan slås samman. Det här utkastet kommer inte att visa bilder förrän filerna finns.
+Åtta nygenererade bilder: 01, 03, 04, 05, 07, 10, 13 och 18. De kräver användarens godkännande före publicering. Svarspunkten för 18 har ändrats till (305, 450) med radie 65 i bildens 1672 × 941-koordinatsystem. Kopian är inte publicerad.
+
+Bildfilerna finns avsiktligt inte i grenen. Före publicering behövs hitta-snoleoparden/assets/01.webp, 03.webp, 04.webp, 05.webp, 07.webp, 10.webp, 13.webp, 18.webp samt assets/snow-leopard-cover.webp. Lägg bara till godkända bilder; kontrollera koordinaterna för varje slutgiltig bild och gör en riktig webbläsarkontroll. Slå inte ihop grenen före godkännande.
