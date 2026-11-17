@@ -1,5 +1,6 @@
 (()=>{'use strict';
-const $=id=>document.getElementById(id), canvas=$('scene'),ctx=canvas.getContext('2d'),W=1600,H=900;
+const $=id=>document.getElementById(id), canvas=$('scene'),ctx=canvas.getContext('2d');
+let W=1600,H=900,houseWide=null;
 const dirt=document.createElement('canvas');dirt.width=W;dirt.height=H;const dc=dirt.getContext('2d',{willReadFrequently:true});
 const sample=document.createElement('canvas');sample.width=200;sample.height=113;const sc=sample.getContext('2d',{willReadFrequently:true});
 let areaMask=null,pointerValid=true;
@@ -20,8 +21,10 @@ function tool(){if(!kit[save.tool]||golds()<kit[save.tool].need)save.tool=0;retu
 function time(n){return `${Math.floor(n/60)}:${String(Math.floor(n%60)).padStart(2,'0')}`}
 function stars(i,t){return t<=levels[i].goal?3:t<=levels[i].goal*1.6?2:1}
 function toast(s){$('toast').textContent=s;$('toast').style.opacity=1;toastTime=3}
-function getImage(id){if(images.has(id))return images.get(id);const p=new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=`assets/${id}.webp`});images.set(id,p);p.catch(()=>images.delete(id));return p}
-function polyPath(c){c.beginPath();for(const p of levels[level].polygons){p.forEach(([x,y],i)=>i?c.lineTo(x*W,y*H):c.moveTo(x*W,y*H));c.closePath()}}
+function getImage(id){if(images.has(id))return images.get(id);const p=new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=`assets/${id==='house'?'house-portrait-v2':id==='house-wide'?'house-wide-v2':id}.webp`});images.set(id,p);p.catch(()=>images.delete(id));return p}
+const housePolygons=[[[.280,.330],[.791,.324],[.791,.549],[.582,.549],[.470,.563],[.280,.566]],[[.578,.453],[.695,.406],[.791,.453],[.791,.554],[.582,.555]]];
+function polygons(){return levels[level].id==='house'?housePolygons:levels[level].polygons;}
+function polyPath(c){c.beginPath();for(const p of polygons()){p.forEach(([x,y],i)=>i?c.lineTo(x*W,y*H):c.moveTo(x*W,y*H));c.closePath()}}
 let seed=1;function rand(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}
 function makeDirt(){seed=12345+level*923;dc.clearRect(0,0,W,H);dc.save();polyPath(dc);dc.clip();dc.fillStyle='rgba(67,65,24,.75)';dc.fillRect(0,0,W,H);
  for(let i=0;i<9000;i++){const x=rand()*W,y=rand()*H,r=1+rand()*24;dc.fillStyle=`rgba(${25+rand()*40|0},${35+rand()*43|0},${10+rand()*20|0},${.08+rand()*.22})`;dc.beginPath();dc.ellipse(x,y,r,r*(.4+rand()),0,0,Math.PI*2);dc.fill()}
@@ -29,15 +32,15 @@ function makeDirt(){seed=12345+level*923;dc.clearRect(0,0,W,H);dc.save();polyPat
 function mass(layer=dirt){sc.clearRect(0,0,200,113);sc.drawImage(layer,0,0,200,113);let sum=0;const data=sc.getImageData(0,0,200,113).data;for(let i=3;i<data.length;i+=4)sum+=data[i];return sum}
 function updateStage(){$('hint').textContent='Håll in och dra för att tvätta bort smutsen.';}
 function measure(){percent=Math.min(100,Math.max(0,100*(1-mass()/initial)));if(percent>=98.4&&!done)finish();$('fill').style.width=percent+'%';$('progressLabel').textContent=`Rent: ${Math.floor(percent)}%`;}
-async function load(i,resume=false){const token=++loadedToken;playing=false;holding=false;ready=false;$('loading').hidden=false;if($('panel').open)$('panel').close();try{const [im]=await Promise.all([getImage(levels[i].id),window.WasherRig.ready]);if(token!==loadedToken)return;level=i;cameraX=800;pointerScreen=null;img=im;elapsed=0;percent=0;done=false;last=null;particles=[];aim={x:800,y:450};sprayAim={...aim};makeDirt();
+async function load(i,resume=false){const token=++loadedToken;playing=false;holding=false;ready=false;$('loading').hidden=false;if($('panel').open)$('panel').close();try{const [im,wide]=await Promise.all([getImage(levels[i].id),levels[i].id==='house'?getImage('house-wide'):Promise.resolve(null),window.WasherRig.ready]);if(token!==loadedToken)return;level=i;houseWide=wide;W=levels[i].id==='house'?1145:1600;H=levels[i].id==='house'?1374:900;dirt.width=W;dirt.height=H;cameraX=800;pointerScreen=null;img=im;elapsed=0;percent=0;done=false;last=null;particles=[];aim={x:800,y:450};sprayAim={...aim};makeDirt();
  sc.clearRect(0,0,200,113);sc.drawImage(dirt,0,0,200,113);areaMask=sc.getImageData(0,0,200,113).data;
- if(resume&&save.active?.id===levels[i].id&&save.active.mask){elapsed=Number(save.active.elapsed)||0;const snap=new Image();await new Promise(resolve=>{snap.onload=()=>{dc.clearRect(0,0,W,H);dc.drawImage(snap,0,0,W,H);resolve()};snap.onerror=resolve;snap.src=save.active.mask});}
+ if(resume&&save.active?.id===levels[i].id&&save.active.mask&&(levels[i].id!=='house'||save.active.version>=5)){elapsed=Number(save.active.elapsed)||0;const snap=new Image();await new Promise(resolve=>{snap.onload=()=>{dc.clearRect(0,0,W,H);dc.drawImage(snap,0,0,W,H);resolve()};snap.onerror=resolve;snap.src=save.active.mask});}
  ready=true;measure();$('levelName').textContent=levels[i].name;$('target').textContent=`★ Tidsmål ${time(levels[i].goal)}`;$('hint').style.opacity=1;updateStage();updateTool();$('loading').hidden=true;if(!done){playing=true;clock=performance.now()}if(i+1<levels.length)getImage(levels[i+1].id).catch(()=>{});
  }catch{$('loading').hidden=true;openPanel('<h2>Bilden kunde inte laddas</h2><p>Kontrollera anslutningen och försök igen.</p><div class="actions"><button class="primary" data-retry="'+i+'">Försök igen</button></div>')}}
-function snapshot(){if(!ready||done)return;save.active={version:4,id:levels[level].id,elapsed,mask:dirt.toDataURL('image/png')};persist()}
+function snapshot(){if(!ready||done)return;save.active={version:5,id:levels[level].id,elapsed,mask:dirt.toDataURL('image/png')};persist()}
 function updateTool(){tool();updateStage();$('sound').textContent=muted?'♫':'♪';$('sound').setAttribute('aria-label',muted?'Slå på ljud':'Stäng av ljud')}
 function openPanel(html){holding=false;last=null;playing=false;setNoise(false);$('panelBody').innerHTML=html;if(!$('panel').open)$('panel').showModal()}
-function menu(page=menuPage){menuPage=Math.max(0,Math.min(Math.ceil(levels.length/6)-1,page));snapshot();openPanel(`<h2>Välj ditt nästa uppdrag</h2><p>Gör allt rent för att öppna nästa bana. Klara tidsmålet för tre stjärnor och nya tillbehör.</p><div class="cards">${levels.slice(menuPage*6,menuPage*6+6).map((l,n)=>{const i=menuPage*6+n;const best=save.best[l.id];return `<button class="card" data-level="${i}" ${!unlocked(i)?'disabled':''}><img src="assets/${l.id}.webp" alt="${l.name}" loading="lazy"><span class="copy"><strong>${unlocked(i)?'':'🔒 '}${l.name}</strong><small>★ ${time(l.goal)} ${Number.isFinite(best)?'· Bäst '+time(best):''}</small><span class="stars">${Number.isFinite(best)?'★'.repeat(stars(i,best))+'☆'.repeat(3-stars(i,best)):unlocked(i)?'Redo att tvätta':'Klara föregående bana'}</span></span></button>`}).join('')}</div><div class="actions"><button class="secondary" data-page="${menuPage-1}" ${menuPage===0?'disabled':''}>← Föregående</button><span>Sida ${menuPage+1} / ${Math.ceil(levels.length/6)}</span><button class="secondary" data-page="${menuPage+1}" ${menuPage>=Math.ceil(levels.length/6)-1?'disabled':''}>Nästa →</button></div>`)}
+function menu(page=menuPage){menuPage=Math.max(0,Math.min(Math.ceil(levels.length/6)-1,page));snapshot();openPanel(`<h2>Välj ditt nästa uppdrag</h2><p>Gör allt rent för att öppna nästa bana. Klara tidsmålet för tre stjärnor och nya tillbehör.</p><div class="cards">${levels.slice(menuPage*6,menuPage*6+6).map((l,n)=>{const i=menuPage*6+n;const best=save.best[l.id];return `<button class="card" data-level="${i}" ${!unlocked(i)?'disabled':''}><img src="assets/${l.id==='house'?'house-portrait-v2':l.id}.webp" alt="${l.name}" loading="lazy"><span class="copy"><strong>${unlocked(i)?'':'🔒 '}${l.name}</strong><small>★ ${time(l.goal)} ${Number.isFinite(best)?'· Bäst '+time(best):''}</small><span class="stars">${Number.isFinite(best)?'★'.repeat(stars(i,best))+'☆'.repeat(3-stars(i,best)):unlocked(i)?'Redo att tvätta':'Klara föregående bana'}</span></span></button>`}).join('')}</div><div class="actions"><button class="secondary" data-page="${menuPage-1}" ${menuPage===0?'disabled':''}>← Föregående</button><span>Sida ${menuPage+1} / ${Math.ceil(levels.length/6)}</span><button class="secondary" data-page="${menuPage+1}" ${menuPage>=Math.ceil(levels.length/6)-1?'disabled':''}>Nästa →</button></div>`)}
 function toolsMenu(){openPanel(`<h2>Din högtryckstvätt</h2><p>${golds()} av ${levels.length} tidsmål klarade. Klara tidsmålen på olika banor för att låsa upp mer kraft.</p><div class="tool-grid">${kit.map((k,i)=>`<button class="card tool-card ${save.tool===i?'selected':''}" data-tool="${i}" ${golds()<k.need?'disabled':''}><div class="symbol">${k.symbol}</div><strong>${k.name}${save.tool===i?' ✓':''}</strong><p>${k.desc}</p><small>${golds()>=k.need?'Välj munstycke':`🔒 Klara ${k.need} olika tidsmål`}</small></button>`).join('')}</div>`)}
 function finish(){done=true;playing=false;holding=false;percent=100;dc.clearRect(0,0,W,H);const l=levels[level],oldGold=golds();save.best[l.id]=Math.min(save.best[l.id]??Infinity,elapsed);delete save.active;persist();setNoise(false);chime();const newly=kit.filter(k=>k.need>oldGold&&k.need<=golds());openPanel(`<div class="welcome"><div class="big">✨</div><h2>Skinande rent!</h2><div class="stars" style="font-size:42px">${'★'.repeat(stars(level,elapsed))}${'☆'.repeat(3-stars(level,elapsed))}</div><p><b>${l.name}</b> är klar på <b>${time(elapsed)}</b>.<br>Tidsmål: ${time(l.goal)} · Ditt rekord: ${time(save.best[l.id])}</p>${newly.length?`<p><b>🔓 ${newly.map(k=>k.name).join(', ')} upplåst!</b></p>`:elapsed>l.goal?'<p>Testa igen och slå tidsmålet för att låsa upp bättre tillbehör.</p>':'<p>Du klarade tidsmålet. Snyggt tvättat!</p>'}<div class="actions">${level<levels.length-1?`<button class="primary" data-level="${level+1}">Nästa uppdrag →</button>`:'<button class="primary" data-menu>Alla uppdrag</button>'}<button class="secondary" data-level="${level}">Spela igen</button><button class="secondary" data-tools>Verktyg</button></div></div>`)}
 function initAudio(){if(audio)return;try{audio=new(window.AudioContext||window.webkitAudioContext)();let b=audio.createBuffer(1,audio.sampleRate*2,audio.sampleRate);let d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*.25;noise=audio.createBufferSource();noise.buffer=b;noise.loop=true;let filter=audio.createBiquadFilter();filter.type='lowpass';filter.frequency.value=1600;gain=audio.createGain();gain.gain.value=0;noise.connect(filter).connect(gain).connect(audio.destination);noise.start()}catch{}}
@@ -53,11 +56,20 @@ function rotationNotice(){return typeof matchMedia==='function'&&matchMedia('(or
 function resize(){const b=canvas.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);canvas.width=Math.max(1,Math.round(b.width*d));canvas.height=Math.max(1,Math.round(b.height*d));last=null;}
 window.addEventListener('resize',()=>{release();resize()});new ResizeObserver(resize).observe($('playArea'));resize();
 function washBounds(){
- const points=levels[level].polygons.flat(),xs=points.map(p=>p[0]*W),ys=points.map(p=>p[1]*H),pad=28;
+ const points=polygons().flat(),xs=points.map(p=>p[0]*W),ys=points.map(p=>p[1]*H),pad=levels[level].id==='house'?2:28;
  const x=Math.max(1,Math.min(...xs)-pad),y=Math.max(1,Math.min(...ys)-pad);
  return {x,y,w:Math.min(W-1,Math.max(...xs)+pad)-x,h:Math.min(H-1,Math.max(...ys)+pad)-y};
 }
 function sceneLayout(cw,ch,insets){
+ if(levels[level].id==='house'){
+  const portrait=cw<ch,bounds=washBounds(),top=insets?.top??100,bottom=insets?.bottom??ch-80;
+  const bgW=portrait?1145:1672,bgH=portrait?1374:941;
+  const bgScale=portrait?Math.min(Math.max(cw/bgW,ch/bgH),(cw-8)/bounds.w):Math.max(cw/bgW,ch/bgH),bx=portrait?Math.min(4-bounds.x*bgScale,Math.max(cw-4-(bounds.x+bounds.w)*bgScale,(cw-bgW*bgScale)/2)):(cw-bgW*bgScale)/2,by=portrait?Math.max(0,(ch-bgH*bgScale)/2):(ch-bgH*bgScale)/2;
+  const s=portrait?bgScale:bgScale*.774,x=portrait?bx:bx+538*bgScale,y=portrait?by:by-74*bgScale;
+  const target={x:x+bounds.x*s,y:y+bounds.y*s,w:bounds.w*s,h:bounds.h*s};
+  const actorH=portrait?Math.min(ch*.19,145):Math.min(ch*.43,310),actor={x:Math.max(4,cw*.012),y:Math.min(ch-actorH-10,bottom-actorH),w:actorH*.68,h:actorH};
+  return {s,x,y,portrait,actor,target,bounds,background:{x:bx,y:by,w:bgW*bgScale,h:bgH*bgScale}};
+ }
  const portrait=cw<ch,bounds=washBounds();
  const top=insets?.top??(portrait?104:ch<550?64:128),bottom=insets?.bottom??ch-(portrait?104:ch<550?84:120);
  const usable=Math.max(60,bottom-top);
@@ -70,6 +82,7 @@ function sceneLayout(cw,ch,insets){
 }
 function drawScenery(layout,cw,ch){
  // Fill the outer screen with adjoining scenery, never stretching the wash image.
+ if(levels[level].id==='house'){const b=layout.background;const picture=layout.portrait?img:houseWide;if(b.y>0)ctx.drawImage(picture,0,0,picture.width,30,0,0,cw,b.y+1);if(b.y+b.h<ch)ctx.drawImage(picture,0,picture.height-40,picture.width,40,0,b.y+b.h-1,cw,ch-(b.y+b.h)+1);ctx.drawImage(picture,b.x,b.y,b.w,b.h);return;}
  const {s,x,y}=layout;
  function segments(start,length,screen,edge){
   const out=[{at:start,size:length*s,src:0,len:length,flip:false}],step=edge*s;
@@ -109,6 +122,6 @@ $('panelBody').addEventListener('click',e=>{const b=e.target.closest('button');i
 function closePanel(){release();$('panel').close();if(ready){playing=!done;clock=performance.now();canvas.focus({preventScroll:true});}else{const i=levels.findIndex(l=>l.id===save.active?.id);return load(i<0?0:i,i>=0);}}
 $('closePanel').onclick=closePanel;$('panel').addEventListener('cancel',e=>{e.preventDefault();closePanel()});$('levels').onclick=()=>menu(Math.floor(level/6));$('tools').onclick=toolsMenu;$('pause').onclick=pause;$('reveal').onclick=()=>{if(!ready)return;highlight=4;toast('Gula ringar visar smuts som finns kvar')};$('sound').onclick=()=>{muted=!muted;save.sound=!muted;persist();initAudio();audio?.resume();updateTool()};
 document.addEventListener('visibilitychange',()=>{if(document.hidden){snapshot();release();keys.clear();if(playing)pause()}});window.addEventListener('pagehide',snapshot);
-updateTool();getImage('house').then(im=>{if(!img)img=im}).catch(()=>{});openPanel(`<div class="welcome"><div class="big">💦</div><h2>Lite smuts.<br>Massor av tvättglädje.</h2><p>${levels.length} soliga uppdrag väntar. Spruta bort smutsen med högtryckstvätten! Slå tidsmålen för att låsa upp bättre munstycken.</p><div class="actions"><button class="primary" data-start>${save.active?'Fortsätt tvätta':'Nu gör vi rent!'} →</button><button class="secondary" data-menu>Välj uppdrag</button></div><p><small>Mus eller finger · Pilar + mellanslag · Sparas på denna enhet</small></p></div>`);requestAnimationFrame(render);
+updateTool();openPanel(`<div class="welcome"><div class="big">💦</div><h2>Lite smuts.<br>Massor av tvättglädje.</h2><p>${levels.length} soliga uppdrag väntar. Spruta bort smutsen med högtryckstvätten! Slå tidsmålen för att låsa upp bättre munstycken.</p><div class="actions"><button class="primary" data-start>${save.active?'Fortsätt tvätta':'Nu gör vi rent!'} →</button><button class="secondary" data-menu>Välj uppdrag</button></div><p><small>Mus eller finger · Pilar + mellanslag · Sparas på denna enhet</small></p></div>`);requestAnimationFrame(render);
 })();
 
