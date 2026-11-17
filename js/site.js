@@ -193,7 +193,7 @@ function gymGallery(q){let games=gymGames.filter(g=>g.min<=gymStudents&&g.max>=g
 
 
 const funTools=[
-{key:"snoleopard",icon:"🐾",name:"Hitta snöleoparden",image:"tool_snoleopard_playful.svg",desc:"Leta efter den välkamouflerade snöleoparden i kluriga bergslandskap."},
+{key:"snoleopard",icon:"🐾",name:"Hitta snöleoparden",image:"snow-leopard-icon-20261117.jpg",desc:"Leta efter den välkamouflerade snöleoparden i kluriga bergslandskap."},
 {key:"ansiktsloppa",icon:"👄",name:"Ansiktsloppan",image:"tool_ansiktsloppa.svg",desc:"Skapa en vikloppa med ett eget ansikte och skriv ut arket."},
 {key:"wheel",icon:"🎡",name:"Snurrhjulet",image:"tool_wheel.svg",desc:"Spin the wheel – låt hjulet välja bland era egna alternativ."}
 ];
