@@ -115,6 +115,8 @@ def refine(level, img, old, session):
             if stats[component, cv2.CC_STAT_AREA] < 200:
                 rotor[labels == component] = 0
         kept[rotor > 0] = 255
+        # The tree at the far left is not part of the helicopter.
+        kept[(fx < .14) & (fy > .305) & (fy < .45)] = 0
     fraction = float(np.count_nonzero(kept)/(w*h))
     if not (.02 < fraction < .72):
         raise RuntimeError(f'{level["id"]}: segmentation area {fraction:.1%} suspicious')
