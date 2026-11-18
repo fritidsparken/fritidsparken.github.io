@@ -193,7 +193,7 @@ function gymGallery(q){let games=gymGames.filter(g=>g.min<=gymStudents&&g.max>=g
 
 
 const funTools=[
-{key:"skillnader",icon:"🔎",name:"Hitta 5 skillnader",image:"hitta-fem-skillnader-icon.webp",desc:"Jämför två bilder och ringa in de fem saker som saknas."},
+{key:"skillnader",icon:"🔎",name:"Hitta 5 skillnader",image:"hitta-fem-skillnader-icon.webp",desc:"Hitta fem saknade saker i elva banor som blir svårare och svårare."},
 {key:"snoleopard",icon:"🐾",name:"Hitta snöleoparden",image:"snow-leopard-icon-20261117.jpg",desc:"Leta efter den välkamouflerade snöleoparden i kluriga bergslandskap."},
 {key:"ansiktsloppa",icon:"👄",name:"Ansiktsloppan",image:"tool_ansiktsloppa.svg",desc:"Skapa en vikloppa med ett eget ansikte och skriv ut arket."},
 {key:"wheel",icon:"🎡",name:"Snurrhjulet",image:"tool_wheel.svg",desc:"Spin the wheel – låt hjulet välja bland era egna alternativ."}
@@ -206,7 +206,7 @@ function funHub(){return '<div class="fun-intro"><strong>Små verktyg som gör f
 function funPage(){
  const back='<button class="secondary fun-back" data-funback>← Alla verktyg</button>';
  if(!funTool)return funHub();
- if(funTool==="skillnader")return '<section class="snow-leopard-overlay differences-overlay" role="dialog" aria-modal="true" aria-label="Hitta 5 skillnader"><header class="snow-leopard-overlay-bar"><button type="button" class="snow-leopard-close" data-funback>← Alla verktyg</button><strong>Hitta 5 skillnader</strong></header><iframe title="Hitta 5 skillnader" src="./hitta-fem-skillnader/?embedded=1" allow="fullscreen"></iframe></section>';
+ if(funTool==="skillnader")return '<section class="snow-leopard-overlay differences-overlay" role="dialog" aria-modal="true" aria-label="Hitta 5 skillnader"><header class="snow-leopard-overlay-bar"><button type="button" class="snow-leopard-close" data-funback>← Alla verktyg</button><strong>Hitta 5 skillnader</strong></header><iframe title="Hitta 5 skillnader" src="./hitta-fem-skillnader/?embedded=1&v=levels-20261118-2" allow="fullscreen"></iframe></section>';
  if(funTool==="snoleopard")return '<section class="snow-leopard-overlay" role="dialog" aria-modal="true" aria-label="Hitta snöleoparden"><header class="snow-leopard-overlay-bar"><button type="button" class="snow-leopard-close" data-funback>← Alla verktyg</button><strong>Hitta snöleoparden</strong></header><iframe title="Hitta snöleoparden" src="./hitta-snoleoparden/" allow="fullscreen"></iframe></section>';
  if(funTool==="ansiktsloppa")return back+'<div class="fun-panel"><h2>Ansiktsloppan</h2><p>Skapa en loppa med ett ansikte som öppnar och stänger munnen.</p><iframe title="Ansiktsloppan" src="./ansiktsloppan/?v=20261109" allow="camera" style="width:100%;height:1600px;border:0;border-radius:16px;background:var(--paper)"></iframe><p><a href="./ansiktsloppan/">Öppna Ansiktsloppan på en egen sida</a></p></div>';
  if(funTool==="wheel")return back+window.FPWheel.page();

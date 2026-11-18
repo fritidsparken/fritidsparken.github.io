@@ -1,4 +1,4 @@
-/* Hitta 5 skillnader. All game state stays in this tab. */
+/* Hitta 5 skillnader. Progress is stored only in this browser. */
 (() => {
   'use strict';
   if (new URLSearchParams(window.location.search).get('embedded') === '1') {
@@ -12,13 +12,83 @@
     progress: $('progressText'), dots: Array.from($('progressDots').children),
     hint: $('hintButton'), replay: $('replayButton'), retry: $('retryButton'),
     load: $('loadState'), loadMessage: $('loadMessage'), feedback: $('feedback'),
-    live: $('liveMessage'), help: $('helpDialog'), completion: $('completionDialog')
+    live: $('liveMessage'), help: $('helpDialog'), completion: $('completionDialog'),
+    levelSelect: $('levelSelect'), previous: $('previousLevel'), next: $('nextLevel'),
+    difficulty: $('difficultyLabel'), zoom: $('zoomButton'), nextComplete: $('completionNextButton')
   };
+  const levels = window.FP_DIFFERENCE_LEVELS || [];
+  const storageKey = 'fp-five-differences-progress-v1';
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(storageKey)) || {}; } catch {}
+  if (!saved || typeof saved !== 'object' || Array.isArray(saved)) saved = {};
+  const validIds = new Set(levels.map(level => level.id));
   const state = {
     level: null, found: new Set(), ready: false, loading: 0, ratio: 1.5,
     cursor: {x: .5, y: .5}, hintId: null, hintTimer: 0, feedbackTimer: 0,
-    completeTimer: 0, layoutFrame: 0
+    completeTimer: 0, layoutFrame: 0, levelIndex: Math.max(0, levels.findIndex(level => level.id === saved.current)),
+    completed: new Set((Array.isArray(saved.completed) ? saved.completed : []).filter(id => validIds.has(id))),
+    rounds: saved.rounds && typeof saved.rounds === 'object' && !Array.isArray(saved.rounds) ? saved.rounds : {},
+    zoom: 1, camera: {x: .5, y: .5}
   };
+
+  function saveProgress() {
+    if (!state.level) return;
+    state.rounds[state.level.id] = [...state.found];
+    const rounds = Object.fromEntries(levels.map(level => [level.id,
+      (Array.isArray(state.rounds[level.id]) ? state.rounds[level.id] : []).filter(id => level.targets.some(target => target.id === id))
+    ]));
+    try { localStorage.setItem(storageKey, JSON.stringify({current: state.level.id, completed: [...state.completed], rounds})); } catch {}
+  }
+
+  function updateNavigation() {
+    ui.levelSelect.replaceChildren(...levels.map((level, index) => {
+      const option = document.createElement('option');
+      option.value = String(index);
+      option.textContent = `${index + 1}/${levels.length} · ${level.title}${state.completed.has(level.id) ? ' ✓' : ''}`;
+      return option;
+    }));
+    ui.levelSelect.value = String(state.levelIndex);
+    ui.previous.disabled = state.levelIndex <= 0;
+    ui.next.disabled = state.levelIndex >= levels.length - 1;
+    ui.difficulty.textContent = levels[state.levelIndex]?.difficultyLabel || 'Start';
+    ui.difficulty.dataset.difficulty = String(levels[state.levelIndex]?.difficulty || 0);
+  }
+
+  function cameraBounds() {
+    const half = .5 / state.zoom;
+    state.camera.x = Math.max(half, Math.min(1 - half, state.camera.x));
+    state.camera.y = Math.max(half, Math.min(1 - half, state.camera.y));
+    return {left: state.camera.x - half, top: state.camera.y - half};
+  }
+
+  function applyZoom() {
+    const {left, top} = cameraBounds();
+    ui.boards.forEach(board => {
+      board.querySelector('.scene-stage').style.transform = `translate(${-left * 100 * state.zoom}%, ${-top * 100 * state.zoom}%) scale(${state.zoom})`;
+      board.classList.toggle('is-zoomed', state.zoom > 1);
+    });
+    ui.zoom.setAttribute('aria-pressed', String(state.zoom > 1));
+    ui.zoom.setAttribute('aria-label', state.zoom > 1 ? 'Visa hela bilderna' : 'Förstora båda bilderna');
+    ui.zoom.title = state.zoom > 1 ? 'Visa hela bilderna' : 'Förstora båda bilderna';
+    $('zoomText').textContent = state.zoom > 1 ? 'Översikt' : 'Förstora';
+  }
+
+  function toggleZoom() {
+    if (!state.ready) return;
+    state.zoom = state.zoom === 1 ? 2 : 1;
+    if (state.zoom === 1) state.camera = {x: .5, y: .5};
+    applyZoom();
+    feedback(state.zoom > 1 ? 'Dra i bilden – båda följer med.' : 'Nu ser du hela bilderna.', 2600);
+  }
+
+  function keepCursorVisible() {
+    if (state.zoom === 1) return;
+    const {left, top} = cameraBounds();
+    const margin = .07 / state.zoom;
+    if (state.cursor.x < left + margin || state.cursor.x > left + 1 / state.zoom - margin) state.camera.x = state.cursor.x;
+    if (state.cursor.y < top + margin || state.cursor.y > top + 1 / state.zoom - margin) state.camera.y = state.cursor.y;
+    applyZoom();
+  }
 
   function announce(message) {
     ui.live.textContent = '';
@@ -174,6 +244,7 @@
     ui.marks.forEach((layer) => layer.append(ellipse({cx: target.x * 1000, cy: target.y * 1000, rx: rx * 1000, ry: ry * 1000, class: 'hint-ring'})));
     // A keyboard player can continue searching inside the same indicated region.
     state.cursor = {x: target.x, y: target.y};
+    if (state.zoom > 1) { state.camera = {...state.cursor}; applyZoom(); }
     updateCursors();
     const horizontal = target.x < .34 ? 'till vänster' : target.x > .66 ? 'till höger' : 'i mitten';
     const vertical = target.y < .34 ? 'högt upp' : target.y > .66 ? 'långt ner' : 'på mitten';
@@ -193,8 +264,8 @@
     const rect = ui.boards[boardIndex].getBoundingClientRect();
     const padding = touch ? 8 : 3;
     const candidates = state.level.targets.map((target) => {
-      const rx = target.rx + padding / rect.width;
-      const ry = target.ry + padding / rect.height;
+      const rx = target.rx + padding / (rect.width * state.zoom);
+      const ry = target.ry + padding / (rect.height * state.zoom);
       return {target, distance: ((x - target.x) / rx) ** 2 + ((y - target.y) / ry) ** 2};
     }).filter((item) => item.distance <= 1).sort((a, b) => a.distance - b.distance);
     const match = candidates.find((item) => !state.found.has(item.target.id));
@@ -205,17 +276,26 @@
     }
     const target = match.target;
     state.found.add(target.id);
+    if (state.found.size === 5) state.completed.add(state.level.id);
+    saveProgress();
     clearHint();
     drawFound(target);
     updateProgress();
-    const name = target.label ? `${target.label} hittad!` : 'Bra spanat!';
+    const name = target.label ? `Du hittade ${target.label.toLocaleLowerCase('sv')}!` : 'Bra spanat!';
     feedback(`${name} ${state.found.size} av 5.`, 1700);
     if (state.found.size === 5) {
+      updateNavigation();
+      const hasNext = state.levelIndex < levels.length - 1;
+      ui.nextComplete.hidden = !hasNext;
+      $('completionTitle').textContent = state.completed.size === levels.length ? 'Alla banor är klara!' : 'Du hittade alla fem!';
+      $('completionMessage').textContent = hasNext
+        ? `${state.level.title} är klar! Nästa bana är ${levels[state.levelIndex + 1].title}. ${state.completed.size} av ${levels.length} banor klarade.`
+        : `${state.completed.size} av ${levels.length} banor klarade. Vilka skarpa ögon!`;
       clearTimeout(state.completeTimer);
       state.completeTimer = setTimeout(() => {
         if (state.found.size !== 5) return;
         ui.completion.showModal();
-        $('playAgainButton').focus();
+        (hasNext ? ui.nextComplete : $('playAgainButton')).focus();
         announce('Du hittade alla fem skillnader!');
       }, 900);
     }
@@ -229,24 +309,30 @@
     });
   }
 
-  function resetRound() {
+  function resetRound(save = true) {
     clearTimeout(state.completeTimer);
     clearHint();
     if (ui.completion.open) ui.completion.close();
     state.found.clear();
     state.cursor = {x: .5, y: .5};
+    state.zoom = 1;
+    state.camera = {x: .5, y: .5};
+    applyZoom();
     ui.marks.forEach((layer) => layer.replaceChildren());
     ui.boards.forEach((board) => { board.querySelector('.keyboard-cursor').hidden = true; });
     updateCursors();
     updateProgress();
     ui.feedback.classList.remove('show');
+    if (save) saveProgress();
     announce('Ny omgång. Hitta de fem sakerna som saknas i bild 2.');
   }
 
-  async function start() {
+  async function start(index = state.levelIndex) {
     const ticket = ++state.loading;
     state.ready = false;
-    resetRound();
+    resetRound(false);
+    state.levelIndex = Math.max(0, Math.min(levels.length - 1, Number(index) || 0));
+    updateNavigation();
     ui.area.setAttribute('aria-busy', 'true');
     ui.load.hidden = false;
     ui.load.classList.remove('error');
@@ -254,27 +340,34 @@
     ui.loadMessage.textContent = 'Gör i ordning bilderna…';
     ui.hint.disabled = true;
     ui.replay.disabled = true;
+    ui.zoom.disabled = true;
     try {
-      const level = window.FP_DIFFERENCE_LEVELS?.[0];
+      const level = levels[state.levelIndex];
       validateLevel(level);
       state.level = level;
       state.ratio = (level.width || 1536) / (level.height || 1024);
-      $('levelLabel').textContent = `Bana 1 · ${level.title || 'Parken'}`;
       sizeBoards();
       const [original, removed] = await Promise.all([loadImage(level.image), loadImage(level.removedImage)]);
       if (ticket !== state.loading) return;
+      if (original.naturalWidth !== removed.naturalWidth || original.naturalHeight !== removed.naturalHeight) throw new Error('Bildernas storlek stämmer inte överens.');
       state.ratio = original.naturalWidth / original.naturalHeight;
       composeMissingObjects(original, removed, level);
       ui.image.src = original.src;
       if (ui.image.decode) await ui.image.decode();
       if (ticket !== state.loading) return;
       state.ready = true;
+      const foundIds = Array.isArray(state.rounds[level.id]) ? state.rounds[level.id] : [];
+      for (const target of level.targets) {
+        if (foundIds.includes(target.id)) { state.found.add(target.id); drawFound(target, false); }
+      }
       ui.area.setAttribute('aria-busy', 'false');
       ui.load.hidden = true;
       ui.replay.disabled = false;
+      ui.zoom.disabled = false;
       updateProgress();
       sizeBoards();
-      announce('Bilderna är klara. Fem saker saknas i bild 2.');
+      saveProgress();
+      announce(`${level.title}. ${state.found.size} av 5 hittade. Fem saker saknas i bild 2.`);
     } catch (error) {
       if (ticket !== state.loading) return;
       ui.area.setAttribute('aria-busy', 'true');
@@ -290,18 +383,30 @@
     let pointer = null;
     board.addEventListener('pointerdown', (event) => {
       if (!event.isPrimary || event.button !== 0) return;
-      pointer = {id: event.pointerId, x: event.clientX, y: event.clientY};
+      pointer = {id: event.pointerId, x: event.clientX, y: event.clientY, camera: {...state.camera}, moved: false};
+      if (state.zoom > 1) board.setPointerCapture(event.pointerId);
       board.querySelector('.keyboard-cursor').hidden = true;
     });
     board.addEventListener('pointercancel', () => { pointer = null; });
-    board.addEventListener('pointerleave', () => { pointer = null; });
+    board.addEventListener('pointerleave', () => { if (state.zoom === 1) pointer = null; });
+    board.addEventListener('pointermove', event => {
+      if (!pointer || pointer.id !== event.pointerId || state.zoom === 1) return;
+      const dx = event.clientX - pointer.x, dy = event.clientY - pointer.y;
+      if (Math.hypot(dx, dy) < 6 && !pointer.moved) return;
+      pointer.moved = true;
+      const rect = board.getBoundingClientRect();
+      state.camera = {x: pointer.camera.x - dx / (rect.width * state.zoom), y: pointer.camera.y - dy / (rect.height * state.zoom)};
+      applyZoom();
+    });
     board.addEventListener('pointerup', (event) => {
       if (!pointer || event.pointerId !== pointer.id) return;
-      const moved = Math.hypot(event.clientX - pointer.x, event.clientY - pointer.y);
+      const moved = pointer.moved || Math.hypot(event.clientX - pointer.x, event.clientY - pointer.y) > 14;
       pointer = null;
-      if (moved > 14) return;
+      if (board.hasPointerCapture(event.pointerId)) board.releasePointerCapture(event.pointerId);
+      if (moved) return;
       const rect = board.getBoundingClientRect();
-      selectPoint((event.clientX - rect.left) / rect.width, (event.clientY - rect.top) / rect.height, index, event.pointerType !== 'mouse');
+      const {left, top} = cameraBounds();
+      selectPoint(left + (event.clientX - rect.left) / (rect.width * state.zoom), top + (event.clientY - rect.top) / (rect.height * state.zoom), index, event.pointerType !== 'mouse');
     });
     board.addEventListener('focus', () => {
       if (board.matches(':focus-visible')) {
@@ -320,6 +425,7 @@
         const [dx, dy] = directions[event.key];
         state.cursor.x = Math.max(.005, Math.min(.995, state.cursor.x + dx));
         state.cursor.y = Math.max(.005, Math.min(.995, state.cursor.y + dy));
+        keepCursorVisible();
         board.querySelector('.keyboard-cursor').hidden = false;
         updateCursors();
       } else if (event.key === 'Enter' || event.key === ' ') {
@@ -328,13 +434,21 @@
       } else if (event.key.toLowerCase() === 'h') {
         event.preventDefault();
         if (!event.repeat) showHint();
+      } else if (event.key.toLowerCase() === 'z') {
+        event.preventDefault();
+        if (!event.repeat) toggleZoom();
       }
     });
   });
 
   ui.hint.addEventListener('click', showHint);
-  ui.replay.addEventListener('click', resetRound);
-  ui.retry.addEventListener('click', start);
+  ui.replay.addEventListener('click', () => resetRound());
+  ui.retry.addEventListener('click', () => start());
+  ui.zoom.addEventListener('click', toggleZoom);
+  ui.levelSelect.addEventListener('change', () => start(Number(ui.levelSelect.value)));
+  ui.previous.addEventListener('click', () => start(state.levelIndex - 1));
+  ui.next.addEventListener('click', () => start(state.levelIndex + 1));
+  ui.nextComplete.addEventListener('click', () => start(state.levelIndex + 1));
   $('helpButton').addEventListener('click', () => ui.help.showModal());
   $('closeHelpButton').addEventListener('click', () => ui.help.close());
   $('playAgainButton').addEventListener('click', () => { resetRound(); ui.boards[0].focus(); });
