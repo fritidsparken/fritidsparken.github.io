@@ -1,0 +1,1080 @@
+[
+  {
+    "index": 1,
+    "id": "house",
+    "name": "Villa Solgläntan",
+    "source": "levels.js",
+    "size": [
+      1145,
+      1374
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.1404
+  },
+  {
+    "index": 2,
+    "id": "bicycle",
+    "name": "Cykeln",
+    "source": "levels.js",
+    "size": [
+      1145,
+      1374
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0517
+  },
+  {
+    "index": 3,
+    "id": "caravan",
+    "name": "Husvagnen",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0571
+  },
+  {
+    "index": 4,
+    "id": "treehouse",
+    "name": "Trädkojan",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0475
+  },
+  {
+    "index": 5,
+    "id": "bookbus",
+    "name": "Bokbussen",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0805
+  },
+  {
+    "index": 6,
+    "id": "farm",
+    "name": "Bondgården",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0683
+  },
+  {
+    "index": 7,
+    "id": "windmill",
+    "name": "Väderkvarnen",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0607
+  },
+  {
+    "index": 8,
+    "id": "lighthouse",
+    "name": "Fyren",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0378
+  },
+  {
+    "index": 9,
+    "id": "trailer",
+    "name": "Släpvagnen",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0291
+  },
+  {
+    "index": 10,
+    "id": "motorcycle",
+    "name": "Motorcykeln",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0147
+  },
+  {
+    "index": 11,
+    "id": "vintage",
+    "name": "Veteranbilen",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0256
+  },
+  {
+    "index": 12,
+    "id": "taxi",
+    "name": "Taxin",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0321
+  },
+  {
+    "index": 13,
+    "id": "camper",
+    "name": "Husbilen",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.076
+  },
+  {
+    "index": 14,
+    "id": "helicopter",
+    "name": "Helikoptern",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0189
+  },
+  {
+    "index": 15,
+    "id": "balloon",
+    "name": "Luftballongen",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0611
+  },
+  {
+    "index": 16,
+    "id": "rocket",
+    "name": "Raketen",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0205
+  },
+  {
+    "index": 17,
+    "id": "submarine",
+    "name": "Ubåten",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0469
+  },
+  {
+    "index": 18,
+    "id": "sailboat",
+    "name": "Segelbåten",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0304
+  },
+  {
+    "index": 19,
+    "id": "fishing",
+    "name": "Fiskebåten",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0406
+  },
+  {
+    "index": 20,
+    "id": "ferry",
+    "name": "Färjan",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0616
+  },
+  {
+    "index": 21,
+    "id": "steam",
+    "name": "Ångloket",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0401
+  },
+  {
+    "index": 22,
+    "id": "crane",
+    "name": "Lyftkranen",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0228
+  },
+  {
+    "index": 23,
+    "id": "mixer",
+    "name": "Betongbilen",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0504
+  },
+  {
+    "index": 24,
+    "id": "snowplow",
+    "name": "Snöplogen",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0568
+  },
+  {
+    "index": 25,
+    "id": "sweeper",
+    "name": "Gatusopmaskinen",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0388
+  },
+  {
+    "index": 26,
+    "id": "playhouse",
+    "name": "Lekstugan",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0595
+  },
+  {
+    "index": 27,
+    "id": "greenhouse",
+    "name": "Växthuset",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0729
+  },
+  {
+    "index": 28,
+    "id": "pier",
+    "name": "Badbryggan",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0405
+  },
+  {
+    "index": 29,
+    "id": "waterslide",
+    "name": "Vattenrutschkanan",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.029
+  },
+  {
+    "index": 30,
+    "id": "carousel",
+    "name": "Karusellen",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.069
+  },
+  {
+    "index": 31,
+    "id": "dinosaur",
+    "name": "Dinosauriestatyn",
+    "source": "levels.js",
+    "size": [
+      1672,
+      941
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.0215
+  },
+  {
+    "index": 32,
+    "id": "new26_firetruck",
+    "name": "Brandbilen",
+    "source": "extra-levels-20261117.js",
+    "size": [
+      900,
+      1080
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.3422,
+    "oldArea": 0.2466,
+    "overlapWithOld": 0.9868,
+    "marginPixels": 104
+  },
+  {
+    "index": 33,
+    "id": "new26_ambulance",
+    "name": "Ambulansen",
+    "source": "extra-levels-20261117.js",
+    "size": [
+      900,
+      1080
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.361,
+    "oldArea": 0.3452,
+    "overlapWithOld": 0.9835,
+    "marginPixels": 104
+  },
+  {
+    "index": 34,
+    "id": "new26_policecar",
+    "name": "Polisbilen",
+    "source": "extra-levels-20261117.js",
+    "size": [
+      900,
+      1080
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.2163,
+    "oldArea": 0.1888,
+    "overlapWithOld": 0.9966,
+    "marginPixels": 104
+  },
+  {
+    "index": 35,
+    "id": "new26_schoolbus",
+    "name": "Skolbussen",
+    "source": "extra-levels-20261117.js",
+    "size": [
+      900,
+      1080
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.3534,
+    "oldArea": 0.3042,
+    "overlapWithOld": 0.9854,
+    "marginPixels": 104
+  },
+  {
+    "index": 36,
+    "id": "new26_garbagetruck",
+    "name": "Sopbilen",
+    "source": "extra-levels-20261117.js",
+    "size": [
+      900,
+      1080
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.3496,
+    "oldArea": 0.293,
+    "overlapWithOld": 1.0,
+    "marginPixels": 104
+  },
+  {
+    "index": 37,
+    "id": "new26_tractor",
+    "name": "Traktorn",
+    "source": "extra-levels-20261117.js",
+    "size": [
+      900,
+      1080
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.3711,
+    "oldArea": 0.3212,
+    "overlapWithOld": 0.9878,
+    "marginPixels": 104
+  },
+  {
+    "index": 38,
+    "id": "new26_excavator",
+    "name": "Grävmaskinen",
+    "source": "extra-levels-20261117.js",
+    "size": [
+      900,
+      1080
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.3066,
+    "oldArea": 0.2537,
+    "overlapWithOld": 0.9069,
+    "marginPixels": 104
+  },
+  {
+    "index": 39,
+    "id": "new26_foodtruck",
+    "name": "Glassbilen",
+    "source": "extra-levels-20261117.js",
+    "size": [
+      900,
+      1080
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.3383,
+    "oldArea": 0.254,
+    "overlapWithOld": 0.9675,
+    "marginPixels": 104
+  },
+  {
+    "index": 40,
+    "id": "new26_train",
+    "name": "Persontåget",
+    "source": "extra-levels-20261117.js",
+    "size": [
+      900,
+      1080
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.2205,
+    "oldArea": 0.1624,
+    "overlapWithOld": 0.9326,
+    "marginPixels": 104
+  },
+  {
+    "index": 41,
+    "id": "new26_boat",
+    "name": "Räddningsbåten",
+    "source": "extra-levels-20261117.js",
+    "size": [
+      900,
+      1080
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.243,
+    "oldArea": 0.1105,
+    "overlapWithOld": 0.9659,
+    "marginPixels": 104
+  },
+  {
+    "index": 42,
+    "id": "new26_airplane",
+    "name": "Propellerplanet",
+    "source": "extra-levels-20261117.js",
+    "size": [
+      900,
+      1080
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.2599,
+    "oldArea": 0.1469,
+    "overlapWithOld": 0.9905,
+    "marginPixels": 104
+  },
+  {
+    "index": 43,
+    "id": "new26_castle",
+    "name": "Slottet",
+    "source": "extra-levels-20261117.js",
+    "size": [
+      900,
+      1080
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.4604,
+    "oldArea": 0.3653,
+    "overlapWithOld": 0.9827,
+    "marginPixels": 104
+  },
+  {
+    "index": 44,
+    "id": "new26_cottage",
+    "name": "Röda stugan",
+    "source": "extra-levels-20261117.js",
+    "size": [
+      900,
+      1080
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.4448,
+    "oldArea": 0.4066,
+    "overlapWithOld": 0.9376,
+    "marginPixels": 104
+  },
+  {
+    "index": 45,
+    "id": "new26_kiosk",
+    "name": "Glasskiosken",
+    "source": "extra-levels-20261117.js",
+    "size": [
+      900,
+      1080
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.5234,
+    "oldArea": 0.3728,
+    "overlapWithOld": 0.9902,
+    "marginPixels": 104
+  },
+  {
+    "index": 46,
+    "id": "new26_garage",
+    "name": "Garaget",
+    "source": "extra-levels-20261117.js",
+    "size": [
+      900,
+      1080
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.4753,
+    "oldArea": 0.4517,
+    "overlapWithOld": 0.9963,
+    "marginPixels": 104
+  },
+  {
+    "index": 47,
+    "id": "extra27_tram",
+    "name": "Spårvagnen",
+    "source": "extra-levels-20261117b.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.3184,
+    "oldArea": 0.3043,
+    "overlapWithOld": 0.9657,
+    "marginPixels": 110
+  },
+  {
+    "index": 48,
+    "id": "extra27_helicopter",
+    "name": "Helikoptern",
+    "source": "extra-levels-20261117b.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.1878,
+    "oldArea": 0.2136,
+    "overlapWithOld": 0.7918,
+    "marginPixels": 110
+  },
+  {
+    "index": 49,
+    "id": "extra27_recycling",
+    "name": "Återvinningskärlet",
+    "source": "extra-levels-20261117b.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.3394,
+    "oldArea": 0.2581,
+    "overlapWithOld": 0.9999,
+    "marginPixels": 110
+  },
+  {
+    "index": 50,
+    "id": "extra27_postbox",
+    "name": "Brevlådan",
+    "source": "extra-levels-20261117b.js",
+    "size": [
+      960,
+      1440
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.3181,
+    "oldArea": 0.2334,
+    "overlapWithOld": 0.9999,
+    "marginPixels": 110
+  },
+  {
+    "index": 51,
+    "id": "extra27_slide",
+    "name": "Rutschkanan",
+    "source": "extra-levels-20261117b.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.3214,
+    "oldArea": 0.1917,
+    "overlapWithOld": 0.9498,
+    "marginPixels": 110
+  },
+  {
+    "index": 52,
+    "id": "extra27_roundabout",
+    "name": "Snurrkarusellen",
+    "source": "extra-levels-20261117b.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.3146,
+    "oldArea": 0.1835,
+    "overlapWithOld": 0.8891,
+    "marginPixels": 110
+  },
+  {
+    "index": 53,
+    "id": "extra27_bench",
+    "name": "Parkbänken",
+    "source": "extra-levels-20261117b.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.2999,
+    "oldArea": 0.2849,
+    "overlapWithOld": 0.8728,
+    "marginPixels": 110
+  },
+  {
+    "index": 54,
+    "id": "extra27_greenhouse",
+    "name": "Växthuset",
+    "source": "extra-levels-20261117b.js",
+    "size": [
+      960,
+      1051
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.4587,
+    "oldArea": 0.4296,
+    "overlapWithOld": 0.9197,
+    "marginPixels": 110
+  },
+  {
+    "index": 55,
+    "id": "extra27_playcastle",
+    "name": "Klätterborgen",
+    "source": "extra-levels-20261117b.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.3521,
+    "oldArea": 0.3566,
+    "overlapWithOld": 0.8833,
+    "marginPixels": 110
+  },
+  {
+    "index": 56,
+    "id": "extra27_balloon",
+    "name": "Luftballongen",
+    "source": "extra-levels-20261117b.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.4085,
+    "oldArea": 0.4098,
+    "overlapWithOld": 0.9236,
+    "marginPixels": 110
+  },
+  {
+    "index": 57,
+    "id": "extra27_submarine",
+    "name": "Ubåten",
+    "source": "extra-levels-20261117b.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.2644,
+    "oldArea": 0.2414,
+    "overlapWithOld": 0.8933,
+    "marginPixels": 110
+  },
+  {
+    "index": 58,
+    "id": "extra27_shed",
+    "name": "Trädgårdsboden",
+    "source": "extra-levels-20261117b.js",
+    "size": [
+      960,
+      1051
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.4812,
+    "oldArea": 0.4876,
+    "overlapWithOld": 0.9178,
+    "marginPixels": 110
+  },
+  {
+    "index": 59,
+    "id": "extra27_carousel",
+    "name": "Hästkarusellen",
+    "source": "extra-levels-20261117b.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.4691,
+    "oldArea": 0.3075,
+    "overlapWithOld": 0.866,
+    "marginPixels": 110
+  },
+  {
+    "index": 60,
+    "id": "extra27_van",
+    "name": "Paketbilen",
+    "source": "extra-levels-20261117b.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.274,
+    "oldArea": 0.2608,
+    "overlapWithOld": 0.9179,
+    "marginPixels": 110
+  },
+  {
+    "index": 61,
+    "id": "extra27_locomotive",
+    "name": "Ångloket",
+    "source": "extra-levels-20261117b.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": true,
+    "model": "u2net",
+    "area": 0.3772,
+    "oldArea": 0.4119,
+    "overlapWithOld": 0.8579,
+    "marginPixels": 110
+  },
+  {
+    "index": 62,
+    "id": "tivoli_ferris",
+    "name": "Pariserhjulet",
+    "source": "tivoli-levels-20261117.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.3441
+  },
+  {
+    "index": 63,
+    "id": "tivoli_bumper",
+    "name": "Radiobilen",
+    "source": "tivoli-levels-20261117.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.3169
+  },
+  {
+    "index": 64,
+    "id": "tivoli_teacups",
+    "name": "Tekopparna",
+    "source": "tivoli-levels-20261117.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.4272
+  },
+  {
+    "index": 65,
+    "id": "tivoli_pirate",
+    "name": "Piratskeppet",
+    "source": "tivoli-levels-20261117.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.3158
+  },
+  {
+    "index": 66,
+    "id": "tivoli_drop",
+    "name": "Fritt fall",
+    "source": "tivoli-levels-20261117.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.2897
+  },
+  {
+    "index": 67,
+    "id": "tivoli_coaster",
+    "name": "Berg- och dalbanevagnen",
+    "source": "tivoli-levels-20261117.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.4437
+  },
+  {
+    "index": 68,
+    "id": "tivoli_ghost",
+    "name": "Spöktågets station",
+    "source": "tivoli-levels-20261117.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.4461
+  },
+  {
+    "index": 69,
+    "id": "tivoli_mirrors",
+    "name": "Spegelhuset",
+    "source": "tivoli-levels-20261117.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.4888
+  },
+  {
+    "index": 70,
+    "id": "tivoli_tickets",
+    "name": "Biljettkiosken",
+    "source": "tivoli-levels-20261117.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.425
+  },
+  {
+    "index": 71,
+    "id": "tivoli_cotton",
+    "name": "Sockervaddsvagnen",
+    "source": "tivoli-levels-20261117.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.4481
+  },
+  {
+    "index": 72,
+    "id": "tivoli_popcorn",
+    "name": "Popcornvagnen",
+    "source": "tivoli-levels-20261117.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.3965
+  },
+  {
+    "index": 73,
+    "id": "tivoli_ringtoss",
+    "name": "Ringkastningen",
+    "source": "tivoli-levels-20261117.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.3957
+  },
+  {
+    "index": 74,
+    "id": "tivoli_duckpond",
+    "name": "Ankdammens fiskestånd",
+    "source": "tivoli-levels-20261117.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.5341
+  },
+  {
+    "index": 75,
+    "id": "tivoli_strength",
+    "name": "Kraftmätaren",
+    "source": "tivoli-levels-20261117.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.2545
+  },
+  {
+    "index": 76,
+    "id": "tivoli_circus",
+    "name": "Cirkusentrén",
+    "source": "tivoli-levels-20261117.js",
+    "size": [
+      960,
+      1280
+    ],
+    "coarse": false,
+    "model": "existing detailed mask",
+    "area": 0.4401
+  }
+]
