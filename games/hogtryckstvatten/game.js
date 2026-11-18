@@ -26,7 +26,15 @@ function stars(i,t){return t<=levels[i].goal?3:t<=levels[i].goal*1.6?2:1}
 function toast(s){$('toast').textContent=s;$('toast').style.opacity=1;toastTime=3}
 function usesAlignedMask(i){return /^(new26_|extra27_)/.test(levels[i].id)}
 function saveMaskVersion(i){return levels[i].id==='house'?8:(usesAlignedMask(i)||levels[i].alphaMask)?8:7}
-function getImage(id){if(images.has(id))return images.get(id);const p=new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=`assets/${id==='house'?'house-portrait-v2':id==='house-wide'?'house-wide-v2':id}.webp`});images.set(id,p);p.catch(()=>images.delete(id));return p}
+function getImage(id,cache=true){
+ if(cache&&images.has(id))return images.get(id);
+ const path=id==='house'?'house-portrait-v2':id==='house-wide'?'house-wide-v2':id;
+ const promise=new Promise((resolve,reject)=>{
+  const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=`assets/${path}.webp`;
+ });
+ if(cache){images.set(id,promise);promise.catch(()=>images.delete(id));}
+ return promise;
+}
 const housePolygons=[[[.2445,.3268],[.319,.299],[.319,.262],[.365,.262],[.365,.291],[.733,.261],[.802,.296],[.800,.307],[.2445,.335]],[[.279,.334],[.770,.305],[.770,.418],[.679,.394],[.568,.438],[.568,.541],[.453,.535],[.279,.554]],[[.570,.435],[.681,.395],[.795,.435],[.793,.553],[.774,.576],[.594,.576],[.594,.555],[.570,.550]]];
 function regions(){return levels[level].id==='house'?housePolygons.map(p=>[p]):levels[level].regions||levels[level].polygons.map(p=>[p]);}
 function polygons(){return regions().map(r=>r[0]);}
@@ -116,7 +124,7 @@ function measure(){
  if(!done)percent=Math.min(percent,99.9);
  $('fill').style.width=percent+'%';$('progressLabel').textContent=`Rent: ${Math.floor(percent)}%`;
 }
-async function load(i,resume=false){const token=++loadedToken;playing=false;holding=false;ready=false;$('loading').hidden=false;if($('panel').open)$('panel').close();try{const [im,wide,backdrop,mask]=await Promise.all([getImage(levels[i].id),levels[i].id==='house'?getImage('house-wide'):Promise.resolve(null),levels[i].backdrop?getImage(levels[i].backdrop):Promise.resolve(null),usesAlignedMask(i)?getImage('masks/'+levels[i].id):Promise.resolve(null),window.WasherRig.ready]);if(token!==loadedToken)return;level=i;houseWide=wide;backdropImage=backdrop;alignedMaskImage=mask;W=im.naturalWidth;H=im.naturalHeight;dirt.width=W;dirt.height=H;cameraX=800;pointerScreen=null;img=im;elapsed=0;percent=0;done=false;last=null;particles=[];aim={x:800,y:450};sprayAim={...aim};makeDirt();makeForeground();
+async function load(i,resume=false){const token=++loadedToken;playing=false;holding=false;ready=false;$('loading').hidden=false;if($('panel').open)$('panel').close();try{const [im,wide,backdrop,mask]=await Promise.all([getImage(levels[i].id),levels[i].id==='house'?getImage('house-wide'):Promise.resolve(null),levels[i].backdrop?getImage(levels[i].backdrop,!levels[i].sceneAnchor):Promise.resolve(null),usesAlignedMask(i)?getImage('masks/'+levels[i].id):Promise.resolve(null),window.WasherRig.ready]);if(token!==loadedToken)return;level=i;houseWide=wide;backdropImage=backdrop;alignedMaskImage=mask;W=im.naturalWidth;H=im.naturalHeight;dirt.width=W;dirt.height=H;cameraX=800;pointerScreen=null;img=im;elapsed=0;percent=0;done=false;last=null;particles=[];aim={x:800,y:450};sprayAim={...aim};makeDirt();makeForeground();
  sc.clearRect(0,0,200,113);sc.drawImage(dirt,0,0,200,113);areaMask=sc.getImageData(0,0,200,113).data;
  if(resume&&save.active?.id===levels[i].id&&save.active.mask&&save.active.version===saveMaskVersion(i)){elapsed=Number(save.active.elapsed)||0;const snap=new Image();await new Promise(resolve=>{snap.onload=()=>{dc.clearRect(0,0,W,H);dc.drawImage(snap,0,0,W,H);resolve()};snap.onerror=resolve;snap.src=save.active.mask});}
  ready=true;measure();$('levelName').textContent=levels[i].name;$('target').textContent=`★ Tidsmål ${time(levels[i].goal)}`;$('hint').style.opacity=1;updateStage();updateTool();$('loading').hidden=true;if(!done){playing=true;clock=performance.now()}if(i+1<levels.length)getImage(levels[i+1].id).catch(()=>{});
@@ -127,8 +135,9 @@ function openPanel(html){holding=false;last=null;playing=false;setNoise(false);$
 function levelCard(l,i){
  const best=save.best[l.id],available=unlocked(i);
  const location=l.country?(l.city===l.country?l.country:`${l.city}, ${l.country}`):'';
- const backdrop=l.alphaMask?` style="--landmark-backdrop:url('assets/${l.backdrop}.webp')"`:'';
- return `<button class="card${l.alphaMask?' landmark-card':''}"${backdrop} data-level="${i}" ${!available?'disabled':''}><img src="assets/${l.id==='house'?'house-portrait-v2':l.id}.webp" alt="${l.name}" loading="lazy"><span class="copy"><strong>${available?'':'🔒 '}${l.name}</strong>${location?`<small class="location">${location}</small>`:''}<small>★ ${time(l.goal)} ${Number.isFinite(best)?'· Bäst '+time(best):''}</small><span class="stars">${Number.isFinite(best)?'★'.repeat(stars(i,best))+'☆'.repeat(3-stars(i,best)):available?'Redo att tvätta':'Klara föregående bana'}</span></span></button>`;
+ const photo=`<img src="assets/${l.id==='house'?'house-portrait-v2':l.id}.webp" alt="${l.name}" loading="lazy">`;
+ const scene=l.sceneAnchor?`<span class="landmark-preview" style="--landmark-backdrop:url('assets/${l.backdrop}.webp');--landmark-x:${l.sceneAnchor[0]*100}%;--landmark-y:${l.sceneAnchor[1]*100}%">${photo}</span>`:photo;
+ return `<button class="card${l.sceneAnchor?' landmark-card':''}" data-level="${i}" ${!available?'disabled':''}>${scene}<span class="copy"><strong>${available?'':'🔒 '}${l.name}</strong>${location?`<small class="location">${location}</small>`:''}<small>★ ${time(l.goal)} ${Number.isFinite(best)?'· Bäst '+time(best):''}</small><span class="stars">${Number.isFinite(best)?'★'.repeat(stars(i,best))+'☆'.repeat(3-stars(i,best)):available?'Redo att tvätta':'Klara föregående bana'}</span></span></button>`;
 }
 function menu(page=menuPage){
  menuPage=Math.max(0,Math.min(Math.ceil(levels.length/6)-1,page));snapshot();
@@ -170,18 +179,33 @@ function sceneLayout(cw,ch,insets){
  const top=insets?.top??(portrait?104:ch<550?64:128),bottom=insets?.bottom??ch-(portrait?104:ch<550?84:120);
  const usable=Math.max(60,bottom-top);
  const actorH=portrait?Math.min(185,usable*.32):Math.min(620,ch*.8),actorW=actorH*.68;
- const actor={x:0,y:bottom-actorH,w:actorW,h:actorH};
- const left=portrait?10:actorW+8,right=cw-10,low=portrait?actor.y-8:bottom;
+ const actorTop=bottom-actorH;
+ // The washer is in the close foreground, including on views across water.
+ const actor={x:0,y:levels[level].sceneAnchor?ch-actorH:actorTop,w:actorW,h:actorH};
+ const left=portrait?10:actorW+8,right=cw-10,low=portrait?actorTop-8:bottom;
  const s=Math.min((right-left)/bounds.w,Math.max(40,low-top)/bounds.h);
  const target={x:left+(right-left-bounds.w*s)/2,y:top+(low-top-bounds.h*s)/2,w:bounds.w*s,h:bounds.h*s};
  return {s,x:target.x-bounds.x*s,y:target.y-bounds.y*s,portrait,actor,target,bounds};
 }
 function drawScenery(layout,cw,ch){
  if(backdropImage){
-  const scale=Math.max(cw/backdropImage.naturalWidth,ch/backdropImage.naturalHeight),bw=backdropImage.naturalWidth*scale,bh=backdropImage.naturalHeight*scale;
-  ctx.drawImage(backdropImage,(cw-bw)/2,(ch-bh)/2,bw,bh);
-  const t=layout.target,rx=Math.max(8,t.w*.45),ry=Math.max(4,t.h*.025);
-  ctx.save();ctx.translate(t.x+t.w/2,t.y+t.h-28*layout.s);ctx.scale(rx,ry);
+  const {naturalWidth:width,naturalHeight:height}=backdropImage;
+  const sceneAnchor=levels[level].sceneAnchor;
+  const t=layout.target;
+  let groundX=t.x+t.w/2,groundY=t.y+t.h-28*layout.s;
+  let scale=Math.max(cw/width,ch/height),left=null,top=null;
+  if(sceneAnchor){
+   // Keep the real ground under the landmark as its screen position changes.
+   const [[x0],[x1], [,y1]]=levels[level].polygons[0];
+   groundX=layout.x+(x0+x1)*.5*W*layout.s;groundY=layout.y+y1*H*layout.s;
+   const anchorX=sceneAnchor[0]*width,anchorY=sceneAnchor[1]*height;
+   scale=Math.max(groundX/anchorX,(cw-groundX)/(width-anchorX),groundY/anchorY,(ch-groundY)/(height-anchorY));
+   left=groundX-anchorX*scale;top=groundY-anchorY*scale;
+  }
+  const bw=width*scale,bh=height*scale;
+  ctx.drawImage(backdropImage,left??(cw-bw)/2,top??(ch-bh)/2,bw,bh);
+  const rx=Math.max(8,t.w*.45),ry=Math.max(4,t.h*.025);
+  ctx.save();ctx.translate(groundX,groundY);ctx.scale(rx,ry);
   const shade=ctx.createRadialGradient(0,0,0,0,0,1);shade.addColorStop(0,'rgba(35,30,45,.23)');shade.addColorStop(.45,'rgba(35,30,45,.12)');shade.addColorStop(1,'rgba(35,30,45,0)');
   ctx.fillStyle=shade;ctx.fillRect(-1,-1,2,2);ctx.restore();
   ctx.drawImage(foreground,layout.x,layout.y,W*layout.s,H*layout.s);return;

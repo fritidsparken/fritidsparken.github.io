@@ -72,10 +72,13 @@ vm.runInContext(source, sandbox, { filename: 'game.js' });
   assert.strictEqual(levels.length, 100, '76 original + 24 new levels');
   assert.strictEqual(JSON.stringify(levels.slice(0, 76)), originalLevels, 'Original levels and order are unchanged');
   assert.strictEqual(new Set(levels.map(l => l.id)).size, levels.length, 'All IDs are unique');
-  assert.strictEqual(levels.filter(l => l.alphaMask).length, 24);
+  const landmarks = levels.filter(l => l.alphaMask);
+  assert.strictEqual(landmarks.length, 24);
+  assert.strictEqual(new Set(landmarks.map(l => l.backdrop)).size, 24, 'Each landmark has its own backdrop');
   const result = [];
   for (let i = 76; i < levels.length; i++) {
     const l = levels[i];
+    assert(l.sceneAnchor.length === 2 && l.sceneAnchor.every(n => n > 0 && n < 1), `${l.id}: valid ground anchor`);
     await qa.load(i);
     const state = qa.get();
     assert(state.ready && !state.done, `${l.id}: loads with dirt`);
@@ -88,7 +91,7 @@ vm.runInContext(source, sandbox, { filename: 'game.js' });
     const bounds = qa.sceneLayout(viewport.width, viewport.height).bounds;
     let area = 0, lastPixel = -1;
     for (let p = 3; p < mask.length; p += 4) {
-      const expected = original[p] >= l.alphaMask;
+      const expected = original[p] >= Math.max(96, l.alphaMask);
       assert.strictEqual(mask[p] > 0, expected, `${l.id}: mask matches sprite at pixel ${(p-3)/4}`);
       if (!expected) assert.strictEqual(dirty[p], 0, `${l.id}: no dirt in sky or holes`);
       if (dirty[p]) {
@@ -105,7 +108,11 @@ vm.runInContext(source, sandbox, { filename: 'game.js' });
       assert(t.x >= 0 && t.y >= 0 && t.x+t.w <= width+.01 && t.y+t.h <= height+.01, `${l.id}: complete building fits ${width}x${height}`);
       assert(a.x+a.w <= t.x+.01 || a.y >= t.y+t.h-.01, `${l.id}: washer does not cover building`);
       qa.render(16);
-      if (output && ((width === 390) || (width === 1366 && [76,77,85,87,88,90,99].includes(i))))
+      const context = canvas.getContext('2d');
+      for (const [x, y] of [[0, 0], [width-1, 0], [0, height-1], [width-1, height-1]]) {
+        assert.strictEqual(context.getImageData(x, y, 1, 1).data[3], 255, `${l.id}: scene fills ${width}x${height}`);
+      }
+      if (output && (width === 390 || width === 1366))
         fs.writeFileSync(path.join(output, `${l.id}-${width}.png`), canvas.toBuffer('image/png'));
     }
     // Almost clean must never complete; even a single remaining real pixel matters.
@@ -142,6 +149,7 @@ vm.runInContext(source, sandbox, { filename: 'game.js' });
   qa.menu(16);
   assert(element('panelBody').innerHTML.includes('Sida 17 / 17'), 'Pagination includes all 100 missions');
   assert(element('panelBody').innerHTML.includes('Australien'), 'World mission cards show location');
+  assert(element('panelBody').innerHTML.includes('world-scene_operahuset-sydney.webp'), 'Mission card uses the local scene');
   if(output) fs.writeFileSync(path.join(output, 'results.json'), JSON.stringify(result,null,2));
   console.log(`PASS: ${result.length} world levels, exact alpha masks, holes stay clean, 5 layouts each, all last-pixel completions, resume, full Eiffel wash, unlock/save, old-level regression and menu.`);
 })().catch(e => { console.error(e); process.exit(1); });

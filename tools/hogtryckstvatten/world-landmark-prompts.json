@@ -1,7 +1,7 @@
 {
   "mode": "built-in image_gen",
   "date": "2026-11-18",
-  "purpose": "24 landmark sprites for Hogtryckstvatten; generated clean with transparent backgrounds. Production WebP preserves alpha and limits the longest edge to 1280 pixels.",
+  "purpose": "24 clean transparent landmark sprites and a generated scene of the real surroundings for each Högtryckstvätten mission. The scene anchor marks where the building meets the ground.",
   "items": [
     {
       "id": "world_stockholms-stadshus",
@@ -126,19 +126,220 @@
   ],
   "backgrounds": [
     {
-      "id": "world-plaza",
+      "id": "world-scene_stockholms-stadshus",
+      "anchor": [
+        0.56,
+        0.64
+      ],
       "transparent_background": false,
-      "prompt": "Use case: stylized-concept. Asset type: seamless-feeling full-screen background plate for an existing sunny children's 3D pressure-washing game. Create one beautiful wide landscape 16:9 image of an EMPTY spacious warm pale limestone public plaza for visiting famous architecture around the world. Camera almost frontal from a modestly raised human viewpoint. Foreground and lower 60% of the image are uninterrupted gently textured clean paving, continuing past all side and bottom edges. Low distant green hedges and softly rendered trees only at the horizon in the far background, no trees entering the central upper half. Horizon no lower than 38% from top. Upper 40% clear saturated blue sky with a few fluffy white clouds. Open clear center with lots of sky and ground space where a building will later be composited. Bright warm sunlight from upper left, soft high quality ambient light, polished colorful stylized 3D animated film environment, inviting child-friendly, real material details with clean attractive shapes. NO building, landmark, statue, people, vehicles, water spray, game character, dirt, text, letters, logo, watermark or interface. This is ONLY the background; no main subject and no frame. Matching saturated bright family game quality."
+      "prompt": "Create a landscape 16:9 background plate for a polished colorful 3D architectural pressure-washing game for children. The real, specific place below is being depicted with recognizable materials, vegetation, geography and neighboring structures. Use a natural cohesive illustrated 3D architectural visualization with slightly softened edges and clean tactile materials, bright but believable daytime, with directional light from the upper left and clear foreground depth. Use almost frontal, gently elevated perspective. Leave the MAIN landmark completely absent for later compositing; reserve a clear open central area, with its real ground or foundation touching near x=50%, y=64% of the image. Keep the actual central site and several distinctive ground or background details visible in the central 45% of the width, since this image is center-cropped on mobile. Vertical architecture stays upright. Surroundings extend to all edges. No people, text, typography, brand names, watermark, gameplay, tools, dirt, frame, guide marks, or reference collage. One complete opaque picture of one place.\nLocation: Stockholm, Sweden.\nScene layout and actual context: Riddarfjärden and Norr Mälarstrand as seen from the water south of Kungsholmen. Calm dark blue freshwater fills the foreground. A low grey granite quay and narrow green shoreline cross the center to support the city hall, with recognizable ochre and cream Stockholm waterfront apartment blocks receding on the left and soft distant rooftops on the right. Cool clear Nordic daylight."
     },
     {
-      "id": "world-desert",
+      "id": "world-scene_eiffeltornet",
+      "anchor": [
+        0.5,
+        0.57
+      ],
       "transparent_background": false,
-      "prompt": "Use case: stylized-concept. Create one full-screen background plate only for a polished colorful sunny 3D children's pressure washing game. Wide 16:9 landscape. Almost frontal modestly raised human camera, warm sunlight from upper left, soft global illumination, clean attractive real materials and animated-film polish. Empty open central area for later compositing a large landmark building. Ground fills lower 60%, horizon at 38% from top, bright blue sky with a few fluffy clouds above. Continue ground beyond all side and bottom image edges. No building, landmark, people, vehicle, main subject, text, labels, dirt, spray, logos, watermark, interface or frame. An expansive smooth warm Egyptian desert courtyard of pale golden compacted sand and occasional sandstone paving. Very low far-away dunes at the horizon. Sparse small rocks only near extreme far side edges. No pyramid, palm trees or shrubs in center. Atmospheric bright sunlit sky. No foreground obstacles."
+      "prompt": "Create a landscape 16:9 background plate for a polished colorful 3D architectural pressure-washing game for children. The real, specific place below is being depicted with recognizable materials, vegetation, geography and neighboring structures. Use a natural cohesive illustrated 3D architectural visualization with slightly softened edges and clean tactile materials, bright but believable daytime, with directional light from the upper left and clear foreground depth. Use almost frontal, gently elevated perspective. Leave the MAIN landmark completely absent for later compositing; reserve a clear open central area, with its real ground or foundation touching near x=50%, y=64% of the image. Keep the actual central site and several distinctive ground or background details visible in the central 45% of the width, since this image is center-cropped on mobile. Vertical architecture stays upright. Surroundings extend to all edges. No people, text, typography, brand names, watermark, gameplay, tools, dirt, frame, guide marks, or reference collage. One complete opaque picture of one place.\nLocation: Paris, France.\nScene layout and actual context: The authentic Champ de Mars axis seen from the south-east toward the Seine, centered on lawn and pale gravel cross paths, with regimented rows of clipped trees and pale Parisian façades at the far sides. The center is where the Eiffel Tower actually stands at the far end of the garden. No generic plaza. Blue sky and light soft clouds."
     },
     {
-      "id": "world-harbour",
+      "id": "world-scene_big-ben",
+      "anchor": [
+        0.482,
+        0.79
+      ],
       "transparent_background": false,
-      "prompt": "Use case: stylized-concept. Create one full-screen background plate only for a polished colorful sunny 3D children's pressure washing game. Wide 16:9 landscape. Almost frontal modestly raised human camera, warm sunlight from upper left, soft global illumination, clean attractive real materials and animated-film polish. Empty open central area for later compositing a large landmark building. Ground fills lower 60%, horizon at 38% from top, bright blue sky with a few fluffy clouds above. Continue ground beyond all side and bottom image edges. No building, landmark, people, vehicle, main subject, text, labels, dirt, spray, logos, watermark, interface or frame. An empty broad elegant pale warm sandstone waterfront promenade. Behind its open paved foreground, a calm turquoise harbor is a narrow horizontal band at the horizon, with distant very low soft green coastal hills at extreme left and right. Open center. No railings, benches, lamps or boats; no vegetation in foreground. Paved foreground fills lower 60% and has subtle perspective texture."
+      "prompt": "Generate a replacement opaque 16:9 wide landscape background for a polished realistic 3D architectural children's pressure-washing game, photographed by a virtual camera with gently stylized clean materials. Place: the authentic Elizabeth Tower (Big Ben) end of the Palace of Westminster, London, seen nearly frontally from across Bridge Street with a modestly elevated urban view. This is an environmental plate; the entire Elizabeth clock tower is intentionally ABSENT for a separate sprite to go there. The real ornate golden limestone neo-Gothic Parliament facade extends to the LEFT of the tower site at comfortable distance. Compose the end of that facade at x=47% and its entire foundation at y=65%, with its roofline much LOWER than any clock tower, about y=41%, and leave the sky open above this join point. The separate tower will sit over the very right end of Parliament, centered at x=50% with its visible foundation at y=66%. DO NOT render it. Next to the empty tower site is the real west end of Westminster Bridge with hints of its green cast-iron rails and a glimpse of the Thames to the right only. The paved Bridge Street / Westminster embankment foreground spans the bottom, so foreground is not all water. Surrounding London trees and buildings are modest height, no tall structures or generic plaza. Believable London partly overcast daylight, tactile historical architecture, distinctly English city. Architectural verticals stay upright. No characters, no people, no labels, no typography, no vehicles, no watermark, no interface, no clock faces, no other towers, no guide marks."
+    },
+    {
+      "id": "world-scene_colosseum",
+      "anchor": [
+        0.52,
+        0.63
+      ],
+      "transparent_background": false,
+      "prompt": "Create a landscape 16:9 background plate for a polished colorful 3D architectural pressure-washing game for children. The real, specific place below is being depicted with recognizable materials, vegetation, geography and neighboring structures. Use a natural cohesive illustrated 3D architectural visualization with slightly softened edges and clean tactile materials, bright but believable daytime, with directional light from the upper left and clear foreground depth. Use almost frontal, gently elevated perspective. Leave the MAIN landmark completely absent for later compositing; reserve a clear open central area, with its real ground or foundation touching near x=50%, y=64% of the image. Keep the actual central site and several distinctive ground or background details visible in the central 45% of the width, since this image is center-cropped on mobile. Vertical architecture stays upright. Surroundings extend to all edges. No people, text, typography, brand names, watermark, gameplay, tools, dirt, frame, guide marks, or reference collage. One complete opaque picture of one place.\nLocation: Rome, Italy.\nScene layout and actual context: Piazza del Colosseo outside the Roman Colosseum, its authentic immediate setting. Broad sloping worn grey basalt cobblestones and pale stone walkways in foreground, the Arch of Constantine on the far right in the distance toward the Palatine, sparing umbrella pines and Rome's warm ochre historic masonry low in the far distance. The center is open for the amphitheatre to ground on the actual ancient site."
+    },
+    {
+      "id": "world-scene_lutande-tornet",
+      "anchor": [
+        0.55,
+        0.735
+      ],
+      "transparent_background": false,
+      "prompt": "Create a landscape 16:9 background plate for a polished colorful 3D architectural pressure-washing game for children. The real, specific place below is being depicted with recognizable materials, vegetation, geography and neighboring structures. Use a natural cohesive illustrated 3D architectural visualization with slightly softened edges and clean tactile materials, bright but believable daytime, with directional light from the upper left and clear foreground depth. Use almost frontal, gently elevated perspective. Leave the MAIN landmark completely absent for later compositing; reserve a clear open central area, with its real ground or foundation touching near x=50%, y=64% of the image. Keep the actual central site and several distinctive ground or background details visible in the central 45% of the width, since this image is center-cropped on mobile. Vertical architecture stays upright. Surroundings extend to all edges. No people, text, typography, brand names, watermark, gameplay, tools, dirt, frame, guide marks, or reference collage. One complete opaque picture of one place.\nLocation: Pisa, Italy.\nScene layout and actual context: Piazza dei Miracoli. Distinctive vivid green lawn extending across the foreground with pale paths cut into it. The long striped white-marble Pisa Cathedral with its low dome on the LEFT of the empty bell-tower site, authentic medieval low brick walls and town rooflines far right. Natural Tuscan sun. No other leaning tower, no generic paving square."
+    },
+    {
+      "id": "world-scene_sagrada-familia",
+      "anchor": [
+        0.5,
+        0.65
+      ],
+      "transparent_background": false,
+      "prompt": "Create a landscape 16:9 background plate for a polished colorful 3D architectural pressure-washing game for children. The real, specific place below is being depicted with recognizable materials, vegetation, geography and neighboring structures. Use a natural cohesive illustrated 3D architectural visualization with slightly softened edges and clean tactile materials, bright but believable daytime, with directional light from the upper left and clear foreground depth. Use almost frontal, gently elevated perspective. Leave the MAIN landmark completely absent for later compositing; reserve a clear open central area, with its real ground or foundation touching near x=50%, y=64% of the image. Keep the actual central site and several distinctive ground or background details visible in the central 45% of the width, since this image is center-cropped on mobile. Vertical architecture stays upright. Surroundings extend to all edges. No people, text, typography, brand names, watermark, gameplay, tools, dirt, frame, guide marks, or reference collage. One complete opaque picture of one place.\nLocation: Barcelona, Spain.\nScene layout and actual context: View from Plaça de Gaudí along the Nativity facade approach. The park's rectangular duck pond and tree-lined edges lead toward a narrow street and the basilica site, warm Eixample apartment façades on both outer sides, sunlit Mediterranean foliage. The center remains open at pavement behind the pond for the basilica. No extra basilica or towers."
+    },
+    {
+      "id": "world-scene_neuschwanstein",
+      "anchor": [
+        0.51,
+        0.55
+      ],
+      "transparent_background": false,
+      "prompt": "Create a landscape 16:9 background plate for a polished colorful 3D architectural pressure-washing game for children. The real, specific place below is being depicted with recognizable materials, vegetation, geography and neighboring structures. Use a natural cohesive illustrated 3D architectural visualization with slightly softened edges and clean tactile materials, bright but believable daytime, with directional light from the upper left and clear foreground depth. Use almost frontal, gently elevated perspective. Leave the MAIN landmark completely absent for later compositing; reserve a clear open central area, with its real ground or foundation touching near x=50%, y=64% of the image. Keep the actual central site and several distinctive ground or background details visible in the central 45% of the width, since this image is center-cropped on mobile. Vertical architecture stays upright. Surroundings extend to all edges. No people, text, typography, brand names, watermark, gameplay, tools, dirt, frame, guide marks, or reference collage. One complete opaque picture of one place.\nLocation: Schwangau, Bavaria, Germany.\nScene layout and actual context: Neuschwanstein's actual hilltop setting below the Ammergau Alps, seen from the familiar elevated western side. The open central crest is a steep grey rocky ridge, with attached exposed cliff faces and dense dark green fir forest below. Behind are distant Bavarian meadows, hints of the Alpsee to the left, blue-grey layered high Alpine peaks and clouds. The rocky central ridge is the exact surface for the castle to sit on. No plaza, castle, roads, houses or snow in the foreground."
+    },
+    {
+      "id": "world-scene_vasilijkatedralen",
+      "anchor": [
+        0.5,
+        0.69
+      ],
+      "transparent_background": false,
+      "prompt": "Create a landscape 16:9 background plate for a polished colorful 3D architectural pressure-washing game for children. The real, specific place below is being depicted with recognizable materials, vegetation, geography and neighboring structures. Use a natural cohesive illustrated 3D architectural visualization with slightly softened edges and clean tactile materials, bright but believable daytime, with directional light from the upper left and clear foreground depth. Use almost frontal, gently elevated perspective. Leave the MAIN landmark completely absent for later compositing; reserve a clear open central area, with its real ground or foundation touching near x=50%, y=64% of the image. Keep the actual central site and several distinctive ground or background details visible in the central 45% of the width, since this image is center-cropped on mobile. Vertical architecture stays upright. Surroundings extend to all edges. No people, text, typography, brand names, watermark, gameplay, tools, dirt, frame, guide marks, or reference collage. One complete opaque picture of one place.\nLocation: Moscow, Russia.\nScene layout and actual context: Authentic Red Square seen from the north across broad dark grey setts in foreground. The red brick Kremlin wall and slender crenellations running off to the RIGHT, with distant central Moscow urban silhouettes at far left. The cathedral will stand centered on the south end of Red Square. Crisp cool bright autumn atmosphere. No other onion domes or main cathedral."
+    },
+    {
+      "id": "world-scene_hagia-sofia",
+      "anchor": [
+        0.5,
+        0.545
+      ],
+      "transparent_background": false,
+      "prompt": "Create a landscape 16:9 background plate for a polished colorful 3D architectural pressure-washing game for children. The real, specific place below is being depicted with recognizable materials, vegetation, geography and neighboring structures. Use a natural cohesive illustrated 3D architectural visualization with slightly softened edges and clean tactile materials, bright but believable daytime, with directional light from the upper left and clear foreground depth. Use almost frontal, gently elevated perspective. Leave the MAIN landmark completely absent for later compositing; reserve a clear open central area, with its real ground or foundation touching near x=50%, y=64% of the image. Keep the actual central site and several distinctive ground or background details visible in the central 45% of the width, since this image is center-cropped on mobile. Vertical architecture stays upright. Surroundings extend to all edges. No people, text, typography, brand names, watermark, gameplay, tools, dirt, frame, guide marks, or reference collage. One complete opaque picture of one place.\nLocation: Istanbul, Türkiye.\nScene layout and actual context: Sultanahmet Archaeological Park looking north toward the Hagia Sophia site from Sultanahmet Square. Its formal ornamental circular fountain, pale stone paths and low flowerbeds in the foreground, mature cypresses on the flanks, small historic Ottoman stone and red-tiled roofs far off at edges. Warm late morning light, quiet urban garden. No main mosque, tall minarets or other center buildings."
+    },
+    {
+      "id": "world-scene_cheopspyramiden",
+      "anchor": [
+        0.51,
+        0.66
+      ],
+      "transparent_background": false,
+      "prompt": "Create a landscape 16:9 background plate for a polished colorful 3D architectural pressure-washing game for children. The real, specific place below is being depicted with recognizable materials, vegetation, geography and neighboring structures. Use a natural cohesive illustrated 3D architectural visualization with slightly softened edges and clean tactile materials, bright but believable daytime, with directional light from the upper left and clear foreground depth. Use almost frontal, gently elevated perspective. Leave the MAIN landmark completely absent for later compositing; reserve a clear open central area, with its real ground or foundation touching near x=50%, y=64% of the image. Keep the actual central site and several distinctive ground or background details visible in the central 45% of the width, since this image is center-cropped on mobile. Vertical architecture stays upright. Surroundings extend to all edges. No people, text, typography, brand names, watermark, gameplay, tools, dirt, frame, guide marks, or reference collage. One complete opaque picture of one place.\nLocation: Giza, Egypt.\nScene layout and actual context: Authentic rocky Giza plateau, with rippled dusty ochre limestone and small rock fragments in foreground, flat elevated bedrock centrally and lower sand-colored ridges with faint Cairo haze at the far edge. If any structures at all, only tiny low Mastaba tombs far to one side. Strong arid midday gold and dusty blue sky. No pyramids or palm trees included."
+    },
+    {
+      "id": "world-scene_hassan-ii-mosken",
+      "anchor": [
+        0.5,
+        0.58
+      ],
+      "transparent_background": false,
+      "prompt": "Create a landscape 16:9 background plate for a polished colorful 3D architectural pressure-washing game for children. The real, specific place below is being depicted with recognizable materials, vegetation, geography and neighboring structures. Use a natural cohesive illustrated 3D architectural visualization with slightly softened edges and clean tactile materials, bright but believable daytime, with directional light from the upper left and clear foreground depth. Use almost frontal, gently elevated perspective. Leave the MAIN landmark completely absent for later compositing; reserve a clear open central area, with its real ground or foundation touching near x=50%, y=64% of the image. Keep the actual central site and several distinctive ground or background details visible in the central 45% of the width, since this image is center-cropped on mobile. Vertical architecture stays upright. Surroundings extend to all edges. No people, text, typography, brand names, watermark, gameplay, tools, dirt, frame, guide marks, or reference collage. One complete opaque picture of one place.\nLocation: Casablanca, Morocco.\nScene layout and actual context: Actual Atlantic coast, with the Hassan II Mosque site on its flat man-made stone platform projecting from Casablanca's shore. Cool ocean with foam breaking along riprap along the left and behind, pale beige paved esplanade underfoot center and right, very low white Casablanca waterfront structures far right. Brisk sunny coastal light. No mosque or minaret."
+    },
+    {
+      "id": "world-scene_taj-mahal",
+      "anchor": [
+        0.5,
+        0.505
+      ],
+      "transparent_background": false,
+      "prompt": "Create a landscape 16:9 background plate for a polished colorful 3D architectural pressure-washing game for children. The real, specific place below is being depicted with recognizable materials, vegetation, geography and neighboring structures. Use a natural cohesive illustrated 3D architectural visualization with slightly softened edges and clean tactile materials, bright but believable daytime, with directional light from the upper left and clear foreground depth. Use almost frontal, gently elevated perspective. Leave the MAIN landmark completely absent for later compositing; reserve a clear open central area, with its real ground or foundation touching near x=50%, y=64% of the image. Keep the actual central site and several distinctive ground or background details visible in the central 45% of the width, since this image is center-cropped on mobile. Vertical architecture stays upright. Surroundings extend to all edges. No people, text, typography, brand names, watermark, gameplay, tools, dirt, frame, guide marks, or reference collage. One complete opaque picture of one place.\nLocation: Agra, India.\nScene layout and actual context: Authentic view down the Charbagh garden axis from the Great Gate, long slim reflective turquoise pool extending from bottom center toward the white marble platform where the mausoleum will go. Symmetrical red sandstone paths, compact dark cypress avenues set off toward the sides, low red sandstone flanking buildings only far away. Warm light mist over the Yamuna beyond. No white dome or minarets."
+    },
+    {
+      "id": "world-scene_burj-khalifa",
+      "anchor": [
+        0.5,
+        0.535
+      ],
+      "transparent_background": false,
+      "prompt": "Create a landscape 16:9 background plate for a polished colorful 3D architectural pressure-washing game for children. The real, specific place below is being depicted with recognizable materials, vegetation, geography and neighboring structures. Use a natural cohesive illustrated 3D architectural visualization with slightly softened edges and clean tactile materials, bright but believable daytime, with directional light from the upper left and clear foreground depth. Use almost frontal, gently elevated perspective. Leave the MAIN landmark completely absent for later compositing; reserve a clear open central area, with its real ground or foundation touching near x=50%, y=64% of the image. Keep the actual central site and several distinctive ground or background details visible in the central 45% of the width, since this image is center-cropped on mobile. Vertical architecture stays upright. Surroundings extend to all edges. No people, text, typography, brand names, watermark, gameplay, tools, dirt, frame, guide marks, or reference collage. One complete opaque picture of one place.\nLocation: Downtown Dubai, UAE.\nScene layout and actual context: Scene from the Burj Lake waterfront near Souk Al Bahar. The turquoise Dubai Fountain basin and pale paved rim fill foreground, the opposite waterfront and sandstone podium at center is where the tower will be placed. Burj Park lawns and clusters of modern sunlit tan and glass Downtown Dubai buildings on the flanks. Only comparatively low surrounding buildings, no main tower, no water jets."
+    },
+    {
+      "id": "world-scene_petronas-towers",
+      "anchor": [
+        0.51,
+        0.54
+      ],
+      "transparent_background": false,
+      "prompt": "Create a landscape 16:9 background plate for a polished colorful 3D architectural pressure-washing game for children. The real, specific place below is being depicted with recognizable materials, vegetation, geography and neighboring structures. Use a natural cohesive illustrated 3D architectural visualization with slightly softened edges and clean tactile materials, bright but believable daytime, with directional light from the upper left and clear foreground depth. Use almost frontal, gently elevated perspective. Leave the MAIN landmark completely absent for later compositing; reserve a clear open central area, with its real ground or foundation touching near x=50%, y=64% of the image. Keep the actual central site and several distinctive ground or background details visible in the central 45% of the width, since this image is center-cropped on mobile. Vertical architecture stays upright. Surroundings extend to all edges. No people, text, typography, brand names, watermark, gameplay, tools, dirt, frame, guide marks, or reference collage. One complete opaque picture of one place.\nLocation: Kuala Lumpur, Malaysia.\nScene layout and actual context: Looking toward the Petronas Towers site from KLCC Park, its signature Lake Symphony reflecting pool with calm water, light stone promenade, curving landscaped tropical shrubs and fan palms at frame edges, and low Suria KLCC podium and adjacent lower Kuala Lumpur city blocks in the distance. Humid tropical sunlight and slight cloud. No twin towers or skybridge."
+    },
+    {
+      "id": "world-scene_marina-bay-sands",
+      "anchor": [
+        0.55,
+        0.68
+      ],
+      "transparent_background": false,
+      "prompt": "Create a landscape 16:9 background plate for a polished colorful 3D architectural pressure-washing game for children. The real, specific place below is being depicted with recognizable materials, vegetation, geography and neighboring structures. Use a natural cohesive illustrated 3D architectural visualization with slightly softened edges and clean tactile materials, bright but believable daytime, with directional light from the upper left and clear foreground depth. Use almost frontal, gently elevated perspective. Leave the MAIN landmark completely absent for later compositing; reserve a clear open central area, with its real ground or foundation touching near x=50%, y=64% of the image. Keep the actual central site and several distinctive ground or background details visible in the central 45% of the width, since this image is center-cropped on mobile. Vertical architecture stays upright. Surroundings extend to all edges. No people, text, typography, brand names, watermark, gameplay, tools, dirt, frame, guide marks, or reference collage. One complete opaque picture of one place.\nLocation: Marina Bay, Singapore.\nScene layout and actual context: The correct Bayfront waterfront as viewed from across Marina Bay, luminous deep turquoise bay water in foreground. A straight narrow waterfront promenade and low glass shoreline buildings near the middle. The white lotus-shaped ArtScience Museum on the LEFT offset to one side and distant greenery low on the right, humid bright equatorial atmosphere. Leave the center open above the boardwalk for the three resort towers; no main resort towers or boat roof."
+    },
+    {
+      "id": "world-scene_forbjudna-staden",
+      "anchor": [
+        0.5,
+        0.6
+      ],
+      "transparent_background": false,
+      "prompt": "Create a landscape 16:9 background plate for a polished colorful 3D architectural pressure-washing game for children. The real, specific place below is being depicted with recognizable materials, vegetation, geography and neighboring structures. Use a natural cohesive illustrated 3D architectural visualization with slightly softened edges and clean tactile materials, bright but believable daytime, with directional light from the upper left and clear foreground depth. Use almost frontal, gently elevated perspective. Leave the MAIN landmark completely absent for later compositing; reserve a clear open central area, with its real ground or foundation touching near x=50%, y=64% of the image. Keep the actual central site and several distinctive ground or background details visible in the central 45% of the width, since this image is center-cropped on mobile. Vertical architecture stays upright. Surroundings extend to all edges. No people, text, typography, brand names, watermark, gameplay, tools, dirt, frame, guide marks, or reference collage. One complete opaque picture of one place.\nLocation: Beijing, China.\nScene layout and actual context: The authentic broad Hall of Supreme Harmony courtyard in the Forbidden City, weathered rectangular grey stone slab courtyard with a low centered initial rise, receding red perimeter halls with ochre glazed upturned roof tiles on left and right. Imperial symmetry and Beijing's soft dry clear light. Center background open for the hall and its white marble stairs. No main palace hall or staircase repeated."
+    },
+    {
+      "id": "world-scene_himejis-slott",
+      "anchor": [
+        0.5,
+        0.47
+      ],
+      "transparent_background": false,
+      "prompt": "Create a landscape 16:9 background plate for a polished colorful 3D architectural pressure-washing game for children. The real, specific place below is being depicted with recognizable materials, vegetation, geography and neighboring structures. Use a natural cohesive illustrated 3D architectural visualization with slightly softened edges and clean tactile materials, bright but believable daytime, with directional light from the upper left and clear foreground depth. Use almost frontal, gently elevated perspective. Leave the MAIN landmark completely absent for later compositing; reserve a clear open central area, with its real ground or foundation touching near x=50%, y=64% of the image. Keep the actual central site and several distinctive ground or background details visible in the central 45% of the width, since this image is center-cropped on mobile. Vertical architecture stays upright. Surroundings extend to all edges. No people, text, typography, brand names, watermark, gameplay, tools, dirt, frame, guide marks, or reference collage. One complete opaque picture of one place.\nLocation: Himeji, Japan.\nScene layout and actual context: Himeji Castle's authentic hilltop site seen from the south above the Sannomaru grounds. Dark sloped traditional ishigaki dry-jointed grey stone ramparts, white plaster defensive walls and black tile roofed gates low at the sides, a few Japanese pines and cherry blossom trees, distant soft green Hyogo hills. The central upper stone terrace is open to carry the keep. No main castle or pagoda."
+    },
+    {
+      "id": "world-scene_taipei-101",
+      "anchor": [
+        0.5,
+        0.65
+      ],
+      "transparent_background": false,
+      "prompt": "Create a landscape 16:9 background plate for a polished colorful 3D architectural pressure-washing game for children. The real, specific place below is being depicted with recognizable materials, vegetation, geography and neighboring structures. Use a natural cohesive illustrated 3D architectural visualization with slightly softened edges and clean tactile materials, bright but believable daytime, with directional light from the upper left and clear foreground depth. Use almost frontal, gently elevated perspective. Leave the MAIN landmark completely absent for later compositing; reserve a clear open central area, with its real ground or foundation touching near x=50%, y=64% of the image. Keep the actual central site and several distinctive ground or background details visible in the central 45% of the width, since this image is center-cropped on mobile. Vertical architecture stays upright. Surroundings extend to all edges. No people, text, typography, brand names, watermark, gameplay, tools, dirt, frame, guide marks, or reference collage. One complete opaque picture of one place.\nLocation: Taipei, Taiwan.\nScene layout and actual context: Authentic Xinyi commercial district viewed from Xinyi Road, wide zebra crossing, attractive low grey stone sidewalks, street trees and midrise glass and grey stone Taiwan office blocks to the sides, distant lush Taipei hills in soft cloud at far right. A contemporary low connected mall podium with an empty open area above it at midground center for the pagoda-shaped tower. No other tall spired towers and no readable signage."
+    },
+    {
+      "id": "world-scene_lotustemplet",
+      "anchor": [
+        0.51,
+        0.525
+      ],
+      "transparent_background": false,
+      "prompt": "Create a landscape 16:9 background plate for a polished colorful 3D architectural pressure-washing game for children. The real, specific place below is being depicted with recognizable materials, vegetation, geography and neighboring structures. Use a natural cohesive illustrated 3D architectural visualization with slightly softened edges and clean tactile materials, bright but believable daytime, with directional light from the upper left and clear foreground depth. Use almost frontal, gently elevated perspective. Leave the MAIN landmark completely absent for later compositing; reserve a clear open central area, with its real ground or foundation touching near x=50%, y=64% of the image. Keep the actual central site and several distinctive ground or background details visible in the central 45% of the width, since this image is center-cropped on mobile. Vertical architecture stays upright. Surroundings extend to all edges. No people, text, typography, brand names, watermark, gameplay, tools, dirt, frame, guide marks, or reference collage. One complete opaque picture of one place.\nLocation: New Delhi, India.\nScene layout and actual context: The authentic Baháʼí Lotus Temple complex in New Delhi. The raised red sandstone platform and red paver paths at its site, with characteristic shallow geometric turquoise pools on the flanks, green lawns, carefully clipped shrubs and lush Delhi trees at the outer boundaries. Warm clear daylight. Leave empty central foundation for the monument. No white petals, no secondary temple."
+    },
+    {
+      "id": "world-scene_empire-state-building",
+      "anchor": [
+        0.5,
+        0.75
+      ],
+      "transparent_background": false,
+      "prompt": "Create a landscape 16:9 background plate for a polished colorful 3D architectural pressure-washing game for children. The real, specific place below is being depicted with recognizable materials, vegetation, geography and neighboring structures. Use a natural cohesive illustrated 3D architectural visualization with slightly softened edges and clean tactile materials, bright but believable daytime, with directional light from the upper left and clear foreground depth. Use almost frontal, gently elevated perspective. Leave the MAIN landmark completely absent for later compositing; reserve a clear open central area, with its real ground or foundation touching near x=50%, y=64% of the image. Keep the actual central site and several distinctive ground or background details visible in the central 45% of the width, since this image is center-cropped on mobile. Vertical architecture stays upright. Surroundings extend to all edges. No people, text, typography, brand names, watermark, gameplay, tools, dirt, frame, guide marks, or reference collage. One complete opaque picture of one place.\nLocation: Midtown Manhattan, New York City.\nScene layout and actual context: Authentic Fifth Avenue and West 34th Street in Midtown Manhattan, close urban street walls of stone and red brick setting off the central site, tactile asphalt, stone sidewalks and zebra crossing foreground, art deco cornices and more modern glass blocks farther away. Looking slightly up with vertical architecture. Surrounding low rooftops frame the center for the Empire State Building. No Empire State Building or similar spire, no Times Square signs."
+    },
+    {
+      "id": "world-scene_vita-huset",
+      "anchor": [
+        0.51,
+        0.62
+      ],
+      "transparent_background": false,
+      "prompt": "Create a landscape 16:9 background plate for a polished colorful 3D architectural pressure-washing game for children. The real, specific place below is being depicted with recognizable materials, vegetation, geography and neighboring structures. Use a natural cohesive illustrated 3D architectural visualization with slightly softened edges and clean tactile materials, bright but believable daytime, with directional light from the upper left and clear foreground depth. Use almost frontal, gently elevated perspective. Leave the MAIN landmark completely absent for later compositing; reserve a clear open central area, with its real ground or foundation touching near x=50%, y=64% of the image. Keep the actual central site and several distinctive ground or background details visible in the central 45% of the width, since this image is center-cropped on mobile. Vertical architecture stays upright. Surroundings extend to all edges. No people, text, typography, brand names, watermark, gameplay, tools, dirt, frame, guide marks, or reference collage. One complete opaque picture of one place.\nLocation: Washington, D.C., USA.\nScene layout and actual context: The authentic North Lawn seen from Pennsylvania Avenue, Washington DC. Broad gently graded deep green lawn with the curving light grey drive approaching an empty central building site, dark richly textured deciduous trees and shrubs flanking the grounds, partial distant stone wings low at the outer margins. Bright soft summer sun. No White House, no fence covering the lawn or fountain in the center."
+    },
+    {
+      "id": "world-scene_kukulkans-pyramid",
+      "anchor": [
+        0.51,
+        0.64
+      ],
+      "transparent_background": false,
+      "prompt": "Create a landscape 16:9 background plate for a polished colorful 3D architectural pressure-washing game for children. The real, specific place below is being depicted with recognizable materials, vegetation, geography and neighboring structures. Use a natural cohesive illustrated 3D architectural visualization with slightly softened edges and clean tactile materials, bright but believable daytime, with directional light from the upper left and clear foreground depth. Use almost frontal, gently elevated perspective. Leave the MAIN landmark completely absent for later compositing; reserve a clear open central area, with its real ground or foundation touching near x=50%, y=64% of the image. Keep the actual central site and several distinctive ground or background details visible in the central 45% of the width, since this image is center-cropped on mobile. Vertical architecture stays upright. Surroundings extend to all edges. No people, text, typography, brand names, watermark, gameplay, tools, dirt, frame, guide marks, or reference collage. One complete opaque picture of one place.\nLocation: Chichén Itzá, Yucatán, Mexico.\nScene layout and actual context: The Great Plaza at Chichén Itzá where El Castillo stands, pale buff compacted ground mixed with worn dry short grass, dense low green Yucatán tropical woodland beyond, the Temple of the Warriors and low rows of stone columns far to the right. Warm humid sun with soft cloud. Leave center open for the pyramid. No main pyramid and no giant mountains."
+    },
+    {
+      "id": "world-scene_brasiliens-kongresspalats",
+      "anchor": [
+        0.51,
+        0.575
+      ],
+      "transparent_background": false,
+      "prompt": "Create a landscape 16:9 background plate for a polished colorful 3D architectural pressure-washing game for children. The real, specific place below is being depicted with recognizable materials, vegetation, geography and neighboring structures. Use a natural cohesive illustrated 3D architectural visualization with slightly softened edges and clean tactile materials, bright but believable daytime, with directional light from the upper left and clear foreground depth. Use almost frontal, gently elevated perspective. Leave the MAIN landmark completely absent for later compositing; reserve a clear open central area, with its real ground or foundation touching near x=50%, y=64% of the image. Keep the actual central site and several distinctive ground or background details visible in the central 45% of the width, since this image is center-cropped on mobile. Vertical architecture stays upright. Surroundings extend to all edges. No people, text, typography, brand names, watermark, gameplay, tools, dirt, frame, guide marks, or reference collage. One complete opaque picture of one place.\nLocation: Brasília, Brazil.\nScene layout and actual context: The actual eastern end of the Monumental Axis in Brasília viewed from the Esplanade of Ministries. Broad well-mown green lawns, a narrow blue reflective pool and pale white modernist paths and low slabs around the central empty Congress site, unobtrusive rectilinear modernist buildings far off on the sides, wide highland Cerrado sky. No central towers or pavilion or domes."
+    },
+    {
+      "id": "world-scene_operahuset-sydney",
+      "anchor": [
+        0.56,
+        0.6
+      ],
+      "transparent_background": false,
+      "prompt": "Create a landscape 16:9 background plate for a polished colorful 3D architectural pressure-washing game for children. The real, specific place below is being depicted with recognizable materials, vegetation, geography and neighboring structures. Use a natural cohesive illustrated 3D architectural visualization with slightly softened edges and clean tactile materials, bright but believable daytime, with directional light from the upper left and clear foreground depth. Use almost frontal, gently elevated perspective. Leave the MAIN landmark completely absent for later compositing; reserve a clear open central area, with its real ground or foundation touching near x=50%, y=64% of the image. Keep the actual central site and several distinctive ground or background details visible in the central 45% of the width, since this image is center-cropped on mobile. Vertical architecture stays upright. Surroundings extend to all edges. No people, text, typography, brand names, watermark, gameplay, tools, dirt, frame, guide marks, or reference collage. One complete opaque picture of one place.\nLocation: Sydney, Australia.\nScene layout and actual context: The real Bennelong Point peninsula in Sydney Harbour, viewed from southwest near Circular Quay: the flat straight-edged sandstone seawall and headland across center supporting the building later, sparkling deep blue harbor water across foreground, Sydney Harbour Bridge's real steel arch off to LEFT in the distance and a low distant green shore. Sunny blue Australian daylight. No Opera House sails or duplicate landmark."
     }
   ]
 }

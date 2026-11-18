@@ -1,4 +1,4 @@
-"""Package the 24 generated landmark sprites and derive exact playable bounds.
+"""Package 24 generated landmark sprites and their location-specific scenery.
 
 Artwork is created with the built-in image generator. This script only encodes
 web assets, measures alpha, and builds level data; it does not draw or alter art.
@@ -17,40 +17,48 @@ MAX_EDGE = 1280
 
 # Append only: the original 76 IDs and their saved progress retain their order.
 LANDMARKS = [
-    ("stockholms-stadshus", "Stockholms stadshus", "Stockholm", "Sverige", 210, "harbour"),
-    ("eiffeltornet", "Eiffeltornet", "Paris", "Frankrike", 210, "plaza"),
-    ("big-ben", "Big Ben", "London", "Storbritannien", 180, "plaza"),
-    ("colosseum", "Colosseum", "Rom", "Italien", 210, "plaza"),
-    ("lutande-tornet", "Lutande tornet i Pisa", "Pisa", "Italien", 180, "plaza"),
-    ("sagrada-familia", "Sagrada Família", "Barcelona", "Spanien", 240, "plaza"),
-    ("neuschwanstein", "Slottet Neuschwanstein", "Schwangau", "Tyskland", 210, "plaza"),
-    ("vasilijkatedralen", "Vasilijkatedralen", "Moskva", "Ryssland", 210, "plaza"),
-    ("hagia-sofia", "Hagia Sofia", "Istanbul", "Turkiet", 210, "plaza"),
-    ("cheopspyramiden", "Cheopspyramiden", "Giza", "Egypten", 210, "desert"),
-    ("hassan-ii-mosken", "Hassan II-moskén", "Casablanca", "Marocko", 210, "harbour"),
-    ("taj-mahal", "Taj Mahal", "Agra", "Indien", 240, "plaza"),
-    ("burj-khalifa", "Burj Khalifa", "Dubai", "Förenade Arabemiraten", 180, "plaza"),
-    ("petronas-towers", "Petronas Towers", "Kuala Lumpur", "Malaysia", 210, "plaza"),
-    ("marina-bay-sands", "Marina Bay Sands", "Singapore", "Singapore", 210, "harbour"),
-    ("forbjudna-staden", "Förbjudna staden", "Peking", "Kina", 210, "plaza"),
-    ("himejis-slott", "Himejis slott", "Himeji", "Japan", 210, "plaza"),
-    ("taipei-101", "Taipei 101", "Taipei", "Taiwan", 180, "plaza"),
-    ("lotustemplet", "Lotustemplet", "New Delhi", "Indien", 180, "plaza"),
-    ("empire-state-building", "Empire State Building", "New York", "USA", 210, "plaza"),
-    ("vita-huset", "Vita huset", "Washington, D.C.", "USA", 180, "plaza"),
-    ("kukulkans-pyramid", "Kukulkáns pyramid", "Chichén Itzá", "Mexiko", 210, "plaza"),
-    ("brasiliens-kongresspalats", "Brasiliens kongresspalats", "Brasília", "Brasilien", 210, "plaza"),
-    ("operahuset-sydney", "Operahuset i Sydney", "Sydney", "Australien", 210, "harbour"),
+    ("stockholms-stadshus", "Stockholms stadshus", "Stockholm", "Sverige", 210),
+    ("eiffeltornet", "Eiffeltornet", "Paris", "Frankrike", 210),
+    ("big-ben", "Big Ben", "London", "Storbritannien", 180),
+    ("colosseum", "Colosseum", "Rom", "Italien", 210),
+    ("lutande-tornet", "Lutande tornet i Pisa", "Pisa", "Italien", 180),
+    ("sagrada-familia", "Sagrada Família", "Barcelona", "Spanien", 240),
+    ("neuschwanstein", "Slottet Neuschwanstein", "Schwangau", "Tyskland", 210),
+    ("vasilijkatedralen", "Vasilijkatedralen", "Moskva", "Ryssland", 210),
+    ("hagia-sofia", "Hagia Sofia", "Istanbul", "Turkiet", 210),
+    ("cheopspyramiden", "Cheopspyramiden", "Giza", "Egypten", 210),
+    ("hassan-ii-mosken", "Hassan II-moskén", "Casablanca", "Marocko", 210),
+    ("taj-mahal", "Taj Mahal", "Agra", "Indien", 240),
+    ("burj-khalifa", "Burj Khalifa", "Dubai", "Förenade Arabemiraten", 180),
+    ("petronas-towers", "Petronas Towers", "Kuala Lumpur", "Malaysia", 210),
+    ("marina-bay-sands", "Marina Bay Sands", "Singapore", "Singapore", 210),
+    ("forbjudna-staden", "Förbjudna staden", "Peking", "Kina", 210),
+    ("himejis-slott", "Himejis slott", "Himeji", "Japan", 210),
+    ("taipei-101", "Taipei 101", "Taipei", "Taiwan", 180),
+    ("lotustemplet", "Lotustemplet", "New Delhi", "Indien", 180),
+    ("empire-state-building", "Empire State Building", "New York", "USA", 210),
+    ("vita-huset", "Vita huset", "Washington, D.C.", "USA", 180),
+    ("kukulkans-pyramid", "Kukulkáns pyramid", "Chichén Itzá", "Mexiko", 210),
+    ("brasiliens-kongresspalats", "Brasiliens kongresspalats", "Brasília", "Brasilien", 210),
+    ("operahuset-sydney", "Operahuset i Sydney", "Sydney", "Australien", 210),
 ]
 
 
 def build():
     levels = []
+    prompts_path = Path(__file__).with_name("world-landmark-prompts.json")
+    scenes = {scene["id"]: scene["anchor"] for scene in json.loads(prompts_path.read_text(encoding="utf-8"))["backgrounds"]}
     missing = [slug for slug, *_ in LANDMARKS if not (ASSETS / f"world_{slug}.webp").exists()]
     if missing:
         raise SystemExit("Missing artwork: " + ", ".join(missing))
-    for slug, name, city, country, goal, backdrop in LANDMARKS:
+    for slug, name, city, country, goal in LANDMARKS:
         path = ASSETS / f"world_{slug}.webp"
+        backdrop = f"world-scene_{slug}"
+        scene_anchor = scenes[backdrop]
+        if not (ASSETS / f"{backdrop}.webp").is_file():
+            raise SystemExit(f"Missing background: {backdrop}.webp")
+        if len(scene_anchor) != 2 or not all(0 < position < 1 for position in scene_anchor):
+            raise ValueError(f"{slug}: expected a normalized ground anchor")
         sprite = Image.open(path).convert("RGBA")
         if max(sprite.size) > MAX_EDGE:
             sprite.thumbnail((MAX_EDGE, MAX_EDGE), Image.Resampling.LANCZOS)
@@ -70,15 +78,13 @@ def build():
         levels.append({
             "id": f"world_{slug}", "name": name, "label": name,
             "city": city, "country": country, "goal": goal,
-            "theme": "Världens byggnader", "backdrop": f"world-{backdrop}",
+            "theme": "Världens byggnader", "backdrop": backdrop,
+            "sceneAnchor": scene_anchor,
             "alphaMask": ALPHA_THRESHOLD,
             # Bounds only; makeDirt uses the exact alpha channel instead of this rectangle.
             "polygons": [[[x0, y0], [x1, y0], [x1, y1], [x0, y1]]],
         })
         print(f"{name}: {width}x{height}, {coverage:.1%} washable, {path.stat().st_size:,} bytes")
-    for backdrop in {item[5] for item in LANDMARKS}:
-        if not (ASSETS / f"world-{backdrop}.webp").exists():
-            raise SystemExit(f"Missing background: world-{backdrop}.webp")
     payload = json.dumps(levels, ensure_ascii=False, separators=(",", ":"))
     (GAME / "world-levels-20261118.js").write_text(
         "// 24 world landmarks. Generated by tools/hogtryckstvatten/build-world-levels.py.\n"
