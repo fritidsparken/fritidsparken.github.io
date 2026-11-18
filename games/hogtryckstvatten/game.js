@@ -1,6 +1,6 @@
 (()=>{'use strict';
 const $=id=>document.getElementById(id), canvas=$('scene'),ctx=canvas.getContext('2d');
-let W=1600,H=900,houseWide=null,backdropImage=null;
+let W=1600,H=900,houseWide=null,backdropImage=null,alignedMaskImage=null,maskBounds=null;
 const surface=document.createElement('canvas');const surfaceContext=surface.getContext('2d');
 const foreground=document.createElement('canvas');const foregroundContext=foreground.getContext('2d');
 const dirt=document.createElement('canvas');dirt.width=W;dirt.height=H;const dc=dirt.getContext('2d',{willReadFrequently:true});
@@ -24,23 +24,39 @@ function tool(){if(!kit[save.tool]||golds()<kit[save.tool].need)save.tool=0;retu
 function time(n){return `${Math.floor(n/60)}:${String(Math.floor(n%60)).padStart(2,'0')}`}
 function stars(i,t){return t<=levels[i].goal?3:t<=levels[i].goal*1.6?2:1}
 function toast(s){$('toast').textContent=s;$('toast').style.opacity=1;toastTime=3}
+function usesAlignedMask(i){return /^(new26_|extra27_)/.test(levels[i].id)}
+function saveMaskVersion(i){return levels[i].id==='house'?8:(usesAlignedMask(i)||levels[i].alphaMask)?8:7}
 function getImage(id){if(images.has(id))return images.get(id);const p=new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=`assets/${id==='house'?'house-portrait-v2':id==='house-wide'?'house-wide-v2':id}.webp`});images.set(id,p);p.catch(()=>images.delete(id));return p}
 const housePolygons=[[[.2445,.3268],[.319,.299],[.319,.262],[.365,.262],[.365,.291],[.733,.261],[.802,.296],[.800,.307],[.2445,.335]],[[.279,.334],[.770,.305],[.770,.418],[.679,.394],[.568,.438],[.568,.541],[.453,.535],[.279,.554]],[[.570,.435],[.681,.395],[.795,.435],[.793,.553],[.774,.576],[.594,.576],[.594,.555],[.570,.550]]];
 function regions(){return levels[level].id==='house'?housePolygons.map(p=>[p]):levels[level].regions||levels[level].polygons.map(p=>[p]);}
 function polygons(){return regions().map(r=>r[0]);}
 function polyPath(c,paths=polygons()){c.beginPath();for(const p of paths){p.forEach(([x,y],i)=>i?c.lineTo(x*W,y*H):c.moveTo(x*W,y*H));c.closePath()}}
 let seed=1;function rand(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}
+function computeMaskBounds(){
+ const pixels=surfaceContext.getImageData(0,0,W,H).data;
+ let x0=W,y0=H,x1=-1,y1=-1;
+ for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(pixels[(y*W+x)*4+3]>32){x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y)}
+ if(x1<x0||y1<y0)throw new Error('Tom smutsmask för '+levels[level].id);
+ const pad=28,x=Math.max(0,x0-pad),y=Math.max(0,y0-pad);
+ maskBounds={x,y,w:Math.min(W,x1+pad+1)-x,h:Math.min(H,y1+pad+1)-y};
+}
 function makeDirt(){seed=12345+level*923;dc.clearRect(0,0,W,H);surface.width=W;surface.height=H;
- if(levels[level].alphaMask){
+ if(alignedMaskImage){
+  // Pixel-aligned alpha mask produced from the exact level artwork.
+  surfaceContext.drawImage(alignedMaskImage,0,0,W,H);
+  // Exclude a small background-tree fragment beside the helicopter rotor.
+  if(levels[level].id==='extra27_helicopter')surfaceContext.clearRect(0,H*.265,W*.14,H*.18);
+ }else if(levels[level].alphaMask){
   // Use the building's own silhouette, including every roof and transparent opening.
   // Ignore near-invisible antialias fringes so they never become required dirt.
   surfaceContext.drawImage(img,0,0,W,H);
   const mask=surfaceContext.getImageData(0,0,W,H);
-  for(let i=0;i<mask.data.length;i+=4){mask.data[i]=mask.data[i+1]=mask.data[i+2]=255;if(mask.data[i+3]<levels[level].alphaMask)mask.data[i+3]=0;}
+  for(let i=0;i<mask.data.length;i+=4){mask.data[i]=mask.data[i+1]=mask.data[i+2]=255;mask.data[i+3]=mask.data[i+3]>=Math.max(96,levels[level].alphaMask)?255:0;}
   surfaceContext.putImageData(mask,0,0);
  }else{
   surfaceContext.fillStyle='#fff';for(const region of regions()){polyPath(surfaceContext,region);surfaceContext.fill('evenodd')}
  }
+ computeMaskBounds();
  dc.save();dc.fillStyle='rgba(67,65,24,.75)';dc.fillRect(0,0,W,H);
  for(let i=0;i<9000;i++){const x=rand()*W,y=rand()*H,r=1+rand()*24;dc.fillStyle=`rgba(${25+rand()*40|0},${35+rand()*43|0},${10+rand()*20|0},${.08+rand()*.22})`;dc.beginPath();dc.ellipse(x,y,r,r*(.4+rand()),0,0,Math.PI*2);dc.fill()}
  for(let i=0;i<520;i++){let x=rand()*W,y=rand()*H;dc.strokeStyle=`rgba(37,48,17,${.06+rand()*.23})`;dc.lineWidth=1+rand()*5;dc.beginPath();dc.moveTo(x,y);dc.lineTo(x+rand()*7,y+20+rand()*80);dc.stroke()}dc.globalCompositeOperation='destination-in';dc.drawImage(surface,0,0);dc.restore();initial=mass();}
@@ -100,12 +116,12 @@ function measure(){
  if(!done)percent=Math.min(percent,99.9);
  $('fill').style.width=percent+'%';$('progressLabel').textContent=`Rent: ${Math.floor(percent)}%`;
 }
-async function load(i,resume=false){const token=++loadedToken;playing=false;holding=false;ready=false;$('loading').hidden=false;if($('panel').open)$('panel').close();try{const [im,wide,backdrop]=await Promise.all([getImage(levels[i].id),levels[i].id==='house'?getImage('house-wide'):Promise.resolve(null),levels[i].backdrop?getImage(levels[i].backdrop):Promise.resolve(null),window.WasherRig.ready]);if(token!==loadedToken)return;level=i;houseWide=wide;backdropImage=backdrop;W=im.naturalWidth;H=im.naturalHeight;dirt.width=W;dirt.height=H;cameraX=800;pointerScreen=null;img=im;elapsed=0;percent=0;done=false;last=null;particles=[];aim={x:800,y:450};sprayAim={...aim};makeDirt();makeForeground();
+async function load(i,resume=false){const token=++loadedToken;playing=false;holding=false;ready=false;$('loading').hidden=false;if($('panel').open)$('panel').close();try{const [im,wide,backdrop,mask]=await Promise.all([getImage(levels[i].id),levels[i].id==='house'?getImage('house-wide'):Promise.resolve(null),levels[i].backdrop?getImage(levels[i].backdrop):Promise.resolve(null),usesAlignedMask(i)?getImage('masks/'+levels[i].id):Promise.resolve(null),window.WasherRig.ready]);if(token!==loadedToken)return;level=i;houseWide=wide;backdropImage=backdrop;alignedMaskImage=mask;W=im.naturalWidth;H=im.naturalHeight;dirt.width=W;dirt.height=H;cameraX=800;pointerScreen=null;img=im;elapsed=0;percent=0;done=false;last=null;particles=[];aim={x:800,y:450};sprayAim={...aim};makeDirt();makeForeground();
  sc.clearRect(0,0,200,113);sc.drawImage(dirt,0,0,200,113);areaMask=sc.getImageData(0,0,200,113).data;
- if(resume&&save.active?.id===levels[i].id&&save.active.mask&&save.active.version===(levels[i].id==='house'?8:7)){elapsed=Number(save.active.elapsed)||0;const snap=new Image();await new Promise(resolve=>{snap.onload=()=>{dc.clearRect(0,0,W,H);dc.drawImage(snap,0,0,W,H);resolve()};snap.onerror=resolve;snap.src=save.active.mask});}
+ if(resume&&save.active?.id===levels[i].id&&save.active.mask&&save.active.version===saveMaskVersion(i)){elapsed=Number(save.active.elapsed)||0;const snap=new Image();await new Promise(resolve=>{snap.onload=()=>{dc.clearRect(0,0,W,H);dc.drawImage(snap,0,0,W,H);resolve()};snap.onerror=resolve;snap.src=save.active.mask});}
  ready=true;measure();$('levelName').textContent=levels[i].name;$('target').textContent=`★ Tidsmål ${time(levels[i].goal)}`;$('hint').style.opacity=1;updateStage();updateTool();$('loading').hidden=true;if(!done){playing=true;clock=performance.now()}if(i+1<levels.length)getImage(levels[i+1].id).catch(()=>{});
  }catch{$('loading').hidden=true;openPanel('<h2>Bilden kunde inte laddas</h2><p>Kontrollera anslutningen och försök igen.</p><div class="actions"><button class="primary" data-retry="'+i+'">Försök igen</button></div>')}}
-function snapshot(){if(!ready||done)return;save.active={version:levels[level].id==='house'?8:7,id:levels[level].id,elapsed,mask:dirt.toDataURL('image/png')};persist()}
+function snapshot(){if(!ready||done)return;save.active={version:saveMaskVersion(level),id:levels[level].id,elapsed,mask:dirt.toDataURL('image/png')};persist()}
 function updateTool(){tool();updateStage();$('sound').textContent=muted?'♫':'♪';$('sound').setAttribute('aria-label',muted?'Slå på ljud':'Stäng av ljud')}
 function openPanel(html){holding=false;last=null;playing=false;setNoise(false);$('panelBody').innerHTML=html;if(!$('panel').open)$('panel').showModal()}
 function levelCard(l,i){
@@ -134,6 +150,7 @@ function resize(){const b=canvas.getBoundingClientRect(),d=Math.min(devicePixelR
 window.addEventListener('resize',()=>{release();resize()});new ResizeObserver(resize).observe($('playArea'));resize();
 function washBounds(){
  if(levels[level].id==='house')return {x:275,y:350,w:650,h:465};
+ if(maskBounds)return maskBounds;
  const points=polygons().flat(),xs=points.map(p=>p[0]*W),ys=points.map(p=>p[1]*H),pad=levels[level].id==='house'?2:28;
  const edge=levels[level].alphaMask?0:1;
  const x=Math.max(edge,Math.min(...xs)-pad),y=Math.max(edge,Math.min(...ys)-pad);
