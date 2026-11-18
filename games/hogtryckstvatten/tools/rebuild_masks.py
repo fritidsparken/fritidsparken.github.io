@@ -74,6 +74,43 @@ def refine(level, img, old, session):
         overlap = int(np.count_nonzero(comp & (old > 0)))
         if overlap >= max(10, area*.035) or area >= w*h*.012:
             kept[comp] = 255
+    # Remove visible background through slats, handrails and open frames.
+    ident = level['id']
+    hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
+    hue, sat, val = cv2.split(hsv)
+    yy, xx = np.ogrid[:h, :w]
+    fx, fy = xx / w, yy / h
+    green = (hue >= 35) & (hue <= 88) & (sat > 65) & (val > 55)
+    sky = (hue >= 87) & (hue <= 112) & (sat > 50) & (sat < 220) & (val > 215)
+    def cut_pixels(pixel_class, x0, y0, x1, y1):
+        roi = (fx > x0) & (fx < x1) & (fy > y0) & (fy < y1)
+        kept[roi & pixel_class] = 0
+    if ident == 'extra27_bench':
+        cut_pixels(green, .13, .30, .87, .56)
+    if ident == 'extra27_roundabout':
+        cut_pixels(green, .05, .33, .95, .70)
+    if ident == 'extra27_slide':
+        cut_pixels(green, .08, .34, .91, .72)
+        cut_pixels(sky, .27, .24, .75, .50)
+    if ident == 'extra27_playcastle':
+        cut_pixels(green, .09, .42, .92, .72)
+        cut_pixels(sky, .10, .22, .90, .57)
+    if ident == 'extra27_carousel':
+        cut_pixels(green, .08, .35, .92, .74)
+        cut_pixels(sky, .09, .29, .91, .58)
+    if ident == 'new26_firetruck':
+        cut_pixels(sky, .20, .22, .87, .41)
+    if ident == 'extra27_helicopter':
+        # Restore the four thin rotor blades, not the blue sky between them.
+        roi = (fy > .165) & (fy < .305) & (fx > .01) & (fx < .99)
+        red = ((hue < 12) | (hue > 170)) & (sat > 90) & (val > 75)
+        yellow = (hue >= 12) & (hue <= 38) & (sat > 105) & (val > 95)
+        gray = (sat < 115) & (val < 195) & (val > 55)
+        rotor = roi & (red | yellow | gray)
+        rotor &= ~((fx < .13) & (fy < .205))
+        rotor = cv2.morphologyEx(rotor.astype('uint8'), cv2.MORPH_CLOSE,
+                                 cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(3,3)))
+        kept[rotor > 0] = 255
     fraction = float(np.count_nonzero(kept)/(w*h))
     if not (.02 < fraction < .72):
         raise RuntimeError(f'{level["id"]}: segmentation area {fraction:.1%} suspicious')
