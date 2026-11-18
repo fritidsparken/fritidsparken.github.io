@@ -413,9 +413,9 @@
     ],
     "coarse": true,
     "model": "u2net",
-    "area": 0.3422,
+    "area": 0.3321,
     "oldArea": 0.2466,
-    "overlapWithOld": 0.9868,
+    "overlapWithOld": 0.9804,
     "marginPixels": 104
   },
   {
@@ -669,9 +669,9 @@
     ],
     "coarse": true,
     "model": "u2net",
-    "area": 0.1878,
+    "area": 0.2255,
     "oldArea": 0.2136,
-    "overlapWithOld": 0.7918,
+    "overlapWithOld": 0.8325,
     "marginPixels": 110
   },
   {
@@ -717,9 +717,9 @@
     ],
     "coarse": true,
     "model": "u2net",
-    "area": 0.3214,
+    "area": 0.2868,
     "oldArea": 0.1917,
-    "overlapWithOld": 0.9498,
+    "overlapWithOld": 0.9305,
     "marginPixels": 110
   },
   {
@@ -733,9 +733,9 @@
     ],
     "coarse": true,
     "model": "u2net",
-    "area": 0.3146,
+    "area": 0.2709,
     "oldArea": 0.1835,
-    "overlapWithOld": 0.8891,
+    "overlapWithOld": 0.8558,
     "marginPixels": 110
   },
   {
@@ -749,9 +749,9 @@
     ],
     "coarse": true,
     "model": "u2net",
-    "area": 0.2999,
+    "area": 0.2855,
     "oldArea": 0.2849,
-    "overlapWithOld": 0.8728,
+    "overlapWithOld": 0.8399,
     "marginPixels": 110
   },
   {
@@ -781,9 +781,9 @@
     ],
     "coarse": true,
     "model": "u2net",
-    "area": 0.3521,
+    "area": 0.3259,
     "oldArea": 0.3566,
-    "overlapWithOld": 0.8833,
+    "overlapWithOld": 0.8114,
     "marginPixels": 110
   },
   {
@@ -845,9 +845,9 @@
     ],
     "coarse": true,
     "model": "u2net",
-    "area": 0.4691,
+    "area": 0.4253,
     "oldArea": 0.3075,
-    "overlapWithOld": 0.866,
+    "overlapWithOld": 0.8516,
     "marginPixels": 110
   },
   {
