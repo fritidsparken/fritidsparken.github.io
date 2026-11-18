@@ -1,0 +1,105 @@
+@charset "UTF-8";
+:root{color-scheme:light;--ink:#07575b;--paper:#faf6ed;--teal:#07575b;--green:#459b49;--ring:#ef4549;--amber:#ffcc65;font-family:ui-rounded,"Arial Rounded MT Bold","Trebuchet MS",system-ui,sans-serif;font-synthesis:none}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0;overflow:hidden;background:var(--paper);color:var(--ink)}
+body{-webkit-text-size-adjust:100%}
+button,a{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+button{font:inherit;color:inherit;cursor:pointer}
+button:disabled{cursor:default;opacity:.45}
+button:focus-visible,a:focus-visible,.board:focus-visible{outline:3px solid #f1a517;outline-offset:4px}
+.game-app{height:100vh;height:100dvh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);overflow:hidden}
+.game-header{flex:none;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:14px;min-height:70px;padding:12px max(22px,env(safe-area-inset-left,0px)) 13px;border-radius:0 0 22px 22px;background:var(--teal);color:#fff}
+.game-header h1{margin:0;text-align:center;font-size:clamp(24px,3.4vw,44px);line-height:1.1;font-weight:900;letter-spacing:-.035em;white-space:nowrap}
+.home-link{display:inline-flex;align-items:center;gap:12px;justify-self:start;color:inherit;text-decoration:none;font-size:clamp(15px,1.65vw,24px);font-weight:900;white-space:nowrap}
+.home-link svg{width:30px;height:30px;fill:currentColor;stroke:currentColor;stroke-width:1.4;stroke-linejoin:round;flex:none}
+.home-link span{border-left:1px solid #ffffff65;padding-left:14px}
+.help-button{width:40px;height:40px;display:grid;place-items:center;padding:7px;justify-self:end;background:#ffffff13;border:1px solid #ffffff35;border-radius:50%;color:#fff}
+.help-button svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.is-embedded .game-header{height:0;min-height:0;padding:0;border:0;background:none}
+.is-embedded .game-header h1{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.is-embedded .home-link,.is-embedded .help-button{display:none}
+.game-main{min-height:0;flex:1;display:flex;flex-direction:column;padding:0 clamp(12px,1.8vw,28px);position:relative}
+.intro{flex:none;text-align:center;padding:12px 0 8px}
+.intro p{margin:0 0 9px;font-size:clamp(16px,1.8vw,23px);font-weight:800;line-height:1.25;letter-spacing:-.02em}
+.level-label{display:inline-block;padding:6px 23px;border-radius:30px;background:#dceacb;font-size:clamp(13px,1.5vw,19px);font-weight:900;line-height:1.2}
+.play-area{position:relative;min-height:0;flex:1;display:flex;align-items:center;justify-content:center;gap:16px;padding:20px 0 6px}
+.board-card{position:relative;width:46%;aspect-ratio:1.5;flex:none;border:5px solid white;border-radius:20px;background:#e7edd9;box-shadow:0 3px 7px #51492a24;transition:opacity .2s}
+.play-area[aria-busy=true] .board-card{visibility:hidden}
+.board-label{position:absolute;top:-23px;left:50%;transform:translateX(-50%);z-index:3;background:#fff;border-radius:18px;padding:4px 21px;box-shadow:0 1px 5px #51492a10;font-size:clamp(15px,1.65vw,21px);font-weight:900;line-height:1.2;white-space:nowrap;pointer-events:none}
+.board{position:relative;width:100%;height:100%;overflow:hidden;border-radius:15px;cursor:crosshair;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.board:focus-visible{outline-offset:-5px}
+.scene-image,.mark-layer{display:block;position:absolute;inset:0;width:100%;height:100%}
+.scene-image{object-fit:fill;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.mark-layer{overflow:visible;pointer-events:none}
+.found-ring{fill:none;stroke:var(--ring);stroke-width:4px;vector-effect:non-scaling-stroke;filter:drop-shadow(0 1px 1px #611a1a30)}
+.found-ring-outline{fill:none;stroke:#fff9ed;stroke-width:7px;vector-effect:non-scaling-stroke}
+.found-group{transform-box:fill-box;transform-origin:center;animation:found-pop .28s cubic-bezier(.18,.75,.3,1.3)}
+.hint-ring{fill:#ffd15c22;stroke:#ffce4f;stroke-width:4px;stroke-dasharray:9 6;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 3px #49360a);animation:hint-pulse 1s ease-in-out infinite}
+.miss-ring{fill:none;stroke:#fff;stroke-width:2px;vector-effect:non-scaling-stroke;opacity:0;animation:miss-fade .55s ease-out}
+.keyboard-cursor{position:absolute;left:50%;top:50%;width:25px;height:25px;transform:translate(-50%,-50%);border:2px solid #fff;border-radius:50%;box-shadow:0 0 0 2px #07575b,0 1px 4px #0008;pointer-events:none;z-index:4}
+.keyboard-cursor:before,.keyboard-cursor:after{content:"";position:absolute;background:#07575b;box-shadow:0 0 0 1px white}
+.keyboard-cursor:before{width:15px;height:2px;left:3px;top:9px}
+.keyboard-cursor:after{width:2px;height:15px;left:9px;top:3px}
+.game-footer{flex:none;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;padding:14px 0 17px;min-height:84px}
+.button{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:45px;border:0;border-radius:15px;padding:10px 20px;font-weight:900;font-size:18px;line-height:1.2;white-space:nowrap;transition:transform .12s,background-color .12s;box-shadow:none}
+.button:active:not(:disabled){transform:translateY(2px)}
+.button svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.button-amber{background:var(--amber);box-shadow:0 3px 0 #d89424;color:#153f3e}
+.button-amber:hover:not(:disabled){background:#ffd67d}
+.button-teal{color:white;background:var(--teal);box-shadow:0 3px 0 #003c40}
+.button-teal:hover{background:#087176}
+.button-quiet{background:#edf0e3;border:1px solid #d6dfcd;font-size:15px}
+.button-quiet:hover:not(:disabled){background:#e2e9d8}
+.replay-button{justify-self:start;padding:10px 13px}
+.replay-button svg{width:21px;height:21px}
+.hint-button{justify-self:end;padding:12px 25px;font-size:21px}
+.progress{display:flex;align-items:center;justify-content:center;gap:20px;background:#e4efd7;padding:12px 27px;border-radius:40px;white-space:nowrap}
+.progress strong{font-size:clamp(17px,2vw,26px);font-weight:900;letter-spacing:-.025em;line-height:1.2}
+.progress-dots{display:flex;gap:8px;align-items:center}
+.progress-dots i{display:block;width:21px;height:21px;border-radius:50%;border:2px solid var(--ink);background:transparent;transition:background-color .2s,transform .2s}
+.progress-dots i.found{border-color:#7db865;background:var(--green);box-shadow:inset 0 0 0 2px #ffffff2b;animation:found-pop .28s ease-out}
+.load-state{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;font-weight:800;padding:20px}
+.load-state p{margin:0;max-width:40ch;line-height:1.45}
+.loading-ring{height:40px;width:40px;border:4px solid #dce8cc;border-top-color:var(--ink);border-radius:50%;animation:spin 1.2s linear infinite}
+.load-state.error .loading-ring{display:none}
+.feedback{position:absolute;z-index:6;bottom:95px;left:50%;transform:translate(-50%,8px);background:#07575bef;color:#fff;border-radius:22px;padding:9px 20px;opacity:0;pointer-events:none;font-size:15px;font-weight:800;white-space:nowrap;transition:opacity .18s,transform .18s;box-shadow:0 3px 12px #14392725}
+.feedback.show{opacity:1;transform:translate(-50%,0)}
+.game-dialog{border:0;border-radius:25px;background:var(--paper);color:var(--ink);width:min(440px,calc(100vw - 28px));max-height:calc(100dvh - 35px);padding:0;box-shadow:0 15px 80px #0c30335c}
+.game-dialog::backdrop{background:#092f3c80;backdrop-filter:blur(3px)}
+.dialog-content{padding:26px;text-align:center}
+.dialog-content h2{margin:14px 0 10px;font-size:28px;letter-spacing:-.035em;line-height:1.15}
+.dialog-content p{font:16px/1.5 "Trebuchet MS",system-ui,sans-serif;margin:12px 0 20px}
+.dialog-symbol{display:grid;place-items:center;margin:auto;width:66px;height:66px;background:#dceacb;border-radius:50%;font-weight:900;font-size:40px}
+.dialog-content .keyboard-instructions{font-size:13px;padding:12px;background:#eaf0df;border-radius:12px;text-align:left}
+.completion-medal{display:grid;place-items:center;width:90px;height:90px;margin:2px auto 0;background:#fff0b7;border-radius:50%;box-shadow:inset 0 0 0 5px #ffdf79}
+.completion-medal svg{width:59px;height:59px;fill:#f6ae31;stroke:#d89116;stroke-width:1.5;stroke-linejoin:round}
+.completion-actions{display:flex;flex-direction:column;align-items:stretch;gap:12px;margin-top:24px}
+.completion-dialog[open] .completion-medal{animation:found-pop .45s ease-out}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+noscript{position:fixed;inset:30% 12%;padding:20px;background:white;border:2px solid var(--teal);border-radius:15px;z-index:20;text-align:center}
+@keyframes found-pop{from{transform:scale(.7);opacity:.2}to{transform:scale(1);opacity:1}}
+@keyframes hint-pulse{0%,100%{opacity:.65}50%{opacity:1}}
+@keyframes miss-fade{0%{opacity:.8;stroke-width:3px}100%{opacity:0;stroke-width:1px}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:980px){.home-link span{display:none}.game-header{min-height:60px;padding:11px 18px}.home-link svg{width:27px;height:27px}.game-footer{gap:10px}.progress{padding:12px 20px;gap:13px}.replay-button span{display:none}.replay-button{min-width:45px;padding:10px}.progress-dots{gap:6px}.progress-dots i{width:19px;height:19px}.hint-button{font-size:18px;padding:12px 17px}}
+@media(max-width:700px) and (orientation:portrait){
+  .game-header{min-height:57px;border-radius:0 0 18px 18px;gap:9px;padding:10px 13px}
+  .game-header h1{font-size:clamp(20px,5.7vw,30px)}
+  .home-link svg{width:25px;height:25px}.help-button{width:32px;height:32px;padding:5px}.help-button svg{width:21px;height:21px}
+  .game-main{padding:0 12px}.intro{padding:10px 0 3px}.intro p{font-size:14px;margin-bottom:6px}.level-label{font-size:13px;padding:5px 17px}
+  .play-area{flex-direction:column;gap:24px;padding:17px 0 4px}
+  .board-card{border-width:4px;border-radius:16px}.board{border-radius:12px}.board-label{top:-19px;font-size:14px;padding:3px 16px}
+  .game-footer{grid-template-columns:45px 1fr auto;gap:8px;padding:11px 0 12px;min-height:72px}
+  .button{border-radius:12px}.replay-button{min-width:40px;min-height:42px;padding:9px}.progress{gap:6px;flex-direction:column;padding:7px 10px;border-radius:18px}.progress strong{font-size:17px}.progress-dots{gap:6px}.progress-dots i{width:13px;height:13px;border-width:1.5px}
+  .hint-button{padding:11px 12px;font-size:15px;gap:5px;min-height:44px}.hint-button svg{width:20px;height:20px}.feedback{bottom:80px;font-size:13px;max-width:90%;white-space:normal;text-align:center}
+  .found-ring{stroke-width:3px}.found-ring-outline{stroke-width:5px}.hint-ring{stroke-width:3px}
+}
+@media(orientation:landscape) and (max-height:580px){
+  .game-header{min-height:43px;padding:6px 15px;border-radius:0 0 14px 14px}.game-header h1{font-size:24px}.home-link svg{width:23px;height:23px}.help-button{width:30px;height:30px;padding:4px}.help-button svg{width:20px;height:20px}
+  .game-main{padding:0 13px}.intro{display:flex;align-items:center;justify-content:center;gap:14px;padding:7px 0 0}.intro p{font-size:14px;margin:0}.level-label{font-size:12px;padding:4px 13px}
+  .play-area{gap:13px;padding-top:15px;padding-bottom:2px}.board-card{border-width:3px;border-radius:13px}.board{border-radius:10px}.board-label{font-size:12px;top:-15px;padding:2px 13px}
+  .game-footer{min-height:51px;padding:7px 0 9px}.button{min-height:35px;padding:7px 12px;border-radius:11px;font-size:14px}.button svg{width:19px;height:19px}.progress{padding:7px 18px;gap:13px}.progress strong{font-size:17px}.progress-dots i{width:14px;height:14px;border-width:1.5px}.progress-dots{gap:6px}.hint-button{font-size:15px}.feedback{bottom:55px;font-size:13px}.found-ring{stroke-width:3px}.found-ring-outline{stroke-width:5px}
+  .dialog-content{padding:18px}.dialog-content h2{font-size:23px;margin:8px 0}.dialog-content p{font-size:14px;margin:9px 0}.completion-medal{width:64px;height:64px}.completion-medal svg{width:43px;height:43px}.completion-actions{flex-direction:row;justify-content:center;margin-top:14px}.dialog-symbol{display:none}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important;scroll-behavior:auto!important}.hint-ring{opacity:1}.loading-ring{border-top-color:var(--ink);border-right-color:var(--ink)}}

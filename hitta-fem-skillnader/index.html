@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#07575b">
+  <meta name="description" content="Hitta fem saker som saknas! Jämför två bilder, ringa in skillnaderna och ta en ledtråd om du behöver. En gratis aktivitet på Fritidsparken.">
+  <link rel="canonical" href="https://fritidsparken.se/hitta-fem-skillnader/">
+  <link rel="icon" href="/assets/fritidsparken-logo.jpg" type="image/jpeg">
+  <title>Hitta 5 skillnader – Fritidsparken</title>
+  <link rel="stylesheet" href="style.css?v=20261118-1">
+  <script defer src="levels.js?v=20261118-1"></script>
+  <script defer src="game.js?v=20261118-1"></script>
+</head>
+<body>
+  <div class="game-app" id="gameApp">
+    <header class="game-header">
+      <a class="home-link" href="/?category=Roliga%20verktyg" target="_top" aria-label="Till Roliga verktyg på Fritidsparken">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/><path d="m1 11 11-9 11 9"/></svg>
+        <span>Fritidsparken</span>
+      </a>
+      <h1>Hitta <span>5</span> skillnader</h1>
+      <button class="help-button" id="helpButton" type="button" aria-label="Så spelar du" title="Så spelar du">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.3 8.5a2.8 2.8 0 0 1 5.4 1c0 2-2.7 2.1-2.7 4M12 17h.01"/></svg>
+      </button>
+    </header>
+
+    <main class="game-main">
+      <section class="intro" aria-label="Uppdrag">
+        <p id="instruction">Fem saker saknas. Tryck där du ser en skillnad!</p>
+        <span class="level-label" id="levelLabel">Bana 1 · Parken</span>
+      </section>
+
+      <section class="play-area" id="playArea" aria-label="Jämför bilderna" aria-busy="true">
+        <div class="board-card" data-board="0">
+          <span class="board-label" id="labelOne">Bild 1</span>
+          <div class="board" id="boardOne" tabindex="0" role="application" aria-label="Bild 1, hela bilden. Använd piltangenterna för att flytta markören och Enter för att välja." aria-describedby="keyboardHelp">
+            <img id="originalImage" class="scene-image" alt="" draggable="false">
+            <svg class="mark-layer" id="marksOne" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true"></svg>
+            <span class="keyboard-cursor" hidden aria-hidden="true"></span>
+          </div>
+        </div>
+        <div class="board-card" data-board="1">
+          <span class="board-label" id="labelTwo">Bild 2</span>
+          <div class="board" id="boardTwo" tabindex="0" role="application" aria-label="Bild 2, fem föremål saknas. Använd piltangenterna för att flytta markören och Enter för att välja." aria-describedby="keyboardHelp">
+            <canvas id="changedImage" class="scene-image" aria-hidden="true"></canvas>
+            <svg class="mark-layer" id="marksTwo" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true"></svg>
+            <span class="keyboard-cursor" hidden aria-hidden="true"></span>
+          </div>
+        </div>
+        <div class="load-state" id="loadState" role="status">
+          <span class="loading-ring" aria-hidden="true"></span>
+          <p id="loadMessage">Gör i ordning bilderna…</p>
+          <button type="button" class="button button-amber" id="retryButton" hidden>Försök igen</button>
+        </div>
+      </section>
+
+      <footer class="game-footer">
+        <button class="button button-quiet replay-button" id="replayButton" type="button" disabled aria-label="Börja om banan" title="Börja om">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11a9 9 0 1 1 2 6M3 4v7h7"/></svg>
+          <span>Börja om</span>
+        </button>
+        <div class="progress" aria-label="Hittade skillnader">
+          <strong id="progressText">0 av 5 hittade</strong>
+          <span class="progress-dots" id="progressDots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+        </div>
+        <button class="button button-amber hint-button" id="hintButton" type="button" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 15a6 6 0 1 1 8 0c-1.2 1-1 2-1 3H9c0-1 .2-2-1-3ZM9 21h6M12 0v1M2 5l1 1M21 6l1-1M1 12h1M22 12h1"/></svg>
+          <span>Ledtråd</span>
+        </button>
+      </footer>
+      <div class="feedback" id="feedback" aria-hidden="true"></div>
+      <p class="sr-only" id="liveMessage" role="status" aria-live="polite" aria-atomic="true"></p>
+      <p class="sr-only" id="keyboardHelp">När en bild är markerad: flytta sikten med piltangenterna. Håll Skift för små steg. Tryck Enter eller mellanslag för att ringa in en skillnad. Tryck H för en ledtråd.</p>
+    </main>
+  </div>
+
+  <dialog class="game-dialog" id="helpDialog" aria-labelledby="helpTitle">
+    <div class="dialog-content">
+      <span class="dialog-symbol" aria-hidden="true">5</span>
+      <h2 id="helpTitle">Vad har försvunnit?</h2>
+      <p>Fem saker i <strong>Bild 1</strong> saknas i <strong>Bild 2</strong>. Tryck på föremålet eller på den tomma platsen i den andra bilden.</p>
+      <p>När du hittar rätt får du en röd ring på båda bilderna. Hitta alla fem!</p>
+      <p class="keyboard-instructions"><strong>Med tangentbord:</strong> välj en bild med Tab, flytta sikten med piltangenterna och tryck Enter. Skift ger mindre steg. H ger en ledtråd.</p>
+      <button class="button button-teal" id="closeHelpButton" type="button">Nu letar vi!</button>
+    </div>
+  </dialog>
+
+  <dialog class="game-dialog completion-dialog" id="completionDialog" aria-labelledby="completionTitle">
+    <div class="dialog-content">
+      <div class="completion-medal" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="m32 5 8.2 17 18.8 2.7-13.5 13.2 3.2 18.6L32 47.7l-16.7 8.8 3.2-18.6L5 24.7 23.8 22Z"/></svg></div>
+      <h2 id="completionTitle">Du hittade alla fem!</h2>
+      <p id="completionMessage">Vilka skarpa ögon! Alla saknade saker är inringade.</p>
+      <div class="completion-actions">
+        <button class="button button-teal" id="playAgainButton" type="button">Spela igen</button>
+        <button class="button button-quiet" id="viewPictureButton" type="button">Titta på bilden</button>
+      </div>
+    </div>
+  </dialog>
+  <noscript>Aktivera JavaScript i webbläsaren för att spela Hitta 5 skillnader.</noscript>
+</body>
+</html>
