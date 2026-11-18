@@ -1,0 +1,35 @@
+name: Audit and rebuild Högtryckstvätten masks
+
+on:
+  push:
+    branches: ["fix-wash-contours-20261118"]
+    paths:
+      - ".github/workflows/wash-mask-review.yml"
+      - "games/hogtryckstvatten/tools/rebuild_masks.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install image analysis
+        run: python -m pip install --disable-pip-version-check "rembg[cpu]==2.0.67" "Pillow>=10" "opencv-python-headless>=4.9" "numpy<3"
+      - name: Audit all 76 levels and build masks for coarse contours
+        run: python games/hogtryckstvatten/tools/rebuild_masks.py
+      - name: Save results on review branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add games/hogtryckstvatten/assets/masks games/hogtryckstvatten/diagnostics
+          git diff --cached --quiet || git commit -m "Generate precise masks and review sheets for all 76 wash levels"
+          git push origin HEAD:fix-wash-contours-20261118
