@@ -107,9 +107,13 @@ def refine(level, img, old, session):
         yellow = (hue >= 12) & (hue <= 38) & (sat > 105) & (val > 95)
         gray = (sat < 115) & (val < 195) & (val > 55)
         rotor = roi & (red | yellow | gray)
-        rotor &= ~((fx < .13) & (fy < .205))
+        rotor &= ~((fx < .13) & (fy < .218))
         rotor = cv2.morphologyEx(rotor.astype('uint8'), cv2.MORPH_CLOSE,
                                  cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(3,3)))
+        n, labels, stats, _ = cv2.connectedComponentsWithStats(rotor, connectivity=8)
+        for component in range(1, n):
+            if stats[component, cv2.CC_STAT_AREA] < 200:
+                rotor[labels == component] = 0
         kept[rotor > 0] = 255
     fraction = float(np.count_nonzero(kept)/(w*h))
     if not (.02 < fraction < .72):
