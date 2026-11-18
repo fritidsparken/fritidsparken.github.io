@@ -669,9 +669,9 @@
     ],
     "coarse": true,
     "model": "u2net",
-    "area": 0.2255,
+    "area": 0.2249,
     "oldArea": 0.2136,
-    "overlapWithOld": 0.8325,
+    "overlapWithOld": 0.8322,
     "marginPixels": 110
   },
   {
