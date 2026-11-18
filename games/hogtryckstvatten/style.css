@@ -20,7 +20,7 @@ footer .square{height:66px;min-width:76px;font-size:28px}footer .square span{fon
 @media(orientation:portrait) and (max-width:700px){header{display:flex;flex-wrap:wrap;align-items:center}header>a{order:0;width:44px}h1{order:1;flex:1;width:auto}#sound{order:2;width:44px}#pause{order:3;width:44px}header .meter{order:4;flex:0 0 calc(50% - 4px);margin:0}#mission{order:5;flex:0 0 calc(50% - 4px);min-width:0}#mission span{font-size:10px}}
 
 #rotateNotice{display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;padding:24px;background:#0a345c99;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}.rotateCard{max-width:420px;padding:24px 36px;border:3px solid white;border-radius:24px;background:#f5fcff;color:#163e70;text-align:center;font-size:clamp(18px,3vw,25px);box-shadow:0 12px 45px #1238}.rotateCard div{font-size:44px;margin-bottom:10px}footer{grid-template-columns:1fr}.actions-right{grid-column:1;justify-self:end}
-@media (orientation:landscape) and (any-pointer:coarse){#rotateNotice{display:flex}dialog{visibility:hidden}}
+@media (orientation:landscape){.portrait-only-device #rotateNotice{display:flex}.portrait-only-device dialog{visibility:hidden}}
 
 .landmark-preview{display:block;position:relative;overflow:hidden;aspect-ratio:16/9;background:var(--landmark-backdrop) var(--landmark-x) var(--landmark-y)/cover}
 .landmark-preview img{position:absolute;left:var(--landmark-x);transform:translateX(-50%);top:0;height:calc(var(--landmark-y) + 5%);object-fit:contain;object-position:center bottom}
