@@ -30,13 +30,25 @@ function regions(){return levels[level].id==='house'?housePolygons.map(p=>[p]):l
 function polygons(){return regions().map(r=>r[0]);}
 function polyPath(c,paths=polygons()){c.beginPath();for(const p of paths){p.forEach(([x,y],i)=>i?c.lineTo(x*W,y*H):c.moveTo(x*W,y*H));c.closePath()}}
 let seed=1;function rand(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}
-function makeDirt(){seed=12345+level*923;dc.clearRect(0,0,W,H);surface.width=W;surface.height=H;surfaceContext.fillStyle='#fff';for(const region of regions()){polyPath(surfaceContext,region);surfaceContext.fill('evenodd')}dc.save();dc.fillStyle='rgba(67,65,24,.75)';dc.fillRect(0,0,W,H);
+function makeDirt(){seed=12345+level*923;dc.clearRect(0,0,W,H);surface.width=W;surface.height=H;
+ if(levels[level].alphaMask){
+  // Use the building's own silhouette, including every roof and transparent opening.
+  // Ignore near-invisible antialias fringes so they never become required dirt.
+  surfaceContext.drawImage(img,0,0,W,H);
+  const mask=surfaceContext.getImageData(0,0,W,H);
+  for(let i=0;i<mask.data.length;i+=4){mask.data[i]=mask.data[i+1]=mask.data[i+2]=255;if(mask.data[i+3]<levels[level].alphaMask)mask.data[i+3]=0;}
+  surfaceContext.putImageData(mask,0,0);
+ }else{
+  surfaceContext.fillStyle='#fff';for(const region of regions()){polyPath(surfaceContext,region);surfaceContext.fill('evenodd')}
+ }
+ dc.save();dc.fillStyle='rgba(67,65,24,.75)';dc.fillRect(0,0,W,H);
  for(let i=0;i<9000;i++){const x=rand()*W,y=rand()*H,r=1+rand()*24;dc.fillStyle=`rgba(${25+rand()*40|0},${35+rand()*43|0},${10+rand()*20|0},${.08+rand()*.22})`;dc.beginPath();dc.ellipse(x,y,r,r*(.4+rand()),0,0,Math.PI*2);dc.fill()}
  for(let i=0;i<520;i++){let x=rand()*W,y=rand()*H;dc.strokeStyle=`rgba(37,48,17,${.06+rand()*.23})`;dc.lineWidth=1+rand()*5;dc.beginPath();dc.moveTo(x,y);dc.lineTo(x+rand()*7,y+20+rand()*80);dc.stroke()}dc.globalCompositeOperation='destination-in';dc.drawImage(surface,0,0);dc.restore();initial=mass();}
 function makeForeground(){
  if(!backdropImage)return;
  foreground.width=W;foreground.height=H;
  foregroundContext.drawImage(img,0,0,W,H);
+ if(levels[level].alphaMask)return;
  foregroundContext.globalCompositeOperation='destination-in';
  foregroundContext.drawImage(surface,0,0);
  foregroundContext.globalCompositeOperation='source-over';
@@ -96,7 +108,16 @@ async function load(i,resume=false){const token=++loadedToken;playing=false;hold
 function snapshot(){if(!ready||done)return;save.active={version:levels[level].id==='house'?8:7,id:levels[level].id,elapsed,mask:dirt.toDataURL('image/png')};persist()}
 function updateTool(){tool();updateStage();$('sound').textContent=muted?'♫':'♪';$('sound').setAttribute('aria-label',muted?'Slå på ljud':'Stäng av ljud')}
 function openPanel(html){holding=false;last=null;playing=false;setNoise(false);$('panelBody').innerHTML=html;if(!$('panel').open)$('panel').showModal()}
-function menu(page=menuPage){menuPage=Math.max(0,Math.min(Math.ceil(levels.length/6)-1,page));snapshot();openPanel(`<h2>Välj ditt nästa uppdrag</h2><p>Gör allt rent för att öppna nästa bana. Klara tidsmålet för tre stjärnor och nya tillbehör.</p><div class="cards">${levels.slice(menuPage*6,menuPage*6+6).map((l,n)=>{const i=menuPage*6+n;const best=save.best[l.id];return `<button class="card" data-level="${i}" ${!unlocked(i)?'disabled':''}><img src="assets/${l.id==='house'?'house-portrait-v2':l.id}.webp" alt="${l.name}" loading="lazy"><span class="copy"><strong>${unlocked(i)?'':'🔒 '}${l.name}</strong><small>★ ${time(l.goal)} ${Number.isFinite(best)?'· Bäst '+time(best):''}</small><span class="stars">${Number.isFinite(best)?'★'.repeat(stars(i,best))+'☆'.repeat(3-stars(i,best)):unlocked(i)?'Redo att tvätta':'Klara föregående bana'}</span></span></button>`}).join('')}</div><div class="actions"><button class="secondary" data-page="${menuPage-1}" ${menuPage===0?'disabled':''}>← Föregående</button><span>Sida ${menuPage+1} / ${Math.ceil(levels.length/6)}</span><button class="secondary" data-page="${menuPage+1}" ${menuPage>=Math.ceil(levels.length/6)-1?'disabled':''}>Nästa →</button></div>`)}
+function levelCard(l,i){
+ const best=save.best[l.id],available=unlocked(i);
+ const location=l.country?(l.city===l.country?l.country:`${l.city}, ${l.country}`):'';
+ const backdrop=l.alphaMask?` style="--landmark-backdrop:url('assets/${l.backdrop}.webp')"`:'';
+ return `<button class="card${l.alphaMask?' landmark-card':''}"${backdrop} data-level="${i}" ${!available?'disabled':''}><img src="assets/${l.id==='house'?'house-portrait-v2':l.id}.webp" alt="${l.name}" loading="lazy"><span class="copy"><strong>${available?'':'🔒 '}${l.name}</strong>${location?`<small class="location">${location}</small>`:''}<small>★ ${time(l.goal)} ${Number.isFinite(best)?'· Bäst '+time(best):''}</small><span class="stars">${Number.isFinite(best)?'★'.repeat(stars(i,best))+'☆'.repeat(3-stars(i,best)):available?'Redo att tvätta':'Klara föregående bana'}</span></span></button>`;
+}
+function menu(page=menuPage){
+ menuPage=Math.max(0,Math.min(Math.ceil(levels.length/6)-1,page));snapshot();
+ openPanel(`<h2>Välj ditt nästa uppdrag</h2><p>Gör allt rent för att öppna nästa bana. Klara tidsmålet för tre stjärnor och nya tillbehör.</p><div class="cards">${levels.slice(menuPage*6,menuPage*6+6).map((l,n)=>levelCard(l,menuPage*6+n)).join('')}</div><div class="actions"><button class="secondary" data-page="${menuPage-1}" ${menuPage===0?'disabled':''}>← Föregående</button><span>Sida ${menuPage+1} / ${Math.ceil(levels.length/6)}</span><button class="secondary" data-page="${menuPage+1}" ${menuPage>=Math.ceil(levels.length/6)-1?'disabled':''}>Nästa →</button></div>`);
+}
 function toolsMenu(){openPanel(`<h2>Din högtryckstvätt</h2><p>${golds()} av ${levels.length} tidsmål klarade. Klara tidsmålen på olika banor för att låsa upp mer kraft.</p><div class="tool-grid">${kit.map((k,i)=>`<button class="card tool-card ${save.tool===i?'selected':''}" data-tool="${i}" ${golds()<k.need?'disabled':''}>${k.symbol?`<div class="symbol">${k.symbol}</div>`:''}<strong>${k.name}${save.tool===i?' ✓':''}</strong><p>${k.desc}</p><small>${golds()>=k.need?'Välj munstycke':`🔒 Klara ${k.need} olika tidsmål`}</small></button>`).join('')}</div>`)}
 function finish(){done=true;playing=false;holding=false;percent=100;dc.clearRect(0,0,W,H);const l=levels[level],oldGold=golds();save.best[l.id]=Math.min(save.best[l.id]??Infinity,elapsed);delete save.active;persist();setNoise(false);chime();const newly=kit.filter(k=>k.need>oldGold&&k.need<=golds());openPanel(`<div class="welcome"><div class="big">✨</div><h2>Skinande rent!</h2><div class="stars" style="font-size:42px">${'★'.repeat(stars(level,elapsed))}${'☆'.repeat(3-stars(level,elapsed))}</div><p><b>${l.name}</b> är klar på <b>${time(elapsed)}</b>.<br>Tidsmål: ${time(l.goal)} · Ditt rekord: ${time(save.best[l.id])}</p>${newly.length?`<p><b>🔓 ${newly.map(k=>k.name).join(', ')} upplåst!</b></p>`:elapsed>l.goal?'<p>Testa igen och slå tidsmålet för att låsa upp bättre tillbehör.</p>':'<p>Du klarade tidsmålet. Snyggt tvättat!</p>'}<div class="actions">${level<levels.length-1?`<button class="primary" data-level="${level+1}">Nästa uppdrag →</button>`:'<button class="primary" data-menu>Alla uppdrag</button>'}<button class="secondary" data-level="${level}">Spela igen</button><button class="secondary" data-tools>Verktyg</button></div></div>`)}
 function initAudio(){if(audio)return;try{audio=new(window.AudioContext||window.webkitAudioContext)();let b=audio.createBuffer(1,audio.sampleRate*2,audio.sampleRate);let d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*.25;noise=audio.createBufferSource();noise.buffer=b;noise.loop=true;let filter=audio.createBiquadFilter();filter.type='lowpass';filter.frequency.value=1600;gain=audio.createGain();gain.gain.value=0;noise.connect(filter).connect(gain).connect(audio.destination);noise.start()}catch{}}
@@ -114,8 +135,9 @@ window.addEventListener('resize',()=>{release();resize()});new ResizeObserver(re
 function washBounds(){
  if(levels[level].id==='house')return {x:275,y:350,w:650,h:465};
  const points=polygons().flat(),xs=points.map(p=>p[0]*W),ys=points.map(p=>p[1]*H),pad=levels[level].id==='house'?2:28;
- const x=Math.max(1,Math.min(...xs)-pad),y=Math.max(1,Math.min(...ys)-pad);
- return {x,y,w:Math.min(W-1,Math.max(...xs)+pad)-x,h:Math.min(H-1,Math.max(...ys)+pad)-y};
+ const edge=levels[level].alphaMask?0:1;
+ const x=Math.max(edge,Math.min(...xs)-pad),y=Math.max(edge,Math.min(...ys)-pad);
+ return {x,y,w:Math.min(W-edge,Math.max(...xs)+pad)-x,h:Math.min(H-edge,Math.max(...ys)+pad)-y};
 }
 function sceneLayout(cw,ch,insets){
  if(levels[level].id==='house'){

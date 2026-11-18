@@ -21,3 +21,7 @@ footer .square{height:66px;min-width:76px;font-size:28px}footer .square span{fon
 
 #rotateNotice{display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;padding:24px;background:#0a345c99;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}.rotateCard{max-width:420px;padding:24px 36px;border:3px solid white;border-radius:24px;background:#f5fcff;color:#163e70;text-align:center;font-size:clamp(18px,3vw,25px);box-shadow:0 12px 45px #1238}.rotateCard div{font-size:44px;margin-bottom:10px}footer{grid-template-columns:1fr}.actions-right{grid-column:1;justify-self:end}
 @media (orientation:landscape) and (any-pointer:coarse){#rotateNotice{display:flex}dialog{visibility:hidden}}
+
+/* Show the complete landmark silhouette, including tall spires, in mission cards. */
+.landmark-card img{object-fit:contain;padding:5px;background-image:var(--landmark-backdrop);background-position:center;background-size:cover}
+.landmark-card .location{font-size:11px;line-height:1.25;color:#476a86}
