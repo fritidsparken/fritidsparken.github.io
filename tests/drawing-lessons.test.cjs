@@ -6,6 +6,7 @@ const script=source.slice(source.indexOf('(()=>{'));
 const site=fs.readFileSync('js/site.js','utf8');
 const newSource=fs.readFileSync('js/drawing-new-100.js','utf8');
 const window={};vm.runInNewContext(newSource,{window});vm.runInNewContext(fs.readFileSync('js/drawing-reference-30.js','utf8'),{window});
+window.drawingGuidePanelImage=(_,index)=>'reference-panel-'+index;
 const registry=site.slice(site.indexOf('const drawingAnimals='),site.indexOf('function drawingStepCount'));
 const ids=vm.runInNewContext(registry+'drawingAnimals.map(a=>a.id)',{window});
 const gallery=site.slice(site.indexOf('function drawingGallery('),site.indexOf('function pearlSvg('));
@@ -30,6 +31,7 @@ function setup(id){
   constructor(tag){this.tagName=tag;this.children=[];this.attrs={};this.style={};this.dataset={};this.listeners={};this.hidden=false;this.disabled=false;this.className='';this.textContent='';this.classList={add:c=>this.className+=' '+c}}
   setAttribute(k,v){this.attrs[k]=String(v);if(k==='class')this.className=v}
   getAttribute(k){return this.attrs[k]??null}
+  removeAttribute(k){delete this.attrs[k]}
   append(...els){for(const e of els){e.parent=this;this.children.push(e)}}
   get isConnected(){return this===document.body||this===document.head||!!this.parent?.isConnected}
   matches(s){if(s.startsWith('.'))return this.className.split(' ').includes(s.slice(1));if(s.startsWith('canvas['))return this.tagName==='canvas'&&this.dataset.drawingGuide;return this.tagName===s}
@@ -47,6 +49,11 @@ function setup(id){
  const document={body:new El('body'),head:new El('head'),hidden:false,createElement:t=>new El(t),createElementNS:(_,t)=>new El(t),getElementById:()=>null,querySelectorAll:s=>document.body.querySelectorAll(s)};
  const modal=new El('article');modal.className='draw-modal';const holder=new El('div');holder.className='draw-modal-guides';const canvas=new El('canvas');canvas.dataset.drawingGuide=id;holder.append(canvas);modal.append(holder);document.body.append(modal);
  vm.runInNewContext(script,{window,document,MutationObserver:class{constructor(fn){this.fn=fn;observers.push(this)}observe(){}disconnect(){this.stopped=true}},requestAnimationFrame:fn=>{frames.set(++seq,fn);return seq},cancelAnimationFrame:n=>frames.delete(n)});
+ if(id==='pingvin'){
+  assert.equal(holder.querySelector('.draw-lesson'),null,'the penguin waits for its source image');
+  canvas.dataset.rendered='1';
+  canvas.listeners['draw-guide-ready'][0]();
+ }
  const lesson=()=>holder.querySelector('.draw-lesson'),cards=()=>holder.querySelectorAll('.draw-lesson-board'),next=()=>holder.querySelector('.draw-lesson-wait')?.querySelector('button');
  function finish(){let guard=0;while(frames.size){assert.ok(guard++<1000,'animation terminates');clock+=3000;const pending=[...frames.values()];frames.clear();pending.forEach(fn=>fn(clock))}}
  return {document,holder,modal,observers,frames,lesson,cards,next,finish};
@@ -54,12 +61,19 @@ function setup(id){
 for(const id of ids){
  const t=setup(id);assert.ok(t.lesson(),id+' mounted');assert.equal(t.cards().length,1);assert.equal(t.next(),undefined);
  for(let i=0;i<5;i++){
+  if(id==='pingvin')assert.ok(t.cards()[i].querySelector('mask'),'the penguin starts each step with an animated reveal');
   t.finish();
   if(id.startsWith('nyrit')){
    assert.equal(t.cards()[i].querySelectorAll('mask').length,0,id+' uses the same unmasked stroke renderer as the bat');
    assert.equal(t.cards()[i].querySelectorAll('image').length,0,id+' has no bitmap replacement');
    assert.equal(window.newDrawingLessons[id].referenceStrokes,true,id+' uses authored reference paths');
    assert.ok(t.cards()[i].querySelectorAll('path').length>0,id+' draws real paths');
+  }
+  if(id==='pingvin'){
+   const images=t.cards()[i].querySelectorAll('image');
+   assert.equal(images.length,1,'the penguin ends with one image');
+   assert.equal(images[0].getAttribute('href'),'reference-panel-'+i,'the penguin uses the matching original panel');
+   assert.equal(images[0].getAttribute('mask'),null,'the entire reference panel is visible at the end');
   }
   assert.equal(t.cards().length,i+1,id+' remains paused');assert.equal(t.frames.size,0);
   const repeats=t.holder.querySelectorAll('.draw-lesson-replay');assert.equal(repeats.length,i+1);
