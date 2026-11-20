@@ -1,11 +1,10 @@
 import {FlightPlayer} from './flight-player.mjs';
-import {BlenderPlayer} from './blender-player.mjs?v=browser-fix-2';
+import {BlenderPlayer} from './blender-player.mjs?v=browser-fix-3';
 import {models,categories} from './models.mjs?v=flight-fix-3';
 import {compile} from './geometry.mjs?v=paper-40-1';
 import {PaperRenderer} from './renderer.mjs?v=orbit-1';
 import {loadProgress,saveProgress} from './progress.mjs';
 const $=id=>document.getElementById(id),svgNS='http://www.w3.org/2000/svg';
-const reduced=matchMedia('(prefers-reduced-motion: reduce)');
 const colors=[['Honung','#edb852'],['Himmel','#78b5d3'],['Ros','#e58f9f'],['Lavendel','#a7a1d4'],['Salvia','#83b28b']];
 const cache=new Map();
 const compiled=m=>{if(!cache.has(m.id))cache.set(m.id,compile(m));return cache.get(m.id);};
@@ -110,7 +109,9 @@ $('restart').onclick=()=>{setPanel('paper');step=0;showStep();save();};
 $('result').onclick=()=>{stop();setPanel('paper');preview=!preview;render(preview?compiled(current).states.at(-1):compiled(current).states[step]);update();};
 $('speed').onchange=e=>{speed=Number(e.target.value);blender.setSpeed(speed);};
 $('render-modes').onclick=e=>{const b=e.target.closest('[data-render]');if(!b||b.dataset.render===renderMode)return;stop();renderMode=b.dataset.render;render(preview?compiled(current).states.at(-1):compiled(current).states[step]);update();};
-$('less-motion').checked=reduced.matches;
+// Folding is an essential, explicitly started animation. Keep still-step mode
+// available as a deliberate choice; OS motion preferences must not disable it.
+$('less-motion').checked=false;
 $('less-motion').onchange=()=>{if(playing&&$('less-motion').checked){stop();render(compiled(current).states[step]);save();update();}};
 $('views').onclick=e=>{const b=e.target.closest('[data-view]');if(!b)return;renderer.view=b.dataset.view;$('views').querySelectorAll('button').forEach(n=>n.setAttribute('aria-pressed',String(n===b)));if(paintState)render(paintState);};
 function buildSwatches(){
@@ -118,7 +119,6 @@ $('swatches').replaceChildren();
 const palette=colors.map(v=>[...v]);if(!palette.some(([,c])=>c===renderer.color))palette[0]=['Modellens färg',renderer.color];
 for(const [name,color] of palette){const b=document.createElement('button');b.style.setProperty('--swatch',color);b.dataset.color=color;b.setAttribute('aria-label',name);b.onclick=()=>{renderer.color=color;render(paintState);save();update();};$('swatches').append(b);}
 }
-reduced.addEventListener('change',()=>{$('less-motion').checked=reduced.matches;if(playing&&reduced.matches){stop();render(compiled(current).states[step]);save();update();}});
 gallery();
 const requested=new URLSearchParams(location.search).get('model');
 if(requested){const model=models.find(m=>m.id===requested);if(model)open(model,document.querySelector(`[data-model="${model.id}"]`));}
