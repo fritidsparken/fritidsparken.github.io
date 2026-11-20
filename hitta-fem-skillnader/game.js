@@ -14,7 +14,7 @@
     load: $('loadState'), loadMessage: $('loadMessage'), feedback: $('feedback'),
     live: $('liveMessage'), help: $('helpDialog'), completion: $('completionDialog'),
     levelSelect: $('levelSelect'), previous: $('previousLevel'), next: $('nextLevel'),
-    difficulty: $('difficultyLabel'), zoom: $('zoomButton'), nextComplete: $('completionNextButton')
+    difficultySelect: $('difficultySelect'), zoom: $('zoomButton'), nextComplete: $('completionNextButton')
   };
   const allLevels = window.FP_DIFFERENCE_LEVELS || [];
   let levels = allLevels;
@@ -51,8 +51,6 @@
     ui.levelSelect.value = String(state.levelIndex);
     ui.previous.disabled = state.levelIndex <= 0;
     ui.next.disabled = state.levelIndex >= levels.length - 1;
-    ui.difficulty.textContent = levels[state.levelIndex]?.difficultyLabel || 'Start';
-    ui.difficulty.dataset.difficulty = String(levels[state.levelIndex]?.difficulty || 0);
   }
 
   function cameraBounds() {
@@ -288,10 +286,11 @@
       updateNavigation();
       const hasNext = state.levelIndex < levels.length - 1;
       ui.nextComplete.hidden = !hasNext;
-      $('completionTitle').textContent = state.completed.size === levels.length ? 'Alla banor är klara!' : 'Du hittade alla fem!';
+      const completedCount = levels.filter(level => state.completed.has(level.id)).length;
+      $('completionTitle').textContent = completedCount === levels.length ? 'Alla banor i urvalet är klara!' : 'Du hittade alla fem!';
       $('completionMessage').textContent = hasNext
-        ? `${state.level.title} är klar! Nästa bana är ${levels[state.levelIndex + 1].title}. ${state.completed.size} av ${levels.length} banor klarade.`
-        : `${state.completed.size} av ${levels.length} banor klarade. Vilka skarpa ögon!`;
+        ? `${state.level.title} är klar! Nästa bana är ${levels[state.levelIndex + 1].title}. ${completedCount} av ${levels.length} banor klarade.`
+        : `${completedCount} av ${levels.length} banor klarade. Vilka skarpa ögon!`;
       clearTimeout(state.completeTimer);
       state.completeTimer = setTimeout(() => {
         if (state.found.size !== 5) return;
@@ -442,24 +441,10 @@
     });
   });
 
-  // Difficulty selection keeps each level's stored progress when switching groups.
-  const difficultySelect = document.createElement('select');
-  difficultySelect.setAttribute('aria-label', 'Välj svårighetsgrad');
-  difficultySelect.style.cssText = 'font:inherit;max-width:7.2em;padding:.35em;border-radius:.6em;border:1px solid #90b8b5;background:white;color:#07575b';
-  for (const [value, label] of [['alla','Alla'], ['latt','Lätt'], ['medel','Medel'], ['svar','Svår']]) {
-    const option = document.createElement('option');
-    option.value = value;
-    option.textContent = label;
-    difficultySelect.append(option);
-  }
-  ui.difficulty.replaceWith(difficultySelect);
-  ui.difficulty = document.createElement('span');
-  function difficultyGroup(level) {
-    return level.difficulty <= 3 ? 'latt' : level.difficulty <= 6 ? 'medel' : 'svar';
-  }
-  difficultySelect.addEventListener('change', () => {
+  ui.difficultySelect.addEventListener('change', () => {
     const currentId = state.level?.id;
-    levels = difficultySelect.value === 'alla' ? allLevels : allLevels.filter(level => difficultyGroup(level) === difficultySelect.value);
+    const tier = ui.difficultySelect.value;
+    levels = tier === 'alla' ? allLevels : allLevels.filter(level => level.difficultyLabel === tier);
     const currentIndex = levels.findIndex(level => level.id === currentId);
     start(currentIndex < 0 ? 0 : currentIndex);
   });

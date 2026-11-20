@@ -132,3 +132,17 @@ noscript{position:fixed;inset:30% 12%;padding:20px;background:white;border:2px s
 @media(orientation:landscape) and (max-height:580px){
  .intro p{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0)}.level-nav{gap:7px}.level-arrow{width:27px;height:27px;padding:5px}.level-label select{padding:4px 10px;font-size:12px;width:235px}.difficulty-label{padding:4px 8px;font-size:11px}.zoom-button{min-width:35px;padding:7px 10px}.left-actions{gap:6px}.completion-actions{display:grid;grid-template-columns:1fr 1fr}
 }
+
+.difficulty-select {
+  flex: 0 0 auto;
+  max-width: 7em;
+  min-height: 36px;
+  padding: 0 .4em;
+  font: inherit;
+  font-size: .875rem;
+  color: #07575b;
+  background: #fff;
+  border: 1px solid #90b8b5;
+  border-radius: .6em;
+}
+.level-nav .level-label { min-width: 0; }

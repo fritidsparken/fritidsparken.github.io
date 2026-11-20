@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#07575b">
-  <meta name="description" content="Hitta 5 skillnader i elva färgglada miljöer! Börja i parken och prova tio nya banor som blir svårare och svårare. Gratis på Fritidsparken.">
+  <meta name="description" content="Hitta 5 skillnader i 31 färgglada miljöer! Spela banorna i stigande svårighetsordning eller välj Lätt, Medel eller Svår.">
   <link rel="canonical" href="https://fritidsparken.se/hitta-fem-skillnader/">
   <link rel="icon" href="/assets/fritidsparken-logo.jpg" type="image/jpeg">
   <title>Hitta 5 skillnader – Fritidsparken</title>
-  <link rel="stylesheet" href="style.css?v=20261118-levels-2">
-  <script defer src="levels.js?v=20261118-levels-2"></script>
-  <script defer src="game.js?v=20261120-difficulty-1"></script>
+  <link rel="stylesheet" href="style.css?v=20261120-motiv-31">
+  <script defer src="levels.js?v=20261120-motiv-31"></script>
+  <script defer src="game.js?v=20261120-motiv-31"></script>
 </head>
 <body>
   <div class="game-app" id="gameApp">
@@ -31,7 +31,12 @@
         <div class="level-nav" aria-label="Välj bana">
           <button class="level-arrow" id="previousLevel" type="button" aria-label="Föregående bana" title="Föregående bana"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></button>
           <label class="level-label" for="levelSelect"><span class="sr-only">Välj bana</span><select id="levelSelect" aria-label="Välj bana"></select></label>
-          <span class="difficulty-label" id="difficultyLabel">Start</span>
+          <select class="difficulty-select" id="difficultySelect" aria-label="Välj svårighetsgrad">
+            <option value="alla">Alla nivåer</option>
+            <option value="Lätt">Lätt</option>
+            <option value="Medel">Medel</option>
+            <option value="Svår">Svår</option>
+          </select>
           <button class="level-arrow" id="nextLevel" type="button" aria-label="Nästa bana" title="Nästa bana"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
         </div>
       </section>
