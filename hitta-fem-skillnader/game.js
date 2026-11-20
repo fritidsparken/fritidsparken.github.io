@@ -16,12 +16,13 @@
     levelSelect: $('levelSelect'), previous: $('previousLevel'), next: $('nextLevel'),
     difficulty: $('difficultyLabel'), zoom: $('zoomButton'), nextComplete: $('completionNextButton')
   };
-  const levels = window.FP_DIFFERENCE_LEVELS || [];
+  const allLevels = window.FP_DIFFERENCE_LEVELS || [];
+  let levels = allLevels;
   const storageKey = 'fp-five-differences-progress-v1';
   let saved = {};
   try { saved = JSON.parse(localStorage.getItem(storageKey)) || {}; } catch {}
   if (!saved || typeof saved !== 'object' || Array.isArray(saved)) saved = {};
-  const validIds = new Set(levels.map(level => level.id));
+  const validIds = new Set(allLevels.map(level => level.id));
   const state = {
     level: null, found: new Set(), ready: false, loading: 0, ratio: 1.5,
     cursor: {x: .5, y: .5}, hintId: null, hintTimer: 0, feedbackTimer: 0,
@@ -34,7 +35,7 @@
   function saveProgress() {
     if (!state.level) return;
     state.rounds[state.level.id] = [...state.found];
-    const rounds = Object.fromEntries(levels.map(level => [level.id,
+    const rounds = Object.fromEntries(allLevels.map(level => [level.id,
       (Array.isArray(state.rounds[level.id]) ? state.rounds[level.id] : []).filter(id => level.targets.some(target => target.id === id))
     ]));
     try { localStorage.setItem(storageKey, JSON.stringify({current: state.level.id, completed: [...state.completed], rounds})); } catch {}
@@ -439,6 +440,28 @@
         if (!event.repeat) toggleZoom();
       }
     });
+  });
+
+  // Difficulty selection keeps each level's stored progress when switching groups.
+  const difficultySelect = document.createElement('select');
+  difficultySelect.setAttribute('aria-label', 'Välj svårighetsgrad');
+  difficultySelect.style.cssText = 'font:inherit;max-width:7.2em;padding:.35em;border-radius:.6em;border:1px solid #90b8b5;background:white;color:#07575b';
+  for (const [value, label] of [['alla','Alla'], ['latt','Lätt'], ['medel','Medel'], ['svar','Svår']]) {
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = label;
+    difficultySelect.append(option);
+  }
+  ui.difficulty.replaceWith(difficultySelect);
+  ui.difficulty = document.createElement('span');
+  function difficultyGroup(level) {
+    return level.difficulty <= 3 ? 'latt' : level.difficulty <= 6 ? 'medel' : 'svar';
+  }
+  difficultySelect.addEventListener('change', () => {
+    const currentId = state.level?.id;
+    levels = difficultySelect.value === 'alla' ? allLevels : allLevels.filter(level => difficultyGroup(level) === difficultySelect.value);
+    const currentIndex = levels.findIndex(level => level.id === currentId);
+    start(currentIndex < 0 ? 0 : currentIndex);
   });
 
   ui.hint.addEventListener('click', showHint);
