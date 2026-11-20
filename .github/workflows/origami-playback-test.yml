@@ -1,0 +1,21 @@
+name: Origami playback checks
+on:
+  push:
+    branches: [main]
+    paths: ['origami/js/**', 'origami/css/**', 'origami/index.html', 'tests/origami-*.test.mjs', '.github/workflows/origami-playback-test.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  playback:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check animation modules and regression tests
+        run: |
+          node --check origami/js/studio.mjs
+          node --check origami/js/blender-player.mjs
+          node --test tests/origami-playback.test.mjs tests/origami-geometry.test.mjs tests/origami-renderer.test.mjs

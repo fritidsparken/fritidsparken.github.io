@@ -1,5 +1,5 @@
 import {FlightPlayer} from './flight-player.mjs';
-import {BlenderPlayer} from './blender-player.mjs?v=continuous-1';
+import {BlenderPlayer} from './blender-player.mjs?v=browser-fix-2';
 import {models,categories} from './models.mjs?v=flight-fix-3';
 import {compile} from './geometry.mjs?v=paper-40-1';
 import {PaperRenderer} from './renderer.mjs?v=orbit-1';
@@ -58,10 +58,10 @@ function update(){
 function showStep(){stop();preview=false;render(compiled(current).states[step]);update();}
 function animate(){
   stop(true);preview=false;elapsed=0;last=0;
-  if(reduced.matches||$('less-motion').checked){finish();return;}
+  if($('less-motion').checked){finish();return;}
   playing=true;update();$('pause').textContent='Pausa';
   if(renderMode==='blender'){
-    if(automatic){blender.playAll(current,step,speed,n=>{step=n;update();},()=>{step=current.steps.length;finish();},()=>{stop();render(compiled(current).states[step]);update();$('stage-hint').textContent='Hela filmen kunde inte laddas. Försök igen.';});return;}
+    if(automatic){blender.playAll(current,step,speed,n=>{step=n;update();},()=>{step=current.steps.length;finish();},()=>{renderMode='svg';animate();});return;}
     blender.play(current,step,speed,()=>finish(),()=>{renderMode='svg';animate();$('saving').textContent='3D-klippet kunde inte laddas. Vikvyn visas istället.';});
     return;
   }
@@ -118,7 +118,7 @@ $('swatches').replaceChildren();
 const palette=colors.map(v=>[...v]);if(!palette.some(([,c])=>c===renderer.color))palette[0]=['Modellens färg',renderer.color];
 for(const [name,color] of palette){const b=document.createElement('button');b.style.setProperty('--swatch',color);b.dataset.color=color;b.setAttribute('aria-label',name);b.onclick=()=>{renderer.color=color;render(paintState);save();update();};$('swatches').append(b);}
 }
-reduced.addEventListener('change',()=>{if(playing&&reduced.matches){stop();render(compiled(current).states[step]);save();update();}});
+reduced.addEventListener('change',()=>{$('less-motion').checked=reduced.matches;if(playing&&reduced.matches){stop();render(compiled(current).states[step]);save();update();}});
 gallery();
 const requested=new URLSearchParams(location.search).get('model');
 if(requested){const model=models.find(m=>m.id===requested);if(model)open(model,document.querySelector(`[data-model="${model.id}"]`));}
