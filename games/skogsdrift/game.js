@@ -30,7 +30,7 @@ function crossing(c,s,type,deck){
 let ac,engine,engineVol,tyreVol,master,music,soundOn=true;
 let lobbyTrack,raceTrack;
 function playTheme(lobby){if(!soundOn||typeof Audio==='undefined'||document.hidden)return;
- const track=lobby?(lobbyTrack ||= new Audio('afterhours.mp3')):(raceTrack ||= new Audio('pursuit.mp3'));
+ const track=lobby?(lobbyTrack ||= new Audio('afterhours.mp3?v=synth3')):(raceTrack ||= new Audio('pursuit.mp3?v=synth3'));
  if(music!==track){music?.pause();music=track;music.loop=true;music.volume=lobby?.44:.34}
  if(music.paused)music.play().catch(()=>{})}
 function audioStart(){playTheme(false);if(!soundOn||!window.AudioContext&&!window.webkitAudioContext)return;
@@ -84,11 +84,24 @@ function makeTrack(){
   11:[[380,700],[880,440],[1350,720],[1750,700],[2100,360],[2630,460],[2790,1050],[2440,1380],[2040,1190],[1730,1260],[1530,1760],[1010,1850],[580,1530]]
  };
  const anchors=shaped[idx]?shaped[idx].map(([x,y])=>({x,y})):rs.map((r,i)=>{const a=i*TAU/rs.length+phase;return {x:W/2+1280*r*Math.cos(a),y:H/2+865*r*Math.sin(a)}});
- // Add alternating gates on well-separated long sectors of the original loop.
- const spans=anchors.map((p,i)=>{const q=anchors[(i+1)%anchors.length];return {i,len:Math.hypot(q.x-p.x,q.y-p.y)}}).sort((a,b)=>b.len-a.len);
- const gates=new Set();for(const span of spans){if(span.len<490||gates.size===2)break;if(!gates.has(wrap(span.i-1,anchors.length))&&!gates.has((span.i+1)%anchors.length))gates.add(span.i)}
- const nodes=[];anchors.forEach((p,i)=>{nodes.push(p);if(!gates.has(i))return;const q=anchors[(i+1)%anchors.length],dx=q.x-p.x,dy=q.y-p.y,L=Math.hypot(dx,dy),amp=Math.min(72,L*.09)*(i%2?1:-1);
- for(const [u,side] of [[.32,1],[.69,-1]])nodes.push({x:p.x+dx*u-dy/L*side*amp,y:p.y+dy*u+dx/L*side*amp})});
+ // Keep one full straight for passing. Use broad S bends, offset chicanes and linked esses elsewhere.
+ const spans=anchors.map((p,i)=>{
+  const q=anchors[(i+1)%anchors.length];
+  return {i,len:Math.hypot(q.x-p.x,q.y-p.y)}
+ }).sort((a,b)=>b.len-a.len);
+ const sectors=new Set(spans.slice(1,7+(idx%2)).filter(span=>span.len>=385).map(span=>span.i));
+ const nodes=[];
+ anchors.forEach((p,i)=>{
+  nodes.push(p);
+  if(!sectors.has(i))return;
+  const q=anchors[(i+1)%anchors.length],dx=q.x-p.x,dy=q.y-p.y,L=Math.hypot(dx,dy);
+  const shape=(i+idx)%3, amplitude=Math.min(70,L*(.080+.008*shape))*((i+idx)%2?1:-1);
+  const gates=L>740&&shape===0?[[.24,.85],[.51,-.82],[.78,.72]]:
+   shape===1?[[.30,.65],[.65,-1]]:[[.31,1],[.70,-.75]];
+  for(const [fraction,side] of gates){
+   nodes.push({x:p.x+dx*fraction-dy/L*amplitude*side,y:p.y+dy*fraction+dx/L*amplitude*side})
+  }
+ });
  const n=nodes.length;
  const dense=[];let total=0;
  for(let i=0;i<n;i++){let [a,b,c,d]=[-1,0,1,2].map(k=>nodes[wrap(i+k,n)]);for(let j=0;j<150;j++){let t=j/150;let coord=k=>.5*(2*b[k]+(-a[k]+c[k])*t+(2*a[k]-5*b[k]+4*c[k]-d[k])*t*t+(-a[k]+3*b[k]-3*c[k]+d[k])*t*t*t);let p={x:coord('x'),y:coord('y')},prev=dense.at(-1);if(prev)total+=Math.hypot(p.x-prev.x,p.y-prev.y);dense.push({...p,s:total})}}
@@ -127,7 +140,7 @@ function setupMenu(){idx=Number($('tracks').value);makeTrack();mini($('preview')
  $('desc').textContent=['3 varv mot 11 förare','1 varv mot 11 förare','3 varv mot klockan'][mode]}
 function resetInput(){keys.clear();document.querySelectorAll('#pad button').forEach(b=>b.classList.remove('active'))}
 function begin(){
- resetInput();boost=1;boosting=false;driftUntil=0;hitTime=-1;audioStart();makeTrack();buildScene();clock=0;count=3;particles=[];sessionBest=Infinity;lastLap=0;lapStart=0;record=Infinity;try{record=Number(localStorage.getItem('midnight-v1-'+idx))||Infinity}catch{}
+ resetInput();boost=1;boosting=false;driftUntil=0;hitTime=-1;audioStart();makeTrack();buildScene();clock=0;count=3;particles=[];sessionBest=Infinity;lastLap=0;lapStart=0;record=Infinity;try{record=Number(localStorage.getItem('midnight-v3-'+idx))||Infinity}catch{}
  cars=[];for(let i=0;i<(mode===2?1:12);i++){let slot=i===0?5:i<=5?i-1:i,s=mode===2?0:-(Math.floor(slot/2)+1)*48;cars.push({s,l:mode===2?0:(slot%2?34:-34),v:mode===2?235:0,yaw:0,lv:0,grip:0,lap:0,id:i,base:342+(i*17%35),done:false,finishTime:0})}
  player=cars[0];cam=at(player.s);state='count';goTime=0;$('menu').hidden=true;$('overlay').hidden=true;$('hud').hidden=false;document.body.classList.add('play');acc=0;last=0;
 }
@@ -162,7 +175,7 @@ function update(dt){
  }
  contacts();
  for(const car of cars){if(car.done)continue;const me=car===player;
- const lap=Math.max(0,Math.floor(car.s/length));if(lap>car.lap){car.lap=lap;if(me){lastLap=clock-lapStart;lapStart=clock;sessionBest=Math.min(sessionBest,lastLap);if(mode===2&&lastLap<record){record=lastLap;try{localStorage.setItem('midnight-v1-'+idx,record)}catch{}}}}
+ const lap=Math.max(0,Math.floor(car.s/length));if(lap>car.lap){car.lap=lap;if(me){lastLap=clock-lapStart;lapStart=clock;sessionBest=Math.min(sessionBest,lastLap);if(mode===2&&lastLap<record){record=lastLap;try{localStorage.setItem('midnight-v3-'+idx,record)}catch{}}}}
  if(car.s>=targetLaps*length){car.done=true;car.finishTime=clock-(car.s-targetLaps*length)/Math.max(1,car.v)}
  }
  particles=particles.filter(p=>(p.t+=dt)<.83);for(let p of particles){p.x+=p.dx*dt;p.y+=p.dy*dt}
