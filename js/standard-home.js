@@ -178,12 +178,22 @@
     if(category==='Alla'&&q&&!pearlPage){window.FPGameHub?.stop();renderSearch(q);return;}
     originalDraw();
   };
+  // Scroll to the opened category content, not back to the icon grid.
+  // Recalculate the header offset for portrait, landscape and desktop widths.
+  function scrollToActivity(target){
+    if(!target)return;
+    const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const headerHeight=header.getBoundingClientRect().height;
+    const offset=(getComputedStyle(header).position==='fixed'||getComputedStyle(header).position==='sticky')?headerHeight+12:12;
+    const top=Math.max(0,window.scrollY+target.getBoundingClientRect().top-offset);
+    window.scrollTo({top,behavior:reduced?'instant':'smooth'});
+  }
   function navigate(cat,scroll=true){
     category=cat;pearlPage=false;selectedPearl=null;funTool=null;activeDrawing=null;browseAll=false;
     document.getElementById('search').value='';document.getElementById('standardSearch').value='';
     header.classList.remove('menu-open');header.querySelector('.std-menu-toggle').setAttribute('aria-expanded','false');
     drawFilters();draw();
-    if(scroll)(cat==='Alla'?document.body:categoryNavigation).scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});
+    if(scroll)scrollToActivity(cat==='Alla'?document.body:results);
   }
   header.querySelector('.std-menu-toggle').addEventListener('click',e=>{const expanded=header.classList.toggle('menu-open');e.currentTarget.setAttribute('aria-expanded',String(expanded));});
   header.addEventListener('keydown',e=>{if(e.key==='Escape'){header.classList.remove('menu-open');header.querySelector('.std-menu-toggle').setAttribute('aria-expanded','false');header.querySelector('.std-menu-toggle').focus();}});
@@ -198,11 +208,11 @@
   document.getElementById('search').addEventListener('input',()=>{if(isStandard()){searchInput.value=document.getElementById('search').value;draw();}});
   document.addEventListener('click',e=>{
     if(!isStandard())return;
-    const nav=e.target.closest('[data-standard-category]');if(nav){e.preventDefault();closeSearch();navigate(nav.dataset.standardCategory,!nav.hasAttribute('data-standard-browse-all'));if(nav.hasAttribute('data-standard-browse-all')){browseAll=true;draw();categoryNavigation.scrollIntoView({behavior:'smooth'});}return;}
+    const nav=e.target.closest('[data-standard-category]');if(nav){e.preventDefault();closeSearch();navigate(nav.dataset.standardCategory,!nav.hasAttribute('data-standard-browse-all'));if(nav.hasAttribute('data-standard-browse-all')){browseAll=true;draw();scrollToActivity(results);}return;}
     const game=e.target.closest('[data-standard-game]');if(game){navigate('Spel',false);window.FPGameHub?.open(game.dataset.standardGame);return;}
     const activity=e.target.closest('[data-standard-activity]');if(activity){const title=activity.dataset.standardActivity;if(title==='Pärlmönster'){navigate('Pyssel',false);pearlPage=true;pearlLevel='Alla';draw();return;}if(title==='Klippdockor – färglägg och klipp ut'){navigate('Klippdockor');return;}const item=activities.find(a=>a[2]===title);if(item)open(item);return;}
     const gym=e.target.closest('[data-standard-gym]');if(gym){const g=gymGames.find(g=>g.name===gym.dataset.standardGym);if(g)open([g.emoji,'Fritidsgympa',g.name,g.description,g.minutes+' min',g.steps]);return;}
-    if(e.target.closest('[data-standard-pearl]')){navigate('Pyssel',false);pearlPage=true;pearlLevel='Alla';draw();results.scrollIntoView({behavior:'smooth'});return;}
+    if(e.target.closest('[data-standard-pearl]')){navigate('Pyssel',false);pearlPage=true;pearlLevel='Alla';draw();scrollToActivity(results);return;}
     const drawing=e.target.closest('[data-standard-drawing]');if(drawing){navigate('Rita steg-för-steg',false);activeDrawing=drawing.dataset.standardDrawing;drawingStep=1;drawNow();return;}
     const tool=e.target.closest('[data-standard-tool]');if(tool){navigate('Roliga verktyg',false);funTool=tool.dataset.standardTool;draw();return;}
     const color=e.target.closest('.std-color-open');if(color){const paint=color.closest('.mandala-card').querySelector('.fp-online-actions button');if(paint)paint.click();else navigate('Mandala');}
