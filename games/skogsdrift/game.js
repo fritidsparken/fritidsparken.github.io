@@ -28,11 +28,11 @@ function crossing(c,s,type,deck){
  for(let d=-span;d<=span;d+=20){let a=at(s+d,side*(road/2+5)),b=at(s+d,side*(road/2+9));line(c,[a,b],'#555957',4)}}
 }
 let ac,engine,engineVol,master,music,soundOn=true;
-let lobbyTrack,raceTrack;
+let lobbyTrack,raceTrack,waitingForGesture=false;
 function playTheme(lobby){if(!soundOn||typeof Audio==='undefined'||document.hidden)return;
- const track=lobby?(lobbyTrack ||= new Audio('neon-aura.mp3')):(raceTrack ||= new Audio('midnight-drive.mp3'));
+ const track=lobby?(lobbyTrack ||= document.getElementById('menuMusic')):(raceTrack ||= new Audio('midnight-drive.mp3'));
  if(music!==track){music?.pause();music=track;music.loop=true;music.volume=lobby?.44:.34}
- if(music.paused)music.play().catch(()=>{})}
+ if(music.paused)music.play().then(()=>{if(soundOn&&music===track){waitingForGesture=false;$('sound').textContent='Ljud på'}}).catch(error=>{if(lobby&&music===track&&soundOn&&error.name==='NotAllowedError'){waitingForGesture=true;$('sound').textContent='Starta ljud'}})}
 function audioStart(){playTheme(false);if(!soundOn||!window.AudioContext&&!window.webkitAudioContext)return;
  try{if(!ac){ac=new (window.AudioContext||window.webkitAudioContext)();master=ac.createGain();master.gain.value=.27;master.connect(ac.destination);
  engine=ac.createOscillator();engine.type='sawtooth';const filter=ac.createBiquadFilter();filter.frequency.value=270;engineVol=ac.createGain();engineVol.gain.value=0;engine.connect(filter).connect(engineVol).connect(master);engine.start();
@@ -42,21 +42,70 @@ function silent(){music?.pause();if(ac)ac.suspend().catch(()=>{})}
 function tone(freq,duration,level,type='sine'){if(!ac||!soundOn||ac.state!=='running')return;let o=ac.createOscillator(),vol=ac.createGain(),t=ac.currentTime;o.type=type;o.frequency.setValueAtTime(freq,t);o.frequency.exponentialRampToValueAtTime(freq*.58,t+duration);vol.gain.setValueAtTime(level,t);vol.gain.exponentialRampToValueAtTime(.001,t+duration);o.connect(vol).connect(master);o.start();o.stop(t+duration)}
 function motor(){if(!ac||!soundOn)return;let t=ac.currentTime;engine.frequency.setTargetAtTime(38+player.v*.25+(boosting?20:0),t,.09);engineVol.gain.setTargetAtTime(state==='race'?.14:.055,t,.08)}
 // Resolve contact along the separating axes of the two oriented car bodies.
+function carPose(car){
+ return car.manual?{x:car.x,y:car.y,a:car.heading-car.yaw}:at(car.s,car.l)
+}
+// Projection only measures race progress and track boundaries.
+function locate(car){
+ const step=length/track.length,center=Math.floor(car.s/step);
+ let best=Infinity;
+ for(let i=center-14;i<=center+14;i++){
+  const p=track[wrap(i,track.length)],q=track[wrap(i+1,track.length)];
+  const dx=q.x-p.x,dy=q.y-p.y,xx=car.x-p.x,yy=car.y-p.y;
+  const t=clamp((xx*dx+yy*dy)/(dx*dx+dy*dy),0,1),rx=xx-t*dx,ry=yy-t*dy,d=rx*rx+ry*ry;
+  if(d>=best)continue;
+  best=d;car.s=(i+t)*step;car.normal=p.a+delta(q.a,p.a)*t+Math.PI/2;
+  car.l=rx*Math.cos(car.normal)+ry*Math.sin(car.normal)
+ }
+ car.yaw=delta(car.heading,car.normal-Math.PI/2)
+}
+function drive(car,dt,steer,traction,slide,brake){
+ const gas=keys.has('gas'),speed=Math.hypot(car.vx,car.vy);
+ car.wheel+=(steer-car.wheel)*(1-Math.exp(-(steer?5.4:10)*dt));
+ const forward=car.vx*Math.cos(car.heading)+car.vy*Math.sin(car.heading);
+ const direction=forward<-.5?-1:1;
+ const angle=car.wheel*(.65/(1+speed/175))*(slide?1.28:1);
+ car.heading+=direction*speed/32*Math.tan(angle)*dt;
+ const fx=Math.cos(car.heading),fy=Math.sin(car.heading);
+ let along=car.vx*fx+car.vy*fy,side=-car.vx*fy+car.vy*fx;
+ const verge=Math.abs(car.l)>road/2-10;
+ const drag=(13+speed*.055+speed*speed*.00048+(verge?82:0))*dt;
+ along=Math.sign(along)*Math.max(0,Math.abs(along)-drag);
+ if(brake&&forward>4)along=Math.max(0,along-260*traction*dt);
+ else if(brake&&!gas)along=Math.max(-58,along-77*dt);
+ else if(gas||boosting)along+=((boosting?222:116)*Math.max(0,1-Math.max(0,along)/(boosting?470:375))+.31*Math.max(0,along))*dt;
+ side*=Math.exp(-(slide?1.55:8.4)*traction*dt);
+ const gripLimit=boosting?455:356,mag=Math.hypot(along,side);
+ const limit=Math.max(gripLimit,speed-75*dt),scale=Math.min(1,limit/Math.max(.001,mag));
+ car.vx=(fx*along-fy*side)*scale;car.vy=(fy*along+fx*side)*scale;
+ car.x+=car.vx*dt;car.y+=car.vy*dt;locate(car);
+ const excess=Math.abs(car.l)-(road/2+4);
+ if(excess>0){
+  const nx=Math.sign(car.l)*Math.cos(car.normal),ny=Math.sign(car.l)*Math.sin(car.normal);
+  car.x-=nx*excess;car.y-=ny*excess;
+  const outward=Math.max(0,car.vx*nx+car.vy*ny);
+  car.vx-=nx*outward;car.vy-=ny*outward;locate(car)
+ }
+ car.v=Math.hypot(car.vx,car.vy);car.lv=0
+}
+
 function contacts(){
  for(let pass=0;pass<8;pass++){let changed=false;
  for(let i=0;i<cars.length;i++)for(let j=i+1;j<cars.length;j++){
  const a=cars[i],b=cars[j];if(a.done||b.done||Math.abs(wrap(a.s-b.s+length/2,length)-length/2)>100)continue;
- const pa=at(a.s,a.l),pb=at(b.s,b.l),dx=pb.x-pa.x,dy=pb.y-pa.y;
+ const pa=carPose(a),pb=carPose(b),dx=pb.x-pa.x,dy=pb.y-pa.y;
  if(dx*dx+dy*dy>2704)continue;
  const axes=p=>[Math.cos(p),Math.sin(p)],u=axes(pa.a+a.yaw),v=[-u[1],u[0]],w=axes(pb.a+b.yaw),z=[-w[1],w[0]];
  let penetration=Infinity,nx=0,ny=0;for(const [x,y] of [u,v,w,z]){
  const radius=23*(Math.abs(x*u[0]+y*u[1])+Math.abs(x*w[0]+y*w[1]))+11.5*(Math.abs(x*v[0]+y*v[1])+Math.abs(x*z[0]+y*z[1]));
  const dot=dx*x+dy*y,depth=radius-Math.abs(dot);if(depth<penetration){penetration=depth;nx=x*Math.sign(dot||1);ny=y*Math.sign(dot||1)}}
  if(penetration<.02)continue;changed=true;
- const move=(car,p,sign)=>{const c=Math.cos(p.a),t=Math.sin(p.a);let curvature=delta(at(car.s+5).a,p.a)/5;car.s+=sign*(nx*c+ny*t)/clamp(1-curvature*car.l,.4,1.7);car.l=clamp(car.l+sign*(-nx*t+ny*c),-77,77)};
+ const move=(car,p,sign)=>{if(car.manual){car.x+=sign*nx;car.y+=sign*ny;locate(car);return}const c=Math.cos(p.a),t=Math.sin(p.a);let curvature=delta(at(car.s+5).a,p.a)/5;car.s+=sign*(nx*c+ny*t)/clamp(1-curvature*car.l,.4,1.7);car.l=clamp(car.l+sign*(-nx*t+ny*c),-77,77)};
  move(a,pa,-(penetration+.12)*.51);move(b,pb,(penetration+.12)*.51);
- if(pass===0){let va=a.v*Math.cos(pa.a)+a.lv*(-Math.sin(pa.a)),vb=b.v*Math.cos(pb.a)-b.lv*Math.sin(pb.a),rel=(va-vb)*nx+(a.v*Math.sin(pa.a)+a.lv*Math.cos(pa.a)-b.v*Math.sin(pb.a)-b.lv*Math.cos(pb.a))*ny;
- if(rel>0){for(let [car,p,sign] of [[a,pa,-1],[b,pb,1]]){car.v=Math.max(0,car.v+sign*.62*rel*(nx*Math.cos(p.a)+ny*Math.sin(p.a)));car.lv+=sign*.62*rel*(-nx*Math.sin(p.a)+ny*Math.cos(p.a))}
+ if(pass===0){const normalSpeed=(car,p)=>car.manual?car.vx*nx+car.vy*ny:
+  car.v*(Math.cos(p.a)*nx+Math.sin(p.a)*ny)+car.lv*(-Math.sin(p.a)*nx+Math.cos(p.a)*ny);
+ let rel=normalSpeed(a,pa)-normalSpeed(b,pb);
+ if(rel>0){for(let [car,p,sign] of [[a,pa,-1],[b,pb,1]]){if(car.manual){car.vx+=sign*.62*rel*nx;car.vy+=sign*.62*rel*ny;car.v=Math.hypot(car.vx,car.vy);continue}car.v=Math.max(0,car.v+sign*.62*rel*(nx*Math.cos(p.a)+ny*Math.sin(p.a)));car.lv+=sign*.62*rel*(-nx*Math.sin(p.a)+ny*Math.cos(p.a))}
  if((a===player||b===player)&&rel>18&&clock-hitTime>.18){tone(90,.14,.65,'triangle');hitTime=clock}}}
  }if(!changed)break}
 }
@@ -138,9 +187,11 @@ function setupMenu(){idx=Number($('tracks').value);makeTrack();mini($('preview')
  $('desc').textContent=['3 varv mot 11 förare','1 varv mot 11 förare','3 varv mot klockan'][mode]}
 function resetInput(){keys.clear();document.querySelectorAll('#pad button').forEach(b=>b.classList.remove('active'))}
 function begin(){
- resetInput();boost=1;boosting=false;driftUntil=0;hitTime=-1;audioStart();makeTrack();buildScene();clock=0;count=3;particles=[];sessionBest=Infinity;lastLap=0;lapStart=0;record=Infinity;try{record=Number(localStorage.getItem('midnight-v3-'+idx))||Infinity}catch{}
+ resetInput();boost=1;boosting=false;driftUntil=0;hitTime=-1;audioStart();makeTrack();buildScene();clock=0;count=3;particles=[];sessionBest=Infinity;lastLap=0;lapStart=0;record=Infinity;try{record=Number(localStorage.getItem('midnight-manual-1-'+idx))||Infinity}catch{}
  cars=[];for(let i=0;i<(mode===2?1:12);i++){let slot=i===0?5:i<=5?i-1:i,s=mode===2?0:-(Math.floor(slot/2)+1)*48;cars.push({s,l:mode===2?0:(slot%2?34:-34),v:mode===2?235:0,yaw:0,lv:0,grip:0,lap:0,id:i,base:342+(i*17%35),done:false,finishTime:0})}
- player=cars[0];cam=at(player.s);state='count';goTime=0;$('menu').hidden=true;$('overlay').hidden=true;$('hud').hidden=false;document.body.classList.add('play');acc=0;last=0;
+ player=cars[0];const spawn=at(player.s,player.l);
+ Object.assign(player,{manual:true,x:spawn.x,y:spawn.y,heading:spawn.a,wheel:0,vx:player.v*Math.cos(spawn.a),vy:player.v*Math.sin(spawn.a)});
+ cam=spawn;state='count';goTime=0;$('menu').hidden=true;$('overlay').hidden=true;$('hud').hidden=false;document.body.classList.add('play');acc=0;last=0;
 }
 function box(paused){silent();state=paused?'paused':'finish';resetInput();document.body.classList.remove('play');$('overlay').hidden=false;$('resume').hidden=!paused;$('title').textContent=paused?'Paus':mode===2?'Tidjakten klar':position(player)===1?'Seger!':'I mål!';$('result').textContent=paused?circuits[idx][0]+' · '+modes[mode]:mode===2?'Bästa varv '+fmt(sessionBest)+' · Banrekord '+fmt(record):'Plats '+position(player)+' av 12 · Tid '+fmt(clock);$('resume').focus()}
 let previous='race';function pause(){if(['race','count'].includes(state)){previous=state;box(true)}}function resume(){if(state!=='paused')return;audioStart();state=previous;last=0;acc=0;$('overlay').hidden=true;document.body.classList.add('play')}
@@ -149,9 +200,8 @@ function update(dt){
  if(state==='count'){let oldCount=Math.ceil(count);count-=dt;if(Math.ceil(count)!==oldCount)tone(count<=0?980:540,.12,.35);if(count<=0){state='race';goTime=.7}return}if(state!=='race')return;
  clock+=dt;goTime=Math.max(0,goTime-dt);smokeTick++;let targetLaps=mode===1?1:3;
  boosting=keys.has('boost')&&boost>.01&&player.v>30;boost=clamp(boost+(boosting?-.46:keys.has('boost')?0:.11)*dt,0,1);
- for(const car of cars){if(car.done)continue;let old=at(car.s,car.l),turn=delta(at(car.s+60).a,old.a)/60,me=car===player,steer=Number(keys.has('right'))-Number(keys.has('left')),traction=icy(car.s)?.36:season()===3?.68:1,slide=me&&(keys.has('drift')||clock<driftUntil)&&car.v>55,brake=me&&keys.has('brake');
- let limit=Math.abs(car.l)>road/2-8?150:boosting?453:355;if(me){car.v=clamp(car.v+((boosting?235:keys.has('gas')?117:0)-14-car.v*.07-(brake?230*traction:0)-(slide?17:0))*dt,0,boosting?458:Math.max(360,car.v));if(car.v>limit)car.v=Math.max(limit,car.v-170*dt);
- const wanted=(steer||(slide?Math.sign(turn):0))*(slide?.67:.38);car.yaw+=(wanted-car.yaw)*Math.min(1,dt*(slide?4.6:7));let demand=car.v*Math.sin(car.yaw)-turn*car.v*car.v*(slide?.19:.095)/traction;car.lv+=(demand-car.lv)*Math.min(1,dt*(slide?2.2:5.6)*traction)
+ for(const car of cars){if(car.done)continue;let old=carPose(car),turn=delta(at(car.s+60).a,old.a)/60,me=car===player,steer=Number(keys.has('right'))-Number(keys.has('left')),traction=icy(car.s)?.36:season()===3?.68:1,slide=me&&(keys.has('drift')||clock<driftUntil)&&car.v>55,brake=me&&keys.has('brake');
+ if(me){drive(car,dt,steer,traction,slide,brake)
  }else{
  const near=delta(at(car.s+40).a,at(car.s-20).a)/60;
  const look=90+car.v*.29,future=delta(at(car.s+look+32).a,at(car.s+look-32).a)/64;
@@ -164,20 +214,20 @@ function update(dt){
  else goal=Math.min(goal,Math.max(0,lead.v+(closest-58)*2))}
  car.v+=clamp(goal-car.v,-210*dt*traction,128*dt);const demand=clamp((lane-car.l)*2.8,-95,95);
  car.lv+=(demand-car.lv)*dt*5*traction;car.yaw+=(clamp(car.lv/Math.max(60,car.v)+near*car.v*.12,-.42,.42)-car.yaw)*dt*6
- }
  car.l+=car.lv*dt;let edge=road/2+6;if(Math.abs(car.l)>edge){car.l=clamp(car.l,-edge,edge);car.lv*=.3}
  car.s+=car.v*dt*Math.cos(car.yaw*.8)/clamp(1-turn*car.l,.75,1.3);
- let now=at(car.s,car.l);car.grip=car.v>85&&(slide&&(Math.abs(car.yaw)>.09||Math.abs(turn)>.0009)||Math.abs(turn)*car.v*car.v>185||brake&&car.v>180);
+ }
+ let now=carPose(car);car.grip=car.v>85&&(slide&&(Math.abs(car.yaw)>.09||Math.abs(turn)>.0009)||Math.abs(turn)*car.v*car.v>185||brake&&car.v>180);
  if(car.grip){const wheels=(p,yaw,side)=>{const a=p.a+yaw;return{x:p.x-14*Math.cos(a)-side*8*Math.sin(a),y:p.y-14*Math.sin(a)+side*8*Math.cos(a)}};for(let side of [-1,1])line(ink,[wheels(old,car.yaw,side),wheels(now,car.yaw,side)],'rgba(27,24,24,.30)',2.4);
  if(smokeTick%5===0&&Math.hypot(now.x-cam.x,now.y-cam.y)<850&&particles.length<200)particles.push({x:now.x-13*Math.cos(now.a),y:now.y-13*Math.sin(now.a),t:0,dx:(Math.random()-.5)*18,dy:(Math.random()-.5)*18})}
  }
  contacts();
  for(const car of cars){if(car.done)continue;const me=car===player;
- const lap=Math.max(0,Math.floor(car.s/length));if(lap>car.lap){car.lap=lap;if(me){lastLap=clock-lapStart;lapStart=clock;sessionBest=Math.min(sessionBest,lastLap);if(mode===2&&lastLap<record){record=lastLap;try{localStorage.setItem('midnight-v3-'+idx,record)}catch{}}}}
+ const lap=Math.max(0,Math.floor(car.s/length));if(lap>car.lap){car.lap=lap;if(me){lastLap=clock-lapStart;lapStart=clock;sessionBest=Math.min(sessionBest,lastLap);if(mode===2&&lastLap<record){record=lastLap;try{localStorage.setItem('midnight-manual-1-'+idx,record)}catch{}}}}
  if(car.s>=targetLaps*length){car.done=true;car.finishTime=clock-(car.s-targetLaps*length)/Math.max(1,car.v)}
  }
  particles=particles.filter(p=>(p.t+=dt)<.83);for(let p of particles){p.x+=p.dx*dt;p.y+=p.dy*dt}
- let aim=at(player.s+player.v*.36,player.l*.65),k=1-Math.exp(-dt*6);cam.x+=(aim.x-cam.x)*k;cam.y+=(aim.y-cam.y)*k;
+ let aim={x:player.x+player.vx*.29,y:player.y+player.vy*.29},k=1-Math.exp(-dt*6);cam.x+=(aim.x-cam.x)*k;cam.y+=(aim.y-cam.y)*k;
  if(player.done)box(false)
 }
 let beam,woodland;
@@ -188,14 +238,14 @@ function draw(){
  const tx=w/2-cam.x*sz,ty=h/2-cam.y*sz;
  g.setTransform(sz,0,0,sz,tx,ty);let left=-tx/sz,top=-ty/sz,ww=w/sz,hh=h/sz;
  g.fillStyle=terrainPattern;g.fillRect(left,top,ww,hh);g.drawImage(scene,0,0);g.drawImage(marks,0,0);
- const visible=cars.filter(c=>!c.done||c===player).map(c=>({...at(c.s,c.l),car:c})).filter(p=>p.x>left-260&&p.x<left+ww+260&&p.y>top-260&&p.y<top+hh+260);
+ const visible=cars.filter(c=>!c.done||c===player).map(c=>({...carPose(c),car:c})).filter(p=>p.x>left-260&&p.x<left+ww+260&&p.y>top-260&&p.y<top+hh+260);
  for(let p of visible){let c=p.car;g.save();g.translate(p.x,p.y);g.rotate(p.a+c.yaw);g.fillStyle='#17131665';g.beginPath();g.ellipse(-1,3,23,11,0,0,TAU);g.fill();g.drawImage(sprites[c.id],-23,-11.5,46,23);g.restore()}
  for(let p of particles){let r=4+13*p.t,alpha=(1-p.t/.83)*.36;let grad=g.createRadialGradient(p.x,p.y,0,p.x,p.y,r);grad.addColorStop(0,'rgba(235,231,225,'+alpha+')');grad.addColorStop(1,'rgba(235,231,225,0)');g.fillStyle=grad;g.fillRect(p.x-r,p.y-r,r*2,r*2)}
  if(night){const l=lightLayer.getContext('2d');l.setTransform(1,0,0,1,0,0);l.globalCompositeOperation='copy';l.fillStyle='rgba(4,10,31,.86)';l.fillRect(0,0,w,h);l.globalCompositeOperation='destination-out';l.setTransform(sz,0,0,sz,tx,ty);
  for(const p of visible){l.save();l.translate(p.x,p.y);l.rotate(p.a+p.car.yaw);for(let side of [-1,1])l.drawImage(beam,16,side*7-75);l.restore()}
  g.setTransform(1,0,0,1,0,0);g.drawImage(lightLayer,0,0);g.setTransform(sz,0,0,sz,tx,ty);
  for(const p of visible){g.save();g.translate(p.x,p.y);g.rotate(p.a+p.car.yaw);g.globalAlpha=.17;for(let side of [-1,1])g.drawImage(beam,17,side*7-75);g.globalAlpha=1;for(let side of [-1,1]){g.fillStyle='#ffedaf';g.fillRect(18,side*7-2,3,4);g.shadowBlur=8;g.shadowColor='#ff3730';g.fillStyle='#ff4136';g.fillRect(-21,side*7-2,3,4);g.shadowBlur=0}g.restore()}}
- let p=at(player.s,player.l);g.fillStyle='#25f8d4';g.strokeStyle='#113f3d';g.lineWidth=1.2;g.beginPath();g.moveTo(p.x,p.y-19);g.lineTo(p.x-5.5,p.y-29);g.lineTo(p.x+5.5,p.y-29);g.closePath();g.fill();g.stroke();
+ let p=carPose(player);g.fillStyle='#25f8d4';g.strokeStyle='#113f3d';g.lineWidth=1.2;g.beginPath();g.moveTo(p.x,p.y-19);g.lineTo(p.x-5.5,p.y-29);g.lineTo(p.x+5.5,p.y-29);g.closePath();g.fill();g.stroke();
  $('rank').textContent=mode===2?'TIDJAKT':position(player)+'/12';$('laps').textContent='VARV '+Math.min(mode===1?1:3,player.lap+1)+'/'+(mode===1?1:3);$('timer').textContent=fmt(mode===2?clock-lapStart:clock);$('speed').textContent=Math.round(player.v*.6)+' km/h'+(mode===2&&isFinite(record)?' · Rekord '+fmt(record):'');$('notice').textContent=state==='count'?Math.ceil(count):goTime>0?'KÖR!':'';mini($('map'),true);$('charge').style.setProperty('--charge',Math.round(boost*100)+'%');motor()
 }
 function frame(now){if(state==='count'||state==='race'){let elapsed=last?Math.min((now-last)/1000,.12):0;acc+=elapsed;while(acc>=1/60){update(1/60);acc-=1/60}draw()}last=now;requestAnimationFrame(frame)}
@@ -208,12 +258,13 @@ async function init(){const start=$('start');start.disabled=true;start.textConte
  for(let i=0;i<12;i++){let c=surface(images.car.width,images.car.height),v=c.getContext('2d');v.drawImage(images.car,0,0);let im=v.getImageData(0,0,c.width,c.height),d=im.data,color=[[0,0,0],[228,53,44],[251,176,36],[67,103,229],[205,79,176],[225,220,207],[127,192,43],[242,111,29],[143,74,184],[237,198,32],[49,117,189],[216,64,104]][i];if(i)for(let j=0;j<d.length;j+=4){let r=d[j],green=d[j+1];if(green-r>18&&d[j+2]-r>12){let k=green/230;for(let ch=0;ch<3;ch++)d[j+ch]=Math.min(255,color[ch]*k+r*.16)}}v.putImageData(im,0,0);sprites.push(c)}
  circuits.forEach(([name,n],i)=>$('tracks').add(new Option(name,i)));
  for(const [id,step] of [['modePrev',-1],['modeNext',1]])$(id).onclick=()=>{mode=wrap(mode+step,modes.length);setupMenu()};
- $('help').textContent=matchMedia('(pointer:coarse)').matches?'Håll Gas och styr med pilarna. Tryck Drift i kurvan och Boost på raksträckan.':'↑ Gas · ↓ Broms · ← → Styr · Mellanslag driftar · Skift ger boost.';
- $('sound').onclick=()=>{soundOn=!soundOn;if(soundOn)playTheme(true);else silent();$('sound').textContent=soundOn?'Ljud på':'Ljud av';$('sound').setAttribute('aria-pressed',soundOn)};
+ $('help').textContent=matchMedia('(pointer:coarse)').matches?'Gas och pilar styr bilen. Håll Broms för att backa. Tryck Drift i kurvan och Boost på raksträckan.':'↑ Gas · ↓ Broms/back · ← → Styr · Mellanslag driftar · Skift ger boost.';
+ $('sound').onclick=()=>{if(waitingForGesture&&soundOn){playTheme(true);return}soundOn=!soundOn;if(soundOn)playTheme(true);else silent();$('sound').textContent=soundOn?'Ljud på':'Ljud av';$('sound').setAttribute('aria-pressed',soundOn)};
  for(let [id,step] of [['prev',-1],['next',1]])$(id).onclick=()=>{$('tracks').value=wrap(idx+step,circuits.length);setupMenu()};
- for(const event of ['click','keydown','touchend'])document.addEventListener(event,()=>{if(state==='menu')playTheme(true)});playTheme(true);
+
  $('tracks').onchange=setupMenu;resize();lightingTexture();setupMenu();start.disabled=false;start.textContent='Starta loppet →';start.onclick=begin;requestAnimationFrame(frame)
 }
 for(const event of ['gesturestart','gesturechange','gestureend','contextmenu','selectstart','dragstart'])document.addEventListener(event,e=>{if(state!=='menu')e.preventDefault()},{passive:false});
 document.addEventListener('wheel',e=>{if(e.ctrlKey)e.preventDefault()},{passive:false});
+ for(const event of ['click','keydown','touchend','pointerup'])document.addEventListener(event,e=>{if(state==='menu'&&soundOn&&e.target!==$('sound'))playTheme(true)});playTheme(true);
 init().catch(()=>{$('start').textContent='Bilderna kunde inte laddas. Öppna spelet igen.'});
