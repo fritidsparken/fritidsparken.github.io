@@ -1,7 +1,7 @@
 const $=id=>document.getElementById(id), TAU=Math.PI*2, clamp=(v,a,b)=>Math.min(b,Math.max(a,v)), wrap=(v,n)=>(v%n+n)%n;
 const seasons=['Sommar','Vår','Höst','Vinter'];
-const seasonIds=[0,1,2,0,0,2,2,1,0,3,2,0,1,2,3,0,3,1,2,3,0,3];
-const season=()=>seasonIds[idx];
+const seasonIds=[0,1,2,0,0,2,2,1,0,3,2,0,1,2,3,0,3,1,2,3,0,3,2,1,3,0];
+const season=()=>seasonIds[routeOrder[idx]];
 const icy=s=>season()===3&&((wrap(s,length)/length>.17&&wrap(s,length)/length<.31)||(wrap(s,length)/length>.58&&wrap(s,length)/length<.73));
 let texture,textureSeason=-1,hitTime=-1,terrainPattern;
 function seasonalTile(){
@@ -28,6 +28,7 @@ function crossing(c,s,type,deck){
  for(let d=-span;d<=span;d+=20){let a=at(s+d,side*(road/2+5)),b=at(s+d,side*(road/2+9));line(c,[a,b],'#555957',4)}}
 }
 let ac,engine,engineVol,master,music,soundOn=true;
+let loadingMotor=false,gear=0;
 let lobbyTrack,raceTrack,waitingForGesture=false;
 function playTheme(lobby){if(!soundOn||typeof Audio==='undefined'||document.hidden)return;
  const track=lobby?(lobbyTrack ||= document.getElementById('menuMusic')):(raceTrack ||= new Audio('midnight-drive.mp3'));
@@ -35,12 +36,28 @@ function playTheme(lobby){if(!soundOn||typeof Audio==='undefined'||document.hidd
  if(music.paused)music.play().then(()=>{if(soundOn&&music===track){waitingForGesture=false;$('sound').textContent='Ljud på'}}).catch(error=>{if(lobby&&music===track&&soundOn&&error.name==='NotAllowedError'){waitingForGesture=true;$('sound').textContent='Starta ljud'}})}
 function audioStart(){playTheme(false);if(!soundOn||!window.AudioContext&&!window.webkitAudioContext)return;
  try{if(!ac){ac=new (window.AudioContext||window.webkitAudioContext)();master=ac.createGain();master.gain.value=.27;master.connect(ac.destination);
- engine=ac.createOscillator();engine.type='sawtooth';const filter=ac.createBiquadFilter();filter.frequency.value=270;engineVol=ac.createGain();engineVol.gain.value=0;engine.connect(filter).connect(engineVol).connect(master);engine.start();
+ engineVol=ac.createGain();engineVol.gain.value=0;engineVol.connect(master);
+ }
+ if(!engine&&!loadingMotor){
+  loadingMotor=true;
+  fetch('engine.wav').then(r=>{if(!r.ok)throw Error('motor');return r.arrayBuffer()})
+   .then(bytes=>ac.decodeAudioData(bytes)).then(buffer=>{
+    engine=ac.createBufferSource();engine.buffer=buffer;engine.loop=true;engine.connect(engineVol);engine.start()
+   }).catch(()=>{}).finally(()=>{loadingMotor=false})
  }
  ac.resume().catch(()=>{})}catch{}}
 function silent(){music?.pause();if(ac)ac.suspend().catch(()=>{})}
 function tone(freq,duration,level,type='sine'){if(!ac||!soundOn||ac.state!=='running')return;let o=ac.createOscillator(),vol=ac.createGain(),t=ac.currentTime;o.type=type;o.frequency.setValueAtTime(freq,t);o.frequency.exponentialRampToValueAtTime(freq*.58,t+duration);vol.gain.setValueAtTime(level,t);vol.gain.exponentialRampToValueAtTime(.001,t+duration);o.connect(vol).connect(master);o.start();o.stop(t+duration)}
-function motor(){if(!ac||!soundOn)return;let t=ac.currentTime;engine.frequency.setTargetAtTime(38+player.v*.25,t,.09);engineVol.gain.setTargetAtTime(state==='race'?.14:.055,t,.08)}
+function motor(){
+ if(!engine||!soundOn)return;
+ const throttle=state==='race'&&(keys.has('gas')||gasPointer!==null);
+ const limits=[77,145,211,279,365];
+ while(gear<4&&player.v>limits[gear])gear++;
+ while(gear>0&&player.v<limits[gear-1]-18)gear--;
+ const revs=gear===0?player.v/77:.50+.5*(player.v-limits[gear-1])/(limits[gear]-limits[gear-1]);
+ engine.playbackRate.setTargetAtTime(.78+1.15*clamp(revs,0,1)+(throttle?.18:0),ac.currentTime,.10);
+ engineVol.gain.setTargetAtTime(throttle?.95:.35,ac.currentTime,.12)
+}
 // Resolve contact along the separating axes of the two oriented car bodies.
 function carPose(car){
  return {x:car.x,y:car.y,a:car.heading-car.yaw}
@@ -116,18 +133,25 @@ function contacts(){
 }
 
 const board=$('world'),g=board.getContext('2d'),images={},sprites=[],W=3200,H=2300,road=142;
-const circuits=[
+const routes=[
  ['Tallåsen',1,[1,.96,.82,1,.97,.67,.94,1]],['Myrkanten',0,[1,.73,1,1,.65,.83,1,.97,.82]],['Granitpasset',0,[.96,.94,.58,.97,1,.76,.93,.88,1]],['Månvarvet',1,[1,.95,.86,.98,.75,.97,.74,.88]],['Långheden',0,[1,.84,.92,1,.66,1,.94,.75]],['Rävberget',0,[.98,.65,.88,1,.8,.96,.59,.97,1]],['Nattvakten',1,[1,.87,.66,1,.96,.7,1,.92,.8]],['Mosshöjden',0,[1,.64,1,.85,1,.78,.92,1]],['Klintvägen',0,[.84,1,.98,.67,1,.91,.76,.94,1,.75]],['Midnattsringen',1,[.94,1,.7,.92,1,.96,.59,.92]],['Kungsåsen',0,[1,.76,1,.95,.71,.92,1,.66,.95,.94]],['Svarta skogen',1,[1,.67,.94,.85,1,.65,1,.84,.97,.87]],
  ['Vitsippsdalen',0,[.98,.65,.86,1,.78,.94,.59,.83,.98]],['Kopparravinen',0,[.75,.99,.64,.89,1,.61,.85,.96,.72,1]],['Frostälven',0,[.92,.97,.76,.6,.94,1,.71,.91,1]],['Solviadukten',0,[1,.8,.56,.88,1,.72,.83,1,.69,.94]],['Polarnatten',1,[.94,.63,1,.76,.93,1,.61,.87,.95]],['Björkfors',0,[1,.84,.62,.97,.74,.99,.79,.56,1,.85]],['Lönnpasset',0,[.81,1,.78,.58,1,.9,.69,.92,1]],['Isbrytaren',0,[.91,1,.62,.87,.99,.63,.92,.72,.98,.81]],['Älvbron',0,[.76,.98,.84,.62,.97,.89,.63,1,.93]],['Norrskensleden',1,[1,.74,.9,.58,.83,1,.67,.94,.82,.97]]
 ];
+routes.push(['Trollstigen'],['Lysebotn'],['Stelviopasset'],['Col de Turini']);
+const routeOrder=[0,22,7,14,3,19,10,23,1,16,8,21,4,24,11,5,18,2,13,25,9,20,6,15,12,17];
+const circuits=routeOrder.map(id=>routes[id]);
 const modes=['Varvlopp','Sprint','Tidjakt'],descriptions=['Tre varv mot elva förare. Först över mållinjen vinner.','Ett varv mot elva förare. Varje omkörning räknas.','Tre flygande varv på fri bana. Jaga ditt bästa varv.'];
 let mode=0,idx=0,state='menu',track=[],length=0,scene,marks,ink,grid=[],cars=[],player,particles=[],clock=0,count=0,last=0,acc=0,cam={x:0,y:0},smokeTick=0,sessionBest=Infinity,lapStart=0,lastLap=0,record=Infinity,night=false,keys=new Set(),mapBounds,lightLayer,goTime=0;
 const surface=(w,h)=>Object.assign(document.createElement('canvas'),{width:w,height:h});
 const fmt=t=>Math.floor(t/60)+':'+(t%60).toFixed(2).padStart(5,'0');
 function makeTrack(){
- const cfg=circuits[idx],rs=cfg[2],phase=idx*.57+.23;
+ const route=routeOrder[idx],cfg=routes[route],rs=cfg[2],phase=route*.57+.23;
  // These routes alternate long straights with linked bends and broad hairpins.
  const shaped={
+  22:[[480,1820],[650,1580],[1820,1490],[2080,1340],[1900,1200],[870,1190],[655,1040],[850,900],[2050,875],[2310,710],[2100,560],[1420,545],[1150,380],[1550,240],[2490,320],[2790,640],[2740,1510],[2330,1930],[1300,2050]],
+  23:[[510,1740],[760,1530],[1420,1450],[1680,1280],[1480,1140],[870,1220],[610,1110],[730,910],[1540,850],[1910,625],[1700,480],[1110,565],[810,475],[1000,290],[2200,265],[2720,650],[2520,1080],[2390,1540],[1870,1840],[960,2060]],
+  24:[[580,1850],[820,1620],[2140,1520],[2350,1370],[2130,1210],[1060,1270],[820,1100],[1010,930],[2250,890],[2440,735],[2250,575],[1320,610],[960,465],[1100,285],[2400,250],[2790,560],[2860,1430],[2580,1860],[1630,2020]],
+  25:[[440,1530],[710,1130],[1190,1010],[1390,820],[1230,665],[740,730],[525,575],[770,345],[1650,305],[2130,515],[2660,435],[2800,690],[2490,890],[2070,940],[1840,1130],[2080,1300],[2510,1240],[2710,1410],[2350,1760],[1700,1830],[1310,1600],[855,1840]],
   0:[[440,540],[980,370],[1530,560],[2140,390],[2700,530],[2830,1010],[2410,1480],[1840,1740],[1550,1420],[1650,980],[1340,900],[1050,1390],[660,1670],[355,1420]],
   2:[[380,640],[1050,380],[1850,420],[2640,600],[2790,1030],[2420,1220],[2060,920],[1730,990],[1820,1430],[2310,1630],[2120,1910],[1270,1820],[850,1430],[400,1350]],
   4:[[355,870],[630,465],[1450,405],[2380,475],[2790,800],[2530,1140],[1740,1140],[1450,1390],[1550,1780],[1120,1870],[730,1480]],
@@ -135,19 +159,19 @@ function makeTrack(){
   9:[[340,920],[610,460],[1190,420],[1750,760],[2220,700],[2670,440],[2860,840],[2600,1550],[2160,1830],[1570,1620],[1090,1770],[680,1610]],
   11:[[380,700],[880,440],[1350,720],[1750,700],[2100,360],[2630,460],[2790,1050],[2440,1380],[2040,1190],[1730,1260],[1530,1760],[1010,1850],[580,1530]]
  };
- const anchors=shaped[idx]?shaped[idx].map(([x,y])=>({x,y})):rs.map((r,i)=>{const a=i*TAU/rs.length+phase;return {x:W/2+1280*r*Math.cos(a),y:H/2+865*r*Math.sin(a)}});
+ const anchors=shaped[route]?shaped[route].map(([x,y])=>({x,y})):rs.map((r,i)=>{const a=i*TAU/rs.length+phase;return {x:W/2+1280*r*Math.cos(a),y:H/2+865*r*Math.sin(a)}});
  // Keep one full straight for passing. Use broad S bends, offset chicanes and linked esses elsewhere.
  const spans=anchors.map((p,i)=>{
   const q=anchors[(i+1)%anchors.length];
   return {i,len:Math.hypot(q.x-p.x,q.y-p.y)}
  }).sort((a,b)=>b.len-a.len);
- const sectors=new Set(spans.slice(1,7+(idx%2)).filter(span=>span.len>=385).map(span=>span.i));
+ const sectors=new Set(spans.slice(1,7+(route%2)).filter(span=>span.len>=385).map(span=>span.i));
  const nodes=[];
  anchors.forEach((p,i)=>{
   nodes.push(p);
-  if(!sectors.has(i))return;
+  if(route>=22||!sectors.has(i))return;
   const q=anchors[(i+1)%anchors.length],dx=q.x-p.x,dy=q.y-p.y,L=Math.hypot(dx,dy);
-  const shape=(i+idx)%3, amplitude=Math.min(70,L*(.080+.008*shape))*((i+idx)%2?1:-1);
+  const shape=(i+route)%3, amplitude=Math.min(70,L*(.080+.008*shape))*((i+route)%2?1:-1);
   const gates=L>740&&shape===0?[[.24,.85],[.51,-.82],[.78,.72]]:
    shape===1?[[.30,.65],[.65,-1]]:[[.31,1],[.70,-.75]];
   for(const [fraction,side] of gates){
@@ -162,17 +186,57 @@ function makeTrack(){
  for(let i=0;i<num;i++){let s=i*length/num;while(dense[j+1].s<s)j++;let a=dense[j],b=dense[j+1],t=(s-a.s)/(b.s-a.s);track.push({x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t})}
  track.forEach((p,i)=>{const a=track[wrap(i-1,num)],b=track[(i+1)%num];p.a=Math.atan2(b.y-a.y,b.x-a.x)});
  const xs=track.map(p=>p.x),ys=track.map(p=>p.y);mapBounds=[Math.min(...xs),Math.min(...ys),Math.max(...xs),Math.max(...ys)];
- night=!!cfg[1]
+ night=true
 }
 function delta(a,b){return Math.atan2(Math.sin(a-b),Math.cos(a-b))}
 function at(s,l=0){let k=wrap(s,length)*track.length/length,i=Math.floor(k),p=track[i],q=track[(i+1)%track.length],t=k-i,a=p.a+delta(q.a,p.a)*t;return{x:p.x+(q.x-p.x)*t-Math.sin(a)*l,y:p.y+(q.y-p.y)*t+Math.cos(a)*l,a}}
 function line(ctx,points,color,width,close=false){ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));if(close)ctx.closePath();ctx.lineWidth=width;ctx.strokeStyle=color;ctx.stroke()}
+let riverPose,ripples=[],overpass;
+function drawWater(time){
+ if(!riverPose||Math.hypot(cam.x-riverPose.x,cam.y-riverPose.y)>1500)return;
+ g.save();g.translate(riverPose.x,riverPose.y);g.rotate(riverPose.a+.18);
+ g.strokeStyle='#b3ebf5';g.lineWidth=1.6;
+ for(const r of ripples){
+  const wave=time*1.4+r.phase+r.y*.014,y=r.y+5*Math.sin(wave);
+  g.globalAlpha=.17+.15*Math.sin(wave+.5);
+  g.beginPath();g.moveTo(r.x-4,y);g.quadraticCurveTo(r.x,y-2,r.x+5+2*Math.sin(wave),y);g.stroke()
+ }
+ g.restore()
+}
+function drawOverpass(){
+ if(!overpass||Math.hypot(cam.x-overpass.x,cam.y-overpass.y)>1200)return;
+ g.save();g.translate(overpass.x,overpass.y);g.rotate(overpass.a+.21);
+ g.fillStyle='#060a108a';g.fillRect(-25,-185,81,383);
+ g.fillStyle='#454e56';g.fillRect(-42,-190,84,380);
+ g.fillStyle='#292e39';g.fillRect(-36,-190,72,380);
+ g.strokeStyle='#ddc68f';g.setLineDash([14,15]);g.beginPath();g.moveTo(0,-190);g.lineTo(0,190);g.stroke();g.setLineDash([]);
+ for(const x of [-39,39]){
+  g.fillStyle='#738594';g.fillRect(x-1,-190,3,380);
+  for(let y=-176;y<=176;y+=44){g.fillStyle='#ffe4a0';g.fillRect(x-2,y,4,5)}
+ }
+ g.restore()
+}
 function buildScene(){
  scene ||= surface(W,H);let c=scene.getContext('2d');marks ||= surface(W,H);marks.getContext('2d').clearRect(0,0,W,H);ink=marks.getContext('2d');
  c.fillStyle=c.createPattern(seasonalTile(),'repeat');c.fillRect(0,0,W,H);
- let seed=idx+21;const rand=()=>((seed=Math.imul(seed,1664525)+1013904223>>>0)/4294967296);
+ let seed=routeOrder[idx]+21;const rand=()=>((seed=Math.imul(seed,1664525)+1013904223>>>0)/4294967296);
  function grit(base,amount){let tile=surface(144,144),v=tile.getContext('2d'),im=v.createImageData(144,144);for(let i=0;i<im.data.length;i+=4){let n=(rand()-.5)*amount;for(let j=0;j<3;j++)im.data[i+j]=base[j]+n;im.data[i+3]=255}v.putImageData(im,0,0);return c.createPattern(tile,'repeat')}
- const sites=[[length*(.14+.014*(idx%6)),'bridge'],[length*(.55+.018*(idx%5)),'viaduct']];for(const [s,type] of sites)crossing(c,s,type,false);
+ const sites=[[length*(.14+.014*(idx%6)),'bridge'],[length*(.55+.018*(idx%5)),'viaduct']];riverPose=at(sites[0][0]);ripples=[];
+ const angle=riverPose.a+.18,cs=Math.cos(angle),sn=Math.sin(angle);
+ for(let i=0;i<380;i++){
+  const y=rand()*790-395,bank=Math.sqrt(1-(y/420)**4)*(77+12*Math.sin(y*.015));
+  const x=20*Math.sin(y*.009)+(rand()*2-1)*Math.max(0,bank-14);
+  const wx=riverPose.x+x*cs-y*sn,wy=riverPose.y+x*sn+y*cs;
+  if(!track.some(p=>Math.hypot(p.x-wx,p.y-wy)<road/2+35))ripples.push({x,y,phase:rand()*TAU})
+ }
+ overpass=routeOrder[idx]%3===0||routeOrder[idx]>=22?at(sites[1][0]):null;
+ if(overpass){
+  c.save();c.translate(overpass.x,overpass.y);c.rotate(overpass.a+.21);
+  c.fillStyle='#786e60';c.fillRect(-43,-450,86,900);c.fillStyle='#58595c';c.fillRect(-36,-450,72,900);
+  for(let y=-440;y<450;y+=29){c.fillStyle='#cfbd8b';c.fillRect(-1,y,2,14)}
+  c.restore()
+ }
+ for(const [s,type] of sites)if(type==='bridge'||!overpass)crossing(c,s,type,false);
  c.lineJoin='round';line(c,track,grit([177,149,112],77),road+36,true);line(c,track,'#ece2d2',road+4,true);line(c,track,grit(season()===3?[177,188,193]:[100,97,96],32),road,true);
  if(season()===3)for(const [a,b] of [[.17,.31],[.58,.73]]){const pts=[];for(let s=a*length;s<b*length;s+=6)pts.push(at(s));line(c,pts,grit([156,184,201],16),road-2);for(let i=0;i<100;i++){let s=(a+rand()*(b-a))*length,l=(rand()-.5)*(road-14);line(c,[at(s,l),at(s+12+rand()*12,l+1)],'#e8fcff65',1.2)}}
  // The inner shoulder follows the signed bend, including both halves of a chicane.
@@ -181,7 +245,7 @@ function buildScene(){
  line(c,[at(s,edge),at(s+7.4,edge)],'#edece7',12);
  line(c,[at(s,edge-5*side),at(s+1.5,edge+5*side)],'#9e9e9a',1.7)}
  for(let s=75;s<length;s+=330){let bend=delta(at(s+100).a,at(s).a);if(Math.abs(bend)<.08)continue;let lane=-Math.sign(bend)*(road/2+13);const pts=[];for(let j=0;j<=135;j+=9){let p=at(s+j,lane);pts.push(p);if(j%27===0){c.fillStyle='#554e45';c.fillRect(p.x-2,p.y-2,5,5)}}line(c,pts,'#4e4944',5);line(c,pts,'#d6d3c6',2)}
- for(const [s,type] of sites)crossing(c,s,type,true);
+ for(const [s,type] of sites)if(type==='bridge'||!overpass)crossing(c,s,type,true);
  let p=at(0);c.save();c.translate(p.x,p.y);c.rotate(p.a);for(let i=0;i<2;i++)for(let j=0;j<18;j++){c.fillStyle=(i+j)%2?'#3c3d3b':'#eeeade';c.fillRect(i*7,-road/2+j*road/18,7,road/18+.35)}c.restore();
 }
 function mini(canvas,live){let c=canvas.getContext('2d'),w=canvas.width,h=canvas.height,[x,y,X,Y]=mapBounds,k=Math.min((w-24)/(X-x),(h-20)/(Y-y)),ox=(w-(X-x)*k)/2,oy=(h-(Y-y)*k)/2;
@@ -208,8 +272,8 @@ function recoverCar(){
  }
 }
 function begin(){
- resetInput();lapTimes=[];$('finishCard').hidden=true;hitTime=-1;audioStart();makeTrack();buildScene();clock=0;count=3;particles=[];sessionBest=Infinity;lastLap=0;lapStart=0;record=Infinity;try{record=Number(localStorage.getItem('midnight-manual-1-'+idx))||Infinity}catch{}
- cars=[];for(let i=0;i<(mode===2?1:12);i++){let slot=i===0?5:i<=5?i-1:i,s=mode===2?0:-(Math.floor(slot/2)+1)*48;cars.push({s,l:mode===2?0:(slot%2?34:-34),v:mode===2?235:0,yaw:0,grip:0,lap:0,id:i,base:174+(i*17%37),decisionAt:.20+i*.055,steer:0,gas:false,brake:false,done:false,finishTime:0})}
+ resetInput();lapTimes=[];$('finishCard').hidden=true;hitTime=-1;audioStart();makeTrack();buildScene();clock=0;count=3;particles=[];sessionBest=Infinity;lastLap=0;lapStart=0;record=Infinity;try{record=Number(localStorage.getItem('midnight-manual-1-'+routeOrder[idx]))||Infinity}catch{}
+ cars=[];for(let i=0;i<(mode===2?1:12);i++){let slot=i===0?5:i<=5?i-1:i,s=mode===2?0:-(Math.floor(slot/2)+1)*48;cars.push({s,l:mode===2?0:(slot%2?34:-34),v:mode===2?235:0,yaw:0,grip:0,lap:0,id:i,skill:(i*7%11)/10,base:182+4*(i*7%11),decisionAt:.20+i*.055,steer:0,gas:false,brake:false,done:false,finishTime:0})}
  for(const car of cars){
   const spawn=at(car.s,car.l);
   Object.assign(car,{x:spawn.x,y:spawn.y,heading:spawn.a,wheel:0,vx:car.v*Math.cos(spawn.a),vy:car.v*Math.sin(spawn.a)});
@@ -254,10 +318,10 @@ function resume(){if(state!=='paused')return;audioStart();state=previous;last=0;
 function position(car){return 1+cars.filter(b=>b!==car&&(car.done?b.done&&b.finishTime<car.finishTime:b.done||b.s>car.s)).length}
 function chooseInputs(car,traction){
  if(clock<car.decisionAt)return;
- car.decisionAt=clock+.16+(car.id%4)*.035;
+ car.decisionAt=clock+.22-.095*car.skill;
  const ahead=54+car.v*.30;
  const bend=Math.abs(delta(at(car.s+ahead+48).a,at(car.s+14).a));
- let goal=clamp(car.base*(.85+.15*traction)-bend*85,88,car.base);
+ let goal=clamp(car.base*(.85+.15*traction)-bend*(89-15*car.skill),88,car.base);
  let lane=(car.id%3-1)*28+Math.sin(clock*.45+car.id)*5;
  for(const rival of cars){
   if(rival===car||rival.done)continue;
@@ -270,7 +334,7 @@ function chooseInputs(car,traction){
  const error=delta(Math.atan2(target.y-car.y,target.x-car.x),car.heading);
  car.steer=clamp(error*1.85,-1,1);
  car.gas=car.v<goal;
- car.brake=car.v>goal+14;
+ car.brake=car.v>goal+16-6*car.skill;
 }
 function update(dt){
  if(state==='count'){let oldCount=Math.ceil(count);count-=dt;if(Math.ceil(count)!==oldCount)tone(count<=0?980:540,.12,.35);if(count<=0){state='race';goTime=.7}return}if(state!=='race')return;
@@ -284,7 +348,7 @@ function update(dt){
  }
  contacts();
  for(const car of cars){if(car.done)continue;const me=car===player;
- const lap=Math.max(0,Math.floor(car.s/length));if(lap>car.lap){car.lap=lap;if(me){const crossed=clock-clamp((car.s-lap*length)/Math.max(1,car.v),0,dt);lastLap=crossed-lapStart;lapStart=crossed;lapTimes.push(lastLap);sessionBest=Math.min(sessionBest,lastLap);if(mode===2&&lastLap<record){record=lastLap;try{localStorage.setItem('midnight-manual-1-'+idx,record)}catch{}}}}
+ const lap=Math.max(0,Math.floor(car.s/length));if(lap>car.lap){car.lap=lap;if(me){const crossed=clock-clamp((car.s-lap*length)/Math.max(1,car.v),0,dt);lastLap=crossed-lapStart;lapStart=crossed;lapTimes.push(lastLap);sessionBest=Math.min(sessionBest,lastLap);if(mode===2&&lastLap<record){record=lastLap;try{localStorage.setItem('midnight-manual-1-'+routeOrder[idx],record)}catch{}}}}
  if(car.s>=targetLaps*length){car.done=true;car.finishTime=clock-clamp((car.s-targetLaps*length)/Math.max(1,car.v),0,dt)}
  }
  particles=particles.filter(p=>(p.t+=dt)<.83);for(let p of particles){p.x+=p.dx*dt;p.y+=p.dy*dt}
@@ -298,7 +362,7 @@ function draw(){
  let w=board.width,h=board.height,sz=Math.min(w/740,h/510);if(innerWidth<innerHeight)sz=w/470;
  const tx=w/2-cam.x*sz,ty=h/2-cam.y*sz;
  g.setTransform(sz,0,0,sz,tx,ty);let left=-tx/sz,top=-ty/sz,ww=w/sz,hh=h/sz;
- g.fillStyle=terrainPattern;g.fillRect(left,top,ww,hh);g.drawImage(scene,0,0);g.drawImage(marks,0,0);
+ g.fillStyle=terrainPattern;g.fillRect(left,top,ww,hh);g.drawImage(scene,0,0);drawWater(performance.now()/1000);g.drawImage(marks,0,0);
  const visible=cars.filter(c=>!c.done||c===player).map(c=>({...carPose(c),car:c})).filter(p=>p.x>left-260&&p.x<left+ww+260&&p.y>top-260&&p.y<top+hh+260);
  for(let p of visible){let c=p.car;g.save();g.translate(p.x,p.y);g.rotate(p.a+c.yaw);g.fillStyle='#17131665';g.beginPath();g.ellipse(-1,3,23,11,0,0,TAU);g.fill();g.drawImage(sprites[c.id],-23,-11.5,46,23);g.restore()}
  for(let p of particles){let r=4+13*p.t,alpha=(1-p.t/.83)*.36;let grad=g.createRadialGradient(p.x,p.y,0,p.x,p.y,r);grad.addColorStop(0,'rgba(235,231,225,'+alpha+')');grad.addColorStop(1,'rgba(235,231,225,0)');g.fillStyle=grad;g.fillRect(p.x-r,p.y-r,r*2,r*2)}
@@ -306,6 +370,7 @@ function draw(){
  for(const p of visible){l.save();l.translate(p.x,p.y);l.rotate(p.a+p.car.yaw);for(let side of [-1,1])l.drawImage(beam,16,side*7-75);l.restore()}
  g.setTransform(1,0,0,1,0,0);g.drawImage(lightLayer,0,0);g.setTransform(sz,0,0,sz,tx,ty);
  for(const p of visible){g.save();g.translate(p.x,p.y);g.rotate(p.a+p.car.yaw);g.globalAlpha=.17;for(let side of [-1,1])g.drawImage(beam,17,side*7-75);g.globalAlpha=1;for(let side of [-1,1]){g.fillStyle='#ffedaf';g.fillRect(18,side*7-2,3,4);g.shadowBlur=8;g.shadowColor='#ff3730';g.fillStyle='#ff4136';g.fillRect(-21,side*7-2,3,4);g.shadowBlur=0}g.restore()}}
+ drawOverpass();
  let p=carPose(player);g.fillStyle='#25f8d4';g.strokeStyle='#113f3d';g.lineWidth=1.2;g.beginPath();g.moveTo(p.x,p.y-19);g.lineTo(p.x-5.5,p.y-29);g.lineTo(p.x+5.5,p.y-29);g.closePath();g.fill();g.stroke();
  $('rank').textContent=mode===2?'TIDJAKT':position(player)+'/12';$('laps').textContent='VARV '+Math.min(mode===1?1:3,player.lap+1)+'/'+(mode===1?1:3);$('timer').textContent=fmt(mode===2?clock-lapStart:clock);$('speed').textContent=Math.round(player.v*.6)+' km/h'+(mode===2&&isFinite(record)?' · Rekord '+fmt(record):'');$('notice').textContent=state==='count'?Math.ceil(count):goTime>0?'KÖR!':'';mini($('map'),true);motor()
 }
