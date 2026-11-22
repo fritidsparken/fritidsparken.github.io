@@ -14,18 +14,37 @@ function seasonalTile(){
  else{d[i]=r*.88;d[i+1]=v*1.17+7;d[i+2]=b*1.1+3}}
  c.putImageData(im,0,0)}terrainPattern=g.createPattern(texture,'repeat');return texture
 }
-function stretch(s,r,l=0){let pts=[];for(let d=-r;d<=r;d+=5)pts.push(at(s+d,l));return pts}
-function crossing(c,s,type,deck){
+function stretch(s,r,l=0){const pts=[],n=Math.ceil(2*r/5);for(let i=0;i<=n;i++)pts.push(at(s-r+2*r*i/n,l));return pts}
+function crossing(c,s,type,deck,asphalt,extent=440,local=false){
  const span=type==='bridge'?126:102,p=at(s);
- if(!deck){c.save();c.translate(p.x,p.y);c.rotate(p.a+.18);if(type==='bridge'){
+ if(!deck){c.save();if(!local){c.translate(p.x,p.y);c.rotate(p.a+.18)}if(type==='bridge'){
  let water=c.createLinearGradient(-100,0,100,0);['#707554','#334941','#284e55','#447b80','#295360','#757966'].forEach((v,i)=>water.addColorStop(i/5,v));
  c.fillStyle=water;c.beginPath();for(let side of [-1,1])for(let j=0;j<=60;j++){let y=(side<0?j:60-j)*14-420;let bank=Math.sqrt(Math.max(0,1-Math.pow(y/420,4)));let x=side*bank*(77+12*Math.sin(y*.015))+20*Math.sin(y*.009);if(side===-1&&j===0)c.moveTo(x,y);else c.lineTo(x,y)}c.closePath();c.fill();c.strokeStyle='#9dd6cd70';c.lineWidth=1;for(let j=0;j<190;j++){let y=Math.sin(j*64.3)*402,x=Math.sin(j*31.7)*57*Math.sqrt(Math.max(0,1-Math.pow(y/420,4)))+20*Math.sin(y*.009);c.beginPath();c.moveTo(x,y);c.lineTo(x+1,y+4+j%10);c.stroke()}
- }else{c.fillStyle='#766d60';c.fillRect(-25,-410,50,820);for(let y=-410;y<410;y+=12){c.fillStyle='#554a41';c.fillRect(-19,y,38,5)}for(let x of [-12,12]){c.fillStyle='#c4c3bb';c.fillRect(x,-410,3,820)}}c.restore();return}
- const pts=stretch(s,span);line(c,pts.map(p=>({x:p.x+9,y:p.y+13})),'#15212778',road+20);
- line(c,pts,'#555552',road+15);line(c,pts,season()===3?'#adb7be':'#747576',road);
- for(let d=-span;d<=span;d+=28){line(c,[at(s+d,-road/2),at(s+d,road/2)],'#353e443b',1.4)}
- for(let side of [-1,1]){let rail=stretch(s,span,side*(road/2+3));line(c,rail,'#535955',6);line(c,rail,'#e4e1cc',2);
- for(let d=-span;d<=span;d+=20){let a=at(s+d,side*(road/2+5)),b=at(s+d,side*(road/2+9));line(c,[a,b],'#555957',4)}}
+ }else{
+  // Fade the railway into the woodland instead of leaving square ends.
+  const bed=c.createLinearGradient(0,-extent,0,extent);
+  for(const [t,color] of [[0,'#766d6000'],[.12,'#766d60'],[.88,'#766d60'],[1,'#766d6000']])bed.addColorStop(t,color);
+  c.strokeStyle=bed;c.lineWidth=58;c.beginPath();c.moveTo(0,-extent);c.lineTo(0,extent);c.stroke();
+  for(let y=-extent;y<extent;y+=13){c.globalAlpha=clamp((extent-Math.abs(y))/75,0,1);c.fillStyle='#554c42';c.fillRect(-20,y,40,5)}
+  for(let x of [-13,13]){const rail=c.createLinearGradient(0,-extent,0,extent);for(const [t,color] of [[0,'#a7aaa100'],[.12,'#a7aaa1'],[.88,'#a7aaa1'],[1,'#a7aaa100']])rail.addColorStop(t,color);c.globalAlpha=1;c.fillStyle=rail;c.fillRect(x,-extent,2.5,extent*2)}
+ }c.restore();return}
+ c.save();c.lineCap='butt';
+ const pts=stretch(s,span);line(c,pts.map(p=>({x:p.x+8,y:p.y+12})),'#15212768',road+24);
+ // The deck keeps the same asphalt as its approaches; only the masonry changes.
+ line(c,pts,'#66675f',road+18);line(c,pts,'#b4b2a0',road+8);line(c,pts,asphalt,road);
+ for(const d of [-span+2,span-2])line(c,[at(s+d,-road/2+4),at(s+d,road/2-4)],'#343d4140',1.3);
+ for(const side of [-1,1]){
+  const rail=stretch(s,span,side*(road/2+5));line(c,rail,'#424b48',8);line(c,rail,'#b0b0a0',4);
+  for(let d=-span+12;d<span;d+=27){
+   line(c,[at(s+d,side*(road/2+3)),at(s+d,side*(road/2+8))],'#656c62',2);
+  }
+  for(const d of [-span,span]){
+   const q=at(s+d,side*(road/2+10));c.save();c.translate(q.x,q.y);c.rotate(q.a);
+   c.fillStyle='#28352d50';c.fillRect(-7,1,20,18);c.fillStyle='#747970';c.fillRect(-9,-8,18,16);
+   c.fillStyle=season()===3?'#d4dcda':'#b5b4a3';c.fillRect(-9,-8,18,3);c.restore();
+  }
+ }
+ c.restore();
 }
 let ac,engine,engineVol,master,music,soundOn=true;
 let loadingMotor=false,gear=0;
@@ -62,22 +81,42 @@ function motor(){
 function carPose(car){
  return {x:car.x,y:car.y,a:car.heading-car.yaw}
 }
-// Projection only measures race progress and track boundaries.
-function locate(car){
- const step=length/track.length,center=Math.floor(car.s/step);
+// Stay on the same stretch of road. A close bend must not award distant progress.
+function locate(car,origin=car.s,reach=0){
+ const step=length/track.length,low=origin-reach,high=origin+reach;
  let best=Infinity;
- for(let i=center-14;i<=center+14;i++){
+ for(let i=Math.floor(low/step);i<=Math.floor(high/step);i++){
   const p=track[wrap(i,track.length)],q=track[wrap(i+1,track.length)];
   const dx=q.x-p.x,dy=q.y-p.y,xx=car.x-p.x,yy=car.y-p.y;
-  const t=clamp((xx*dx+yy*dy)/(dx*dx+dy*dy),0,1),rx=xx-t*dx,ry=yy-t*dy,d=rx*rx+ry*ry;
+  const t=clamp((xx*dx+yy*dy)/(dx*dx+dy*dy),Math.max(0,low/step-i),Math.min(1,high/step-i));
+  const rx=xx-t*dx,ry=yy-t*dy,d=rx*rx+ry*ry;
   if(d>=best)continue;
   best=d;car.s=(i+t)*step;car.normal=p.a+delta(q.a,p.a)*t+Math.PI/2;
   car.l=rx*Math.cos(car.normal)+ry*Math.sin(car.normal)
  }
  car.yaw=delta(car.heading,car.normal-Math.PI/2)
 }
+function containCar(car,origin,reach){
+ locate(car,origin,reach);
+ // Mosshöjden's continuous rails contain the whole body, including its rotation.
+ // Preserve the established verge allowance on the other circuits.
+ const body=11.5*Math.abs(Math.cos(car.yaw))+23*Math.abs(Math.sin(car.yaw));
+ const edge=routeOrder[idx]===7?road/2+7-body:road/2+4,excess=Math.abs(car.l)-edge;
+ if(excess>0){
+  const nx=Math.sign(car.l)*Math.cos(car.normal),ny=Math.sign(car.l)*Math.sin(car.normal);
+  const outward=Math.max(0,car.vx*nx+car.vy*ny);
+  car.vx-=nx*outward;car.vy-=ny*outward;
+  car.l=clamp(car.l,-edge,edge)
+ }
+ // Preserve free world-space motion unless a boundary actually needs correction.
+ // Clamping the progress window must also remove its tangential overshoot.
+ if(excess>0||Math.abs(car.s-origin)>=reach-.0001){
+  const p=at(car.s,car.l);car.x=p.x;car.y=p.y
+ }
+ car.v=Math.hypot(car.vx,car.vy)
+}
 function drive(car,dt,steer,traction,brake,gas){
- const speed=Math.hypot(car.vx,car.vy);
+ const speed=Math.hypot(car.vx,car.vy),origin=car.s;
  car.wheel+=(steer-car.wheel)*(1-Math.exp(-(steer?5.4:10)*dt));
  const forward=car.vx*Math.cos(car.heading)+car.vy*Math.sin(car.heading);
  const direction=forward<-.5?-1:1;
@@ -95,18 +134,13 @@ function drive(car,dt,steer,traction,brake,gas){
  const gripLimit=356,mag=Math.hypot(along,side);
  const limit=Math.max(gripLimit,speed-75*dt),scale=Math.min(1,limit/Math.max(.001,mag));
  car.vx=(fx*along-fy*side)*scale;car.vy=(fy*along+fx*side)*scale;
- car.x+=car.vx*dt;car.y+=car.vy*dt;locate(car);
- const excess=Math.abs(car.l)-(road/2+4);
- if(excess>0){
-  const nx=Math.sign(car.l)*Math.cos(car.normal),ny=Math.sign(car.l)*Math.sin(car.normal);
-  car.x-=nx*excess;car.y-=ny*excess;
-  const outward=Math.max(0,car.vx*nx+car.vy*ny);
-  car.vx-=nx*outward;car.vy-=ny*outward;locate(car)
- }
- car.v=Math.hypot(car.vx,car.vy)
+ car.x+=car.vx*dt;car.y+=car.vy*dt;
+ containCar(car,origin,2*Math.hypot(car.vx,car.vy)*dt)
 }
 
 function contacts(){
+ // All solver passes share one origin so repeated pushes cannot ratchet progress.
+ const origins=cars.map(c=>({s:c.s,x:c.x,y:c.y}));
  for(let pass=0;pass<8;pass++){let changed=false;
  for(let i=0;i<cars.length;i++)for(let j=i+1;j<cars.length;j++){
  const a=cars[i],b=cars[j];if(a.done||b.done||Math.abs(wrap(a.s-b.s+length/2,length)-length/2)>100)continue;
@@ -120,7 +154,6 @@ function contacts(){
  const separation=(penetration+.12)*.5;
  a.x-=nx*separation;a.y-=ny*separation;
  b.x+=nx*separation;b.y+=ny*separation;
- locate(a);locate(b);
  if(pass===0){
  const rel=(a.vx-b.vx)*nx+(a.vy-b.vy)*ny;
  if(rel>0){
@@ -129,6 +162,10 @@ function contacts(){
  b.vx+=nx*impulse;b.vy+=ny*impulse;
  a.v=Math.hypot(a.vx,a.vy);b.v=Math.hypot(b.vx,b.vy);
  if((a===player||b===player)&&rel>18&&clock-hitTime>.18){tone(90,.14,.65,'triangle');hitTime=clock}}}
+ for(const [car,index] of [[a,i],[b,j]]){
+  const start=origins[index],travel=Math.hypot(car.x-start.x,car.y-start.y);
+  containCar(car,start.s,Math.min(46,2*travel))
+ }
  }if(!changed)break}
 }
 
@@ -169,7 +206,8 @@ function makeTrack(){
  const nodes=[];
  anchors.forEach((p,i)=>{
   nodes.push(p);
-  if(route>=22||!sectors.has(i))return;
+  // Mosshöjden's broad loop needs a clear inside edge through its eastern bend.
+  if(route===7||route>=22||!sectors.has(i))return;
   const q=anchors[(i+1)%anchors.length],dx=q.x-p.x,dy=q.y-p.y,L=Math.hypot(dx,dy);
   const shape=(i+route)%3, amplitude=Math.min(70,L*(.080+.008*shape))*((i+route)%2?1:-1);
   const gates=L>740&&shape===0?[[.24,.85],[.51,-.82],[.78,.72]]:
@@ -191,7 +229,63 @@ function makeTrack(){
 function delta(a,b){return Math.atan2(Math.sin(a-b),Math.cos(a-b))}
 function at(s,l=0){let k=wrap(s,length)*track.length/length,i=Math.floor(k),p=track[i],q=track[(i+1)%track.length],t=k-i,a=p.a+delta(q.a,p.a)*t;return{x:p.x+(q.x-p.x)*t-Math.sin(a)*l,y:p.y+(q.y-p.y)*t+Math.cos(a)*l,a}}
 function line(ctx,points,color,width,close=false){ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));if(close)ctx.closePath();ctx.lineWidth=width;ctx.strokeStyle=color;ctx.stroke()}
-let riverPose,ripples=[],overpass;
+let riverPose,ripples=[],overpass,crossingGround=[];
+const overpassSpan=162,overpassExtent=540;
+function sideRoadX(y,extent=overpassExtent){const t=Math.max(0,Math.abs(y)-overpassSpan)/(extent-overpassSpan);return Math.sign(y)*52*t*t}
+function crossingSite(preferred,extent,avoid,maxBend=.32){
+ // Fit structures to a straight, isolated stretch rather than a fixed lap fraction.
+ let best=null,bestScore=Infinity;
+ for(let i=0;i<250;i++){
+  const offset=i?Math.ceil(i/2)*length*.004*(i%2?1:-1):0,s=wrap(preferred+offset,length),p=at(s);
+  const bend=Math.max(...[-150,-75,75,150].map(d=>Math.abs(delta(at(s+d).a,p.a))));
+  if(bend>maxBend||p.x<230||p.x>W-230||p.y<230||p.y>H-230)continue;
+  if(avoid&&Math.hypot(p.x-avoid.x,p.y-avoid.y)<660)continue;
+  const a=p.a+.21,cs=Math.cos(a),sn=Math.sin(a);let clear=true;
+  for(let j=0;j<track.length;j+=5){
+   const gap=Math.abs(wrap(j*length/track.length-s+length/2,length)-length/2);
+   if(gap<180)continue;
+   const dx=track[j].x-p.x,dy=track[j].y-p.y,x=dx*cs+dy*sn,y=-dx*sn+dy*cs;
+   if(Math.abs(y)<extent+road/2+25&&Math.abs(x-sideRoadX(y,extent))<road/2+75){clear=false;break}
+  }
+  if(!clear)continue;
+  const score=bend*500+Math.abs(offset)*.12;
+  if(score<bestScore){best={s,...p,extent};bestScore=score}
+ }
+ return best;
+}
+function overpassFootprint(c){
+ const cs=Math.cos(overpass.angle),sn=Math.sin(overpass.angle);
+ for(const [i,[x,y]] of [[-49,-overpassSpan],[49,-overpassSpan],[49,overpassSpan],[-49,overpassSpan]].entries()){
+  const X=overpass.x+x*cs-y*sn,Y=overpass.y+x*sn+y*cs;i?c.lineTo(X,Y):c.moveTo(X,Y);
+ }
+ c.closePath();
+}
+function paintCrossingGround(c,feature){
+ c.save();c.translate(feature.x,feature.y);c.rotate(feature.angle);
+ c.drawImage(feature.image,-feature.image.width/2,-feature.image.height/2);c.restore();
+}
+function buildOverpass(c,asphalt){
+ const extent=overpass.extent,height=extent*2+32,approach=surface(240,height),a=approach.getContext('2d');
+ a.translate(120,height/2);a.lineJoin='round';a.lineCap='round';
+ const points=[];for(let y=-extent;y<=extent;y+=6)points.push({x:sideRoadX(y,extent),y});
+ line(a,points,season()===3?'#c0c7bd':'#776f55',118);
+ line(a,points,'#777a70',98);line(a,points,'#aaa99a',86);line(a,points,asphalt,78);
+ a.setLineDash([17,23]);line(a,points,'#d6cbaa',1.6);a.setLineDash([]);
+ // Soft shoulders disappear into the existing woodland, with no cut-off road slab.
+ a.globalCompositeOperation='destination-in';const fade=a.createLinearGradient(0,-extent,0,extent);
+ for(const [t,alpha] of [[0,0],[.14,1],[.86,1],[1,0]])fade.addColorStop(t,'rgba(0,0,0,'+alpha+')');
+ a.fillStyle=fade;a.fillRect(-120,-height/2,240,height);
+ crossingGround.push({x:overpass.x,y:overpass.y,angle:overpass.angle,image:approach});
+ c.save();c.translate(overpass.x,overpass.y);c.rotate(overpass.angle);c.drawImage(approach,-120,-height/2);
+ // Abutments sit outside the playable road and support the continuous deck.
+ for(const y of [-116,116]){
+  c.fillStyle='#15221f65';c.fillRect(-54,y-6,120,30);
+  c.fillStyle='#626b61';c.fillRect(-55,y-12,110,24);
+  c.fillStyle=season()===3?'#c7d0cb':'#a0a18e';c.fillRect(-55,y-12,110,5);
+  c.strokeStyle='#414d4380';c.lineWidth=1;for(let x=-40;x<55;x+=18){c.beginPath();c.moveTo(x,y-7);c.lineTo(x,y+12);c.stroke()}
+ }
+ c.restore();overpass.asphalt=asphalt;
+}
 function drawWater(time){
  if(!riverPose||Math.hypot(cam.x-riverPose.x,cam.y-riverPose.y)>1500)return;
  g.save();g.translate(riverPose.x,riverPose.y);g.rotate(riverPose.a+.18);
@@ -205,23 +299,32 @@ function drawWater(time){
 }
 function drawOverpass(){
  if(!overpass||Math.hypot(cam.x-overpass.x,cam.y-overpass.y)>1200)return;
- g.save();g.translate(overpass.x,overpass.y);g.rotate(overpass.a+.21);
- g.fillStyle='#060a108a';g.fillRect(-25,-185,81,383);
- g.fillStyle='#454e56';g.fillRect(-42,-190,84,380);
- g.fillStyle='#292e39';g.fillRect(-36,-190,72,380);
- g.strokeStyle='#ddc68f';g.setLineDash([14,15]);g.beginPath();g.moveTo(0,-190);g.lineTo(0,190);g.stroke();g.setLineDash([]);
- for(const x of [-39,39]){
-  g.fillStyle='#738594';g.fillRect(x-1,-190,3,380);
-  for(let y=-176;y<=176;y+=44){g.fillStyle='#ffe4a0';g.fillRect(x-2,y,4,5)}
+ g.save();g.translate(overpass.x,overpass.y);g.rotate(overpass.angle);
+ // Cast shade beside the deck, never a dark cap across its own approach asphalt.
+ g.fillStyle='#111e205c';g.fillRect(49,-overpassSpan+12,16,overpassSpan*2-12);
+ g.fillStyle='#414b45';g.fillRect(-49,-overpassSpan,98,overpassSpan*2);
+ g.fillStyle='#aaa99a';g.fillRect(-43,-overpassSpan,86,overpassSpan*2);
+ g.fillStyle=overpass.asphalt;g.fillRect(-39,-overpassSpan,78,overpassSpan*2);
+ g.lineWidth=1.6;g.strokeStyle='#d6cbaa';g.setLineDash([17,23]);g.lineDashOffset=overpass.extent-overpassSpan;
+ g.beginPath();g.moveTo(0,-overpassSpan);g.lineTo(0,overpassSpan);g.stroke();g.setLineDash([]);
+ for(const x of [-45,45]){
+  g.fillStyle='#535e55';g.fillRect(x-4,-overpassSpan,8,overpassSpan*2);
+  g.fillStyle=season()===3?'#d0d8d2':'#b1b19e';g.fillRect(x-2,-overpassSpan,3,overpassSpan*2);
+  for(let y=-overpassSpan+10;y<overpassSpan;y+=28){g.fillStyle='#727b6d';g.fillRect(x-4,y,8,1.4)}
  }
  g.restore()
 }
 function buildScene(){
  scene ||= surface(W,H);let c=scene.getContext('2d');marks ||= surface(W,H);marks.getContext('2d').clearRect(0,0,W,H);ink=marks.getContext('2d');
+ crossingGround=[];
  c.fillStyle=c.createPattern(seasonalTile(),'repeat');c.fillRect(0,0,W,H);
  let seed=routeOrder[idx]+21;const rand=()=>((seed=Math.imul(seed,1664525)+1013904223>>>0)/4294967296);
  function grit(base,amount){let tile=surface(144,144),v=tile.getContext('2d'),im=v.createImageData(144,144);for(let i=0;i<im.data.length;i+=4){let n=(rand()-.5)*amount;for(let j=0;j<3;j++)im.data[i+j]=base[j]+n;im.data[i+3]=255}v.putImageData(im,0,0);return c.createPattern(tile,'repeat')}
- const sites=[[length*(.14+.014*(idx%6)),'bridge'],[length*(.55+.018*(idx%5)),'viaduct']];riverPose=at(sites[0][0]);ripples=[];
+ const asphalt=grit(season()===3?[177,188,193]:[100,97,96],32);
+ const riverAt=length*(.14+.014*(idx%6)),riverSite=crossingSite(riverAt,420)||{s:riverAt,...at(riverAt)};
+ const upperAt=length*(.55+.018*(idx%5)),wantsOverpass=routeOrder[idx]%3===0||routeOrder[idx]>=22;
+ const upperSite=crossingSite(upperAt,wantsOverpass?540:440,riverSite)||crossingSite(upperAt,340,riverSite)||crossingSite(upperAt,340,riverSite,.4);
+ const sites=[[riverSite.s,'bridge',420]];if(upperSite)sites.push([upperSite.s,'viaduct',upperSite.extent]);riverPose=at(riverSite.s);ripples=[];
  const angle=riverPose.a+.18,cs=Math.cos(angle),sn=Math.sin(angle);
  for(let i=0;i<380;i++){
   const y=rand()*790-395,bank=Math.sqrt(1-(y/420)**4)*(77+12*Math.sin(y*.015));
@@ -229,15 +332,14 @@ function buildScene(){
   const wx=riverPose.x+x*cs-y*sn,wy=riverPose.y+x*sn+y*cs;
   if(!track.some(p=>Math.hypot(p.x-wx,p.y-wy)<road/2+35))ripples.push({x,y,phase:rand()*TAU})
  }
- overpass=routeOrder[idx]%3===0||routeOrder[idx]>=22?at(sites[1][0]):null;
- if(overpass){
-  c.save();c.translate(overpass.x,overpass.y);c.rotate(overpass.a+.21);
-  c.fillStyle='#786e60';c.fillRect(-43,-450,86,900);c.fillStyle='#58595c';c.fillRect(-36,-450,72,900);
-  for(let y=-440;y<450;y+=29){c.fillStyle='#cfbd8b';c.fillRect(-1,y,2,14)}
-  c.restore()
+ overpass=wantsOverpass&&upperSite?{...upperSite,angle:upperSite.a+.21}:null;
+ if(overpass)buildOverpass(c,asphalt);
+ for(const [s,type,extent] of sites)if(type==='bridge'||!overpass){
+  const p=at(s),image=surface(280,2*(Math.max(420,extent)+20)),context=image.getContext('2d');
+  context.translate(image.width/2,image.height/2);crossing(context,s,type,false,asphalt,extent,true);
+  const feature={x:p.x,y:p.y,angle:p.a+.18,image};crossingGround.push(feature);paintCrossingGround(c,feature);
  }
- for(const [s,type] of sites)if(type==='bridge'||!overpass)crossing(c,s,type,false);
- c.lineJoin='round';line(c,track,grit([177,149,112],77),road+36,true);line(c,track,'#ece2d2',road+4,true);line(c,track,grit(season()===3?[177,188,193]:[100,97,96],32),road,true);
+ c.lineJoin='round';line(c,track,grit([177,149,112],77),road+36,true);line(c,track,'#ece2d2',road+4,true);line(c,track,asphalt,road,true);
  if(season()===3)for(const [a,b] of [[.17,.31],[.58,.73]]){const pts=[];for(let s=a*length;s<b*length;s+=6)pts.push(at(s));line(c,pts,grit([156,184,201],16),road-2);for(let i=0;i<100;i++){let s=(a+rand()*(b-a))*length,l=(rand()-.5)*(road-14);line(c,[at(s,l),at(s+12+rand()*12,l+1)],'#e8fcff65',1.2)}}
  // The inner shoulder follows the signed bend, including both halves of a chicane.
  for(let s=0;s<length;s+=7){const curve=delta(at(s+24).a,at(s-24).a)/48;
@@ -245,7 +347,12 @@ function buildScene(){
  line(c,[at(s,edge),at(s+7.4,edge)],'#edece7',12);
  line(c,[at(s,edge-5*side),at(s+1.5,edge+5*side)],'#9e9e9a',1.7)}
  for(let s=75;s<length;s+=330){let bend=delta(at(s+100).a,at(s).a);if(Math.abs(bend)<.08)continue;let lane=-Math.sign(bend)*(road/2+13);const pts=[];for(let j=0;j<=135;j+=9){let p=at(s+j,lane);pts.push(p);if(j%27===0){c.fillStyle='#554e45';c.fillRect(p.x-2,p.y-2,5,5)}}line(c,pts,'#4e4944',5);line(c,pts,'#d6d3c6',2)}
- for(const [s,type] of sites)if(type==='bridge'||!overpass)crossing(c,s,type,true);
+ if(routeOrder[idx]===7)for(const side of [-1,1]){
+  const rail=[];for(let s=0;s<length;s+=8)rail.push(at(s,side*(road/2+10)));
+  line(c,rail,'#434c40',5,true);line(c,rail,'#b8bdb0',2,true);
+  for(let s=0;s<length;s+=38){const p=at(s,side*(road/2+12));c.fillStyle='#626c59';c.fillRect(p.x-2,p.y-2,4,4)}
+ }
+ for(const [s,type,extent] of sites)if(type==='bridge'||!overpass)crossing(c,s,type,true,asphalt,extent);
  let p=at(0);c.save();c.translate(p.x,p.y);c.rotate(p.a);for(let i=0;i<2;i++)for(let j=0;j<18;j++){c.fillStyle=(i+j)%2?'#3c3d3b':'#eeeade';c.fillRect(i*7,-road/2+j*road/18,7,road/18+.35)}c.restore();
 }
 function mini(canvas,live){let c=canvas.getContext('2d'),w=canvas.width,h=canvas.height,[x,y,X,Y]=mapBounds,k=Math.min((w-24)/(X-x),(h-20)/(Y-y)),ox=(w-(X-x)*k)/2,oy=(h-(Y-y)*k)/2;
@@ -255,8 +362,7 @@ function setupMenu(){idx=Number($('tracks').value);makeTrack();mini($('preview')
  $('modeName').textContent=modes[mode];$('modeIcon').textContent=['⚑','➤','◷'][mode];
  $('desc').textContent=['3 varv mot 11 förare','1 varv mot 11 förare','3 varv mot klockan'][mode]}
 function resetInput(){
- releaseStick();releaseGas();arrowPointers.clear();keys.clear();
- document.querySelectorAll('#arrows button').forEach(b=>b.classList.remove('active'))
+ releaseStick();releaseGas();keys.clear()
 }
 function recoverCar(){
  if(state!=='race'||player.done)return;
@@ -339,7 +445,7 @@ function chooseInputs(car,traction){
 function update(dt){
  if(state==='count'){let oldCount=Math.ceil(count);count-=dt;if(Math.ceil(count)!==oldCount)tone(count<=0?980:540,.12,.35);if(count<=0){state='race';goTime=.7}return}if(state!=='race')return;
  clock+=dt;goTime=Math.max(0,goTime-dt);smokeTick++;let targetLaps=mode===1?1:3;
- for(const car of cars){if(car.done)continue;let old=carPose(car),turn=delta(at(car.s+60).a,old.a)/60,me=car===player,steer=clamp(thumbSteer+Number(keys.has('right')||arrowPointers.has('right'))-Number(keys.has('left')||arrowPointers.has('left')),-1,1),traction=icy(car.s)?.36:season()===3?.68:1,brake=me&&keys.has('brake');
+ for(const car of cars){if(car.done)continue;let old=carPose(car),turn=delta(at(car.s+60).a,old.a)/60,me=car===player,steer=clamp(thumbSteer+Number(keys.has('right'))-Number(keys.has('left')),-1,1),traction=icy(car.s)?.36:season()===3?.68:1,brake=me&&keys.has('brake');
  if(!me){chooseInputs(car,traction);steer=car.steer;brake=car.brake}
  drive(car,dt,steer,traction,brake,me?(keys.has('gas')||gasPointer!==null):car.gas);
  let now=carPose(car);car.grip=car.v>85&&(Math.abs(turn)*car.v*car.v>185||brake&&car.v>180);
@@ -362,15 +468,27 @@ function draw(){
  let w=board.width,h=board.height,sz=Math.min(w/740,h/510);if(innerWidth<innerHeight)sz=w/470;
  const tx=w/2-cam.x*sz,ty=h/2-cam.y*sz;
  g.setTransform(sz,0,0,sz,tx,ty);let left=-tx/sz,top=-ty/sz,ww=w/sz,hh=h/sz;
- g.fillStyle=terrainPattern;g.fillRect(left,top,ww,hh);g.drawImage(scene,0,0);drawWater(performance.now()/1000);g.drawImage(marks,0,0);
+ g.fillStyle=terrainPattern;g.fillRect(left,top,ww,hh);
+ // Continue compact scenery layers beyond the cached map, without square crop seams.
+ if(left<0||top<0||left+ww>W||top+hh>H){
+  g.save();g.beginPath();g.rect(left-100,top-100,ww+200,hh+200);g.rect(0,0,W,H);g.clip('evenodd');
+  for(const feature of crossingGround)paintCrossingGround(g,feature);g.restore();
+ }
+ g.drawImage(scene,0,0);drawWater(performance.now()/1000);g.drawImage(marks,0,0);
  const visible=cars.filter(c=>!c.done||c===player).map(c=>({...carPose(c),car:c})).filter(p=>p.x>left-260&&p.x<left+ww+260&&p.y>top-260&&p.y<top+hh+260);
  for(let p of visible){let c=p.car;g.save();g.translate(p.x,p.y);g.rotate(p.a+c.yaw);g.fillStyle='#17131665';g.beginPath();g.ellipse(-1,3,23,11,0,0,TAU);g.fill();g.drawImage(sprites[c.id],-23,-11.5,46,23);g.restore()}
  for(let p of particles){let r=4+13*p.t,alpha=(1-p.t/.83)*.36;let grad=g.createRadialGradient(p.x,p.y,0,p.x,p.y,r);grad.addColorStop(0,'rgba(235,231,225,'+alpha+')');grad.addColorStop(1,'rgba(235,231,225,0)');g.fillStyle=grad;g.fillRect(p.x-r,p.y-r,r*2,r*2)}
- if(night){const l=lightLayer.getContext('2d');l.setTransform(1,0,0,1,0,0);l.globalCompositeOperation='copy';l.fillStyle='rgba(4,10,31,.86)';l.fillRect(0,0,w,h);l.globalCompositeOperation='destination-out';l.setTransform(sz,0,0,sz,tx,ty);
- for(const p of visible){l.save();l.translate(p.x,p.y);l.rotate(p.a+p.car.yaw);for(let side of [-1,1])l.drawImage(beam,16,side*7-75);l.restore()}
- g.setTransform(1,0,0,1,0,0);g.drawImage(lightLayer,0,0);g.setTransform(sz,0,0,sz,tx,ty);
- for(const p of visible){g.save();g.translate(p.x,p.y);g.rotate(p.a+p.car.yaw);g.globalAlpha=.17;for(let side of [-1,1])g.drawImage(beam,17,side*7-75);g.globalAlpha=1;for(let side of [-1,1]){g.fillStyle='#ffedaf';g.fillRect(18,side*7-2,3,4);g.shadowBlur=8;g.shadowColor='#ff3730';g.fillStyle='#ff4136';g.fillRect(-21,side*7-2,3,4);g.shadowBlur=0}g.restore()}}
+ // The upper deck hides cars beneath it and receives the same night as the forest.
  drawOverpass();
+ if(night){const l=lightLayer.getContext('2d');l.setTransform(1,0,0,1,0,0);l.globalCompositeOperation='copy';l.fillStyle='rgba(4,10,31,.86)';l.fillRect(0,0,w,h);l.globalCompositeOperation='destination-out';l.setTransform(sz,0,0,sz,tx,ty);
+ // Cut headlight openings only in the lower road's lighting layer.
+ l.save();if(overpass){l.beginPath();l.rect(left-300,top-300,ww+600,hh+600);overpassFootprint(l);l.clip('evenodd')}
+ for(const p of visible){l.save();l.translate(p.x,p.y);l.rotate(p.a+p.car.yaw);for(let side of [-1,1])l.drawImage(beam,16,side*7-75);l.restore()}
+ l.restore();
+ g.setTransform(1,0,0,1,0,0);g.drawImage(lightLayer,0,0);g.setTransform(sz,0,0,sz,tx,ty);
+ g.save();if(overpass){g.beginPath();g.rect(left-300,top-300,ww+600,hh+600);overpassFootprint(g);g.clip('evenodd')}
+ for(const p of visible){g.save();g.translate(p.x,p.y);g.rotate(p.a+p.car.yaw);g.globalAlpha=.17;for(let side of [-1,1])g.drawImage(beam,17,side*7-75);g.globalAlpha=1;for(let side of [-1,1]){g.fillStyle='#ffedaf';g.fillRect(18,side*7-2,3,4);g.shadowBlur=8;g.shadowColor='#ff3730';g.fillStyle='#ff4136';g.fillRect(-21,side*7-2,3,4);g.shadowBlur=0}g.restore()}}
+ if(night)g.restore();
  let p=carPose(player);g.fillStyle='#25f8d4';g.strokeStyle='#113f3d';g.lineWidth=1.2;g.beginPath();g.moveTo(p.x,p.y-19);g.lineTo(p.x-5.5,p.y-29);g.lineTo(p.x+5.5,p.y-29);g.closePath();g.fill();g.stroke();
  $('rank').textContent=mode===2?'TIDJAKT':position(player)+'/12';$('laps').textContent='VARV '+Math.min(mode===1?1:3,player.lap+1)+'/'+(mode===1?1:3);$('timer').textContent=fmt(mode===2?clock-lapStart:clock);$('speed').textContent=Math.round(player.v*.6)+' km/h'+(mode===2&&isFinite(record)?' · Rekord '+fmt(record):'');$('notice').textContent=state==='count'?Math.ceil(count):goTime>0?'KÖR!':'';mini($('map'),true);motor()
 }
@@ -398,18 +516,6 @@ stick.onpointerdown=e=>{
 };
 stick.onpointermove=moveStick;
 stick.onpointerup=stick.onpointercancel=stick.onlostpointercapture=e=>{if(e.pointerId===stickPointer)releaseStick()};
-const arrowPointers=new Map();
-for(const b of document.querySelectorAll('#arrows button')){
- const key=b.dataset.k;
- b.onpointerdown=e=>{
-  if(arrowPointers.has(key))return;
-  e.preventDefault();b.setPointerCapture(e.pointerId);arrowPointers.set(key,e.pointerId);b.classList.add('active')
- };
- b.onlostpointercapture=b.onpointercancel=b.onpointerup=e=>{
-  if(arrowPointers.get(key)!==e.pointerId)return;
-  arrowPointers.delete(key);b.classList.remove('active')
- }
-}
 const gasButton=$('gasButton');
 let gasPointer=null;
 function releaseGas(){gasPointer=null;gasButton.classList.remove('active')}
@@ -429,18 +535,7 @@ async function init(){const start=$('start');start.disabled=true;start.textConte
  for(const [id,step] of [['modePrev',-1],['modeNext',1]])$(id).onclick=()=>{mode=wrap(mode+step,modes.length);setupMenu()};
  const touch=navigator.maxTouchPoints>0||matchMedia('(any-pointer:coarse)').matches;
  document.body.classList.toggle('touch-controls',touch);
- let analog=false;
- try{analog=localStorage.getItem('midnight-touch-steering')==='stick'}catch{}
- function showSteering(){
-  document.body.classList.toggle('use-stick',analog);
-  $('steerMode').textContent='Styrning: '+(analog?'joystick':'pilar');
-  $('help').textContent=touch?'Håll Gas med höger tumme. Släpp för att sakta ner.':$('keyboardHelp').textContent
- }
- $('steerMode').onclick=()=>{
-  analog=!analog;showSteering();
-  try{localStorage.setItem('midnight-touch-steering',analog?'stick':'arrows')}catch{}
- };
- showSteering();
+ $('help').textContent=touch?'Styr med joysticken till vänster. Håll Gas med höger tumme. Släpp för att sakta ner.':$('keyboardHelp').textContent;
  $('sound').onclick=()=>{if(waitingForGesture&&soundOn){playTheme(true);return}soundOn=!soundOn;if(soundOn)playTheme(true);else silent();$('sound').textContent=soundOn?'Ljud på':'Ljud av';$('sound').setAttribute('aria-pressed',soundOn)};
  for(let [id,step] of [['prev',-1],['next',1]])$(id).onclick=()=>{$('tracks').value=wrap(idx+step,circuits.length);setupMenu()};
 
