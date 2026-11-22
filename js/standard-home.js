@@ -179,7 +179,7 @@
     if(category==='origami'){
       window.FPGameHub?.stop();
       document.getElementById('catalog').innerHTML='';
-      results.insertAdjacentHTML('beforeend','<div class="std-origami-embed"><iframe id="std-origami-frame" src="/origami/?embedded=1" title="Origamistudion – välj en modell och vik papper" loading="eager" allow="fullscreen"></iframe></div>');
+      results.insertAdjacentHTML('beforeend','<div class="std-origami-embed"><iframe id="std-origami-frame" src="/origami/?embedded=1&amp;v=responsive-20261122" title="Origamistudion – välj en modell och vik papper" loading="eager" allow="fullscreen"></iframe></div>');
       return;
     }
     originalDraw();
