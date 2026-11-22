@@ -185,8 +185,9 @@ function setupMenu(){idx=Number($('tracks').value);makeTrack();mini($('preview')
  $('info').textContent=seasons[season()]+' · '+(night?'Natt':'Dag')+' · '+(idx+1)+' / '+circuits.length;
  $('modeName').textContent=modes[mode];$('modeIcon').textContent=['⚑','➤','◷'][mode];
  $('desc').textContent=['3 varv mot 11 förare','1 varv mot 11 förare','3 varv mot klockan'][mode]}
-function resetInput(){keys.clear();document.querySelectorAll('#pad button').forEach(b=>b.classList.remove('active'))}
+function resetInput(){releaseStick();keys.clear();document.querySelectorAll('#pad button').forEach(b=>b.classList.remove('active'))}
 function begin(){
+ $('lobbyFilm').pause();
  resetInput();boost=1;boosting=false;driftUntil=0;hitTime=-1;audioStart();makeTrack();buildScene();clock=0;count=3;particles=[];sessionBest=Infinity;lastLap=0;lapStart=0;record=Infinity;try{record=Number(localStorage.getItem('midnight-manual-1-'+idx))||Infinity}catch{}
  cars=[];for(let i=0;i<(mode===2?1:12);i++){let slot=i===0?5:i<=5?i-1:i,s=mode===2?0:-(Math.floor(slot/2)+1)*48;cars.push({s,l:mode===2?0:(slot%2?34:-34),v:mode===2?235:0,yaw:0,lv:0,grip:0,lap:0,id:i,base:342+(i*17%35),done:false,finishTime:0})}
  player=cars[0];const spawn=at(player.s,player.l);
@@ -200,7 +201,7 @@ function update(dt){
  if(state==='count'){let oldCount=Math.ceil(count);count-=dt;if(Math.ceil(count)!==oldCount)tone(count<=0?980:540,.12,.35);if(count<=0){state='race';goTime=.7}return}if(state!=='race')return;
  clock+=dt;goTime=Math.max(0,goTime-dt);smokeTick++;let targetLaps=mode===1?1:3;
  boosting=keys.has('boost')&&boost>.01&&player.v>30;boost=clamp(boost+(boosting?-.46:keys.has('boost')?0:.11)*dt,0,1);
- for(const car of cars){if(car.done)continue;let old=carPose(car),turn=delta(at(car.s+60).a,old.a)/60,me=car===player,steer=Number(keys.has('right'))-Number(keys.has('left')),traction=icy(car.s)?.36:season()===3?.68:1,slide=me&&(keys.has('drift')||clock<driftUntil)&&car.v>55,brake=me&&keys.has('brake');
+ for(const car of cars){if(car.done)continue;let old=carPose(car),turn=delta(at(car.s+60).a,old.a)/60,me=car===player,steer=clamp(thumbSteer+Number(keys.has('right'))-Number(keys.has('left')),-1,1),traction=icy(car.s)?.36:season()===3?.68:1,slide=me&&(keys.has('drift')||clock<driftUntil)&&car.v>55,brake=me&&keys.has('brake');
  if(me){drive(car,dt,steer,traction,slide,brake)
  }else{
  const near=delta(at(car.s+40).a,at(car.s-20).a)/60;
@@ -251,14 +252,35 @@ function draw(){
 function frame(now){if(state==='count'||state==='race'){let elapsed=last?Math.min((now-last)/1000,.12):0;acc+=elapsed;while(acc>=1/60){update(1/60);acc-=1/60}draw()}last=now;requestAnimationFrame(frame)}
 const mapping={ArrowUp:'gas',KeyW:'gas',ArrowDown:'brake',KeyS:'brake',ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',Space:'drift',ShiftLeft:'boost',ShiftRight:'boost'};
 window.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&['Equal','Minus','Digit0','NumpadAdd','NumpadSubtract'].includes(e.code)){e.preventDefault();return}if(e.code==='Escape'&&!e.repeat){if(state==='paused')resume();else pause();return}if(['race','count'].includes(state)&&mapping[e.code]){e.preventDefault();keys.add(mapping[e.code]);if(e.code==='Space'&&!e.repeat)driftUntil=clock+.65}});window.addEventListener('keyup',e=>keys.delete(mapping[e.code]));
+const stick=$('stick'),knob=$('knob');
+let thumbSteer=0,stickPointer=null;
+function releaseStick(){
+ thumbSteer=0;stickPointer=null;knob.style.transform='';stick.classList.remove('engaged')
+}
+function moveStick(e){
+ if(e.pointerId!==stickPointer)return;
+ const box=stick.getBoundingClientRect(),radius=box.width*.34;
+ const dx=(e.clientX-box.left-box.width/2)/radius,dy=(e.clientY-box.top-box.height/2)/radius;
+ const dist=Math.max(1,Math.hypot(dx,dy)),x=dx/dist,y=dy/dist;
+ knob.style.transform='translate('+x*radius+'px,'+y*radius+'px)';
+ const demand=clamp((Math.abs(x)-.07)/.93,0,1);
+ thumbSteer=Math.sign(x)*demand*(.64+.36*demand)
+}
+stick.onpointerdown=e=>{
+ if(stickPointer!==null)return;
+ e.preventDefault();stickPointer=e.pointerId;stick.setPointerCapture(e.pointerId);
+ stick.classList.add('engaged');moveStick(e)
+};
+stick.onpointermove=moveStick;
+stick.onpointerup=stick.onpointercancel=stick.onlostpointercapture=e=>{if(e.pointerId===stickPointer)releaseStick()};
 for(const b of document.querySelectorAll('#pad button')){let k=b.dataset.k;b.onpointerdown=e=>{e.preventDefault();b.setPointerCapture(e.pointerId);keys.add(k);if(k==='drift')driftUntil=clock+.65;b.classList.add('active')};b.onlostpointercapture=b.onpointercancel=b.onpointerup=()=>{keys.delete(k);b.classList.remove('active')}}
 window.addEventListener('blur',pause);document.addEventListener('visibilitychange',()=>{if(document.hidden){pause();silent()}else if(state==='menu')playTheme(true)});window.addEventListener('resize',resize);
-$('pause').onclick=pause;$('resume').onclick=resume;$('again').onclick=begin;$('back').onclick=()=>{state='menu';playTheme(true);$('menu').hidden=false;$('hud').hidden=$('overlay').hidden=true;setupMenu();$('start').focus()};
+$('pause').onclick=pause;$('resume').onclick=resume;$('again').onclick=begin;$('back').onclick=()=>{state='menu';$('lobbyFilm').play().catch(()=>{});playTheme(true);$('menu').hidden=false;$('hud').hidden=$('overlay').hidden=true;setupMenu();$('start').focus()};
 async function init(){const start=$('start');start.disabled=true;start.textContent='Laddar banorna…';await Promise.all(Object.entries(assets).map(async([k,src])=>{let im=new Image();im.src=src;await im.decode();images[k]=im}));
  for(let i=0;i<12;i++){let c=surface(images.car.width,images.car.height),v=c.getContext('2d');v.drawImage(images.car,0,0);let im=v.getImageData(0,0,c.width,c.height),d=im.data,color=[[0,0,0],[228,53,44],[251,176,36],[67,103,229],[205,79,176],[225,220,207],[127,192,43],[242,111,29],[143,74,184],[237,198,32],[49,117,189],[216,64,104]][i];if(i)for(let j=0;j<d.length;j+=4){let r=d[j],green=d[j+1];if(green-r>18&&d[j+2]-r>12){let k=green/230;for(let ch=0;ch<3;ch++)d[j+ch]=Math.min(255,color[ch]*k+r*.16)}}v.putImageData(im,0,0);sprites.push(c)}
  circuits.forEach(([name,n],i)=>$('tracks').add(new Option(name,i)));
  for(const [id,step] of [['modePrev',-1],['modeNext',1]])$(id).onclick=()=>{mode=wrap(mode+step,modes.length);setupMenu()};
- $('help').textContent=matchMedia('(pointer:coarse)').matches?'Gas och pilar styr bilen. Håll Broms för att backa. Tryck Drift i kurvan och Boost på raksträckan.':'↑ Gas · ↓ Broms/back · ← → Styr · Mellanslag driftar · Skift ger boost.';
+ $('help').textContent=matchMedia('(pointer:coarse)').matches?'Styr med vänster tumspak och gasa med höger tumme. Håll Broms för att backa. Tryck Drift i kurvan och Boost på raksträckan.':'↑ Gas · ↓ Broms/back · ← → Styr · Mellanslag driftar · Skift ger boost.';
  $('sound').onclick=()=>{if(waitingForGesture&&soundOn){playTheme(true);return}soundOn=!soundOn;if(soundOn)playTheme(true);else silent();$('sound').textContent=soundOn?'Ljud på':'Ljud av';$('sound').setAttribute('aria-pressed',soundOn)};
  for(let [id,step] of [['prev',-1],['next',1]])$(id).onclick=()=>{$('tracks').value=wrap(idx+step,circuits.length);setupMenu()};
 
