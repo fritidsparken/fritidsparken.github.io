@@ -178,8 +178,9 @@
     if(category==='Alla'&&q&&!pearlPage){window.FPGameHub?.stop();renderSearch(q);return;}
     if(category==='origami'){
       window.FPGameHub?.stop();
-      document.getElementById('catalog').innerHTML='';
-      results.insertAdjacentHTML('beforeend','<div class="std-origami-embed"><iframe id="std-origami-frame" src="/origami/?embedded=1&amp;v=unified-gallery-20261122" title="Origamistudion – välj en modell och vik papper" loading="eager" allow="fullscreen"></iframe></div>');
+      // Keep the title/back button in their dedicated heading row.
+      // The gallery belongs in the same full-width catalog as other activities.
+      document.getElementById('catalog').innerHTML='<div class="std-origami-embed"><iframe id="std-origami-frame" src="/origami/?embedded=1&amp;v=correct-layout-20261122" title="Origamistudion – välj en modell och vik papper" loading="eager" allow="fullscreen"></iframe></div>';
       return;
     }
     originalDraw();
