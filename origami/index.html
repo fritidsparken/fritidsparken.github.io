@@ -27,6 +27,47 @@ html.origami-embedded body{margin:0}
 html.origami-embedded .std-header,html.origami-embedded .breadcrumb{display:none!important}
 html.origami-embedded .studio-page{padding-top:12px}
 </style>
+<style id="origami-embed-responsive-20261122">
+html.origami-embedded body.origami-page .std-header{display:none!important}
+html.origami-embedded body.origami-page main{width:100%;max-width:1180px;padding:16px clamp(12px,2vw,24px) 32px}
+html.origami-embedded .intro{padding:0 0 22px;grid-template-columns:minmax(0,1fr) minmax(180px,28%);gap:20px}
+html.origami-embedded .intro-paper{height:160px}
+html.origami-embedded .intro-paper svg{max-height:150px}
+html.origami-embedded h1{font-size:clamp(28px,3vw,46px);margin-bottom:8px}
+html.origami-embedded .model-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,175px),1fr));gap:14px}
+html.origami-embedded #studio::backdrop{background:#061c1699;backdrop-filter:none}
+html.origami-embedded #studio{--banner-height:0px!important}
+html.origami-embedded #flight-dialog{--banner-height:0px!important}
+@media(max-width:700px){html.origami-embedded .intro{display:block;padding-bottom:14px}html.origami-embedded .intro-paper{display:none}html.origami-embedded body.origami-page main{padding:12px 12px 25px}html.origami-embedded .model-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}
+@media(orientation:landscape) and (max-height:650px){
+ html.origami-embedded .intro{display:block;padding-bottom:10px}
+ html.origami-embedded .intro-paper{display:none}
+ html.origami-embedded #studio{inset:4px!important;width:calc(100vw - 8px)!important;height:calc(100dvh - 8px)!important;max-height:calc(100dvh - 8px)!important}
+ html.origami-embedded #flight-dialog{max-height:calc(100dvh - 8px)!important}
+}
+</style>
+<script id="origami-frame-size-20261122">
+if(window.self!==window.top&&new URLSearchParams(location.search).get('embedded')==='1'){
+  const notify=()=>{
+    const studio=document.getElementById('studio');
+    const flight=document.getElementById('flight-dialog');
+    const modal=!!((studio&&studio.open)||(flight&&flight.open));
+    const main=document.getElementById('main');
+    const height=Math.ceil(Math.max(main?.scrollHeight||0,main?.getBoundingClientRect().bottom||0)+32);
+    window.parent.postMessage({source:'fritidsparken-origami',modal,height},location.origin);
+  };
+  window.addEventListener('DOMContentLoaded',()=>{
+    new ResizeObserver(notify).observe(document.getElementById('main'));
+    ['studio','flight-dialog'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el)new MutationObserver(notify).observe(el,{attributes:true,attributeFilter:['open']});
+    });
+    window.addEventListener('resize',notify);
+    notify();
+    requestAnimationFrame(notify);
+  });
+}
+</script>
 </head><body class="std-design origami-page"><header class="std-header"><div class="std-topbar"><a class="std-brand" href="/" aria-label="Till Fritidsparken"><img src="../assets/fritidsparken-logo.jpg" alt="" width="38" height="38">Fritidsparken.se</a><a class="std-plugg" href="https://pluggparken.se/" aria-label="Till Pluggparken"><img src="../assets/pluggparken-icon.svg" alt="" width="38" height="38"> Pluggparken.se</a><button type="button" class="std-header-search" aria-label="Sök aktiviteter" aria-expanded="false" aria-controls="activitySearchPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></button><div class="std-controls"><button type="button" class="iconbtn" id="theme" aria-label="Byt tema" aria-pressed="false">🌙</button><button type="button" class="iconbtn season-picker" id="seasonPicker" aria-label="Välj tema: Standard, Halloween eller Jul" aria-expanded="false" aria-controls="activitySeasonMenu" title="Välj tema: Standard, Halloween eller Jul"><img src="../assets/fritidsparken-logo.jpg" alt="Fritidsparken"></button></div></div>
 <form class="std-search-panel" id="activitySearchPanel" action="/" role="search" hidden><label for="activitySearch">Sök på Fritidsparken</label><input type="search" id="activitySearch" name="q" placeholder="Sök aktivitet, pyssel eller spel..." autocomplete="off"></form>
 <nav class="std-season-panel" id="activitySeasonMenu" aria-label="Välj säsongstema" hidden><a href="/?season=standard"><img src="../assets/fritidsparken-logo.jpg" alt="">Standard</a><a href="/?season=christmas"><span aria-hidden="true">🎄</span>Jul</a><a href="/?season=halloween"><span aria-hidden="true">🎃</span>Halloween</a></nav>
