@@ -44,6 +44,15 @@
 #fp-ranking .ranking-icon{display:grid;place-items:center;width:100%;aspect-ratio:1;border-radius:14px;overflow:hidden;font-size:5rem}
 #fp-ranking img{width:100%;height:100%;object-fit:cover}
 #fp-ranking a:focus-visible{outline:3px solid currentColor}
+</style><style id="coloring-touch-controls-20261122">
+/* Larger, easier-to-tap coloring actions on phone, tablet and desktop. */
+.mandala-card .fp-online-actions{display:flex!important;flex-wrap:wrap;gap:10px!important}
+.mandala-card .fp-online-actions :is(button,a),
+.mandala-card .mandala-links a{min-height:56px!important;min-width:0;padding:14px 16px!important;font-size:16px!important;font-weight:800!important;line-height:1.35!important;display:inline-flex!important;align-items:center;justify-content:center;text-align:center;touch-action:manipulation}
+body.std-design .std-color-card .fp-online-actions :is(button,a){min-height:56px!important;padding:14px 12px!important;font-size:16px!important}
+.mandala-card > a:has(> img),.mandala-card .std-color-open{cursor:default!important}
+.mandala-card > a:has(> img) img,.mandala-card .std-color-open img{pointer-events:none}
+@media(max-width:600px){.mandala-card .fp-online-actions :is(button,a),.mandala-card .mandala-links a{min-height:60px!important;font-size:16px!important}}
 </style></head>
 <body>
 <header class="top"><div class="topin"><a class="brand" href="https://fritidsparken.se/" aria-label="Gå till Fritidsparken.se"><span class="site-logo"><img src="./assets/fritidsparken-logo.jpg" alt="" width="38" height="38"></span><span class="site-name">Fritidsparken.se</span></a><span class="brand-switch" aria-hidden="true"></span><a class="brand plugg-brand" href="https://pluggparken.se/" aria-label="Gå till Pluggparken.se"><span class="plugg-icon"><img src="./assets/pluggparken-icon.svg" alt="" width="38" height="38"></span><span class="plugg-name">Pluggparken.se</span></a><button type="button" class="iconbtn" id="theme" aria-label="Byt tema" aria-pressed="false">🌙</button><button type="button" class="iconbtn season-picker" id="seasonPicker" aria-label="Välj säsongstema" aria-expanded="false" title="Välj säsongstema">🎃</button><button type="button" class="iconbtn halloween-sound" id="halloweenSound" aria-label="Stäng av Halloween-ljud" aria-pressed="true" title="Stäng av Halloween-ljud" disabled>🔊</button></div></header><div id="seasonMenu" class="season-menu" hidden></div>
@@ -79,7 +88,15 @@
 <script src="./js/advent-calendar-data.js?v=20261023-winter-1"></script>
 <script src="./js/advent-calendar.js?v=christmas-preview-20261029-2"></script>
 <script src="./js/standard-home.js?v=activity-motion-2"></script><script src="/js/daily-challenge.js?v=activity-motion-2"></script>
-<script src="./js/game-navigation.js?v=home-left-20261113"></script><script src="./js/visitor-time.js?v=1"></script><script defer src="/js/activity-ranking.js?v=duration-1"></script></body></html>
+<script src="./js/game-navigation.js?v=home-left-20261113"></script><script src="./js/visitor-time.js?v=1"></script><script defer src="/js/activity-ranking.js?v=duration-1"></script><script id="coloring-image-no-click-20261122">
+/* Preview images are display-only; use Måla online or Skriv ut instead. */
+document.addEventListener('click',function(event){
+  const preview=event.target.closest('.mandala-card > a:has(> img), .mandala-card .std-color-open');
+  if(!preview)return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+},true);
+</script></body></html>
 
 
 
