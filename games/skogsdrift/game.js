@@ -30,7 +30,7 @@ function crossing(c,s,type,deck){
 let ac,engine,engineVol,master,music,soundOn=true;
 let lobbyTrack,raceTrack;
 function playTheme(lobby){if(!soundOn||typeof Audio==='undefined'||document.hidden)return;
- const track=lobby?(lobbyTrack ||= new Audio('afterhours.mp3?v=nocturne')):(raceTrack ||= new Audio('midnight-drive.mp3'));
+ const track=lobby?(lobbyTrack ||= new Audio('neon-aura.mp3')):(raceTrack ||= new Audio('midnight-drive.mp3'));
  if(music!==track){music?.pause();music=track;music.loop=true;music.volume=lobby?.44:.34}
  if(music.paused)music.play().catch(()=>{})}
 function audioStart(){playTheme(false);if(!soundOn||!window.AudioContext&&!window.webkitAudioContext)return;
