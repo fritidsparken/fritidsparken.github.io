@@ -1,5 +1,6 @@
 (() => {
   const games=[
+    {id:'skogsdrift',title:'Skogsdrift',tag:'22 BANOR · FYRA ÅRSTIDER',type:'Racing',image:'../games/skogsdrift/hero.webp',text:'Drifta över is och asfalt, tävla mot elva bilar och hitta snabbaste linjen genom natten.',url:'./games/skogsdrift/'},
     {id:'min-matbutik',title:'Min matbutik',tag:'HANDLA, SKANNA OCH PACKA',type:'Butik & rollspel',image:'../games/min-matbutik/assets/checkout-pov.webp',text:'Gå runt i butiken, plocka varor och handla. Jobba i kassan, skanna och packa för att tjäna fler spelkronor!',url:'./games/min-matbutik/'},
     {id:'hogtryckstvatten',title:'Högtryckstvätten',tag:'SMUTSIGT IN. SKINANDE UT.',type:'Städa & upptäck',image:'../games/hogtryckstvatten/assets/house-wide-v2.webp',text:'Tvätta hus, pooler, skolor, slott, flygplan och bilar. Slå tidsmålen och lås upp kraftfullare munstycken!',url:'./games/hogtryckstvatten/'},
     {id:'prince-of-persia',title:'The Lost World',tag:'SOLPORTENS VÄG',type:'Plattformsäventyr',image:'game-icons-2026/prince-of-persia.webp',text:'Hoppa över palatsets falluckor och undvik spjuten. Klarar du Solportens väg väntar nya utmaningar i djungeln.',url:'./games/prince-of-persia/'},
