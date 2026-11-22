@@ -190,7 +190,23 @@ function setupMenu(){idx=Number($('tracks').value);makeTrack();mini($('preview')
  $('info').textContent=seasons[season()]+' · '+(night?'Natt':'Dag')+' · '+(idx+1)+' / '+circuits.length;
  $('modeName').textContent=modes[mode];$('modeIcon').textContent=['⚑','➤','◷'][mode];
  $('desc').textContent=['3 varv mot 11 förare','1 varv mot 11 förare','3 varv mot klockan'][mode]}
-function resetInput(){releaseStick();keys.clear();document.querySelectorAll('#pad button').forEach(b=>b.classList.remove('active'))}
+function resetInput(){
+ releaseStick();releaseAction();arrowPointers.clear();keys.clear();
+ document.querySelectorAll('#arrows button').forEach(b=>b.classList.remove('active'))
+}
+function recoverCar(){
+ if(state!=='race'||player.done)return;
+ // Search backwards so recovery never awards distance or advances a lap.
+ for(let back=0;back<length;back+=55){
+  const s=player.s-back;
+  for(const l of [0,-38,38]){
+   const p=at(s,l);
+   if(cars.some(c=>c!==player&&!c.done&&Math.hypot(c.x-p.x,c.y-p.y)<57))continue;
+   Object.assign(player,{x:p.x,y:p.y,s,l,v:0,vx:0,vy:0,heading:p.a,normal:p.a+Math.PI/2,wheel:0,yaw:0,grip:0});
+   cam={x:p.x,y:p.y};resetInput();driftUntil=0;boosting=false;return
+  }
+ }
+}
 function begin(){
  resetInput();boost=1;boosting=false;driftUntil=0;hitTime=-1;audioStart();makeTrack();buildScene();clock=0;count=3;particles=[];sessionBest=Infinity;lastLap=0;lapStart=0;record=Infinity;try{record=Number(localStorage.getItem('midnight-manual-1-'+idx))||Infinity}catch{}
  cars=[];for(let i=0;i<(mode===2?1:12);i++){let slot=i===0?5:i<=5?i-1:i,s=mode===2?0:-(Math.floor(slot/2)+1)*48;cars.push({s,l:mode===2?0:(slot%2?34:-34),v:mode===2?235:0,yaw:0,grip:0,lap:0,id:i,base:174+(i*17%37),decisionAt:.20+i*.055,steer:0,gas:false,brake:false,done:false,finishTime:0})}
@@ -226,10 +242,10 @@ function chooseInputs(car,traction){
 function update(dt){
  if(state==='count'){let oldCount=Math.ceil(count);count-=dt;if(Math.ceil(count)!==oldCount)tone(count<=0?980:540,.12,.35);if(count<=0){state='race';goTime=.7}return}if(state!=='race')return;
  clock+=dt;goTime=Math.max(0,goTime-dt);smokeTick++;let targetLaps=mode===1?1:3;
- boosting=keys.has('boost')&&boost>.01&&player.v>30;boost=clamp(boost+(boosting?-.46:keys.has('boost')?0:.11)*dt,0,1);
- for(const car of cars){if(car.done)continue;let old=carPose(car),turn=delta(at(car.s+60).a,old.a)/60,me=car===player,steer=clamp(thumbSteer+Number(keys.has('right'))-Number(keys.has('left')),-1,1),traction=icy(car.s)?.36:season()===3?.68:1,slide=me&&(keys.has('drift')||clock<driftUntil)&&car.v>55,brake=me&&keys.has('brake');
+ boosting=(keys.has('boost')||action==='boost')&&boost>.01&&player.v>30;boost=clamp(boost+(boosting?-.46:(keys.has('boost')||action==='boost')?0:.11)*dt,0,1);
+ for(const car of cars){if(car.done)continue;let old=carPose(car),turn=delta(at(car.s+60).a,old.a)/60,me=car===player,steer=clamp(thumbSteer+Number(keys.has('right')||arrowPointers.has('right'))-Number(keys.has('left')||arrowPointers.has('left')),-1,1),traction=icy(car.s)?.36:season()===3?.68:1,slide=me&&(keys.has('drift')||action==='drift'||clock<driftUntil)&&car.v>55,brake=me&&keys.has('brake');
  if(!me){chooseInputs(car,traction);steer=car.steer;brake=car.brake}
- drive(car,dt,steer,traction,slide,brake,me?keys.has('gas'):car.gas,me&&boosting);
+ drive(car,dt,steer,traction,slide,brake,me?(keys.has('gas')||action!==null):car.gas,me&&boosting);
  let now=carPose(car);car.grip=car.v>85&&(slide&&(Math.abs(car.yaw)>.09||Math.abs(turn)>.0009)||Math.abs(turn)*car.v*car.v>185||brake&&car.v>180);
  if(car.grip){const wheels=(p,yaw,side)=>{const a=p.a+yaw;return{x:p.x-14*Math.cos(a)-side*8*Math.sin(a),y:p.y-14*Math.sin(a)+side*8*Math.cos(a)}};for(let side of [-1,1])line(ink,[wheels(old,car.yaw,side),wheels(now,car.yaw,side)],'rgba(27,24,24,.30)',2.4);
  if(smokeTick%5===0&&Math.hypot(now.x-cam.x,now.y-cam.y)<850&&particles.length<200)particles.push({x:now.x-13*Math.cos(now.a),y:now.y-13*Math.sin(now.a),t:0,dx:(Math.random()-.5)*18,dy:(Math.random()-.5)*18})}
@@ -285,7 +301,43 @@ stick.onpointerdown=e=>{
 };
 stick.onpointermove=moveStick;
 stick.onpointerup=stick.onpointercancel=stick.onlostpointercapture=e=>{if(e.pointerId===stickPointer)releaseStick()};
-for(const b of document.querySelectorAll('#pad button')){let k=b.dataset.k;b.onpointerdown=e=>{e.preventDefault();b.setPointerCapture(e.pointerId);keys.add(k);if(k==='drift')driftUntil=clock+.65;b.classList.add('active')};b.onlostpointercapture=b.onpointercancel=b.onpointerup=()=>{keys.delete(k);b.classList.remove('active')}}
+const arrowPointers=new Map();
+for(const b of document.querySelectorAll('#arrows button')){
+ const key=b.dataset.k;
+ b.onpointerdown=e=>{
+  if(arrowPointers.has(key))return;
+  e.preventDefault();b.setPointerCapture(e.pointerId);arrowPointers.set(key,e.pointerId);b.classList.add('active')
+ };
+ b.onlostpointercapture=b.onpointercancel=b.onpointerup=e=>{
+  if(arrowPointers.get(key)!==e.pointerId)return;
+  arrowPointers.delete(key);b.classList.remove('active')
+ }
+}
+const actionStick=$('actionStick'),actionKnob=$('actionKnob');
+let actionPointer=null,action=null;
+function releaseAction(){
+ actionPointer=null;action=null;actionStick.removeAttribute('data-action');
+ actionKnob.style.transform='';actionKnob.textContent='Gas'
+}
+function moveAction(e){
+ if(e.pointerId!==actionPointer)return;
+ const r=actionStick.getBoundingClientRect();
+ const x=clamp((e.clientX-r.left-r.width/2)/(r.width*.5),-1,1);
+ const edge=action==='drift'||action==='boost'?.29:.42;
+ action=x < -edge?'drift':x > edge?'boost':'gas';
+ actionStick.dataset.action=action;
+ actionKnob.textContent={gas:'Gas',drift:'Drift',boost:'Boost'}[action];
+ actionKnob.style.transform='translateX('+x*r.width*.29+'px)'
+}
+actionStick.onpointerdown=e=>{
+ if(actionPointer!==null)return;
+ e.preventDefault();actionPointer=e.pointerId;actionStick.setPointerCapture(e.pointerId);moveAction(e)
+};
+actionStick.onpointermove=moveAction;
+actionStick.onpointercancel=actionStick.onlostpointercapture=actionStick.onpointerup=e=>{
+ if(e.pointerId===actionPointer)releaseAction()
+};
+$('recover').onclick=recoverCar;
 window.addEventListener('blur',pause);document.addEventListener('visibilitychange',()=>{if(document.hidden){pause();silent()}else if(state==='menu')playTheme(true)});window.addEventListener('resize',resize);
 $('pause').onclick=pause;$('resume').onclick=resume;$('again').onclick=begin;$('back').onclick=()=>{state='menu';playTheme(true);$('menu').hidden=false;$('hud').hidden=$('overlay').hidden=true;setupMenu();$('start').focus()};
 async function init(){const start=$('start');start.disabled=true;start.textContent='Laddar banorna…';await Promise.all(Object.entries(assets).map(async([k,src])=>{let im=new Image();im.src=src;await im.decode();images[k]=im}));
@@ -294,7 +346,18 @@ async function init(){const start=$('start');start.disabled=true;start.textConte
  for(const [id,step] of [['modePrev',-1],['modeNext',1]])$(id).onclick=()=>{mode=wrap(mode+step,modes.length);setupMenu()};
  const touch=navigator.maxTouchPoints>0||matchMedia('(any-pointer:coarse)').matches;
  document.body.classList.toggle('touch-controls',touch);
- $('help').textContent=touch?'Styr med tumspaken. Gasa, drifta och boosta med knapparna.':$('keyboardHelp').textContent;
+ let analog=false;
+ try{analog=localStorage.getItem('midnight-touch-steering')==='stick'}catch{}
+ function showSteering(){
+  document.body.classList.toggle('use-stick',analog);
+  $('steerMode').textContent='Styrning: '+(analog?'joystick':'pilar');
+  $('help').textContent=touch?'Höger spak: håll för gas, dra vänster för drift eller höger för boost.':$('keyboardHelp').textContent
+ }
+ $('steerMode').onclick=()=>{
+  analog=!analog;showSteering();
+  try{localStorage.setItem('midnight-touch-steering',analog?'stick':'arrows')}catch{}
+ };
+ showSteering();
  $('sound').onclick=()=>{if(waitingForGesture&&soundOn){playTheme(true);return}soundOn=!soundOn;if(soundOn)playTheme(true);else silent();$('sound').textContent=soundOn?'Ljud på':'Ljud av';$('sound').setAttribute('aria-pressed',soundOn)};
  for(let [id,step] of [['prev',-1],['next',1]])$(id).onclick=()=>{$('tracks').value=wrap(idx+step,circuits.length);setupMenu()};
 
