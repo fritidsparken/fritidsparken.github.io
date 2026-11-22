@@ -47,7 +47,7 @@
   const home = document.createElement('div');
   home.id = 'standardHome';home.className = 'standard-only';
   document.querySelector('.hero').after(home);
-  const categoryPanel = () => `<section class="std-categories" aria-label="Utforska kategorier">${categories.map(([label,cat,symbol],i)=>`<${cat==='origami'?'a href="/origami/"':'button type="button"'} ${cat==='ranking'?'data-ranking-toggle aria-controls="fp-ranking" aria-expanded="false"':cat==='origami'?'data-origami-link':`data-standard-category="${cat}"`} style="--tile:${palettes[i]};--icon-delay:-${i*.43}s;--icon-period:${2.5+(i%3)*.4}s">${cat==='origami'?'<span class="std-icon" data-icon="origami" style="display:grid;place-items:center;font-size:44px" aria-hidden="true"><span class="std-icon-motion">🦢</span></span>':icon(symbol)}<span class="std-category-label">${(label==='How to Draw'?['How to','Draw']:label.split(' ')).map(word=>`<span>${esc(word)}</span>`).join(' ')}</span></${cat==='origami'?'a':'button'}>`).join('')}</section>`;
+  const categoryPanel = () => `<section class="std-categories" aria-label="Utforska kategorier">${categories.map(([label,cat,symbol],i)=>`<button type="button" ${cat==='ranking'?'data-ranking-toggle aria-controls="fp-ranking" aria-expanded="false"':`data-standard-category="${cat}"`} style="--tile:${palettes[i]};--icon-delay:-${i*.43}s;--icon-period:${2.5+(i%3)*.4}s">${cat==='origami'?'<span class="std-icon" data-icon="origami" style="display:grid;place-items:center;font-size:44px" aria-hidden="true"><span class="std-icon-motion">🦢</span></span>':icon(symbol)}<span class="std-category-label">${(label==='How to Draw'?['How to','Draw']:label.split(' ')).map(word=>`<span>${esc(word)}</span>`).join(' ')}</span></button>`).join('')}</section>`;
   const categoryNavigation = document.createElement('div');
   categoryNavigation.innerHTML = categoryPanel();
   home.before(categoryNavigation);
@@ -176,6 +176,12 @@
     if(atHome){window.FPGameHub?.stop();document.getElementById('catalog').innerHTML='';return;}
     results.innerHTML=`<h2>${esc(pearlPage?'Pärlmönster':category==='Mandala'?'Färglägga':category==='Rita steg-för-steg'?'How to Draw':category==='Alla'?'Alla aktiviteter':category)}</h2><button type="button" data-standard-category="Alla">← Till startsidan</button>`;
     if(category==='Alla'&&q&&!pearlPage){window.FPGameHub?.stop();renderSearch(q);return;}
+    if(category==='origami'){
+      window.FPGameHub?.stop();
+      document.getElementById('catalog').innerHTML='';
+      results.insertAdjacentHTML('beforeend','<div class="std-origami-embed"><iframe id="std-origami-frame" src="/origami/?embedded=1" title="Origamistudion – välj en modell och vik papper" loading="eager" allow="fullscreen"></iframe></div>');
+      return;
+    }
     originalDraw();
   };
   // Scroll to the opened category content, not back to the icon grid.
