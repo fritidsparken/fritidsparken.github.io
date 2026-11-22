@@ -30,10 +30,10 @@ function crossing(c,s,type,deck){
 let ac,engine,engineVol,master,music,soundOn=true;
 let lobbyTrack,raceTrack;
 function playTheme(lobby){if(!soundOn||typeof Audio==='undefined'||document.hidden)return;
- const track=lobby?(lobbyTrack ||= new Audio('afterhours.mp3?v=nocturne')):(raceTrack ||= new Audio('pursuit.mp3?v=synth3'));
+ const track=lobby?(lobbyTrack ||= new Audio('afterhours.mp3?v=nocturne')):(raceTrack ||= new Audio('midnight-drive.mp3'));
  if(music!==track){music?.pause();music=track;music.loop=true;music.volume=lobby?.44:.34}
  if(music.paused)music.play().catch(()=>{})}
-function audioStart(){playTheme(false);if(!soundOn||!window.AudioContext&&!window.webkitAudioContext)return;
+function audioStart(restart=false){if(restart&&raceTrack)raceTrack.currentTime=0;playTheme(false);if(!soundOn||!window.AudioContext&&!window.webkitAudioContext)return;
  try{if(!ac){ac=new (window.AudioContext||window.webkitAudioContext)();master=ac.createGain();master.gain.value=.27;master.connect(ac.destination);
  engine=ac.createOscillator();engine.type='sawtooth';const filter=ac.createBiquadFilter();filter.frequency.value=270;engineVol=ac.createGain();engineVol.gain.value=0;engine.connect(filter).connect(engineVol).connect(master);engine.start();
  }
@@ -138,7 +138,7 @@ function setupMenu(){idx=Number($('tracks').value);makeTrack();mini($('preview')
  $('desc').textContent=['3 varv mot 11 förare','1 varv mot 11 förare','3 varv mot klockan'][mode]}
 function resetInput(){keys.clear();document.querySelectorAll('#pad button').forEach(b=>b.classList.remove('active'))}
 function begin(){
- resetInput();boost=1;boosting=false;driftUntil=0;hitTime=-1;audioStart();makeTrack();buildScene();clock=0;count=3;particles=[];sessionBest=Infinity;lastLap=0;lapStart=0;record=Infinity;try{record=Number(localStorage.getItem('midnight-v3-'+idx))||Infinity}catch{}
+ resetInput();boost=1;boosting=false;driftUntil=0;hitTime=-1;audioStart(true);makeTrack();buildScene();clock=0;count=3;particles=[];sessionBest=Infinity;lastLap=0;lapStart=0;record=Infinity;try{record=Number(localStorage.getItem('midnight-v3-'+idx))||Infinity}catch{}
  cars=[];for(let i=0;i<(mode===2?1:12);i++){let slot=i===0?5:i<=5?i-1:i,s=mode===2?0:-(Math.floor(slot/2)+1)*48;cars.push({s,l:mode===2?0:(slot%2?34:-34),v:mode===2?235:0,yaw:0,lv:0,grip:0,lap:0,id:i,base:342+(i*17%35),done:false,finishTime:0})}
  player=cars[0];cam=at(player.s);state='count';goTime=0;$('menu').hidden=true;$('overlay').hidden=true;$('hud').hidden=false;document.body.classList.add('play');acc=0;last=0;
 }
