@@ -187,7 +187,6 @@ function setupMenu(){idx=Number($('tracks').value);makeTrack();mini($('preview')
  $('desc').textContent=['3 varv mot 11 förare','1 varv mot 11 förare','3 varv mot klockan'][mode]}
 function resetInput(){releaseStick();keys.clear();document.querySelectorAll('#pad button').forEach(b=>b.classList.remove('active'))}
 function begin(){
- $('lobbyFilm').pause();
  resetInput();boost=1;boosting=false;driftUntil=0;hitTime=-1;audioStart();makeTrack();buildScene();clock=0;count=3;particles=[];sessionBest=Infinity;lastLap=0;lapStart=0;record=Infinity;try{record=Number(localStorage.getItem('midnight-manual-1-'+idx))||Infinity}catch{}
  cars=[];for(let i=0;i<(mode===2?1:12);i++){let slot=i===0?5:i<=5?i-1:i,s=mode===2?0:-(Math.floor(slot/2)+1)*48;cars.push({s,l:mode===2?0:(slot%2?34:-34),v:mode===2?235:0,yaw:0,lv:0,grip:0,lap:0,id:i,base:342+(i*17%35),done:false,finishTime:0})}
  player=cars[0];const spawn=at(player.s,player.l);
@@ -275,7 +274,7 @@ stick.onpointermove=moveStick;
 stick.onpointerup=stick.onpointercancel=stick.onlostpointercapture=e=>{if(e.pointerId===stickPointer)releaseStick()};
 for(const b of document.querySelectorAll('#pad button')){let k=b.dataset.k;b.onpointerdown=e=>{e.preventDefault();b.setPointerCapture(e.pointerId);keys.add(k);if(k==='drift')driftUntil=clock+.65;b.classList.add('active')};b.onlostpointercapture=b.onpointercancel=b.onpointerup=()=>{keys.delete(k);b.classList.remove('active')}}
 window.addEventListener('blur',pause);document.addEventListener('visibilitychange',()=>{if(document.hidden){pause();silent()}else if(state==='menu')playTheme(true)});window.addEventListener('resize',resize);
-$('pause').onclick=pause;$('resume').onclick=resume;$('again').onclick=begin;$('back').onclick=()=>{state='menu';$('lobbyFilm').play().catch(()=>{});playTheme(true);$('menu').hidden=false;$('hud').hidden=$('overlay').hidden=true;setupMenu();$('start').focus()};
+$('pause').onclick=pause;$('resume').onclick=resume;$('again').onclick=begin;$('back').onclick=()=>{state='menu';playTheme(true);$('menu').hidden=false;$('hud').hidden=$('overlay').hidden=true;setupMenu();$('start').focus()};
 async function init(){const start=$('start');start.disabled=true;start.textContent='Laddar banorna…';await Promise.all(Object.entries(assets).map(async([k,src])=>{let im=new Image();im.src=src;await im.decode();images[k]=im}));
  for(let i=0;i<12;i++){let c=surface(images.car.width,images.car.height),v=c.getContext('2d');v.drawImage(images.car,0,0);let im=v.getImageData(0,0,c.width,c.height),d=im.data,color=[[0,0,0],[228,53,44],[251,176,36],[67,103,229],[205,79,176],[225,220,207],[127,192,43],[242,111,29],[143,74,184],[237,198,32],[49,117,189],[216,64,104]][i];if(i)for(let j=0;j<d.length;j+=4){let r=d[j],green=d[j+1];if(green-r>18&&d[j+2]-r>12){let k=green/230;for(let ch=0;ch<3;ch++)d[j+ch]=Math.min(255,color[ch]*k+r*.16)}}v.putImageData(im,0,0);sprites.push(c)}
  circuits.forEach(([name,n],i)=>$('tracks').add(new Option(name,i)));
