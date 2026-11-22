@@ -27,22 +27,20 @@ function crossing(c,s,type,deck){
  for(let side of [-1,1]){let rail=stretch(s,span,side*(road/2+3));line(c,rail,'#535955',6);line(c,rail,'#e4e1cc',2);
  for(let d=-span;d<=span;d+=20){let a=at(s+d,side*(road/2+5)),b=at(s+d,side*(road/2+9));line(c,[a,b],'#555957',4)}}
 }
-let ac,engine,engineVol,tyreVol,master,music,soundOn=true;
+let ac,engine,engineVol,master,music,soundOn=true;
 let lobbyTrack,raceTrack;
 function playTheme(lobby){if(!soundOn||typeof Audio==='undefined'||document.hidden)return;
- const track=lobby?(lobbyTrack ||= new Audio('afterhours.mp3?v=synth3')):(raceTrack ||= new Audio('pursuit.mp3?v=synth3'));
+ const track=lobby?(lobbyTrack ||= new Audio('afterhours.mp3?v=nocturne')):(raceTrack ||= new Audio('pursuit.mp3?v=synth3'));
  if(music!==track){music?.pause();music=track;music.loop=true;music.volume=lobby?.44:.34}
  if(music.paused)music.play().catch(()=>{})}
 function audioStart(){playTheme(false);if(!soundOn||!window.AudioContext&&!window.webkitAudioContext)return;
  try{if(!ac){ac=new (window.AudioContext||window.webkitAudioContext)();master=ac.createGain();master.gain.value=.27;master.connect(ac.destination);
  engine=ac.createOscillator();engine.type='sawtooth';const filter=ac.createBiquadFilter();filter.frequency.value=270;engineVol=ac.createGain();engineVol.gain.value=0;engine.connect(filter).connect(engineVol).connect(master);engine.start();
- const noise=ac.createBuffer(1,ac.sampleRate,ac.sampleRate),data=noise.getChannelData(0);for(let i=0;i<data.length;i++)data[i]=Math.random()*2-1;
- const source=ac.createBufferSource();source.buffer=noise;source.loop=true;const f=ac.createBiquadFilter();f.type='bandpass';f.frequency.value=2100;tyreVol=ac.createGain();tyreVol.gain.value=0;source.connect(f).connect(tyreVol).connect(master);source.start();
  }
  ac.resume().catch(()=>{})}catch{}}
 function silent(){music?.pause();if(ac)ac.suspend().catch(()=>{})}
 function tone(freq,duration,level,type='sine'){if(!ac||!soundOn||ac.state!=='running')return;let o=ac.createOscillator(),vol=ac.createGain(),t=ac.currentTime;o.type=type;o.frequency.setValueAtTime(freq,t);o.frequency.exponentialRampToValueAtTime(freq*.58,t+duration);vol.gain.setValueAtTime(level,t);vol.gain.exponentialRampToValueAtTime(.001,t+duration);o.connect(vol).connect(master);o.start();o.stop(t+duration)}
-function motor(){if(!ac||!soundOn)return;let t=ac.currentTime;engine.frequency.setTargetAtTime(38+player.v*.25+(boosting?20:0),t,.09);engineVol.gain.setTargetAtTime(state==='race'?.14:.055,t,.08);tyreVol.gain.setTargetAtTime(player.grip?.22:0,t,.05)}
+function motor(){if(!ac||!soundOn)return;let t=ac.currentTime;engine.frequency.setTargetAtTime(38+player.v*.25+(boosting?20:0),t,.09);engineVol.gain.setTargetAtTime(state==='race'?.14:.055,t,.08)}
 // Resolve contact along the separating axes of the two oriented car bodies.
 function contacts(){
  for(let pass=0;pass<8;pass++){let changed=false;
