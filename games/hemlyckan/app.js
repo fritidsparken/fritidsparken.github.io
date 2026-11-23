@@ -1,5 +1,5 @@
-import {ROOMS,TIERS,TOOLS,price,INITIAL_BUDGET,freshState,totalSpent,allDone,completedTasks,TOTAL_TASKS,normalizeState} from './data.js?v=5';
-import {Workshop,FlatWorkshop} from './workshop.js?v=5';
+import {ROOMS,TIERS,TOOLS,price,INITIAL_BUDGET,freshState,totalSpent,allDone,completedTasks,TOTAL_TASKS,normalizeState} from './data.js?v=6';
+import {Workshop,FlatWorkshop} from './workshop.js?v=6';
 const $=s=>document.querySelector(s),money=n=>new Intl.NumberFormat('sv-SE').format(n),key='hemlyckan-save-v1';
 let workshop=null,lastWorkSound=0;
 let state;try{state=normalizeState(JSON.parse(localStorage.getItem(key)));}catch{state=freshState();}
