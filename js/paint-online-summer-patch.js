@@ -169,6 +169,11 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
     'ten exact Pokémon reference mappings');
   source=source.replaceAll('isSummerTarget||isAutumnTarget||isWinterTarget||isBakeryTarget||isMachineTarget',
     'isPokemonReferenceTarget||isSummerTarget||isAutumnTarget||isWinterTarget||isBakeryTarget||isMachineTarget');
+  replaceOnce(' const isPokemonReferenceTarget=!!pokemonReferenceName;',
+    ' const isPokemonReferenceTarget=!!pokemonReferenceName;\n const isAikReferenceTarget=!!REFERENCE&&pokemonReferencePath.endsWith("/fotbollslag-20261022/aik.svg");',
+    'identify the AIK reference');
+  source=source.replaceAll('isPokemonReferenceTarget||isSummerTarget||isAutumnTarget||isWinterTarget||isBakeryTarget||isMachineTarget',
+    'isAikReferenceTarget||isPokemonReferenceTarget||isSummerTarget||isAutumnTarget||isWinterTarget||isBakeryTarget||isMachineTarget');
   replaceOnce('if(isPokemonTarget){\n     const title=', 'if(isPokemonTarget&&!REFERENCE){\n     const title=', 'show supplied reference without generated suggestion');
   replaceOnce('ref.onerror=()=>reject(new Error("Referens saknas"));ref.src=REFERENCE;',
     'ref.onerror=()=>reject(new Error("Referens saknas"));ref.src=isPokemonReferenceTarget?pokemonTexture:REFERENCE;',
