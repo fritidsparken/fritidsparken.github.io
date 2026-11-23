@@ -2,3 +2,12 @@
 
 /* Håll tvättaren synlig när spelkortet beskär bilden på små skärmar. */
 .game-card-hogtryckstvatten .game-cover img{object-position:30% center}
+
+/* Keep the complete square Min matbutik illustration visible in every card. */
+.game-card-min-matbutik .game-cover img,
+body.std-design .std-game-card[data-standard-game="min-matbutik"] img,
+body.std-design .std-activity-card[data-standard-game="min-matbutik"]>img{
+  object-fit:contain;
+  object-position:center;
+  background:#050507;
+}
