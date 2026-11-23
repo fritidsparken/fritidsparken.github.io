@@ -107,7 +107,7 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
   );
   replaceOnce(
     'resolve,(isSpringTarget||isCarTarget)?Math.max(8,Math.min(150,18000/plan.length)):',
-    'resolve,(isSummerTarget||isAutumnTarget||isWinterTarget||isBakeryTarget)?Math.max(12,Math.min(150,18000/plan.length)):(isSpringTarget||isCarTarget)?Math.max(8,Math.min(150,18000/plan.length)):',
+    'resolve,(isSummerTarget||isAutumnTarget||isWinterTarget||isBakeryTarget)?Math.max(12,Math.min(isFootballReferenceTarget?425:150,18000/plan.length)):(isSpringTarget||isCarTarget)?Math.max(8,Math.min(150,18000/plan.length)):',
     "summer animation pace"
   );
   replaceOnce(
@@ -165,15 +165,10 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
     "23-weedle.jpeg":"weedle", "26-venonat.jpeg":"venonat"
   };
   replaceOnce('function openPainter(IMAGE,TARGET,REFERENCE=""){',
-    'function openPainter(IMAGE,TARGET,REFERENCE=""){\n const pokemonReferencePaths='+JSON.stringify(pokemonReferences)+';\n const newPokemonReferences='+JSON.stringify([...newPokemonReferences])+';\n const pokemonReferencePath=new URL(IMAGE,location.href).pathname;\n const pokemonReferenceName=pokemonReferencePath.includes("/pokemon-20261021/")?pokemonReferencePaths[pokemonReferencePath.split("/").pop()]:null;\n const isPokemonReferenceTarget=!!pokemonReferenceName;\n const pokemonReferenceDir="./assets/pokemon-references-20261109"+(newPokemonReferences.includes(pokemonReferenceName)?"-b":"")+"/";\n const pokemonTexture=isPokemonReferenceTarget?pokemonReferenceDir+pokemonReferenceName+"-texture.webp":"";\n if(isPokemonReferenceTarget)REFERENCE=pokemonReferenceDir+pokemonReferenceName+"-reference.webp";',
+    'function openPainter(IMAGE,TARGET,REFERENCE=""){\n const pokemonReferencePaths='+JSON.stringify(pokemonReferences)+';\n const newPokemonReferences='+JSON.stringify([...newPokemonReferences])+';\n const imagePath=new URL(IMAGE,location.href).pathname;\n const pokemonReferenceName=imagePath.includes("/pokemon-20261021/")?pokemonReferencePaths[imagePath.split("/").pop()]:null;\n const isPokemonReferenceTarget=!!pokemonReferenceName;\n const isFootballReferenceTarget=!!REFERENCE&&imagePath.includes("/fotbollslag-20261022/");\n const pokemonReferenceDir="./assets/pokemon-references-20261109"+(newPokemonReferences.includes(pokemonReferenceName)?"-b":"")+"/";\n const pokemonTexture=isPokemonReferenceTarget?pokemonReferenceDir+pokemonReferenceName+"-texture.webp":"";\n if(isPokemonReferenceTarget)REFERENCE=pokemonReferenceDir+pokemonReferenceName+"-reference.webp";',
     'ten exact Pokémon reference mappings');
   source=source.replaceAll('isSummerTarget||isAutumnTarget||isWinterTarget||isBakeryTarget||isMachineTarget',
-    'isPokemonReferenceTarget||isSummerTarget||isAutumnTarget||isWinterTarget||isBakeryTarget||isMachineTarget');
-  replaceOnce(' const isPokemonReferenceTarget=!!pokemonReferenceName;',
-    ' const isPokemonReferenceTarget=!!pokemonReferenceName;\n const isAikReferenceTarget=!!REFERENCE&&pokemonReferencePath.endsWith("/fotbollslag-20261022/aik.svg");',
-    'identify the AIK reference');
-  source=source.replaceAll('isPokemonReferenceTarget||isSummerTarget||isAutumnTarget||isWinterTarget||isBakeryTarget||isMachineTarget',
-    'isAikReferenceTarget||isPokemonReferenceTarget||isSummerTarget||isAutumnTarget||isWinterTarget||isBakeryTarget||isMachineTarget');
+    'isFootballReferenceTarget||isPokemonReferenceTarget||isSummerTarget||isAutumnTarget||isWinterTarget||isBakeryTarget||isMachineTarget');
   replaceOnce('if(isPokemonTarget){\n     const title=', 'if(isPokemonTarget&&!REFERENCE){\n     const title=', 'show supplied reference without generated suggestion');
   replaceOnce('ref.onerror=()=>reject(new Error("Referens saknas"));ref.src=REFERENCE;',
     'ref.onerror=()=>reject(new Error("Referens saknas"));ref.src=isPokemonReferenceTarget?pokemonTexture:REFERENCE;',

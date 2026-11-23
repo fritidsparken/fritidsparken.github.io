@@ -8,7 +8,6 @@ mandalas.push(...[
     "season": "2026",
     "img": "./assets/coloring-originals-2026/fotbollslag-20261022/aik.svg",
     "preview": "./assets/coloring-originals-2026/fotbollslag-20261022/aik.svg",
-    "reference": "./assets/coloring-originals-2026/fotbollslag-20261022/aik-reference.svg",
     "pdf": "./assets/coloring-originals-2026/fotbollslag-20261022/aik.pdf",
     "src": "https://github.com/JoseArroyave/football-logos/blob/main/logos/sweden/AIK.svg",
     "sourceLabel": "Klubbmärke som färgläggningsbild"
@@ -618,4 +617,4 @@ mandalas.push(...[
     "src": "https://github.com/JoseArroyave/football-logos/blob/main/logos/spain/Villarreal.svg",
     "sourceLabel": "Klubbmärke som färgläggningsbild"
   }
-]);
+].map(crest => ({ ...crest, reference: crest.preview.replace(/\.svg$/, "-reference.svg") })));
