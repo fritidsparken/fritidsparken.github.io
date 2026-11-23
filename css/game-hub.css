@@ -3,11 +3,15 @@
 /* Håll tvättaren synlig när spelkortet beskär bilden på små skärmar. */
 .game-card-hogtryckstvatten .game-cover img{object-position:30% center}
 
-/* Keep the complete square Min matbutik illustration visible in every card. */
+/* Zoom past the baked-in black corners while keeping the shop sign in view.
+   The inset clips the zoomed image back to its original card area. */
 .game-card-min-matbutik .game-cover img,
-body.std-design .std-game-card[data-standard-game="min-matbutik"] img,
-body.std-design .std-activity-card[data-standard-game="min-matbutik"]>img{
-  object-fit:contain;
-  object-position:center;
-  background:#050507;
+body.std-design .std-game-card[data-standard-game="min-matbutik"] .std-game-art > img,
+body.std-design .std-activity-card[data-standard-game="min-matbutik"] > img,
+#fp-ranking a[href="/games/min-matbutik/"] .ranking-icon > img {
+  object-fit: cover;
+  object-position: center 5%;
+  scale: 1.25;
+  transform-origin: center 25%;
+  clip-path: inset(5% 10% 15%);
 }
