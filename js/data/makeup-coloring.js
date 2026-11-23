@@ -43,6 +43,7 @@
     title,
     type: 'Smink',
     img: base + file,
+    reference: base + file.replace(/\.webp$/, '-reference.webp'),
     src: base + file,
     sourceLabel: 'Egen färgläggningsbild'
   })));
