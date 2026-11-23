@@ -183,12 +183,14 @@ body.std-design .std-results-heading h2{overflow-wrap:anywhere}
 body.std-design .std-results-heading>button{flex:none;min-height:44px}
 body.std-design .std-inspiration>button{color:#fff}
 body.std-design.halloween .std-inspiration>button{color:#281521}
+/* The shortcut and the calendar door use the same Christmas red. */
+body.std-design{--fp-advent-red:linear-gradient(115deg,#6c1b24,#a33839 48%,#531a23)}
 /* Existing calendar door and popup events remain owned by advent-calendar.js. */
 body.std-design #julkalender,body.std-design .advent-preview,body.std-design .advent-motion-toggle{display:none}
 body.std-design .std-hero #advent-today-shortcut{position:absolute;z-index:2;left:14%;top:50%;transform:translate(-50%,-50%);width:140px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:none;color:#fff6d9;text-align:center;cursor:pointer}
 body.std-design .std-hero #advent-today-shortcut[hidden],body.std-design.std-browsing:not(.christmas) #advent-today-shortcut{display:none}
 body.std-design .advent-banner-caption,body.std-design .advent-banner-status{font-size:14px;font-weight:900;text-shadow:0 2px 6px #102a18}
-body.std-design .advent-banner-door{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;aspect-ratio:4/5;border:2px solid #e1c184;border-radius:46% 46% 10px 10px;background:linear-gradient(115deg,#6c1b24,#a33839 48%,#531a23);box-shadow:0 12px 20px #14291980,inset 0 0 0 6px #6e241f,inset 0 0 0 8px #dcb46b;transition:transform .2s}
+body.std-design .advent-banner-door{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;aspect-ratio:4/5;border:2px solid #e1c184;border-radius:46% 46% 10px 10px;background:var(--fp-advent-red);box-shadow:0 12px 20px #14291980,inset 0 0 0 6px #6e241f,inset 0 0 0 8px #dcb46b;transition:transform .2s}
 body.std-design .advent-banner-door strong{font:700 64px/1 Georgia,serif}
 body.std-design .advent-banner-door>span{font-size:23px;color:#ffe5a1}
 body.std-design .advent-banner-door small{font-size:13px}
@@ -296,7 +298,7 @@ body.std-design.dark:not(.halloween):not(.christmas) :is(.primary,.std-inspirati
    animation instead of freezing it on the closed cover under reduced motion. */
 @media(prefers-reduced-motion:reduce){
  body.std-design *,body.std-design *:before,body.std-design *:after{scroll-behavior:auto!important;transition:none!important}
- body.std-design :not(.advent-motion-enabled,.advent-motion-enabled *),
+ body.std-design :not(.advent-motion-enabled,.advent-motion-enabled *,.std-christmas-crafts),
  body.std-design :not(.advent-motion-enabled,.advent-motion-enabled *):before,
  body.std-design :not(.advent-motion-enabled,.advent-motion-enabled *):after{animation:none!important}
 }
