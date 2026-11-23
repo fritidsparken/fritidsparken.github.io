@@ -1,5 +1,6 @@
 (() => {
   const games=[
+    {id:'hemlyckan',title:'Hemlyckan',tag:'RENOVERA DITT DRÖMHUS',type:'Renovera & skapa',image:'../games/hemlyckan/assets/finale.webp',text:'Ge ett gammalt hus nytt liv! Välj billiga, medel eller dyra material, renovera alla rum och fixa hundkojan.',url:'./games/hemlyckan/'},
     {id:'skogsdrift',title:'Midnight Motor Syndicate',tag:'26 NATTBANOR · FYRA ÅRSTIDER',type:'Racing',image:'../games/midnight-syndicate/midnight.webp',text:'Kör över is och asfalt, tävla mot elva bilar och hitta snabbaste linjen genom natten.',url:'./games/midnight-syndicate/'},
     {id:'min-matbutik',title:'Min matbutik',tag:'HANDLA, SKANNA OCH PACKA',type:'Butik & rollspel',image:'min-matbutik-checkout-20261123.webp',text:'Gå runt i butiken, plocka varor och handla. Jobba i kassan, skanna och packa för att tjäna fler spelkronor!',url:'./games/min-matbutik/'},
     {id:'hogtryckstvatten',title:'Högtryckstvätten',tag:'SMUTSIGT IN. SKINANDE UT.',type:'Städa & upptäck',image:'../games/hogtryckstvatten/assets/house-wide-v2.webp',text:'Tvätta hus, pooler, skolor, slott, flygplan och bilar. Slå tidsmålen och lås upp kraftfullare munstycken!',url:'./games/hogtryckstvatten/'},
@@ -29,3 +30,4 @@
   window.FPGameHub={games,gallery,mount,render,open,stop};
   if(document.querySelector('#filters .active')?.dataset.cat==='Spel'){render();if(window.FPPendingGame){open(window.FPPendingGame);delete window.FPPendingGame;}}
 })();
+
