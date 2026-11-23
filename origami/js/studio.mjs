@@ -1,3 +1,4 @@
+import {galleryFrames} from './gallery-frames.mjs';
 import {FlightPlayer} from './flight-player.mjs';
 import {BlenderPlayer} from './blender-player.mjs?v=browser-fix-3';
 import {models,categories} from './models.mjs?v=pappersfjader-1';
@@ -25,7 +26,23 @@ function gallery(category='Alla') {
   for(const m of visible){
     const b=document.createElement('button');b.className='model-card';b.dataset.model=m.id;b.style.setProperty('--tint',m.color+'25');
     const art=document.createElement('span');art.className='model-art';const svg=document.createElementNS(svgNS,'svg');svg.setAttribute('aria-hidden','true');art.append(svg);
-    if(m.blender){const img=document.createElement('img');img.src=blender.asset(m,'state',m.steps.length,'webp');img.alt='';img.loading='lazy';art.append(img);svg.setAttribute('hidden','');const label=document.createElement('span');label.className='blender-badge';label.textContent='Blender 3D';art.append(label);}
+    if(m.blender){
+      const img=document.createElement('img');
+      const frame=galleryFrames[m.id];
+      if(frame){
+        const [x,y,width,background]=frame;
+        art.style.backgroundColor=background;
+        img.className='framed-model';
+        img.style.setProperty('--frame-x',`-${x}%`);
+        img.style.setProperty('--frame-y',`-${y}%`);
+        img.style.setProperty('--frame-width',`${width}%`);
+      }
+      img.alt='';img.loading='lazy';
+      img.addEventListener('error',()=>{img.remove();svg.removeAttribute('hidden');});
+      img.src=blender.asset(m,'state',m.steps.length,'webp');
+      art.append(img);svg.setAttribute('hidden','');
+      const label=document.createElement('span');label.className='blender-badge';label.textContent='Blender 3D';art.append(label);
+    }
     const badge=document.createElement('span');badge.className='difficulty';badge.textContent=m.level;art.append(badge);
     const copy=document.createElement('span');copy.className='card-copy';const title=document.createElement('strong');title.textContent=m.name;
     const time=document.createElement('small');time.textContent=m.minutes+' · '+m.steps.length+' steg';const paper=document.createElement('small');paper.textContent=m.paper.label;copy.append(title,time,paper);b.append(art,copy);
