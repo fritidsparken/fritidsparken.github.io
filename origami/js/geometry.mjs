@@ -30,6 +30,7 @@ export function rotatePoint(p,axis,angle) {
   return v.map((n,i)=>a[i]+n*c+cross[i]*s+u[i]*dot*(1-c));
 }
 export function initialState(model) {
+  if (model.initialState) return model.initialState();
   const points=(model.paper.outline||[[-model.paper.width/2,-model.paper.height/2],[model.paper.width/2,-model.paper.height/2],[model.paper.width/2,model.paper.height/2],[-model.paper.width/2,model.paper.height/2]]).map(p=>[...p,0]);
   return {panels:[{id:'paper',points,tags:[],front:model.paper.front!==false}],creases:[]};
 }
@@ -49,6 +50,7 @@ function splitFold(state,step) {
   return {fixed,moving};
 }
 export function createTransition(state,step) {
+  if (step.sample) return {step, sample:step.sample};
   if(step.kind==='fold') {
     const partial=step.angle!=null&&Math.abs(step.angle%180)>EPS;
     const input=partial?{...state,panels:state.panels.map((p,i)=>({...p,layerOffset:p.layerOffset||[0,0,i*.18]}))}:state;

@@ -20,7 +20,9 @@ export class PaperRenderer {
   draw(state,{step=null,progress=1,model=null,finished=false}={}) {
     const all=state.panels.flatMap(p=>p.points).map(p=>this.project(p));
     const minX=Math.min(...all.map(p=>p[0])),maxX=Math.max(...all.map(p=>p[0])),minY=Math.min(...all.map(p=>p[1])),maxY=Math.max(...all.map(p=>p[1]));
-    const extent=Math.max(150,Math.max(maxX-minX,maxY-minY)*1.35),cx=(minX+maxX)/2,cy=(minY+maxY)/2;
+    const framing=this.orbit||this.thumbnail?null:state.framing;
+    const extent=framing?.width??Math.max(model?.paper.minExtent??150,Math.max(maxX-minX,maxY-minY)*1.35);
+    const [cx,cy]=framing?this.project(framing.center):[(minX+maxX)/2,(minY+maxY)/2];
     this.svg.setAttribute('viewBox',`${cx-extent/2} ${cy-extent/2} ${extent} ${extent}`);
     const paths=state.panels.map((p,i)=>{
       const offset=p.layerOffset||[0,0,i*.12];
@@ -35,7 +37,9 @@ export class PaperRenderer {
       const pts=item.points.map(v=>v.slice(0,2).join(',')).join(' ');
       const shadow=item.p.points.map(v=>this.project([v[0]+3,v[1]+8,0]).slice(0,2).join(',')).join(' ');
       this.shadows.append(el('polygon',{points:shadow,fill:'#001c13'}));
-      const polygon=el('polygon',{points:pts,fill:item.front?this.color:'#fff7e8',stroke:item.front?'#7d603d':'#c6b89e','stroke-width':.65,'stroke-linejoin':'round'});
+      const fill=item.p.color??(item.front?this.color:'#fff7e8');
+      const stroke=item.p.color?'#53565a':item.front?'#7d603d':'#c6b89e';
+      const polygon=el('polygon',{points:pts,fill,stroke,'stroke-width':item.p.color ? .3 : .65,'stroke-linejoin':'round'});
       this.paper.append(polygon);
       const zspread=Math.max(...item.p.points.map(v=>v[2]))-Math.min(...item.p.points.map(v=>v[2]));
       if(zspread>1)this.paper.append(el('polygon',{points:pts,fill:'#142b24',opacity:Math.min(.23,zspread/650),'pointer-events':'none'}));

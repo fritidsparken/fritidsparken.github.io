@@ -45,7 +45,8 @@ test('selected layer folds do not move cat ears',()=>{
   assert.deepEqual(before.panels.filter(p=>p.tags.includes('ear')),after.panels.filter(p=>p.tags.includes('ear')));
 });
 test('no empty folds silently pass',()=>{
-  assert.throws(()=>createTransition(initialState(models[0]),{kind:'fold',text:'outside paper',line:[[1000,0],[1000,1]],side:-1}),/does not move/);
+  const sheet=initialState(models.find(m=>m.id==='katt'));
+  assert.throws(()=>createTransition(sheet,{kind:'fold',text:'outside paper',line:[[1000,0],[1000,1]],side:-1}),/does not move/);
 });
 
 test('Glidaren locks only its exposed nose flap, keeping both shoulders still',()=>{
@@ -88,4 +89,77 @@ test('standing name-card layers rotate with the lifted paper',()=>{
  const axis=[[0,0,0],[f.line[1][0]-f.line[0][0],f.line[1][1]-f.line[0][1],0]],state=c.states[i+1];
  assert.ok(state.panels.some(p=>Math.abs(p.layerOffset?.[1]||0)>.01));
  for(const p of state.panels.filter(p=>p.points.some(v=>Math.abs(v[2])>1e-6))){const back=rotatePoint(p.layerOffset,axis,-120*Math.PI/180*f.side*(f.direction??1));close(back[0],0,'offset x');close(back[1],0,'offset y');}
+});
+
+test('the spring opens two doubled strips into four arms and weaves each arm in turn',()=>{
+  const model=models.find(m=>m.id==='pappersfjader');
+  const {states}=compile(model);
+  function tails(state) {
+    return state.panels.filter(p=>p.id.endsWith('-tail')).map(panel=>{
+      const [a,b]=panel.points,dx=b[0]-a[0],dy=b[1]-a[1];
+      const direction=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');
+      return {arm:panel.id,material:panel.material,direction};
+    });
+  }
+  const doubled=tails(states[3]);
+  assert.equal(doubled.length,4);
+  assert.deepEqual(doubled.filter(p=>p.material===0).map(p=>p.direction),['right','right']);
+  assert.deepEqual(doubled.filter(p=>p.material===1).map(p=>p.direction),['down','down']);
+  assert.deepEqual(new Set(tails(states[5]).map(p=>p.direction)),new Set(['up','down','left','right']));
+  const folded=[];
+  for(let index=7;index<=10;index++) {
+    const before=tails(states[index-1]),after=tails(states[index]);
+    const moved=after.filter(p=>p.direction!==before.find(q=>q.arm===p.arm).direction);
+    assert.equal(moved.length,1,'each teaching step folds just one free end across the centre');
+    folded.push(moved[0]);
+  }
+  assert.equal(new Set(folded.map(p=>p.arm)).size,4);
+  assert.deepEqual(folded.map(p=>p.material),[0,1,0,1]);
+});
+
+test('the finished spring curves into an arch and keeps four separate checkerboard cells on its end',()=>{
+  const model=models.find(m=>m.id==='pappersfjader'),{states}=compile(model);
+  const subtract=(a,b)=>a.map((v,i)=>v-b[i]);
+  const distance=(a,b)=>Math.hypot(...subtract(a,b));
+  const mean=points=>[0,1,2].map(i=>points.reduce((s,p)=>s+p[i],0)/points.length);
+  function courses(state) {
+    const groups=[];
+    for(const panel of state.panels){
+      const match=panel.id.match(/^\d+-(\d+)-[01]$/);
+      if(!match)continue;
+      const points=panel.points.map(p=>p.map((v,i)=>v+panel.layerOffset[i]));
+      (groups[Number(match[1])]??=[]).push({color:panel.color,points,center:mean(points)});
+    }
+    return groups;
+  }
+  const center=course=>mean(course.map(cell=>cell.center));
+  function bow(groups) {
+    const ends=mean([center(groups[0]),center(groups.at(-1))]);
+    const mid=(groups.length-1)/2;
+    return distance(ends,mean([center(groups[Math.floor(mid)]),center(groups[Math.ceil(mid)])]));
+  }
+  const straight=courses(states.at(-2)),bent=courses(states.at(-1));
+  assert.ok(bow(straight)<model.paper.width*.1);
+  assert.ok(bow(bent)>model.paper.width,'the middle rises away from the line joining the ends');
+  const cap=bent.at(-1),normal=subtract(center(cap),center(bent.at(-2)));
+  const dot=(a,b)=>a.reduce((sum,v,i)=>sum+v*b[i],0);
+  const colors=[...new Set(cap.map(p=>p.color))];
+  assert.equal(colors.length,2);
+  const covers=[];
+  for(const first of cap.filter(p=>p.color===colors[0])) {
+    const other=cap.filter(p=>p.color===colors[1]).sort((a,b)=>distance(first.center,a.center)-distance(first.center,b.center))[0];
+    assert.ok(distance(first.center,other.center)<model.paper.width*.1,'one square of each color occupies this cell');
+    const signs=first.points.map(a=>{
+      const nearest=[...other.points].sort((b,c)=>distance(a,b)-distance(a,c))[0];
+      return Math.sign(dot(subtract(a,nearest),normal));
+    });
+    assert.ok(signs[0]!==0&&signs.every(value=>value===signs[0]),'one entire color lies above the other even at the corners');
+    covers.push(signs[0]>0?first:other);
+  }
+  assert.equal(covers.length,4);
+  for(const color of colors){
+    const pair=covers.filter(cell=>cell.color===color);
+    assert.equal(pair.length,2);
+    assert.ok(distance(pair[0].center,pair[1].center)>model.paper.width*1.3,'matching colors occupy opposite corners');
+  }
 });

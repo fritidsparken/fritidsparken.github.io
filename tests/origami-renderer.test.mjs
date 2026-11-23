@@ -20,3 +20,17 @@ test('every finished model and its pen details render in all ordinary views',()=
   }
  }}finally{globalThis.document=previous;}
 });
+test('both sides of a spring strip keep their color while rotating the finished weave',()=>{
+ const previous=globalThis.document;globalThis.document={createElementNS:(_,tag)=>new SvgElement(tag)};
+ try{
+  const model=models.find(m=>m.id==='pappersfjader'),state=compile(model).states.at(-1);
+  const colors=new Set(state.panels.map(panel=>panel.color));
+  assert.equal(colors.size,2);
+  const r=new PaperRenderer(new SvgElement('svg'));
+  for(const yaw of [0,Math.PI]){
+   r.orbit={yaw,pitch:.43};r.draw(state,{model,finished:true});
+   const fills=new Set(r.paper.children.filter(p=>p.attrs.stroke).map(p=>p.attrs.fill));
+   assert.deepEqual(fills,colors);
+  }
+ }finally{globalThis.document=previous;}
+});

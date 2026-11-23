@@ -1,8 +1,8 @@
 import {FlightPlayer} from './flight-player.mjs';
 import {BlenderPlayer} from './blender-player.mjs?v=browser-fix-3';
-import {models,categories} from './models.mjs?v=flight-fix-3';
-import {compile} from './geometry.mjs?v=paper-40-1';
-import {PaperRenderer} from './renderer.mjs?v=orbit-1';
+import {models,categories} from './models.mjs?v=pappersfjader-1';
+import {compile} from './geometry.mjs?v=pappersfjader-1';
+import {PaperRenderer} from './renderer.mjs?v=pappersfjader-1';
 import {loadProgress,saveProgress} from './progress.mjs';
 const $=id=>document.getElementById(id),svgNS='http://www.w3.org/2000/svg';
 const colors=[['Honung','#edb852'],['Himmel','#78b5d3'],['Ros','#e58f9f'],['Lavendel','#a7a1d4'],['Salvia','#83b28b']];
@@ -39,14 +39,15 @@ function render(state,progress=1){paintState=state;renderer.orbit=(preview||step
 function save(){const ok=saveProgress(current.id,step,renderer.color);$('saving').textContent=ok?'Sparas bara på den här enheten.':'Sparning är inte tillgänglig i den här webbläsaren.';}
 function update(){
   $('flight-launch').hidden=!current.flight;
-  const finished=(preview||step===current.steps.length)&&!playing;const is3D=renderMode==='blender'&&!finished;$('automatic').textContent=automatic?'■ Stoppa auto':'▶ Vik automatiskt';$('automatic').setAttribute('aria-pressed',String(automatic));$('paper').style.touchAction=finished?'none':'';$('paper').toggleAttribute('hidden',is3D);$('blender-stage').hidden=!is3D;$('render-choice').hidden=!current.blender;$('color-options').hidden=is3D;$('view-options').hidden=is3D;$('studio').classList.toggle('blender-mode',is3D);
+  const finished=(preview||step===current.steps.length)&&!playing;const is3D=renderMode==='blender'&&!finished;$('automatic').textContent=automatic?'■ Stoppa auto':'▶ Vik automatiskt';$('automatic').setAttribute('aria-pressed',String(automatic));$('paper').style.touchAction=finished?'none':'';$('paper').toggleAttribute('hidden',is3D);$('blender-stage').hidden=!is3D;$('render-choice').hidden=!current.blender;$('color-options').hidden=is3D||current.paper.fixedColors===true;$('view-options').hidden=is3D;$('studio').classList.toggle('blender-mode',is3D);
   $('render-modes').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.render===renderMode)));
   const done=step===current.steps.length;
   $('step-count').textContent=preview?'Färdig modell':step===0?'Förbered':`Steg ${step} av ${current.steps.length}`;
-  $('instruction').textContent=preview?'Så ser modellen ut när du är klar.':step===0?current.paper.label+(current.paper.front?' · Lägg den färgade sidan uppåt.':' · Lägg den vita sidan uppåt.'):current.steps[step-1].text;
+  const preparation=current.paper.preparation??current.paper.label+(current.paper.front?' · Lägg den färgade sidan uppåt.':' · Lägg den vita sidan uppåt.');
+  $('instruction').textContent=preview?'Så ser modellen ut när du är klar.':step===0?preparation:current.steps[step-1].text;
   $('paper').setAttribute('aria-label',preview?'Den färdiga modellen: '+current.name:$('instruction').textContent);
   $('stage-label').textContent=preview||done?'DIN FÄRDIGA MODELL':playing?'TITTA PÅ VIKNINGEN':'VIK I DIN EGEN TAKT';
-  $('stage-hint').textContent=finished?'Dra för att snurra · piltangenter fungerar också':playing?'':preview?'':done?'Fint vikt!':step?'Gör likadant med ditt papper.':is3D?'Ta fram ditt papper.':'Välj en färg och ta fram ditt papper.';
+  $('stage-hint').textContent=finished?'Dra för att snurra · piltangenter fungerar också':playing?'':preview?'':done?'Fint vikt!':step?'Gör likadant med ditt papper.':current.paper.preparation?'':is3D?'Ta fram ditt papper.':'Välj en färg och ta fram ditt papper.';
   $('back').disabled=playing||(!preview&&step===0);$('replay').disabled=playing||preview||step===0;$('next').disabled=playing;
   $('next').textContent=preview?'Tillbaka till guiden':done?'Klart! Välj något nytt ✓':step?'Okej, jag är klar →':'Börja vika →';
   $('result').textContent=preview?'Tillbaka till guiden':'Visa färdig modell';
@@ -97,7 +98,7 @@ $('info-toggle').onclick=()=>{stop();setPanel(activePanel==='info'?'paper':'info
 function open(model,button){stop();setPanel('paper');opener=button;orbit.yaw=0;orbit.pitch=.43;current=model;if(model.blender)blender.preload(model).catch(()=>{});renderMode=model.blender?'blender':'svg';preview=false;const saved=loadProgress(model.id,model.steps.length+1);step=saved?.step||0;renderer.color=saved?.color||model.color;renderer.view='angle';buildSwatches();
   $('views').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view==='angle')));
   $('studio-title').textContent=model.name;$('studio-category').textContent=model.category+' · '+model.level;$('material').textContent=model.materials;
-  $('source').href=model.source.url;$('source').title=model.source.designer;$('studio').showModal();document.body.style.overflow='hidden';showStep();$('next').focus();
+  $('source').href=model.source.url;$('source').textContent=(model.source.label||'Vikmodellens källa')+' ↗';$('source').title=model.source.designer;$('studio').showModal();document.body.style.overflow='hidden';showStep();$('next').focus();
 }
 function close(){stop();$('studio').close();document.body.style.overflow='';const id=current?.id;const category=$('categories').querySelector('[aria-pressed=true]')?.textContent||'Alla';gallery(category);document.querySelector(`[data-model="${id}"]`)?.focus();}
 $('close').onclick=close;$('studio').addEventListener('cancel',e=>{e.preventDefault();close();});
