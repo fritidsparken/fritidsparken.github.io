@@ -1,4 +1,4 @@
-/* Print the selected gallery originals as a single PDF. */
+/* Print ready-to-use pages in the browser’s native print dialog. */
 (() => {
   const catalog = document.getElementById('catalog');
   const galleries = {
@@ -7,6 +7,7 @@
   };
   const originalLabels = new WeakMap();
   let loader;
+  let printDocument;
 
   function escapeHtml(value) {
     return String(value).replace(/[&<>"']/g, char => ({
@@ -73,18 +74,14 @@
     }
   }
 
-  function loadPdfLibrary() {
+  function loadPdfRenderer() {
     if (!loader) {
-      loader = new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = '/js/vendor/pdf-lib-1.17.1.min.js';
-        script.onload = () => resolve(window.PDFLib);
-        script.onerror = () => {
-          script.remove();
-          loader = undefined;
-          reject(new Error('PDF library unavailable'));
-        };
-        document.head.append(script);
+      loader = import('/js/vendor/pdfjs-4.10.38/pdf.min.mjs').then(pdfjs => {
+        pdfjs.GlobalWorkerOptions.workerSrc = '/js/vendor/pdfjs-4.10.38/pdf.worker.min.mjs';
+        return pdfjs;
+      }).catch(error => {
+        loader = undefined;
+        throw error;
       });
     }
     return loader;
@@ -96,95 +93,140 @@
     return response.blob();
   }
 
-  async function addImage(pdf, blob) {
+  function createPrintDocument(title) {
+    const frame = document.createElement('iframe');
+    frame.title = title;
+    frame.tabIndex = -1;
+    frame.setAttribute('aria-hidden', 'true');
+    frame.style.cssText = 'position:fixed;left:-10000px;top:0;width:794px;height:1123px;border:0';
+    document.body.append(frame);
+
+    const doc = frame.contentDocument;
+    doc.open();
+    doc.write(`<!doctype html><html lang="sv"><head><meta charset="utf-8"><style>
+      @page { size: A4 portrait; margin: 10mm; }
+      html, body { margin: 0; padding: 0; }
+      .print-sheet {
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: calc(277mm - 1px);
+        break-after: page;
+        break-inside: avoid;
+      }
+      .print-sheet:last-child { break-after: auto; }
+      .print-sheet img { display: block; max-width: 100%; max-height: 100%; }
+    </style></head><body></body></html>`);
+    doc.close();
+    doc.title = title;
+    const urls = [];
+    return {
+      doc, urls,
+      dispose() {
+        frame.remove();
+        for (const url of urls) URL.revokeObjectURL(url);
+      }
+    };
+  }
+
+  async function appendImage(print, pages, blob) {
+    const image = print.doc.createElement('img');
     const url = URL.createObjectURL(blob);
-    const canvas = document.createElement('canvas');
+    print.urls.push(url);
+    image.src = url;
+    await image.decode();
+
+    const sheet = print.doc.createElement('section');
+    sheet.className = 'print-sheet';
+    sheet.append(image);
+    pages.append(sheet);
+  }
+
+  async function appendPdf(print, pages, blob) {
+    const { getDocument } = await loadPdfRenderer();
+    const task = getDocument({
+      data: await blob.arrayBuffer(),
+      ownerDocument: print.doc,
+      isEvalSupported: false,
+      useSystemFonts: true
+    });
     try {
-      const image = new Image();
-      image.src = url;
-      await image.decode();
-      const scale = Math.min(1, 1800 / Math.max(image.naturalWidth, image.naturalHeight));
-      canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
-      canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
-      const context = canvas.getContext('2d');
-      context.fillStyle = '#fff';
-      context.fillRect(0, 0, canvas.width, canvas.height);
-      context.drawImage(image, 0, 0, canvas.width, canvas.height);
-      const png = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-      if (!png) throw new Error('Could not prepare image');
-      const picture = await pdf.embedPng(await png.arrayBuffer());
-      const [width, height] = [595.28, 841.89];
-      const margin = 34;
-      const size = picture.scaleToFit(width - margin * 2, height - margin * 2);
-      pdf.addPage([width, height]).drawImage(picture, {
-        x: (width - size.width) / 2, y: (height - size.height) / 2, ...size
-      });
+      const pdf = await task.promise;
+      for (let number = 1; number <= pdf.numPages; number++) {
+        const page = await pdf.getPage(number);
+        const base = page.getViewport({ scale: 1 });
+        const viewport = page.getViewport({ scale: 1800 / Math.max(base.width, base.height) });
+        const canvas = print.doc.createElement('canvas');
+        canvas.width = Math.ceil(viewport.width);
+        canvas.height = Math.ceil(viewport.height);
+        try {
+          await page.render({
+            canvasContext: canvas.getContext('2d'),
+            viewport,
+            intent: 'print',
+            background: '#fff'
+          }).promise;
+          const image = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+          if (!image) throw new Error('Could not prepare PDF page');
+          await appendImage(print, pages, image);
+        } finally {
+          canvas.width = canvas.height = 0;
+          page.cleanup();
+        }
+      }
     } finally {
-      canvas.width = canvas.height = 0;
-      URL.revokeObjectURL(url);
+      await task.destroy();
     }
   }
 
-  async function addMotif(PDFDocument, output, motif) {
+  async function appendMotif(print, motif) {
+    const firstUrl = print.urls.length;
+    let pages = print.doc.createDocumentFragment();
     try {
       const original = await fetchOriginal(motif.source);
-      if (original.type === 'application/pdf' || /\.pdf$/i.test(new URL(motif.source, location.href).pathname)) {
-        const pdf = await PDFDocument.load(await original.arrayBuffer());
-        const pages = await output.copyPages(pdf, pdf.getPageIndices());
-        for (const page of pages) output.addPage(page);
+      const path = new URL(motif.source, location.href).pathname;
+      if (original.type === 'application/pdf' || /\.pdf$/i.test(path)) {
+        await appendPdf(print, pages, original);
       } else {
-        await addImage(output, original);
+        await appendImage(print, pages, original);
       }
     } catch (error) {
+      for (const url of print.urls.splice(firstUrl)) URL.revokeObjectURL(url);
       if (motif.source === motif.preview) throw error;
-      await addImage(output, await fetchOriginal(motif.preview));
+      pages = print.doc.createDocumentFragment();
+      await appendImage(print, pages, await fetchOriginal(motif.preview));
     }
+    print.doc.body.append(pages);
   }
 
   async function printSelection(gallery) {
-    if (gallery.busy || !gallery.selected.size) return;
+    if (!gallery.selected.size || Object.values(galleries).some(item => item.busy)) return;
     const motifs = [...gallery.selected.values()];
-    const popup = window.open('', '_blank');
-    if (!popup) {
-      gallery.notice = 'Tillåt popupfönster för att öppna utskriften.';
-      syncControls();
-      return;
-    }
-
     gallery.busy = true;
     gallery.notice = '';
     syncControls();
-    popup.opener = null;
-    popup.document.title = `Fritidsparken – skriv ut ${gallery.title}`;
-    const progress = popup.document.createElement('p');
-    popup.document.body.append(progress);
-    progress.textContent = 'Förbereder utskriften …';
     let current;
     try {
-      const { PDFDocument } = await loadPdfLibrary();
-      const output = await PDFDocument.create();
-      output.setTitle(`Fritidsparken – ${gallery.title}`);
-      for (const [index, motif] of motifs.entries()) {
-        if (popup.closed) return;
+      printDocument?.dispose();
+      printDocument = createPrintDocument(`Fritidsparken – ${gallery.title}`);
+      for (const motif of motifs) {
         current = motif;
-        progress.textContent = `Förbereder bild ${index + 1} av ${motifs.length} …`;
-        await addMotif(PDFDocument, output, motif);
+        await appendMotif(printDocument, motif);
       }
-      const bytes = await output.save();
-      if (popup.closed) return;
-      const url = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
-      popup.location.replace(url);
-      const watcher = setInterval(() => {
-        if (!popup.closed) return;
-        clearInterval(watcher);
-        URL.revokeObjectURL(url);
-      }, 2000);
+      // All pages and images are ready before showing the native dialog.
+      current = undefined;
+      const view = printDocument.doc.defaultView;
+      view.focus();
+      view.print();
     } catch (error) {
-      console.error('Could not prepare printable pages', error);
+      console.error('Could not print selected pages', error);
+      printDocument?.dispose();
+      printDocument = undefined;
       gallery.notice = current
         ? `Kunde inte läsa ”${current.title}”. Avmarkera bilden eller försök igen.`
         : 'Kunde inte öppna utskriften. Försök igen.';
-      if (!popup.closed) progress.textContent = gallery.notice;
     } finally {
       gallery.busy = false;
       syncControls();
