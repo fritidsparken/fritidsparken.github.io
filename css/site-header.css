@@ -22,8 +22,8 @@ body.std-design .std-christmas-slot{display:none}
 body.std-design.christmas .std-topbar{flex-wrap:nowrap}
 body.std-design.christmas .std-topbar::before{display:none}
 body.std-design.christmas .std-christmas-slot{display:flex;flex:1 1 auto;min-width:100px;justify-content:center;align-items:center;order:1}
-body.std-design.christmas .std-christmas-crafts{min-height:44px;padding:10px 22px;border:1px solid #ffffff26;border-radius:16px;background:#bb4651;color:#fff;font-family:inherit;font-weight:800;font-size:16px;line-height:1.25;white-space:nowrap;cursor:pointer;box-shadow:0 3px 10px #0002;transition:background .15s}
-body.std-design.christmas .std-christmas-crafts:hover{background:#a93643}
+body.std-design.christmas .std-christmas-crafts{min-height:44px;padding:10px 22px;border:1px solid #ffffff26;border-radius:16px;background:linear-gradient(135deg,#a26166,#88494e);color:#fff;font-family:inherit;font-weight:800;font-size:16px;line-height:1.25;white-space:nowrap;cursor:pointer;box-shadow:0 3px 10px #0002;transition:background .15s}
+body.std-design.christmas .std-christmas-crafts:hover{background:linear-gradient(135deg,#96565c,#7e4147)}
 body.std-design.christmas .std-christmas-crafts:focus-visible{outline:3px solid #fff;outline-offset:3px}
 body.std-design.christmas .std-topbar > #fpVisitorTime{order:2;margin-left:0}
 body.std-design.christmas .std-header-search{order:3;margin:0}
