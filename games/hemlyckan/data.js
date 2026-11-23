@@ -16,12 +16,12 @@ export const ROOMS=[
 {id:'doghouse',name:'Hundkojan',icon:'paw',group:'Utsidan',cost:1500,desc:'Även den minsta familjemedlemmen får ett nytt hem.',pos:[81,83],tasks:[t('Städa ur hundkojan','clear',floor),t('Ta bort skadade delar','remove',upper),t('Laga stommen','hammer',wall),t('Lägg nytt tak','install',upper,['Återbrukat tegel','Nytt tegel','Skiffer']),t('Byt och måla panelen','paint',wall,['Gulmålat trä','Grön träpanel','Blå panel och ek']),t('Lägg in bädd och matskålar','install',[.3,.52,.47,.37],['Rutig kudde','Mjuk hundbädd','Extra mjuk bädd'])]}
 ];
 export const TOOLS={
-clear:{name:'Sopa & röj',icon:'hand',verb:'Svep över sakerna för att städa bort dem. Du kan också trycka direkt på en sak. Det som du har städat försvinner direkt.',hint:'Svep över skräpet – eller tryck på en sak.'},
-remove:{name:'Riv varsamt',icon:'hammer',verb:'Svep över gamla delar eller håll fingret på en del. Det slitna materialet lossnar så att du ser underlaget.',hint:'Svep över de gamla delarna för att riva.'},
-hammer:{name:'Laga ytan',icon:'hammer',verb:'Svep över skadade delar eller håll ned på en del. Sprickorna försvinner när du lagar ytan.',hint:'Svep över sprickorna och se ytan bli hel.'},
-install:{name:'Bygg & montera',icon:'hammer',verb:'Svep över de markerade platserna eller tryck direkt på en plats. De nya delarna byggs upp framför dig.',hint:'Svep över platserna – delarna byggs upp.'},
-paint:{name:'Måla & förnya',icon:'brush',verb:'Svep över ytorna och se dem få ny färg. Du kan också trycka på en hel del för att måla den.',hint:'Svep över ytorna och se färgen förändras.'},
-connect:{name:'Koppla ihop',icon:'bolt',verb:'Dra mellan två ändar med samma färg och symbol. Du kan också trycka på ändarna i tur och ordning. Kopplingen snäpper på plats.',hint:'Dra ihop samma symbol – eller tryck på båda.'}
+clear:{name:'Sopa & röj',icon:'hand',verb:'Svep över de stora markerade arbetsytorna. En bock visar vilka delar som är klara.',hint:'Svep över arbetsytorna – en bock betyder klart.'},
+remove:{name:'Riv varsamt',icon:'hammer',verb:'Håll ned eller svep över de markerade arbetsytorna. Fortsätt till nästa del när en bock visas.',hint:'Håll ned eller svep över de stora arbetsytorna.'},
+hammer:{name:'Laga ytan',icon:'hammer',verb:'Håll ned eller svep över arbetsytorna tills varje del har en bock.',hint:'Håll ned och svep – gör alla delar klara.'},
+install:{name:'Bygg & montera',icon:'hammer',verb:'Svep över de markerade arbetsytorna. Materialet väljs automatiskt och en bock visar när en del är klar.',hint:'Svep över arbetsytorna. Materialet är redan valt.'},
+paint:{name:'Måla & förnya',icon:'brush',verb:'Svep över de stora markerade arbetsytorna tills alla delar är klara. Välj Efter för att se bilden med ditt valda material.',hint:'Svep över alla arbetsytor tills de är klara.'},
+connect:{name:'Koppla ihop',icon:'bolt',verb:'Dra mellan två ändar med samma färg och symbol. Du kan också trycka på ändarna i tur och ordning.',hint:'Dra ihop samma symbol – eller tryck på båda.'}
 };
 export function price(room,tier){return Math.round(room.cost*TIERS[tier-1].factor/100)*100;}
 export const INITIAL_BUDGET=220000;
