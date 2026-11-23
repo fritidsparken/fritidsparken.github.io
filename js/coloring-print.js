@@ -98,26 +98,45 @@
     frame.title = title;
     frame.tabIndex = -1;
     frame.setAttribute('aria-hidden', 'true');
-    frame.style.cssText = 'position:fixed;left:-10000px;top:0;width:794px;height:1123px;border:0';
+    frame.style.cssText = 'position:fixed;left:-10000px;top:0;width:718px;height:1040px;border:0';
     document.body.append(frame);
 
     const doc = frame.contentDocument;
     doc.open();
     doc.write(`<!doctype html><html lang="sv"><head><meta charset="utf-8"><style>
       @page { size: A4 portrait; margin: 10mm; }
-      html, body { margin: 0; padding: 0; }
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 190mm;
+        max-width: 190mm;
+      }
       .print-sheet {
         box-sizing: border-box;
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 100%;
-        height: calc(277mm - 1px);
-        break-after: page;
+        width: 190mm;
+        height: 270mm;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
         break-inside: avoid;
+        page-break-inside: avoid;
       }
-      .print-sheet:last-child { break-after: auto; }
-      .print-sheet img { display: block; max-width: 100%; max-height: 100%; }
+      /* Start a new sheet only between motifs; never create a trailing blank page. */
+      .print-sheet + .print-sheet {
+        break-before: page;
+        page-break-before: always;
+      }
+      .print-sheet img {
+        display: block;
+        width: auto;
+        height: auto;
+        max-width: 190mm;
+        max-height: 270mm;
+        object-fit: contain;
+      }
     </style></head><body></body></html>`);
     doc.close();
     doc.title = title;
