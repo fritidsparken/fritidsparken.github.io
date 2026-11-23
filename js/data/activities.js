@@ -15,6 +15,77 @@ const activities=[
 ["🕺","Fritidsgympa","Dansstopp","Rör er till musik och frys när den stannar.","10–15 min",["Sätt på en låt.","Alla dansar fritt medan musiken spelar.","Frys som en staty när musiken pausas."]],
 ["🧘","Fritidsgympa","Djur-yoga","Härma djur med lugna rörelser och balans.","10–15 min",["Välj ett djurkort eller ropa ett djur.","Gör djurets rörelse och ljud.","Håll varje position några andetag."]],
 ["⚽","Fritidsgympa","Prickboll","Sikta på mål tillsammans med mjuka bollar.","15–25 min",["Ställ upp koner eller hinkar som mål.","Rulla eller kasta från en markerad linje.","Räkna lagets gemensamma träffar."]],
+["💗", "Pyssel", "Papperssquishy", "Rita en axolotl, en stjärna eller ditt favoritdjur och gör det till en mjuk klämfigur.", "20–30 min", [
+  "Material: A4-papper, färgpennor, sax, bred genomskinlig tejp och lite vadd eller mjukt hushållspapper.",
+  "Vik pappret på mitten. Rita en figur ungefär lika stor som din hand på det översta lagret. Färglägg figuren och klipp ut genom båda papperslagren, så du får två likadana former.",
+  "Täck utsidan av båda formerna med genomskinlig tejp. Klipp bort det som sticker ut.",
+  "Lägg formerna mot varandra med bilderna utåt. Vik små tejpbitar runt kanten så delarna sitter ihop. Lämna en öppning ungefär två fingrar bred.",
+  "Stoppa in lite vadd i öppningen. Känn efter så att figuren går att klämma lätt. Tejpa igen öppningen och prova din squishy."
+]],
+["🧵", "Pyssel", "Flätade vänskapsarmband", "Fläta ett armband i kompisens favoritfärger med en rund skiva av kartong.", "25–45 min", [
+  "Material: tunn kartong, ett glas att rita runt, penna, sax och sju trådar av broderigarn som är ungefär 50 cm långa.",
+  "Rita av glaset på kartongen och klipp ut cirkeln. Klipp åtta grunda skåror jämnt runt kanten, som åtta väderstreck. Be en vuxen göra ett litet hål i mitten.",
+  "Knyt ihop trådarnas ena ändar. För de lösa ändarna genom hålet så knuten hamnar under skivan. Sätt en tråd i varje skåra och lämna en skåra tom.",
+  "Vrid skivan så att den tomma skåran pekar mot dig. Räkna tre trådar åt höger och flytta den tredje till den tomma skåran. Vrid skivan så att den nya tomma skåran pekar mot dig och upprepa åt samma håll.",
+  "När flätan som växer under skivan räcker runt handleden, lyft ur trådarna och knyt en knut där flätan slutar. Lämna lösa ändar för att knyta fast armbandet."
+]],
+["📚", "Pyssel", "Monsterbokmärken", "Vik en pappersficka med knasiga ögon och vassa papperständer som håller koll på din sida.", "15–25 min", [
+  "Material: ett färgat papper, lite vitt papper, sax, limstift, linjal och penna.",
+  "Klipp ut en kvadrat på 15 × 15 cm. Vik den diagonalt till en triangel och lägg triangeln med den långa kanten mot dig.",
+  "Vik upp de två hörnen längs den långa kanten så att deras spetsar möts vid triangelns topp. Vik ner dem igen.",
+  "Ta bara det översta papperslagret i den övre spetsen och vik spetsen ner till mitten av den långa kanten. Vik sedan upp sidohörnen igen, ett i taget, och stoppa in dem bakom den nedvikta fliken så att det bildas en ficka.",
+  "Klipp ut ögon och tänder. Limma fast dem på framsidan så att fickan går att öppna. Trä monstret över hörnet på din boksida."
+]],
+["🌼", "Pyssel", "Blommor av piprensare", "Böj mjuka piprensare till en bukett med bulliga kronblad och färgglada mittar.", "20–35 min", [
+  "Material: piprensare i flera färger, gröna och gula piprensare, samt en kopp eller liten vas.",
+  "Välj en färg till kronbladen. Böj ena änden av en piprensare till en ögla och tvinna ihop den vid basen. Böj resten av piprensaren till fler öglor med samma mittpunkt. Lägg till en piprensare om du vill ha fler kronblad.",
+  "Rulla den gula piprensaren till en liten platt spiral. Lämna en bit rak och tvinna fast den runt mitten på baksidan av blomman.",
+  "Tvinna fast en grön piprensare på baksidan som stjälk. Vik in ändarna, så att ingen vass tråd sticker ut.",
+  "Gör några blommor till i olika färger och samla dem i en kopp. Böj kronbladen lite olika så att varje blomma får sin egen form."
+]],
+["🌗", "Pyssel", "Dag och natt i samma bild", "Se solen från ena sidan och månen från den andra i en bild som viks som ett dragspel.", "30–45 min", [
+  "Material: tre A4-papper, linjal, penna, sax, färgpennor och limstift.",
+  "Klipp ut två kvadrater på 12 × 12 cm, en från varje papper. Rita sol och gröna kullar på den ena och måne och stjärnor på den andra. Fyll hela ytan.",
+  "Markera sex lodräta remsor som är 2 cm breda på baksidan av varje bild. Klipp isär bilderna och håll remsorna i ordning från vänster till höger, med motiven uppåt.",
+  "Klipp det tredje pappret till 24 × 12 cm. Markera tolv lodräta fält om 2 cm. Limma remsorna i ordning och växla mellan motiven: första dagremsan, första nattremsan, andra dagremsan, andra nattremsan och så vidare.",
+  "Låt limmet torka och vik längs skarvarna, varannan vikning framåt och varannan bakåt. Ställ upp bilden på bordet och titta från vänster och höger."
+]],
+["🦊", "Pyssel", "Sprattelräv av kartong", "Bygg en liten räv med rörliga tassar. Dra i snöret så sprattlar den.", "30–45 min", [
+  "Material: tunn kartong, pennor, sax, fyra påsnitar (jungfruben) och bomullssnöre.",
+  "Rita och klipp ut en räv med huvud och kropp i en hel del, två framtassar och två baktassar. Rita gärna en svans som sticker ut från kroppen. Gör varje tassdel lite längre högst upp så att den kan sticka upp bakom leden.",
+  "Placera tassarna bakom kroppen så att de hänger nedåt. Be en vuxen göra hål genom kartongen vid axlar och höfter, och ett extra hål strax ovanför leden i varje tassdel. Sätt fast tassarna med påsnitarna så löst att de kan röra sig.",
+  "Lägg räven med baksidan upp och tassarna nedåt. Knyt ett snöre rakt mellan de två övre extrahålen på framtassarna och ett mellan extrahålen på baktassarna. Snörena ska vara spända när tassarna hänger rakt ned.",
+  "Knyt ett längre dragsnöre i mitten av det övre tvärsnöret och sedan i mitten av det undre. Låt änden hänga nedanför kroppen. Håll räven upprätt och dra försiktigt. Om en tass fastnar, lossa niten lite."
+]],
+["📖", "Pyssel", "Minibok av ett papper", "Förvandla ett enda A4 till en åttasidig miniserie, sagobok eller hemlig anteckningsbok.", "20–30 min", [
+  "Material: ett A4-papper, sax, penna och färgpennor.",
+  "Lägg pappret på bredden. Vik det på mitten så att högersidan möter vänstersidan och öppna igen. Vik sedan båda kortsidorna in till mittvecket och öppna igen.",
+  "Vik den nedre långsidan upp till den övre och öppna igen. Pappret har nu åtta rutor i två rader.",
+  "Vik kortsidorna mot varandra igen. Klipp från den vikta kanten längs vecket som ligger mitt emellan långsidorna. Stanna vid nästa tvärveck och öppna. Nu finns bara en skåra mitt i arket.",
+  "Vik långsidorna mot varandra. Håll i kortändarna och skjut dem mot varandra så att skåran öppnas som en diamant. Fortsätt tills pappret bildar ett kors. Vik korsets flikar åt samma håll till en bok.",
+  "Rita ditt omslag först. Bläddra sedan och fyll boken med en kort berättelse, en pytteliten serie eller dina bästa gåtor."
+]],
+["🔵", "Pyssel", "Kullabyrint i kartong", "Bygg en egen bana och luta lådan för att rulla kulan förbi alla återvändsgränder.", "30–45 min", [
+  "Material: ett grunt kartonglock med kant, papperssugrör, sax, penna, tejp eller hobbylim och en kula.",
+  "Markera start och mål i två olika hörn. Rita en slingrande väg mellan dem med blyerts. Gör vägen lite bredare än kulan även i svängarna.",
+  "Klipp sugrören i bitar. Testa hur de ligger på båda sidor om vägen och bygg några återvändsgränder där det finns plats. Tejpa eller limma fast bitarna när du är nöjd.",
+  "Lägg kulan vid starten. Håll locket med båda händerna och luta det försiktigt tills kulan rullar. Flytta en vägg om kulan fastnar.",
+  "Låt en kompis testa din bana. Prova sedan att rulla kulan från mål tillbaka till start."
+]],
+["💌", "Pyssel", "Pop-up-kort", "Öppna kortet så reser sig ett hjärta, en tårta eller en figur mitt framför dig.", "20–35 min", [
+  "Material: två lika stora papper i olika färger, pappersspill till motivet, sax, limstift och pennor.",
+  "Vik varje papper på mitten som ett kort. Det ena blir insidan och det andra utsidan.",
+  "Klipp två parallella jack ungefär 3 cm in från insidans vikta kant. Lämna ungefär 4 cm mellan jacken. Vik fliken mellan jacken, öppna kortet och tryck in fliken så att den blir ett litet trappsteg.",
+  "Klipp ut ett motiv lite större än trappsteget. Limma det mot stegets lodräta framsida. Stäng försiktigt och kontrollera att motivet ryms i kortet.",
+  "Limma fast insidan i det andra vikta pappret. Håll själva trappsteget fritt från lim så att det kan röra sig. Rita och skriv runt motivet när kortet går att öppna och stänga."
+]],
+["🦋", "Pyssel", "Fönsterbilder av silkespapper", "Gör en lysande pappersfjäril som släpper igenom färgat ljus när solen tittar fram.", "20–35 min", [
+  "Material: mörkt papper, silkespapper i flera färger, sax, penna, limstift och genomskinlig tejp.",
+  "Vik ett mörkt papper på mitten. Rita en halv fjäril mot vecket och klipp längs ytterlinjen så att vingarna blir lika stora när du öppnar pappret.",
+  "Rita stora fält i vingarna och låt det vara minst en centimeter mellan fälten. Be en vuxen hjälpa dig att göra ett litet starthål i varje fält. Klipp sedan ut fälten så kanterna blir som en ram.",
+  "Klipp silkespappersbitar lite större än öppningarna. Limma fast bitarna på baksidan av ramen. Prova en färg per fält eller låt två färger överlappa varandra.",
+  "Vänd fjärilen och tejpa upp den på ett fönster. Gör gärna ett litet hjärta med samma teknik bredvid."
+]],
 ["🧻","Pyssel","Toarullefigurer","Förvandla tomma rullar till fantasifigurer eller små djur.","20–35 min",["Samla rena tomma rullar, papper och limstift.","Vik eller klipp öron, vingar och ben av papper.","Dekorera figuren och hitta på ett namn."]],
 ["🥚","Pyssel","Äggkartongens små världar","Gör små blommor, insekter eller fantasifigurer av äggkartong.","20–35 min",["Klipp isär äggkartongen i mindre delar.","Måla och låt torka.","Lägg till ben, blad eller vingar av papper."]],
 ["🧶","Pyssel","Garnbokstäver","Linda garn runt en kartongbokstav och gör en färgglad namnskylt.","20–30 min",["Klipp ut en stor bokstav i kartong.","Fäst garnänden med tejp och linda runt bokstaven.","Byt färg genom att knyta fast en ny garnbit."]],
