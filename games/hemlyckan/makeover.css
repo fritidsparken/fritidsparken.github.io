@@ -1,0 +1,57 @@
+/* A quiet room gallery, and a spacious, touch-first playable workshop. */
+.app-layout:has(.working) {grid-template-columns:1fr}
+.app-layout:has(.working) .sidebar{display:none}
+.room-workspace.working{padding:16px 28px;gap:12px;max-width:1600px;margin:0 auto;width:100%;box-sizing:border-box}
+.working .page-heading{min-height:48px}
+.working .page-heading h1{font-size:26px}
+.working .page-heading .eyebrow{display:none}
+.working .task-toolbar{padding:0 2px;min-height:46px;border:0}
+.working .task-toolbar>span{font-size:22px;font-weight:700;letter-spacing:-.025em;gap:12px}
+.working .task-toolbar>span>.icon{width:32px;height:32px;padding:9px;background:#e3ebd9;border-radius:15px;color:#345b41;box-sizing:content-box}
+.workshop-scene{position:relative;border-radius:24px!important;background:#e9eee9;isolation:isolate;box-shadow:inset 0 0 0 1px #dce4d7;overflow:hidden;touch-action:none}
+.workshop-scene canvas{width:100%;height:100%;display:block;cursor:grab!important;touch-action:none;outline-offset:-5px}
+.workshop-scene canvas:active{cursor:grabbing!important}
+.workshop-scene .image-tag{position:absolute;left:16px;top:16px;min-width:0;width:auto!important;height:auto!important;min-height:0;padding:8px 12px;background:#ffffffb5;border-radius:12px;font-size:11px;box-shadow:none;pointer-events:none}
+.working .scene-stage{border-radius:24px;background:#e9eee9}
+.working .play-controls{display:flex;align-items:stretch;gap:12px;padding:0;background:none;border:0}
+.working .workbar{flex:1;padding:15px 18px;border-radius:20px;background:#fcfdf8;box-shadow:0 3px 16px #23402e08;gap:20px;min-width:0}
+.working .tool-display> .icon{width:28px;height:28px;background:#e9efdf;border-radius:12px;padding:10px;box-sizing:content-box}
+.working .tool-display strong{font-size:15px}
+.working .tool-display small{font-size:14px;line-height:1.45;color:#506658}
+.working .work-progress{min-width:140px;max-width:200px;width:23%;gap:7px}
+.working .work-progress>span{font-size:15px;color:#345b41;font-weight:700}
+.working .track{height:9px;border-radius:20px;background:#e5ebdd}
+.working .track i{background:#6b9566;transition:width .16s ease;border-radius:20px}
+.working .supply-bar{display:flex;align-items:center;gap:8px;padding:0;flex-wrap:wrap;justify-content:flex-end;max-width:32%}
+.working .supply-bar .material-note{width:100%;font-size:11px;justify-content:flex-end;color:#536a58}
+.working .reveal-work{min-height:44px;border-radius:14px;background:#fffaf0;border-color:#dfd6ba;font-weight:700}
+.work-celebration[hidden]{display:none!important}
+.work-celebration{position:absolute;left:50%;bottom:24px;transform:translateX(-50%);display:flex;align-items:center;flex-direction:column;gap:5px;padding:16px 30px;border-radius:24px;background:#fffdf2f5;color:#315b43;box-shadow:0 12px 40px #24423126;pointer-events:none;white-space:nowrap;z-index:5}
+.work-celebration>span{display:grid;place-items:center;width:38px;height:38px;background:#6d965f;color:white;border-radius:50%;font-size:24px}.work-celebration strong{font-size:22px}.work-celebration small{font-size:13px}
+@media(max-width:700px){
+ .room-workspace.working{padding:8px 12px;gap:8px}
+ .working .page-heading{min-height:36px}.working .page-heading h1{font-size:22px}
+ .working .task-toolbar{gap:8px;min-height:42px}.working .task-toolbar>span{font-size:16px;gap:8px}.working .task-toolbar>span>.icon{width:22px;height:22px;padding:6px;border-radius:10px}
+ .working .task-toolbar .secondary{font-size:11px;padding:8px}
+ .working .scene-stage,.workshop-scene{border-radius:18px!important}
+ .working .play-controls{display:grid;grid-template-columns:1fr;gap:7px}
+ .working .workbar{padding:10px 12px;gap:8px;border-radius:16px}
+ .working .tool-display>.icon{display:none}.working .tool-display strong{font-size:13px}.working .tool-display small{font-size:12px;max-width:27ch}
+ .working .work-progress{min-width:90px;width:90px}.working .work-progress>span{font-size:12px}
+ .working .supply-bar{max-width:none;width:100%;flex-wrap:nowrap;justify-content:flex-end}
+ .working .supply-bar .material-note{width:auto;flex:1;justify-content:flex-start;font-size:10px}
+ .working .reveal-work{min-height:40px;font-size:12px;padding:8px 12px}
+ .workshop-scene .image-tag{top:10px;left:10px;font-size:10px;padding:6px 9px}
+ .work-celebration{bottom:14px;padding:12px 18px;max-width:90%;white-space:normal;text-align:center;width:max-content}.work-celebration strong{font-size:19px}.work-celebration small{font-size:11px}
+}
+@media(max-height:520px) and (min-width:650px){
+ .room-workspace.working{padding:5px 12px;gap:5px}.working .page-heading{min-height:28px}.working .page-heading h1{font-size:20px}
+ .working .task-toolbar{min-height:30px}.working .task-toolbar>span{font-size:15px}.working .task-toolbar>span>.icon{width:18px;height:18px;padding:5px}.working .task-toolbar .secondary{padding:6px 10px}
+ .working .workbar{padding:7px 12px}.working .tool-display>.icon{display:none}.working .tool-display strong{font-size:12px}.working .tool-display small{font-size:11px}.working .work-progress>span{font-size:12px}.working .supply-bar .material-note{display:none}
+ .workshop-scene .image-tag{top:6px;left:8px;padding:4px 8px;font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){.working .track i{transition:none}}
+
+.working .task-toolbar>span strong{font:inherit}
+
+.workshop-scene canvas:focus{outline:none}.workshop-scene canvas:focus-visible{outline:3px solid #6e9164;outline-offset:-4px;border-radius:20px}

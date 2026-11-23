@@ -16,18 +16,18 @@ export const ROOMS=[
 {id:'doghouse',name:'Hundkojan',icon:'paw',group:'Utsidan',cost:1500,desc:'Även den minsta familjemedlemmen får ett nytt hem.',pos:[81,83],tasks:[t('Städa ur hundkojan','clear',floor),t('Ta bort skadade delar','remove',upper),t('Laga stommen','hammer',wall),t('Lägg nytt tak','install',upper,['Återbrukat tegel','Nytt tegel','Skiffer']),t('Byt och måla panelen','paint',wall,['Gulmålat trä','Grön träpanel','Blå panel och ek']),t('Lägg in bädd och matskålar','install',[.3,.52,.47,.37],['Rutig kudde','Mjuk hundbädd','Extra mjuk bädd'])]}
 ];
 export const TOOLS={
-clear:{name:'Sopa & röj',icon:'hand',verb:'Håll ned och svep genom arbetsområdet. Den lilla ringen visar var det finns arbete kvar.',hint:'Svep över arbetsytan · följ den lilla ringen.'},
-remove:{name:'Riv varsamt',icon:'hammer',verb:'Håll ned inom arbetsområdet. Flytta verktyget vidare när ringen flyttas. Du behöver inte släppa mellan ytorna.',hint:'Håll ned och för verktyget över arbetsytan.'},
-hammer:{name:'Laga ytan',icon:'hammer',verb:'Håll verktyget vid den lilla ringen tills ytan är klar. Fortsätt till nästa del utan att släppa.',hint:'Håll ned · följ ringen till nästa yta.'},
-install:{name:'Bygg & montera',icon:'hammer',verb:'Håll verktyget över arbetsytan och följ den lilla ringen vidare. Materialet används automatiskt.',hint:'Håll ned och arbeta över hela området.'},
-paint:{name:'Måla med roller',icon:'brush',verb:'Håll ned och svep rollern över arbetsområdet. Den lilla ringen visar var du har arbete kvar.',hint:'Dra rollern över arbetsytan · följ ringen.'},
-connect:{name:'Koppla',icon:'bolt',verb:'Dra kabeländen till änden med samma nummer. Du kan också trycka på de två ändarna i tur och ordning.',hint:'Dra ihop kabeländar med samma nummer.'}
+clear:{name:'Sopa & röj',icon:'hand',verb:'Svep över sakerna för att städa bort dem. Du kan också trycka direkt på en sak. Det som du har städat försvinner direkt.',hint:'Svep över skräpet – eller tryck på en sak.'},
+remove:{name:'Riv varsamt',icon:'hammer',verb:'Svep över gamla delar eller håll fingret på en del. Det slitna materialet lossnar så att du ser underlaget.',hint:'Svep över de gamla delarna för att riva.'},
+hammer:{name:'Laga ytan',icon:'hammer',verb:'Svep över skadade delar eller håll ned på en del. Sprickorna försvinner när du lagar ytan.',hint:'Svep över sprickorna och se ytan bli hel.'},
+install:{name:'Bygg & montera',icon:'hammer',verb:'Svep över de markerade platserna eller tryck direkt på en plats. De nya delarna byggs upp framför dig.',hint:'Svep över platserna – delarna byggs upp.'},
+paint:{name:'Måla & förnya',icon:'brush',verb:'Svep över ytorna och se dem få ny färg. Du kan också trycka på en hel del för att måla den.',hint:'Svep över ytorna och se färgen förändras.'},
+connect:{name:'Koppla ihop',icon:'bolt',verb:'Dra mellan två ändar med samma färg och symbol. Du kan också trycka på ändarna i tur och ordning. Kopplingen snäpper på plats.',hint:'Dra ihop samma symbol – eller tryck på båda.'}
 };
 export function price(room,tier){return Math.round(room.cost*TIERS[tier-1].factor/100)*100;}
 export const INITIAL_BUDGET=220000;
-export function freshState(){return {version:1,started:false,selected:'exterior',sound:false,rooms:Object.fromEntries(ROOMS.map(r=>[r.id,{tier:0,step:0,work:[]}]))};}
+export function freshState(){return {version:1,workSchema:2,started:false,selected:'exterior',sound:false,rooms:Object.fromEntries(ROOMS.map(r=>[r.id,{tier:0,step:0,work:[]}]))};}
 export function totalSpent(s){return ROOMS.reduce((sum,r)=>sum+(s.rooms[r.id].tier?price(r,s.rooms[r.id].tier):0),0);}
 export function allDone(s){return ROOMS.every(r=>s.rooms[r.id].step>=r.tasks.length);}
 export function completedTasks(s){return ROOMS.reduce((sum,r)=>sum+s.rooms[r.id].step,0);}
 export const TOTAL_TASKS=ROOMS.reduce((s,r)=>s+r.tasks.length,0);
-export function normalizeState(s){const f=freshState();if(!s||s.version!==1)return f;f.started=!!s.started;f.sound=!!s.sound;f.selected=ROOMS.some(r=>r.id===s.selected)?s.selected:'exterior';for(const r of ROOMS){const v=s.rooms?.[r.id];if(v&&Number.isInteger(v.tier)&&v.tier>=0&&v.tier<=3){f.rooms[r.id]={tier:v.tier,step:v.tier?Math.max(0,Math.min(r.tasks.length,Math.floor(v.step)||0)):0,work:Array.isArray(v.work)?v.work.map(n=>Math.max(0,Math.min(1,Number(n)||0))).slice(0,120):[]};}}return f;}
+export function normalizeState(s){const f=freshState();if(!s||s.version!==1)return f;f.started=!!s.started;f.sound=!!s.sound;f.selected=ROOMS.some(r=>r.id===s.selected)?s.selected:'exterior';for(const r of ROOMS){const v=s.rooms?.[r.id];if(v&&Number.isInteger(v.tier)&&v.tier>=0&&v.tier<=3){f.rooms[r.id]={tier:v.tier,step:v.tier?Math.max(0,Math.min(r.tasks.length,Math.floor(v.step)||0)):0,work:Array.isArray(v.work)?v.work.map(n=>Math.max(0,Math.min(1,Number(n)||0))).slice(0,120):[]};}}if(s.workSchema!==2){for(const r of ROOMS){const v=f.rooms[r.id];if(r.tasks[v.step]?.tool==='paint'&&v.work.length){const old=v.work;v.work=Array.from({length:6},(_,i)=>{const col=i%3,row=Math.floor(i/3);let sum=0;for(let y=0;y<3;y++)for(let x=0;x<4;x++)sum+=old[(row*3+y)*12+col*4+x]||0;return sum/12;});}}}return f;}
