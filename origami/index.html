@@ -106,6 +106,7 @@ html.origami-embedded .filters button{
 html.origami-embedded .filters button[aria-pressed=true]{
  background:#276b4e!important;color:white!important;border-color:#276b4e!important;
 }
+/* The parent sizes the iframe to this grid. Its columns must depend on width only. */
 html.origami-embedded .model-grid{
  display:grid!important;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr))!important;
  gap:18px!important;align-items:stretch!important;
@@ -142,9 +143,6 @@ html.origami-embedded #studio,html.origami-embedded #flight-dialog{
  html.origami-embedded .card-copy small{font-size:12px!important}
  html.origami-embedded .filters{gap:6px!important;margin-bottom:14px!important}
  html.origami-embedded .filters button{padding:8px 11px!important;font-size:12px!important}
-}
-@media(orientation:landscape) and (max-height:650px){
- html.origami-embedded .model-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
 }
 </style>
 </head><body class="std-design origami-page"><header class="std-header"><div class="std-topbar"><a class="std-brand" href="/" aria-label="Till Fritidsparken"><img src="../assets/fritidsparken-logo.jpg" alt="" width="38" height="38">Fritidsparken.se</a><a class="std-plugg" href="https://pluggparken.se/" aria-label="Till Pluggparken"><img src="../assets/pluggparken-icon.svg" alt="" width="38" height="38"> Pluggparken.se</a><button type="button" class="std-header-search" aria-label="Sök aktiviteter" aria-expanded="false" aria-controls="activitySearchPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></button><div class="std-controls"><button type="button" class="iconbtn" id="theme" aria-label="Byt tema" aria-pressed="false">🌙</button><button type="button" class="iconbtn season-picker" id="seasonPicker" aria-label="Välj tema: Standard, Halloween eller Jul" aria-expanded="false" aria-controls="activitySeasonMenu" title="Välj tema: Standard, Halloween eller Jul"><img src="../assets/fritidsparken-logo.jpg" alt="Fritidsparken"></button></div></div>

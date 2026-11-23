@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="sv">
+<meta charset="utf-8">
+<title>Origami – kontroll av galleriets höjd</title>
+<p role="status">Testar Blommor och Dekorationer i den inbäddade origamikategorin…</p>
+<iframe title="Fritidsparken" width="1280" height="800" src="../index.html"></iframe>
+<script type="module">
+const home = document.querySelector('iframe');
+const status = document.querySelector('[role="status"]');
+const nextFrame = () => new Promise(resolve => requestAnimationFrame(resolve));
+async function waitFor(read, description) {
+  const deadline = performance.now() + 15000;
+  while (performance.now() < deadline) {
+    const value = read();
+    if (value) return value;
+    await nextFrame();
+  }
+  throw Error(description);
+}
+
+try {
+  const open = await waitFor(() => home.contentDocument.querySelector('button[data-standard-category="origami"]'), 'Origamikategorin saknas');
+  open.click();
+  const frame = await waitFor(() => home.contentDocument.getElementById('std-origami-frame'), 'Origamiramen saknas');
+  for (const category of ['Blommor', 'Dekorationer']) {
+    const button = await waitFor(() => Array.from(frame.contentDocument.querySelectorAll('#categories button')).find(b => b.textContent === category), category);
+    button.click();
+    await waitFor(() => frame.contentDocument.querySelector('#categories [aria-pressed="true"]')?.textContent === category, category);
+    const cards = frame.contentDocument.querySelectorAll('.model-card');
+    if (!cards.length) throw Error(category + ' saknar modeller');
+    for (let i = 0; i < 10; i++) await nextFrame();
+    const heights = new Set();
+    for (let i = 0; i < 24; i++) {
+      await nextFrame();
+      heights.add(frame.getBoundingClientRect().height);
+    }
+    if (heights.size !== 1) throw Error(category + ' växlar mellan ' + [...heights].join(', ') + ' px');
+  }
+  status.textContent = 'Godkänt – båda gallerierna har stabil höjd.';
+  status.dataset.result = 'pass';
+} catch (error) {
+  status.textContent = 'Underkänt – ' + error.message;
+  status.dataset.result = 'fail';
+}
+</script>
+</html>

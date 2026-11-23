@@ -190,7 +190,7 @@
       window.FPGameHub?.stop();
       // Keep the title/back button in their dedicated heading row.
       // The gallery belongs in the same full-width catalog as other activities.
-      document.getElementById('catalog').innerHTML='<div class="std-origami-embed"><iframe id="std-origami-frame" src="/origami/?embedded=1&amp;v=correct-layout-20261122" title="Origamistudion – välj en modell och vik papper" loading="eager" allow="fullscreen"></iframe></div>';
+      document.getElementById('catalog').innerHTML='<div class="std-origami-embed"><iframe id="std-origami-frame" src="/origami/?embedded=1&amp;v=stable-grid-20261123" title="Origamistudion – välj en modell och vik papper" loading="eager" allow="fullscreen"></iframe></div>';
       return;
     }
     originalDraw();
