@@ -171,7 +171,17 @@
     const atHome=category==='Alla'&&!q&&!pearlPage&&!browseAll;
     document.body.classList.toggle('std-home',atHome);document.body.classList.toggle('std-browsing',!atHome);
     home.hidden=!atHome;results.hidden=atHome;
-    header.querySelectorAll('[data-standard-category]').forEach(b=>{const active=b.dataset.standardCategory===category;b.classList.toggle('active',active);if(b.tagName==='BUTTON')b.setAttribute('aria-current',active?'page':'false');});
+    const categoryLinks = document.querySelectorAll(
+      '.std-header [data-standard-category], .std-categories [data-standard-category]'
+    );
+    categoryLinks.forEach(link => {
+      const active = link.dataset.standardCategory === category;
+      link.classList.toggle('active', active);
+      if (link.tagName === 'BUTTON') {
+        if (active) link.setAttribute('aria-current', 'page');
+        else link.removeAttribute('aria-current');
+      }
+    });
     document.getElementById('standardSearch').value=document.getElementById('search').value;
     if(atHome){window.FPGameHub?.stop();document.getElementById('catalog').innerHTML='';return;}
     results.innerHTML=`<h2>${esc(pearlPage?'Pärlmönster':category==='Mandala'?'Färglägga':category==='Rita steg-för-steg'?'How to Draw':category==='Alla'?'Alla aktiviteter':category)}</h2><button type="button" data-standard-category="Alla">← Till startsidan</button>`;

@@ -461,7 +461,7 @@ body.std-design .std-categories > :is(button,a[data-origami-link]) > span{
 .std-categories > a[data-origami-link]:focus-visible{outline:3px solid var(--green);outline-offset:3px}
 
 /* Artwork moves continuously inside a fixed, clipped viewport. Labels and tiles stay still. */
-body.std-design .std-categories > :is(button,a[data-origami-link]) > .std-icon{overflow:hidden;contain:paint}
+body.std-design .std-categories > :is(button,a[data-origami-link]) > .std-icon{overflow:hidden;contain:paint;pointer-events:none}
 .std-categories .std-icon-motion{
  transform-box:view-box;transform-origin:50% 52%;
  animation:fp-icon-dance var(--icon-period,2.9s) ease-in-out var(--icon-delay,-1.4s) infinite;
@@ -493,4 +493,16 @@ body.std-design .std-categories > :is(button,a[data-origami-link]) > .std-icon{o
 @keyframes fp-scissor-snip{from{transform:rotate(-7deg)}to{transform:rotate(7deg)}}
 @keyframes fp-pencil-bounce{from{transform:translateY(4px)}to{transform:translateY(-5px)}}
 @keyframes fp-pencil-sketch{from{transform:translate(-3px,3px)}to{transform:translate(3px,-4px)}}
-@media(prefers-reduced-motion:reduce){.std-categories :is(.std-icon-motion,.fp-scissor-blade,.fp-pencil,.fp-drawing-pencil){animation:none;transform:none}}
+@keyframes fp-icon-fade {
+  from, to { opacity: 1; }
+  50% { opacity: .76; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .std-categories :is(.std-icon-motion,.fp-scissor-blade,.fp-pencil,.fp-drawing-pencil) {
+    animation: none;
+    transform: none;
+  }
+  .std-categories .std-icon-motion {
+    animation: fp-icon-fade 3.6s ease-in-out var(--icon-delay, -1.4s) infinite;
+  }
+}
