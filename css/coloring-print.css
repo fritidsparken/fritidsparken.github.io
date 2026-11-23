@@ -1,0 +1,56 @@
+.mandala-card:has(> .fp-color-select) {
+  position: relative;
+}
+
+.fp-color-select {
+  position: absolute;
+  z-index: 2;
+  top: 5px;
+  right: 5px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.fp-color-select input {
+  width: 21px;
+  height: 21px;
+  margin: 0;
+  accent-color: #256447;
+  color-scheme: light;
+  cursor: pointer;
+}
+
+.mandala-card:has(> .fp-color-select input:checked) {
+  outline: 3px solid var(--green, #256447);
+  outline-offset: -3px;
+}
+
+.fp-color-print-bar:not([hidden]) {
+  position: sticky;
+  top: 8px;
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 14px;
+  padding: 8px 12px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 4px 16px #102b2424;
+}
+
+.fp-color-print-bar [role="status"] {
+  flex: 1 1 8rem;
+  font-weight: 700;
+}
+
+.fp-color-print-bar button {
+  min-height: 44px;
+}
