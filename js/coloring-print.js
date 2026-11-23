@@ -1,11 +1,12 @@
-/* Print the selected colouring originals as a single PDF. */
+/* Print the selected gallery originals as a single PDF. */
 (() => {
   const catalog = document.getElementById('catalog');
-  const selected = new Map();
+  const galleries = {
+    coloring: { title: 'målarbilder', selected: new Map(), busy: false, notice: '' },
+    dolls: { title: 'klippdockor', selected: new Map(), busy: false, notice: '' }
+  };
   const originalLabels = new WeakMap();
-  let busy = false;
   let loader;
-  let notice = '';
 
   function escapeHtml(value) {
     return String(value).replace(/[&<>"']/g, char => ({
@@ -13,7 +14,8 @@
     })[char]);
   }
 
-  function checkboxMarkup(motif) {
+  function checkboxMarkup(motif, gallery = 'coloring') {
+    const { selected } = galleries[gallery];
     const source = motif.pdf || motif.img;
     return `<label class="fp-color-select">
       <input type="checkbox" aria-label="Markera ${escapeHtml(motif.title)} för utskrift"
@@ -22,17 +24,22 @@
     </label>`;
   }
 
-  function toolbarMarkup() {
-    return `<div class="fp-color-print-bar" hidden>
+  function toolbarMarkup(gallery = 'coloring') {
+    return `<div class="fp-color-print-bar" data-print-gallery="${gallery}" hidden>
       <span role="status"></span>
       <button type="button" class="primary" data-color-print>Skriv ut</button>
       <button type="button" class="secondary" data-color-clear>Rensa val</button>
     </div>`;
   }
 
+  function activeGallery() {
+    return galleries[catalog.querySelector('[data-print-gallery]')?.dataset.printGallery];
+  }
+
   function syncControls() {
     const toolbar = catalog.querySelector('.fp-color-print-bar');
     if (!toolbar) return;
+    const { selected, busy, notice } = galleries[toolbar.dataset.printGallery];
     const count = selected.size;
     const batch = count > 1;
     toolbar.hidden = count === 0;
@@ -134,21 +141,21 @@
     }
   }
 
-  async function printSelection() {
-    if (busy || !selected.size) return;
-    const motifs = [...selected.values()];
+  async function printSelection(gallery) {
+    if (gallery.busy || !gallery.selected.size) return;
+    const motifs = [...gallery.selected.values()];
     const popup = window.open('', '_blank');
     if (!popup) {
-      notice = 'Tillåt popupfönster för att öppna utskriften.';
+      gallery.notice = 'Tillåt popupfönster för att öppna utskriften.';
       syncControls();
       return;
     }
 
-    busy = true;
-    notice = '';
+    gallery.busy = true;
+    gallery.notice = '';
     syncControls();
     popup.opener = null;
-    popup.document.title = 'Fritidsparken – skriv ut målarbilder';
+    popup.document.title = `Fritidsparken – skriv ut ${gallery.title}`;
     const progress = popup.document.createElement('p');
     popup.document.body.append(progress);
     progress.textContent = 'Förbereder utskriften …';
@@ -156,7 +163,7 @@
     try {
       const { PDFDocument } = await loadPdfLibrary();
       const output = await PDFDocument.create();
-      output.setTitle('Fritidsparken – målarbilder');
+      output.setTitle(`Fritidsparken – ${gallery.title}`);
       for (const [index, motif] of motifs.entries()) {
         if (popup.closed) return;
         current = motif;
@@ -173,20 +180,22 @@
         URL.revokeObjectURL(url);
       }, 2000);
     } catch (error) {
-      console.error('Could not prepare colouring pages', error);
-      notice = current
+      console.error('Could not prepare printable pages', error);
+      gallery.notice = current
         ? `Kunde inte läsa ”${current.title}”. Avmarkera bilden eller försök igen.`
         : 'Kunde inte öppna utskriften. Försök igen.';
-      if (!popup.closed) progress.textContent = notice;
+      if (!popup.closed) progress.textContent = gallery.notice;
     } finally {
-      busy = false;
+      gallery.busy = false;
       syncControls();
     }
   }
 
   catalog.addEventListener('change', event => {
     const input = event.target.closest('.fp-color-select input');
-    if (!input) return;
+    const gallery = input && activeGallery();
+    if (!gallery) return;
+    const { selected } = gallery;
     if (input.checked) {
       selected.set(input.value, {
         source: input.value, preview: input.dataset.printPreview, title: input.dataset.printTitle
@@ -194,20 +203,23 @@
     } else {
       selected.delete(input.value);
     }
-    notice = '';
+    gallery.notice = '';
     syncControls();
   });
 
   catalog.addEventListener('click', event => {
-    if (event.target.closest('[data-color-clear]')) {
-      selected.clear();
-      notice = '';
+    const control = event.target.closest('[data-color-clear], [data-color-print], [data-color-print-all]');
+    const gallery = control && activeGallery();
+    if (!gallery) return;
+    if (control.hasAttribute('data-color-clear')) {
+      gallery.selected.clear();
+      gallery.notice = '';
       syncControls();
-    } else if (event.target.closest('[data-color-print], [data-color-print-all]')) {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      printSelection();
+      return;
     }
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    printSelection(gallery);
   }, true);
 
   new MutationObserver(syncControls).observe(catalog, { childList: true, subtree: true });
