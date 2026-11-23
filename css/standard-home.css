@@ -502,7 +502,8 @@ body.std-design .std-categories > :is(button,a[data-origami-link]) > .std-icon{o
     animation: none;
     transform: none;
   }
-  .std-categories .std-icon-motion {
-    animation: fp-icon-fade 3.6s ease-in-out var(--icon-delay, -1.4s) infinite;
+  /* Override the global animation shutdown only for this opacity fade. */
+  body.std-design .std-categories .std-icon-motion {
+    animation: fp-icon-fade 3.6s ease-in-out var(--icon-delay, -1.4s) infinite !important;
   }
 }
