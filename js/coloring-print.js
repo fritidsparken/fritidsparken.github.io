@@ -17,15 +17,15 @@
     const source = motif.pdf || motif.img;
     return `<label class="fp-color-select">
       <input type="checkbox" aria-label="Markera ${escapeHtml(motif.title)} för utskrift"
-        value="${escapeHtml(source)}" data-preview="${escapeHtml(motif.img)}"
-        data-title="${escapeHtml(motif.title)}"${selected.has(source) ? ' checked' : ''}>
+        value="${escapeHtml(source)}" data-print-preview="${escapeHtml(motif.img)}"
+        data-print-title="${escapeHtml(motif.title)}"${selected.has(source) ? ' checked' : ''}>
     </label>`;
   }
 
   function toolbarMarkup() {
     return `<div class="fp-color-print-bar" hidden>
       <span role="status"></span>
-      <button type="button" class="primary" data-color-print> Skriv ut</button>
+      <button type="button" class="primary" data-color-print>Skriv ut</button>
       <button type="button" class="secondary" data-color-clear>Rensa val</button>
     </div>`;
   }
@@ -48,13 +48,20 @@
       const checkbox = card.querySelector('.fp-color-select input');
       checkbox.checked = selected.has(checkbox.value);
       for (const action of card.querySelectorAll('.mandala-links a, .fp-online-actions :is(a,button)')) {
-        if (!originalLabels.has(action)) {
-          if (!/^(?:🖨️?\s*)?(?:Öppna\s*\/\s*)?Skriv ut$/i.test(action.textContent.trim())) continue;
+        if (!batch) {
+          if (originalLabels.has(action)) {
+            action.textContent = originalLabels.get(action);
+            originalLabels.delete(action);
+            action.removeAttribute('data-color-print-all');
+          }
+          continue;
+        }
+        if (/^(?:🖨️?\s*)?(?:Öppna\s*\/\s*)?Skriv ut$/i.test(action.textContent.trim())) {
           originalLabels.set(action, action.textContent);
         }
-        const text = batch ? 'Skriv ut alla' : originalLabels.get(action);
-        if (action.textContent !== text) action.textContent = text;
-        action.toggleAttribute('data-color-print-all', batch);
+        if (!originalLabels.has(action)) continue;
+        if (action.textContent !== 'Skriv ut alla') action.textContent = 'Skriv ut alla';
+        action.setAttribute('data-color-print-all', '');
       }
     }
   }
@@ -181,7 +188,9 @@
     const input = event.target.closest('.fp-color-select input');
     if (!input) return;
     if (input.checked) {
-      selected.set(input.value, { source: input.value, preview: input.dataset.preview, title: input.dataset.title });
+      selected.set(input.value, {
+        source: input.value, preview: input.dataset.printPreview, title: input.dataset.printTitle
+      });
     } else {
       selected.delete(input.value);
     }
