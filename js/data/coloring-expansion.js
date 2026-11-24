@@ -627,7 +627,7 @@
     ],
   };
   const root = "./assets/coloring-expansion-20261124/";
-  const version = ".svg?v=omritade-20261124-3";
+  const version = ".svg?v=omritade-20261124-slut";
   const sheets = [];
   for (const [type, entries] of Object.entries(categories)) {
     const folder = type.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replaceAll(" ", "-");
