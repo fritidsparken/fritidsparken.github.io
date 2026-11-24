@@ -104,26 +104,25 @@
     const doc = frame.contentDocument;
     doc.open();
     doc.write(`<!doctype html><html lang="sv"><head><meta charset="utf-8"><style>
-      @page { size: A4 portrait; margin: 10mm; }
+      @page { size: A4 portrait; margin: 0; }
       html, body {
         margin: 0;
         padding: 0;
-        width: 190mm;
-        max-width: 190mm;
+        width: 100%;
+        height: 100%;
       }
       .print-sheet {
         box-sizing: border-box;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 190mm;
-        height: 270mm;
+        display: block;
+        width: 100%;
+        height: 100%;
         margin: 0;
-        padding: 0;
-        overflow: hidden;
+        padding: 10mm;
         break-inside: avoid;
         page-break-inside: avoid;
       }
+      /* Percentages follow the actual printable page area, including the user's
+         paper and margin settings. A fixed height can spill onto a blank sheet. */
       /* Start a new sheet only between motifs; never create a trailing blank page. */
       .print-sheet + .print-sheet {
         break-before: page;
@@ -131,10 +130,8 @@
       }
       .print-sheet img {
         display: block;
-        width: auto;
-        height: auto;
-        max-width: 190mm;
-        max-height: 270mm;
+        width: 100%;
+        height: 100%;
         object-fit: contain;
       }
     </style></head><body></body></html>`);
@@ -234,6 +231,8 @@
         current = motif;
         await appendMotif(printDocument, motif);
       }
+      // Let the browser finish the image/layout task before entering print mode.
+      await new Promise(resolve => setTimeout(resolve, 0));
       // All pages and images are ready before showing the native dialog.
       current = undefined;
       const view = printDocument.doc.defaultView;
