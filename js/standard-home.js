@@ -103,7 +103,8 @@
   const activityCard = (title,label,src,action,kind='craft') => `<button type="button" class="std-activity-card" ${action}><img src="${esc(src)}" alt="${esc(title)}" loading="lazy" decoding="async"><span class="std-card-copy"><strong>${esc(title)}<span aria-hidden="true">›</span></strong><small class="std-label std-label-${kind}">${esc(label)}</small></span></button>`;
   const sectionHead = (title,cat,symbol) => `<div class="std-section-heading"><h2><span aria-hidden="true">${symbol}</span>${title}</h2><button type="button" data-standard-category="${cat}" ${cat==='Alla'?'data-standard-browse-all':''}>Visa alla <span aria-hidden="true">→</span></button></div>`;
   function coloringCard(m) {
-    const reference = m.type === 'Bilar' ? m.img.replace('-preview.webp','-reference.webp') : m.type === 'Bakverk' ? m.img.replace('bakverk-uploads-20261020/','bakverk-coloring-20261024/').replace('.webp','-reference.webp') : '';
+    const expansionReference = m.img?.startsWith("./assets/coloring-expansion-20261124/") && m.reference;
+    const reference = expansionReference || (m.type === 'Bilar' ? m.img.replace('-preview.webp','-reference.webp') : m.type === 'Bakverk' ? m.img.replace('bakverk-uploads-20261020/','bakverk-coloring-20261024/').replace('.webp','-reference.webp') : '');
     return `<article class="mandala-card std-color-card" data-color-reference="${esc(reference)}"><button class="std-color-open" type="button" aria-label="Färglägg ${esc(m.title)} online"><img src="${esc(m.preview||m.img)}" alt="${esc(m.title)}" loading="lazy" decoding="async"></button><div class="mandala-info"><span class="mandala-label">${esc(m.type)}</span><h3>${esc(m.title)}</h3><div class="mandala-links"><a href="${esc(m.pdf||m.img)}" target="_blank" rel="noopener">Skriv ut</a></div></div></article>`;
   }
   function homeMarkup() {
@@ -128,7 +129,8 @@
     const matches=value=>String(value).toLocaleLowerCase('sv').includes(q);
     const act=activities.filter(a=>matches(a.join(' ')));
     const gym=gymGames.filter(g=>matches(g.name+' '+g.description));
-    const colors=mandalas.filter(m=>(currentSeason()!=='standard'||(!['Halloween','Jul'].includes(m.type)&&!m.types?.some(t=>['Halloween','Jul'].includes(t))))&&matches(m.title+' '+m.type));
+    const season=currentSeason();
+    const colors=mandalas.filter(m=>(m.type!=='Jul'||season==='christmas')&&(season!=='standard'||(!['Halloween','Jul'].includes(m.type)&&!m.types?.some(t=>['Halloween','Jul'].includes(t))))&&matches(m.title+' '+m.type));
     const drawings=drawingAnimals.filter(a=>!['spoke','pumpa','fladdermus'].includes(a.id)&&matches('How to Draw Rita steg för steg '+a.name));
     const dolls=paperDolls.filter(m=>!matchesHoliday(m.title+' '+m.img)&&matches('Klippdockor '+m.title));
     const tools=funTools.filter(t=>matches('Roliga verktyg '+t.name+' '+t.desc));
