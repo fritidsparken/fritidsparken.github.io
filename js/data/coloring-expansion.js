@@ -327,13 +327,15 @@
     ],
   };
   const root = "./assets/coloring-expansion-20261124/";
+  const version = ".svg?v=illustrerade-20261124";
   const sheets = [];
   for (const [type, entries] of Object.entries(categories)) {
     const folder = type.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replaceAll(" ", "-");
     for (const [slug, title] of entries) {
       const path = root + folder + "/" + slug;
-      sheets.push({ title, type, img: path + ".svg", src: path + ".svg",
-        reference: path + "-reference.svg", sourceLabel: "Eget motiv · Fritidsparken" });
+      const image = path + version;
+      sheets.push({ title, type, img: image, src: image,
+        reference: path + "-reference" + version, sourceLabel: "Eget motiv · Fritidsparken" });
     }
   }
   mandalas.unshift(...sheets);
