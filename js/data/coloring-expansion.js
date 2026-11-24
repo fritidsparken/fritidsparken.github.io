@@ -638,5 +638,5 @@
         reference: path + "-reference" + version, sourceLabel: "Eget motiv · Fritidsparken" });
     }
   }
-  mandalas.unshift(...sheets);
+  mandalas.push(...sheets);
 })();
