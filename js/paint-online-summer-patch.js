@@ -235,7 +235,7 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
  const pokemonReference=pokemonReferencePaths[imagePath];
  const isPokemonReferenceTarget=!!pokemonReference;
  const excludePokemonPaper=pokemonReference?.startsWith("./assets/pokemon-references-20261125-voltorb/");
- const isCatalogReferenceTarget=!!REFERENCE&&/[/](?:fotbollsproffs|fotbollslag-20261022|squishy-20261021|smink|coloring-expansion-20261124)[/]/.test(imagePath);
+ const isCatalogReferenceTarget=!!REFERENCE&&/[/](?:superhjaltar|fotbollsproffs|fotbollslag-20261022|squishy-20261021|smink|coloring-expansion-20261124)[/]/.test(imagePath);
  const pokemonTexture=isPokemonReferenceTarget?pokemonReference+"-texture.webp":"";
  if(isPokemonReferenceTarget)REFERENCE=pokemonReference+"-reference.webp";`,
     'Pokémon reference mappings');
