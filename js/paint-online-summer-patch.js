@@ -206,19 +206,26 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
       "29-foongus":"foongus", "30-togepi":"togepi",
       "31-diglett":"diglett", "32-grimer":"grimer",
       "33-poliwrath":"poliwrath", "34-stunfisk":"stunfisk"
+    },
+    "pokemon-references-20261125-b": {
+      "10-mudkip":"mudkip", "78-seaking":"seaking",
+      "egna-pokemonkort.webp":"egna-pokemonkort",
+      "oppnad-pokeboll.webp":"oppnad-pokeboll"
     }
   };
   const pokemonReferences = {};
   for (const [directory, references] of Object.entries(pokemonReferenceBatches)) {
     for (const [original, name] of Object.entries(references)) {
-      pokemonReferences[original + ".jpeg"] = "./assets/" + directory + "/" + name;
+      const uploadedSheet = original.endsWith(".webp");
+      const sourcePath = uploadedSheet ? "pokemon-uploads-20261019/" + original : "pokemon-20261021/" + original + ".jpeg";
+      pokemonReferences["/assets/coloring-originals-2026/" + sourcePath] = "./assets/" + directory + "/" + name;
     }
   }
   replaceOnce('function openPainter(IMAGE,TARGET,REFERENCE=""){',
     `function openPainter(IMAGE,TARGET,REFERENCE=""){
  const pokemonReferencePaths=${JSON.stringify(pokemonReferences)};
  const imagePath=new URL(IMAGE,location.href).pathname;
- const pokemonReference=imagePath.includes("/pokemon-20261021/")?pokemonReferencePaths[imagePath.split("/").pop()]:null;
+ const pokemonReference=pokemonReferencePaths[imagePath];
  const isPokemonReferenceTarget=!!pokemonReference;
  const excludePokemonPaper=pokemonReference?.startsWith("./assets/pokemon-references-20261125-voltorb/");
  const isCatalogReferenceTarget=!!REFERENCE&&/[/](?:fotbollsproffs|fotbollslag-20261022|squishy-20261021|smink|coloring-expansion-20261124)[/]/.test(imagePath);

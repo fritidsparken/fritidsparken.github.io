@@ -20,11 +20,20 @@ vm.runInContext(loader,context);
 (async()=>{while(!context.patched)await new Promise(r=>setImmediate(r));new vm.Script(context.patched);
 const code=context.patched.replace('function openPainter(IMAGE,TARGET,REFERENCE=""){','globalThis.openPainter=function openPainter(IMAGE,TARGET,REFERENCE=""){').replace(' if(autoButton)autoButton.addEventListener("click",safeRunAutoColor);','globalThis.controls={back,REFERENCE,runAutoColor,redraw,paint,lines,undo,redo,autoButton,status,autoProgress,save:()=>back.querySelector(`[data-action="save"]`).onclick(),acts:()=>acts,W:()=>W}; if(autoButton)autoButton.addEventListener("click",safeRunAutoColor);');vm.runInContext(code,context);
 vm.runInContext(fs.readFileSync('js/data/pokemon-coloring.js','utf8'),context);
-const manifest=['pokemon-references-20261109','pokemon-references-20261109-b','pokemon-references-20261109-c','pokemon-references-20261125','pokemon-references-20261125-paras-phanpy','pokemon-references-20261125-voltorb'].flatMap(directory=>{
+const batchSizes = {
+ 'pokemon-references-20261109': 10,
+ 'pokemon-references-20261109-b': 10,
+ 'pokemon-references-20261109-c': 10,
+ 'pokemon-references-20261125': 10,
+ 'pokemon-references-20261125-paras-phanpy': 10,
+ 'pokemon-references-20261125-voltorb': 10,
+ 'pokemon-references-20261125-b': 4,
+};
+const manifest=Object.entries(batchSizes).flatMap(([directory,count])=>{
  const entries=JSON.parse(fs.readFileSync('assets/'+directory+'/manifest.json'));
- assert.equal(entries.length,10,directory);
+ assert.equal(entries.length,count,directory);
  return entries.map(entry=>{
-  const matches=context.mandalas.filter(m=>m.type==='Pokémon'&&m.src==='./'+entry.original);
+  const matches=context.mandalas.filter(m=>m.type==='Pokémon'&&(m.preview||m.img)==='./'+entry.original);
   assert.equal(matches.length,1,entry.original+' has one coloring page');
   return {...entry,directory,title:matches[0].title};
  });

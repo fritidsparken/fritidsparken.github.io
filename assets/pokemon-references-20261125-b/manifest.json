@@ -1,0 +1,94 @@
+[
+  {
+    "name": "seaking",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/78-seaking.jpeg",
+    "sourceFile": "hf_20261109_090326_6f26abbb-62f2-451d-9319-cd7b7fbe623c.png",
+    "sourceSHA256": "c0756fc326e06c04905f919e8925d43769b2b64bc382e58a3d0013e10848fabd",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.032624363899231,
+        0.00919331144541502,
+        -17.85700035095215
+      ],
+      [
+        -0.004121755249798298,
+        0.9801526665687561,
+        22.043601989746094
+      ]
+    ],
+    "alignmentScore": 0.511074147761108,
+    "texture": "seaking-texture.webp",
+    "reference": "seaking-reference.webp"
+  },
+  {
+    "name": "mudkip",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/10-mudkip.jpeg",
+    "sourceFile": "hf_20261109_090543_1987ebcf-5d4f-4be8-8855-152168d0c701.png",
+    "sourceSHA256": "0314462f034cae0d1e3f056d952ab6d267dc38ff72b4b9b4677c3a295ac5d0ed",
+    "width": 1330,
+    "height": 1880,
+    "affine": [
+      [
+        1.0032482147216797,
+        -0.0005454508936963975,
+        -1.103576898574829
+      ],
+      [
+        0.00122561224270612,
+        1.4169467687606812,
+        -392.0701904296875
+      ]
+    ],
+    "alignmentScore": 0.8644187274905731,
+    "texture": "mudkip-texture.webp",
+    "reference": "mudkip-reference.webp"
+  },
+  {
+    "name": "egna-pokemonkort",
+    "original": "assets/coloring-originals-2026/pokemon-uploads-20261019/egna-pokemonkort.webp",
+    "sourceFile": "hf_20261109_090832_45cc7ad6-f2a5-4646-8cca-8b72d7dad083.png",
+    "sourceSHA256": "ed13599b5125a2f7721765b154fb3da90cbcfc972e69b84ded6487aea1559455",
+    "width": 1055,
+    "height": 1491,
+    "affine": [
+      [
+        1.027495265007019,
+        0.0005014422349631786,
+        -4.261826038360596
+      ],
+      [
+        -0.00020389843848533928,
+        0.9895734786987305,
+        5.53331995010376
+      ]
+    ],
+    "alignmentScore": 0.8654824488226106,
+    "texture": "egna-pokemonkort-texture.webp",
+    "reference": "egna-pokemonkort-reference.webp"
+  },
+  {
+    "name": "oppnad-pokeboll",
+    "original": "assets/coloring-originals-2026/pokemon-uploads-20261019/oppnad-pokeboll.webp",
+    "sourceFile": "hf_20261109_090832_75c7cca6-8207-4fa6-8f01-e0c55dc757ce.png",
+    "sourceSHA256": "686f0bc32020a19d5d82557ce7ca8d93d2bf9eb75279685ca64dd72281e14c49",
+    "width": 1417,
+    "height": 1764,
+    "affine": [
+      [
+        1.001527190208435,
+        3.992789424955845e-05,
+        0.07261369377374649
+      ],
+      [
+        -0.00021239744091872126,
+        1.002170205116272,
+        -0.8320591449737549
+      ]
+    ],
+    "alignmentScore": 0.8734823520586635,
+    "texture": "oppnad-pokeboll-texture.webp",
+    "reference": "oppnad-pokeboll-reference.webp"
+  }
+]
