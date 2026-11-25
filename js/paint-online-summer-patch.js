@@ -192,6 +192,13 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
       "62-nidorino":"nidorino", "63-exeggutor":"exeggutor",
       "64-noctowl":"noctowl", "65-golbat":"golbat",
       "66-octillery":"octillery", "72-parasect":"parasect"
+    },
+    "pokemon-references-20261125-paras-phanpy": {
+      "67-onix":"onix", "68-marowak":"marowak",
+      "69-seel":"seel", "70-butterfree":"butterfree",
+      "71-paras":"paras", "73-persian":"persian",
+      "74-phanpy":"phanpy", "75-pineco":"pineco",
+      "76-pinsir":"pinsir", "77-plusle":"plusle"
     }
   };
   const pokemonReferences = {};
