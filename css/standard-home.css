@@ -495,17 +495,17 @@ body.std-design .std-categories > :is(button,a[data-origami-link]) > .std-icon{o
 @keyframes fp-scissor-snip{from{transform:rotate(-7deg)}to{transform:rotate(7deg)}}
 @keyframes fp-pencil-bounce{from{transform:translateY(4px)}to{transform:translateY(-5px)}}
 @keyframes fp-pencil-sketch{from{transform:translate(-3px,3px)}to{transform:translate(3px,-4px)}}
-@keyframes fp-icon-fade {
-  from, to { opacity: 1; }
-  50% { opacity: .76; }
+@keyframes fp-icon-gentle {
+  from, to { transform: translateY(2px) rotate(-3deg); }
+  50% { transform: translateY(-4px) rotate(3deg); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .std-categories :is(.std-icon-motion,.fp-scissor-blade,.fp-pencil,.fp-drawing-pencil) {
+  .std-categories :is(.fp-scissor-blade,.fp-pencil,.fp-drawing-pencil) {
     animation: none;
     transform: none;
   }
-  /* Override the global animation shutdown only for this opacity fade. */
+  /* Use a small, slow sway on the artwork when reduced motion is active. */
   body.std-design .std-categories .std-icon-motion {
-    animation: fp-icon-fade 3.6s ease-in-out var(--icon-delay, -1.4s) infinite !important;
+    animation: fp-icon-gentle 4s ease-in-out var(--icon-delay, -1.4s) infinite !important;
   }
 }
