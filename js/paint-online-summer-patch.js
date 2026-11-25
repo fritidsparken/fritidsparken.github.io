@@ -9,6 +9,19 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
     source = source.slice(0, start) + after + source.slice(start + before.length);
   }
 
+  // A motif can provide full-resolution linework for the painter while keeping
+  // its lightweight thumbnail in the gallery.
+  replaceOnce(
+    'const imageUrl=thumb.currentSrc||thumb.src;',
+    'const imageUrl=card.dataset.paintImage||thumb.currentSrc||thumb.src;',
+    'full-size coloring sheet'
+  );
+  replaceOnce(
+    'image:card.querySelector("img")?.src,reference:card.dataset.colorReference',
+    'image:card.dataset.paintImage||card.querySelector("img")?.src,reference:card.dataset.colorReference',
+    'full-size coloring sheet navigation'
+  );
+
   // The desktop backdrop already reserves 16px on each side. Size the
   // expanded painter within that space, including when a scrollbar is present.
   replaceOnce(
@@ -35,7 +48,7 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
   );
   replaceOnce(
     ' if(isSpringTarget)dialog.classList.add("fp-paint-ghost");',
-    ' if(isSpringTarget||isSummerTarget||isAutumnTarget||isWinterTarget||isBakeryTarget)dialog.classList.add("fp-paint-ghost");\n if(["Fotbollsproffs","Fotbollslag","Pokémon","Superhjältar"].includes(mandalas.find(m=>m.title===TARGET&&new URL(m.preview||m.img,location.href).href===new URL(IMAGE,location.href).href)?.type))dialog.classList.add("fp-paint-unified");',
+    ' if(isSpringTarget||isSummerTarget||isAutumnTarget||isWinterTarget||isBakeryTarget)dialog.classList.add("fp-paint-ghost");\n if(["Fotbollsproffs","Fotbollslag","Pokémon","Superhjältar"].includes(mandalas.find(m=>m.title===TARGET&&[m.img,m.preview].some(path=>path&&new URL(path,location.href).href===new URL(IMAGE,location.href).href))?.type))dialog.classList.add("fp-paint-unified");',
     "summer layout"
   );
   replaceOnce(' let carReferenceImage=null;',
@@ -165,7 +178,7 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
     "23-weedle.jpeg":"weedle", "26-venonat.jpeg":"venonat"
   };
   replaceOnce('function openPainter(IMAGE,TARGET,REFERENCE=""){',
-    'function openPainter(IMAGE,TARGET,REFERENCE=""){\n const pokemonReferencePaths='+JSON.stringify(pokemonReferences)+';\n const newPokemonReferences='+JSON.stringify([...newPokemonReferences])+';\n const imagePath=new URL(IMAGE,location.href).pathname;\n const pokemonReferenceName=imagePath.includes("/pokemon-20261021/")?pokemonReferencePaths[imagePath.split("/").pop()]:null;\n const isPokemonReferenceTarget=!!pokemonReferenceName;\n const isCatalogReferenceTarget=!!REFERENCE&&/[/](?:fotbollslag-20261022|squishy-20261021|smink|coloring-expansion-20261124)[/]/.test(imagePath);\n const pokemonReferenceDir="./assets/pokemon-references-20261109"+(newPokemonReferences.includes(pokemonReferenceName)?"-b":"")+"/";\n const pokemonTexture=isPokemonReferenceTarget?pokemonReferenceDir+pokemonReferenceName+"-texture.webp":"";\n if(isPokemonReferenceTarget)REFERENCE=pokemonReferenceDir+pokemonReferenceName+"-reference.webp";',
+    'function openPainter(IMAGE,TARGET,REFERENCE=""){\n const pokemonReferencePaths='+JSON.stringify(pokemonReferences)+';\n const newPokemonReferences='+JSON.stringify([...newPokemonReferences])+';\n const imagePath=new URL(IMAGE,location.href).pathname;\n const pokemonReferenceName=imagePath.includes("/pokemon-20261021/")?pokemonReferencePaths[imagePath.split("/").pop()]:null;\n const isPokemonReferenceTarget=!!pokemonReferenceName;\n const isCatalogReferenceTarget=!!REFERENCE&&/[/](?:fotbollsproffs|fotbollslag-20261022|squishy-20261021|smink|coloring-expansion-20261124)[/]/.test(imagePath);\n const pokemonReferenceDir="./assets/pokemon-references-20261109"+(newPokemonReferences.includes(pokemonReferenceName)?"-b":"")+"/";\n const pokemonTexture=isPokemonReferenceTarget?pokemonReferenceDir+pokemonReferenceName+"-texture.webp":"";\n if(isPokemonReferenceTarget)REFERENCE=pokemonReferenceDir+pokemonReferenceName+"-reference.webp";',
     'ten exact Pokémon reference mappings');
   source=source.replaceAll('isSummerTarget||isAutumnTarget||isWinterTarget||isBakeryTarget||isMachineTarget',
     'isCatalogReferenceTarget||isPokemonReferenceTarget||isSummerTarget||isAutumnTarget||isWinterTarget||isBakeryTarget||isMachineTarget');
