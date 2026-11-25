@@ -17,11 +17,10 @@ const body=new E(),head=new E();const context={console,URL,Blob,Image:Img,Uint8A
 vm.createContext(context);vm.runInContext(fs.readFileSync('js/paint-online-summer-patch.js','utf8'),context);
 let loader=fs.readFileSync('js/paint-online-car-reference.js','utf8');loader=loader.slice(0,loader.indexOf('  const script=document.createElement("script")'))+'globalThis.patched=source;\n }).catch(error=>{throw error});\n})();';
 vm.runInContext(loader,context);
-const keepalive=setTimeout(()=>{throw Error("Painter test timed out")},300000);
 (async()=>{while(!context.patched)await new Promise(r=>setImmediate(r));new vm.Script(context.patched);
 const code=context.patched.replace('function openPainter(IMAGE,TARGET,REFERENCE=""){','globalThis.openPainter=function openPainter(IMAGE,TARGET,REFERENCE=""){').replace(' if(autoButton)autoButton.addEventListener("click",safeRunAutoColor);','globalThis.controls={back,REFERENCE,runAutoColor,redraw,paint,lines,undo,redo,autoButton,status,autoProgress,save:()=>back.querySelector(`[data-action="save"]`).onclick(),acts:()=>acts,W:()=>W}; if(autoButton)autoButton.addEventListener("click",safeRunAutoColor);');vm.runInContext(code,context);
 vm.runInContext(fs.readFileSync('js/data/pokemon-coloring.js','utf8'),context);
-const manifest=['pokemon-references-20261109','pokemon-references-20261109-b','pokemon-references-20261109-c'].flatMap(directory=>{
+const manifest=['pokemon-references-20261109','pokemon-references-20261109-b','pokemon-references-20261109-c','pokemon-references-20261125'].flatMap(directory=>{
  const entries=JSON.parse(fs.readFileSync('assets/'+directory+'/manifest.json'));
  assert.equal(entries.length,10,directory);
  return entries.map(entry=>{
@@ -31,6 +30,7 @@ const manifest=['pokemon-references-20261109','pokemon-references-20261109-b','p
  });
 });
 for(const entry of [...manifest,{name:'sommar-regression',original:'assets/mandala-summer-2026/midsommar.webp'}]){
+ const keepalive=setTimeout(()=>{throw Error(entry.name+' painter test timed out')},60000);
  const id=entry.name;context.openPainter('./'+entry.original,entry.title||id);const c=context.controls;
  assert.equal(c.W(),0,'asynchronous image loading');await c.runAutoColor();assert.match(c.status.textContent,/startar strax/);
  while(!c.W())await new Promise(r=>setImmediate(r));const ink=c.lines.toBuffer('image/png');
@@ -52,6 +52,6 @@ for(const entry of [...manifest,{name:'sommar-regression',original:'assets/manda
  console.log('PASS',id,c.acts().length,'regions',c.paint.width,c.paint.height);
  c.back.remove();
  context.controls=null;
+ clearTimeout(keepalive);
 }
-clearTimeout(keepalive);
 })();

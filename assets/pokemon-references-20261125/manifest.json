@@ -1,0 +1,232 @@
+[
+  {
+    "name": "porygon2",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/59-porygon2.jpeg",
+    "sourceFile": "hf_20261109_090246_1fb4882b-dcc8-491b-9c63-cdd111f23a54.png",
+    "sourceSHA256": "3cc09e3803e54a1abc4e5f9ce875af4d3832dbb7ef8ca89ec9a69e567b1c31ad",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.04584538936615,
+        -0.0015063286991789937,
+        -23.100242614746094
+      ],
+      [
+        -0.0010330851655453444,
+        0.992639422416687,
+        8.057891845703125
+      ]
+    ],
+    "alignmentScore": 0.952542748420742,
+    "texture": "porygon2-texture.webp",
+    "reference": "porygon2-reference.webp"
+  },
+  {
+    "name": "geodude",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/58-geodude.jpeg",
+    "sourceFile": "hf_20261109_090246_46869b1b-4bac-467b-a6fc-8856534fc922.png",
+    "sourceSHA256": "22e063bcf8f897785467cbc0edacf3408f21af6d8d86c133cd52f9b651750114",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.0143684148788452,
+        -0.0002563630696386099,
+        -5.782288074493408
+      ],
+      [
+        0.00021980531164444983,
+        0.9632131457328796,
+        34.55757522583008
+      ]
+    ],
+    "alignmentScore": 0.9742078621588108,
+    "texture": "geodude-texture.webp",
+    "reference": "geodude-reference.webp"
+  },
+  {
+    "name": "raticate",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/54-raticate.jpeg",
+    "sourceFile": "hf_20261109_090246_f01bad0e-73ec-4997-89b6-acad0776192f.png",
+    "sourceSHA256": "ce52f1f7645d80f725ec16154f9ae6dcf4b79256ef3d24c2b4048c1791d78454",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.0268876552581787,
+        -3.0317129130708054e-05,
+        -4.7296295166015625
+      ],
+      [
+        3.6683275538962334e-05,
+        0.9767099618911743,
+        21.23366355895996
+      ]
+    ],
+    "alignmentScore": 0.9664961200929608,
+    "texture": "raticate-texture.webp",
+    "reference": "raticate-reference.webp"
+  },
+  {
+    "name": "nidorina",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/61-nidorina.jpeg",
+    "sourceFile": "hf_20261109_090304_68278ab8-a3cc-42b3-98db-8b5a86733a24.png",
+    "sourceSHA256": "172b1794616eafd348498c60a41da75a6a03d18d001f1a988264cfab95f67692",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.0239624977111816,
+        0.0004278809647075832,
+        -4.528814792633057
+      ],
+      [
+        0.00014192044909577817,
+        0.9696513414382935,
+        28.849103927612305
+      ]
+    ],
+    "alignmentScore": 0.9908560522614184,
+    "texture": "nidorina-texture.webp",
+    "reference": "nidorina-reference.webp"
+  },
+  {
+    "name": "nidorino",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/62-nidorino.jpeg",
+    "sourceFile": "hf_20261109_090304_85658132-5ddb-4940-8576-36e5c6b0daeb.png",
+    "sourceSHA256": "22e4dda0e14e86c6a0d0356bb37c7f4235a1a3d838f127e435e0674e3197b01b",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.0267665386199951,
+        -5.755172878707526e-06,
+        -4.711881637573242
+      ],
+      [
+        0.00017687382933218032,
+        0.9747217893600464,
+        23.877843856811523
+      ]
+    ],
+    "alignmentScore": 0.9429625435108056,
+    "texture": "nidorino-texture.webp",
+    "reference": "nidorino-reference.webp"
+  },
+  {
+    "name": "noctowl",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/64-noctowl.jpeg",
+    "sourceFile": "hf_20261109_090304_c20ddf6d-4bc0-497f-bbca-de7692955aba.png",
+    "sourceSHA256": "20cdd963dfa6d30dd1b60da8e13c3ed71d62cccef16335d1df9af551fbb92d4e",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.0446847677230835,
+        -0.0005166726186871529,
+        -15.712489128112793
+      ],
+      [
+        0.00033869329490698874,
+        0.9835071563720703,
+        16.299701690673828
+      ]
+    ],
+    "alignmentScore": 0.9299798543362627,
+    "texture": "noctowl-texture.webp",
+    "reference": "noctowl-reference.webp"
+  },
+  {
+    "name": "octillery",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/66-octillery.jpeg",
+    "sourceFile": "hf_20261109_090305_0cbc3b74-1424-42f6-9212-9228f0a9e9d4.png",
+    "sourceSHA256": "8bc1ee20fa53b375644677423c4de8d2cc26745da89fdb91d07ccf1a59586862",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.044709324836731,
+        -0.00015244318637996912,
+        -20.840269088745117
+      ],
+      [
+        -3.91899311580346e-06,
+        0.9927023649215698,
+        6.937185764312744
+      ]
+    ],
+    "alignmentScore": 0.9501414186054133,
+    "texture": "octillery-texture.webp",
+    "reference": "octillery-reference.webp"
+  },
+  {
+    "name": "golbat",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/65-golbat.jpeg",
+    "sourceFile": "hf_20261109_090305_27ddf223-ca52-436d-982e-4d1103a2ecc6.png",
+    "sourceSHA256": "f41b66b63c5ced1cee0dc4bae3b19eb64b0e87ed2c3605deada5f0f6c2b4f8a4",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.0304800271987915,
+        -0.0005623816978186369,
+        -6.514500617980957
+      ],
+      [
+        -4.227986573823728e-05,
+        0.9788318872451782,
+        20.11093521118164
+      ]
+    ],
+    "alignmentScore": 0.9532630901429587,
+    "texture": "golbat-texture.webp",
+    "reference": "golbat-reference.webp"
+  },
+  {
+    "name": "exeggutor",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/63-exeggutor.jpeg",
+    "sourceFile": "hf_20261109_090305_e2aa204b-7e91-4ecb-b550-12c08be81327.png",
+    "sourceSHA256": "5ced54aec0b6617805557a624f2d34d2a8e94d22c5225a5bb5addc601e2b6346",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.026088833808899,
+        0.001084764371626079,
+        -6.163726806640625
+      ],
+      [
+        0.00018796381482388824,
+        0.9755390286445618,
+        23.084440231323242
+      ]
+    ],
+    "alignmentScore": 0.7639922196852547,
+    "texture": "exeggutor-texture.webp",
+    "reference": "exeggutor-reference.webp"
+  },
+  {
+    "name": "parasect",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/72-parasect.jpeg",
+    "sourceFile": "hf_20261109_090314_c40763cc-de0d-4ed6-b7d0-950f9c3484d5.png",
+    "sourceSHA256": "33490829194ac2acf7e3ad6d0cc32ea4772f5bc7119385ddcfd343bb3fed9ceb",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.0290381908416748,
+        -9.72213747445494e-05,
+        -4.970306396484375
+      ],
+      [
+        0.00017736641166266054,
+        0.9775660634040833,
+        21.1980037689209
+      ]
+    ],
+    "alignmentScore": 0.7921685108993538,
+    "texture": "parasect-texture.webp",
+    "reference": "parasect-reference.webp"
+  }
+]

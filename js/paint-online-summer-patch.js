@@ -185,6 +185,13 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
       "49-rhyperior":"rhyperior", "50-rhydon":"rhydon",
       "51-regirock":"regirock", "52-regice":"regice",
       "55-slowpoke":"slowpoke", "56-raichu":"raichu"
+    },
+    "pokemon-references-20261125": {
+      "54-raticate":"raticate", "58-geodude":"geodude",
+      "59-porygon2":"porygon2", "61-nidorina":"nidorina",
+      "62-nidorino":"nidorino", "63-exeggutor":"exeggutor",
+      "64-noctowl":"noctowl", "65-golbat":"golbat",
+      "66-octillery":"octillery", "72-parasect":"parasect"
     }
   };
   const pokemonReferences = {};
