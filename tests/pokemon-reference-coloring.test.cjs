@@ -20,7 +20,7 @@ vm.runInContext(loader,context);
 (async()=>{while(!context.patched)await new Promise(r=>setImmediate(r));new vm.Script(context.patched);
 const code=context.patched.replace('function openPainter(IMAGE,TARGET,REFERENCE=""){','globalThis.openPainter=function openPainter(IMAGE,TARGET,REFERENCE=""){').replace(' if(autoButton)autoButton.addEventListener("click",safeRunAutoColor);','globalThis.controls={back,REFERENCE,runAutoColor,redraw,paint,lines,undo,redo,autoButton,status,autoProgress,save:()=>back.querySelector(`[data-action="save"]`).onclick(),acts:()=>acts,W:()=>W}; if(autoButton)autoButton.addEventListener("click",safeRunAutoColor);');vm.runInContext(code,context);
 vm.runInContext(fs.readFileSync('js/data/pokemon-coloring.js','utf8'),context);
-const manifest=['pokemon-references-20261109','pokemon-references-20261109-b','pokemon-references-20261109-c','pokemon-references-20261125','pokemon-references-20261125-paras-phanpy'].flatMap(directory=>{
+const manifest=['pokemon-references-20261125-b','pokemon-references-20261109','pokemon-references-20261109-b','pokemon-references-20261109-c','pokemon-references-20261125','pokemon-references-20261125-paras-phanpy'].flatMap(directory=>{
  const entries=JSON.parse(fs.readFileSync('assets/'+directory+'/manifest.json'));
  assert.equal(entries.length,10,directory);
  return entries.map(entry=>{

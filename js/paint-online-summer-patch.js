@@ -199,6 +199,13 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
       "71-paras":"paras", "73-persian":"persian",
       "74-phanpy":"phanpy", "75-pineco":"pineco",
       "76-pinsir":"pinsir", "77-plusle":"plusle"
+    },
+    "pokemon-references-20261125-b": {
+      "35-staryu":"staryu", "36-starmie":"starmie",
+      "37-squirtle":"squirtle", "38-drowzee":"drowzee",
+      "39-sudowoodo":"sudowoodo", "40-shuckle":"shuckle",
+      "41-sharpedo":"sharpedo", "42-lunatone":"lunatone",
+      "43-gligar":"gligar", "45-tangela":"tangela"
     }
   };
   const pokemonReferences = {};
