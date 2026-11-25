@@ -20,7 +20,7 @@ vm.runInContext(loader,context);
 (async()=>{while(!context.patched)await new Promise(r=>setImmediate(r));new vm.Script(context.patched);
 const code=context.patched.replace('function openPainter(IMAGE,TARGET,REFERENCE=""){','globalThis.openPainter=function openPainter(IMAGE,TARGET,REFERENCE=""){').replace(' if(autoButton)autoButton.addEventListener("click",safeRunAutoColor);','globalThis.controls={back,REFERENCE,runAutoColor,redraw,paint,lines,undo,redo,autoButton,status,autoProgress,save:()=>back.querySelector(`[data-action="save"]`).onclick(),acts:()=>acts,W:()=>W}; if(autoButton)autoButton.addEventListener("click",safeRunAutoColor);');vm.runInContext(code,context);
 vm.runInContext(fs.readFileSync('js/data/pokemon-coloring.js','utf8'),context);
-const manifest=['pokemon-references-20261109','pokemon-references-20261109-b','pokemon-references-20261109-c','pokemon-references-20261125','pokemon-references-20261125-paras-phanpy'].flatMap(directory=>{
+const manifest=['pokemon-references-20261109','pokemon-references-20261109-b','pokemon-references-20261109-c','pokemon-references-20261125','pokemon-references-20261125-paras-phanpy','pokemon-references-20261125-voltorb'].flatMap(directory=>{
  const entries=JSON.parse(fs.readFileSync('assets/'+directory+'/manifest.json'));
  assert.equal(entries.length,10,directory);
  return entries.map(entry=>{
@@ -36,8 +36,11 @@ for(const entry of [...manifest,{name:'sommar-regression',original:'assets/manda
  while(!c.W())await new Promise(r=>setImmediate(r));const ink=c.lines.toBuffer('image/png');
  while(!c.status.textContent.startsWith('Klart!')){if(c.status.textContent.includes('kunde inte'))throw Error(id+': '+c.status.textContent);await new Promise(r=>setImmediate(r));}
  assert.deepEqual(c.lines.toBuffer('image/png'),ink,'original contours unchanged');
- assert.ok(c.acts().length>=4,id+' multiple regions');assert.ok(c.acts().every(a=>a.type==='summerRegion'),'same Summer engine');
+ assert.ok(c.acts().length>=(id==='voltorb'?2:4),id+' multiple regions');assert.ok(c.acts().every(a=>a.type==='summerRegion'),'same Summer engine');
  assert.equal(c.autoButton.disabled,false);
+ if(entry.directory==='pokemon-references-20261125-voltorb'){
+  assert.ok(c.acts().every(({region})=>region.minX>0&&region.minY>0&&region.maxX<c.paint.width-1&&region.maxY<c.paint.height-1),'color fills stay away from the paper edges');
+ }
  if(entry.width){assert.equal(c.paint.width,entry.width);assert.equal(c.paint.height,entry.height);
  for(let i=1;i<c.acts().length;i++)assert.ok(c.acts()[i-1].region.area>=c.acts()[i].region.area,'large areas first');
  assert.equal(c.REFERENCE,'./assets/'+entry.directory+'/'+entry.reference,'correct suggestion');

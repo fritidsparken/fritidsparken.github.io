@@ -1,0 +1,232 @@
+[
+  {
+    "name": "voltorb",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/24-voltorb.jpeg",
+    "sourceFile": "hf_20261109_090144_714d96fd-6a7c-4003-8245-188422f100b0(1).png",
+    "sourceSHA256": "d2c7de9e892275ca61c6e62ffde4070ea6e5078aef135fb747d76f98c626b567",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.0504440069198608,
+        0.0005336935864761472,
+        -25.443035125732422
+      ],
+      [
+        -0.00021589014795608819,
+        0.9999391436576843,
+        -0.6601701974868774
+      ]
+    ],
+    "alignmentScore": 0.9858006954452442,
+    "texture": "voltorb-texture.webp",
+    "reference": "voltorb-reference.webp"
+  },
+  {
+    "name": "wailord",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/25-wailord.jpeg",
+    "sourceFile": "hf_20261109_090144_eb1bfe4d-5114-4248-95fc-6c1ec5a3f4b5(1).png",
+    "sourceSHA256": "6bf55176d888fc7cbf0ad128d855b78450b46724754a67cca1261e4f8fa0a2c3",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.0361769199371338,
+        0.0005817534402012825,
+        -14.078523635864258
+      ],
+      [
+        5.5816115491325036e-05,
+        0.9902326464653015,
+        6.155900001525879
+      ]
+    ],
+    "alignmentScore": 0.9779455741445311,
+    "texture": "wailord-texture.webp",
+    "reference": "wailord-reference.webp"
+  },
+  {
+    "name": "tyranitar",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/27-tyranitar.jpeg",
+    "sourceFile": "hf_20261109_090144_345f1d42-54a0-471c-94ca-e336c81c54c2(1).png",
+    "sourceSHA256": "00995cddb58e198487c11cdc8d3c088238cf8a953257e74c6169b968fb4fd923",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.049570083618164,
+        0.00017068035958800465,
+        -21.11992073059082
+      ],
+      [
+        0.0008945863810367882,
+        0.9992688298225403,
+        -0.45507511496543884
+      ]
+    ],
+    "alignmentScore": 0.7867312045890845,
+    "texture": "tyranitar-texture.webp",
+    "reference": "tyranitar-reference.webp"
+  },
+  {
+    "name": "dugtrio",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/28-dugtrio.jpeg",
+    "sourceFile": "hf_20261109_090144_7003e7c0-52c2-43c2-950a-5e018c665bb0(1).png",
+    "sourceSHA256": "88142e3af00a4fe1ffd691a23cd42869b1c547704bc6bc929c8018cc3a760d5a",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.026584267616272,
+        5.9130390582140535e-05,
+        -4.6219401359558105
+      ],
+      [
+        6.3215775298886e-05,
+        0.9747539162635803,
+        23.923181533813477
+      ]
+    ],
+    "alignmentScore": 0.9665319504744058,
+    "texture": "dugtrio-texture.webp",
+    "reference": "dugtrio-reference.webp"
+  },
+  {
+    "name": "foongus",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/29-foongus.jpeg",
+    "sourceFile": "hf_20261109_090155_9772125b-b998-4754-905f-91cf43b27a09(1).png",
+    "sourceSHA256": "7f6b90780470afc3216c435f8ca9bd6bd4b6d3b03911f6eea69ac7c8dcd03d27",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.0548228025436401,
+        0.00032854772871360183,
+        -31.444581985473633
+      ],
+      [
+        7.046518021525117e-06,
+        0.9970520734786987,
+        2.1884610652923584
+      ]
+    ],
+    "alignmentScore": 0.9809833463774561,
+    "texture": "foongus-texture.webp",
+    "reference": "foongus-reference.webp"
+  },
+  {
+    "name": "togepi",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/30-togepi.jpeg",
+    "sourceFile": "hf_20261109_090153_d9a81ff8-50cd-4f2a-8511-013faba96b5a(1).png",
+    "sourceSHA256": "787ceccc67c3c5de572b5117f9655a14dbf568f0506466bbcc267486e3b940fb",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.0267421007156372,
+        4.663886102207471e-06,
+        -4.705056667327881
+      ],
+      [
+        -3.583463330869563e-05,
+        0.9745882749557495,
+        24.02156639099121
+      ]
+    ],
+    "alignmentScore": 0.9605497155828087,
+    "texture": "togepi-texture.webp",
+    "reference": "togepi-reference.webp"
+  },
+  {
+    "name": "diglett",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/31-diglett.jpeg",
+    "sourceFile": "hf_20261109_090154_e961eadd-89ea-4416-b2c7-35cfce955bf8(1).png",
+    "sourceSHA256": "37d4abbfa9d176525103d9262bfac6d9f389bf565430e03bf60c854524047971",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.028454303741455,
+        -4.873664875049144e-05,
+        -5.450658798217773
+      ],
+      [
+        -0.00020640507864300162,
+        0.9763093590736389,
+        22.99231719970703
+      ]
+    ],
+    "alignmentScore": 0.9699211661088103,
+    "texture": "diglett-texture.webp",
+    "reference": "diglett-reference.webp"
+  },
+  {
+    "name": "grimer",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/32-grimer.jpeg",
+    "sourceFile": "hf_20261109_090153_47357266-bf60-4a46-95f8-0ce8fbfe3360(1).png",
+    "sourceSHA256": "6ab46532bfbf60bbb4a8336564e221eedd10fb71df27015db0540b969a32d2e9",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.0414797067642212,
+        -0.00016826129285618663,
+        -18.548725128173828
+      ],
+      [
+        8.718757453607395e-05,
+        0.984533965587616,
+        14.765851974487305
+      ]
+    ],
+    "alignmentScore": 0.9325199379372098,
+    "texture": "grimer-texture.webp",
+    "reference": "grimer-reference.webp"
+  },
+  {
+    "name": "poliwrath",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/33-poliwrath.jpeg",
+    "sourceFile": "hf_20261109_090152_b08436de-f70b-4b32-8544-1ce4b5b0c052(1).png",
+    "sourceSHA256": "3949e6d2fedae0166ba8452d43b96a2aacdff9d003fbde6c91378b84cddca0b6",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.0472643375396729,
+        -0.00019857633742503822,
+        -17.79640007019043
+      ],
+      [
+        -9.2065311037004e-06,
+        0.9969819188117981,
+        3.1262311935424805
+      ]
+    ],
+    "alignmentScore": 0.9865143401220375,
+    "texture": "poliwrath-texture.webp",
+    "reference": "poliwrath-reference.webp"
+  },
+  {
+    "name": "stunfisk",
+    "original": "assets/coloring-originals-2026/pokemon-20261021/34-stunfisk.jpeg",
+    "sourceFile": "hf_20261109_090153_57ee5804-c47a-4451-9f7d-f1f4ea5860f4(1).png",
+    "sourceSHA256": "35b26acb01964237269c37b3f65e61031cabd5ca860db4c0f52b46a2ffe55317",
+    "width": 1329,
+    "height": 1881,
+    "affine": [
+      [
+        1.031983733177185,
+        0.00016042515926528722,
+        -10.328475952148438
+      ],
+      [
+        -0.00022592605091631413,
+        0.978838324546814,
+        19.95867347717285
+      ]
+    ],
+    "alignmentScore": 0.9865703277704801,
+    "texture": "stunfisk-texture.webp",
+    "reference": "stunfisk-reference.webp"
+  }
+]

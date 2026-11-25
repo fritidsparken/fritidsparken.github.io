@@ -199,6 +199,13 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
       "71-paras":"paras", "73-persian":"persian",
       "74-phanpy":"phanpy", "75-pineco":"pineco",
       "76-pinsir":"pinsir", "77-plusle":"plusle"
+    },
+    "pokemon-references-20261125-voltorb": {
+      "24-voltorb":"voltorb", "25-wailord":"wailord",
+      "27-tyranitar":"tyranitar", "28-dugtrio":"dugtrio",
+      "29-foongus":"foongus", "30-togepi":"togepi",
+      "31-diglett":"diglett", "32-grimer":"grimer",
+      "33-poliwrath":"poliwrath", "34-stunfisk":"stunfisk"
     }
   };
   const pokemonReferences = {};
@@ -213,6 +220,7 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
  const imagePath=new URL(IMAGE,location.href).pathname;
  const pokemonReference=imagePath.includes("/pokemon-20261021/")?pokemonReferencePaths[imagePath.split("/").pop()]:null;
  const isPokemonReferenceTarget=!!pokemonReference;
+ const excludePokemonPaper=pokemonReference?.startsWith("./assets/pokemon-references-20261125-voltorb/");
  const isCatalogReferenceTarget=!!REFERENCE&&/[/](?:fotbollsproffs|fotbollslag-20261022|squishy-20261021|smink|coloring-expansion-20261124)[/]/.test(imagePath);
  const pokemonTexture=isPokemonReferenceTarget?pokemonReference+"-texture.webp":"";
  if(isPokemonReferenceTarget)REFERENCE=pokemonReference+"-reference.webp";`,
@@ -223,8 +231,12 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
   replaceOnce('ref.onerror=()=>reject(new Error("Referens saknas"));ref.src=REFERENCE;',
     'ref.onerror=()=>reject(new Error("Referens saknas"));ref.src=isPokemonReferenceTarget?pokemonTexture:REFERENCE;',
     'sample aligned RGB texture without duplicate contours');
+  replaceOnce('findAutoRegions(isGhost=false){', 'findAutoRegions(isGhost=false,excludePaper=false){',
+    'keep full-resolution Pokémon region detection');
+  replaceOnce('if((isGhost||!touchesEdge)&&tail>=', 'if((!touchesEdge||(isGhost&&!excludePaper))&&tail>=',
+    'keep paper outside the Pokémon animation');
   replaceOnce('plan=summerPaintingPlan(await findAutoRegions(true));',
-    'plan=summerPaintingPlan(await findAutoRegions(true));\n       if(isPokemonReferenceTarget)plan.sort((a,b)=>b.region.area-a.region.area);',
+    'plan=summerPaintingPlan(await findAutoRegions(true,excludePokemonPaper));\n       if(isPokemonReferenceTarget)plan.sort((a,b)=>b.region.area-a.region.area);',
     'large Pokémon areas before details');
   const referenceLayoutCSS = `
 .fp-pokemon-suggestion-title{margin:0 54px 8px 2px;color:#203b2a;font-size:clamp(19px,3vw,26px);line-height:1.15}
