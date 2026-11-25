@@ -105,6 +105,7 @@ function hash(x, z, seed) {
   return ((v ^ v >>> 15) >>> 0) / 4294967296;
 }
 const creatures = ['ko', 'far', 'gris', 'hona', 'hast', 'kanin', 'rav', 'varg', 'bjorn', 'lyktmott', 'mosslynx', 'skifferbagge', 'korallvandrare'];
+const monsters = new Set(['lyktmott','mosslynx','skifferbagge','korallvandrare','rimfena']);
 const aquatic = ['fisk', 'rimfena'];
 const regional = [
   ['ko','far','kanin','rav','lyktmott'], ['bjorn','varg','rav','mosslynx'],
@@ -139,7 +140,7 @@ export function sanitizeFauna(value) {
 }
 
 export function createActors({scene, ground, seed = 0, waterLevel = -Infinity, biome, blockAt,
-    isSolid = id => id>0 && id!==25 && id!==26, state = {removed:[],pets:{}}}) {
+    isSolid = id => id>0 && id!==25 && id!==26, createHeldSword, blocksStrike, state = {removed:[],pets:{}}}) {
   const templates = new Map(), actors = new Map();
   const clean = sanitizeFauna(state);
   Object.assign(state,clean);
@@ -266,12 +267,29 @@ export function createActors({scene, ground, seed = 0, waterLevel = -Infinity, b
       a.velocity=Math.max(-18,a.velocity-18*dt);a.y=Math.max(floor,a.y+a.velocity*dt);
     }else {a.y=floor;a.velocity=0;}
     a.timer-=dt;
-    let lead=a.yaw,pace=0;
+    let lead=a.yaw,pace=0, strike;
+    const hostile=p.survival && !a.tamed && monsters.has(a.id);
+    const height=p.y-(p.eyeHeight??1.55)-a.y;
     // Hatched creatures belong to the player, but wander instead of chasing them.
     if(a.tamed && a.id!=='mutation'){
       a.state=distance>2.1?'walk':'idle';
       if(swims)a.state='swim';
       if(distance>2.1){lead=Math.atan2(dx,dz);pace=Math.min(7,.8+distance*.45);}
+    }else if(hostile && distance<10 && Math.abs(height)<3){
+      lead=Math.atan2(dx,dz);
+      a.yaw=lead;
+      const close=distance<1.6 && Math.abs(height)<1.15;
+      a.state=close?'eat':swims?'swim':'run';
+      pace=close?0:2.1;
+      if(close && elapsed >= (a.nextStrike??0)){
+        const y=a.y+.8;
+        let clear=true;
+        for(let i=1;i<=6;i++){
+          const t=i/6;
+          if(blocksStrike?.(a.x+dx*t,y+height*t,a.z+dz*t)){clear=false;break}
+        }
+        if(clear){strike=speciesNames[a.id];a.nextStrike=elapsed+1.4}
+      }
     }else if(a.nextHit>elapsed-.9 || (!swims&&distance<1.55)){
       a.state='flee';lead=Math.atan2(-dx,-dz);a.timer=1.2;pace=2.4;
     }else{
@@ -291,8 +309,9 @@ export function createActors({scene, ground, seed = 0, waterLevel = -Infinity, b
     const turn=Math.atan2(Math.sin(a.yaw-m.root.rotation.y),Math.cos(a.yaw-m.root.rotation.y));
     m.root.rotation.y+=turn*Math.min(1,dt*7);
     m.play(a.state);m.mixer.update(dt*(a.state==='flee'?1.6:pace>2.1?1.35:1));
+    return strike;
   }
-  let playerTask;
+  let playerTask, playerSword;
   return {
     update(dt,p) {
       if(disposed)return;
@@ -312,12 +331,22 @@ export function createActors({scene, ground, seed = 0, waterLevel = -Infinity, b
         player.root.visible=!!p.thirdPerson;
         if(p.thirdPerson) {
           player.setOutfit(p.outfit);
+          if(p.sword && !playerSword && createHeldSword){
+            playerSword=createHeldSword();
+            playerSword.scale.setScalar(.85);
+            playerSword.position.set(.12,-.44,.29);
+            playerSword.rotation.y=Math.PI*.33;
+            player.root.getObjectByName('arm1')?.add(playerSword);
+          }
+          if(playerSword)playerSword.visible=!!p.sword;
           player.root.position.set(p.x,p.y-(p.eyeHeight??1.55),p.z);
           player.root.rotation.y=(p.yaw||0)+Math.PI;
           player.play(p.action || (p.moving?'walk':'idle'));player.mixer.update(dt);
         }
       }
-      for(const a of actors.values())updateAnimal(a,dt,p);
+      let attacker;
+      for(const a of actors.values())attacker=updateAnimal(a,dt,p)||attacker;
+      return attacker;
     },
     hatch(seed,p) {
       if(quiet||disposed)return {ok:false,message:'Slå på djurliv i Inställningar först.'};
@@ -356,10 +385,10 @@ export function createActors({scene, ground, seed = 0, waterLevel = -Infinity, b
       state.pets[key]={id:a.id,x:a.x,y:a.y,z:a.z};
       return {ok:true,message:speciesNames[a.id]+' är tam och följer dig!'};
     },
-    attack(key) {
+    attack(key, damage=1) {
       const a=actors.get(key);
       if(!a||quiet||elapsed<a.nextHit)return null;
-      a.nextHit=elapsed+.48;a.health--;a.state='flee';a.timer=2;
+      a.nextHit=elapsed+.48;a.health-=damage;a.state='flee';a.timer=2;
       if(a.health>0)return {message:speciesNames[a.id]+' försöker komma undan.',killed:false};
       removed.add(key);state.removed.push(key);delete state.pets[key];
       const drop={id:faunaFood.id,count:['ko','hast','bjorn'].includes(a.id)?2:1,p:[a.x,a.y+.2,a.z]};

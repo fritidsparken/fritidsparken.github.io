@@ -7,6 +7,7 @@ const hand = (out, count, needs) => ({out, count, needs});
 const bench = (out, count, needs) => ({out, count, needs, station: 'workbench'});
 
 export const recipes = [
+  hand('banana_sword',1,{31:1,apple:1}),
   hand('campfire',1,{31:3,3:4}),
   hand('shelf',1,{31:6}),
   hand('boat',1,{31:8}),

@@ -1,3 +1,4 @@
+import {bananaSword,swordImage,withBananaSword} from './inventory/banana-sword.js';
 import {equipment,withEquipment,boatWater,rowBoat} from './expedition/equipment.js';
 import {createNature} from './expedition/nature.js';
 import {showMap} from './expedition/map.js';
@@ -14,13 +15,13 @@ import {adaptiveGraphics} from './rendering/quality.js';
 import {createSky} from './rendering/sky.js';
 import {loadProps} from './entities/props.js';
 import {createLandscape} from './entities/landscape.js';
-import {createActors,withFaunaFood,faunaFood} from './entities/actors.js?v=expedition1';
+import {createActors,withFaunaFood,faunaFood} from './entities/actors.js?v=combat1';
 import {createAudio} from './audio/sound.js';
 import {consumables,durability} from './inventory/recipes.js?v=expedition1';
 import {extraFoods,extraFoodIcons,withExtraFood} from './inventory/food.js';
 import {flashlight,withFlashlight} from './inventory/flashlight.js';
-import {panels} from './ui/panels.js?v=expedition1';
-import * as db from './persistence/worlds.js';
+import {panels} from './ui/panels.js?v=combat1';
+import * as db from './persistence/worlds.js?v=combat1';
 const $=id=>document.getElementById(id),base='../../assets/blockvarlden/',T=window.THREE;
 const settings={quality:1,sense:1,fov:72,outfit:'skog',music:.45,effects:.7,ambience:.45};
 try{Object.assign(settings,JSON.parse(localStorage.getItem('blockvarlden-options-v2')||'{}'))}catch{}
@@ -32,9 +33,17 @@ const lampBlock=id=>id===140||id===141;
 let graphics,clip,player,handModel,handId,fishAt=-10,flashlightOn=false,flashlightLight,flashlightTarget;const audio=createAudio(),radius=()=>[2,3,4,5][graphics?.level??settings.quality]||2,active=()=>!!meta&&!suspended&&!waiting;
 function toast(t){const note=document.getElementById('dialog-status');if(note&&$('panel').open)note.textContent=t;$('toast').textContent=t;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('toast').textContent='',2600)}
 const name=id=>lookup[id]?.name||String(id);
-function icon(id){const b=defs[id],n=document.createElement('span');if(b){n.className='tile';const t=b.tiles.side;n.style.backgroundImage='url('+base+'blocks/atlas.png)';n.style.backgroundSize=reg.columns*26+'px '+reg.rows*26+'px';n.style.backgroundPosition=-(t%reg.columns)*26+'px '+-Math.floor(t/reg.columns)*26+'px'}else{n.className='symbol';n.textContent=String(id).startsWith('egg_')?'🥚':extraFoodIcons[id]||({door:'🚪',pickaxe:'⛏',axe:'🪓',apple:'🍎',bread:'🥖',chest:'▣',shovel:'⚒',torch:'♨',lantern:'☼',flashlight:'🔦',boat:'🛶',map:'🗺️',campfire:'🔥',shelf:'▤',outfit_sailor:'👕',outfit_explorer:'🧥',flowers:'✿',potion:'⚗',bed:'▱',oak:'♣',pine:'♠'})[id]||'◇'}return n}
-function bar(){if(!meta)return;const item=meta.slots[selected];if(handId!==item&&camera){if(handModel)camera.remove(handModel);handModel=null;handId=item;if(kit.ids.includes(item)&&(['Verktyg','Mat','Föremål'].includes(lookup[item]?.category))){handModel=kit.create(item);handModel.scale.setScalar(.54);handModel.position.set(.33,-.41,-.63);camera.add(handModel)}}$('bar').replaceChildren();meta.slots.forEach((id,i)=>{const b=document.createElement('button');b.title=(i+1)+' · '+name(id);b.setAttribute('aria-label',b.title);b.className=selected===i?'active':'';const count=document.createElement('small');count.textContent=meta.mode==='creative'?i+1:meta.bag[id]||0;b.append(icon(id),count);b.onclick=()=>slot(i);$('bar').append(b)})}
-function slot(i){selected=i;bar();if(meta)toast(meta.slots[i]==='flashlight'?'Ficklampa · tryck Bygg eller högerklicka för att tända/släcka':name(meta.slots[i]))}
+function icon(id){
+ if(id===bananaSword.id){
+   const img=document.createElement('img');img.src=swordImage;img.width=30;img.height=30;img.alt='';
+   return img;
+ }
+ const b=defs[id],n=document.createElement('span');if(b){n.className='tile';const t=b.tiles.side;n.style.backgroundImage='url('+base+'blocks/atlas.png)';n.style.backgroundSize=reg.columns*26+'px '+reg.rows*26+'px';n.style.backgroundPosition=-(t%reg.columns)*26+'px '+-Math.floor(t/reg.columns)*26+'px'}else{n.className='symbol';n.textContent=String(id).startsWith('egg_')?'🥚':extraFoodIcons[id]||({door:'🚪',pickaxe:'⛏',axe:'🪓',apple:'🍎',bread:'🥖',chest:'▣',shovel:'⚒',torch:'♨',lantern:'☼',flashlight:'🔦',boat:'🛶',map:'🗺️',campfire:'🔥',shelf:'▤',outfit_sailor:'👕',outfit_explorer:'🧥',flowers:'✿',potion:'⚗',bed:'▱',oak:'♣',pine:'♠'})[id]||'◇'}return n}
+function bar(){if(!meta)return;const selectedId=meta.slots[selected],item=selectedId===bananaSword.id&&!hasSword()?null:selectedId;if(handId!==item&&camera){if(handModel)camera.remove(handModel);handModel=null;handId=item;if(kit.ids.includes(item)&&(['Verktyg','Mat','Föremål'].includes(lookup[item]?.category))){handModel=kit.create(item);handModel.scale.setScalar(.54);handModel.position.set(.33,-.41,-.63);camera.add(handModel)}}$('bar').replaceChildren();meta.slots.forEach((id,i)=>{const b=document.createElement('button');b.title=(i+1)+' · '+name(id);b.setAttribute('aria-label',b.title);b.className=selected===i?'active':'';const count=document.createElement('small');count.textContent=meta.mode==='creative'?i+1:meta.bag[id]||0;b.append(icon(id),count);b.onclick=()=>slot(i);$('bar').append(b)})}
+function slot(i){selected=i;bar();if(meta)toast(hasSword()?'Banansvärd · sikta på monstret och tryck Slå':meta.slots[i]==='flashlight'?'Ficklampa · tryck Bygg eller högerklicka för att tända/släcka':name(meta.slots[i]))}
+function hasSword(){
+ return meta.slots[selected]===bananaSword.id && (meta.mode==='creative'||meta.bag[bananaSword.id]>0);
+}
 function add(id,n=1){meta.bag[id]=Math.max(0,(meta.bag[id]||0)+n)}
 function showDrop(record){
  const id=record.id;
@@ -95,11 +104,12 @@ async function home(){suspend();await save();roomSession?.close();roomSession=nu
 function setupRenderer(){if(renderer)return;try{renderer=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'})}catch{throw Error('WebGL kunde inte starta. Aktivera grafikacceleration i webbläsaren och öppna spelet igen.')};graphics=adaptiveGraphics(renderer);document.body.prepend(renderer.domElement);scene=new T.Scene();camera=new T.PerspectiveCamera(settings.fov,1,.045,240);camera.rotation.order='YXZ';scene.add(camera);companions=createCompanions(T,$('hud'));sky=createSky(scene);ray=new T.Raycaster();highlight=new T.LineSegments(new T.EdgesGeometry(new T.BoxGeometry(1.012,1.012,1.012)),new T.LineBasicMaterial({color:0xffe6a1}));highlight.visible=false;scene.add(highlight);
  flashlightLight=new T.SpotLight(0xfff1cd,35,24,Math.PI/6,.4,1.5);flashlightTarget=new T.Object3D();scene.add(flashlightLight,flashlightTarget);flashlightLight.target=flashlightTarget;flashlightLight.visible=false;
  glints=new T.Points(new T.BufferGeometry(),new T.PointsMaterial({size:.09,color:0xe2b880}));glints.visible=false;scene.add(glints);
- input=controls(renderer.domElement,{active,pack:()=>ui.pack(),pause:()=>ui.pause(),camera:()=>{player.third=!player.third},fly:()=>{if(meta.mode==='creative')player.fly=!player.fly},slot,cycle:step=>slot((selected+step+9)%9),pickBlock:()=>{findHit();if(!hit)return;const id=hit.kind==='prop'?hit.obj.userData.record.id:hit.id;if(!lookup[id]||(meta.mode==='survival'&&!meta.bag[id]))return;const i=meta.slots.indexOf(id);if(i>=0)slot(i);else{meta.slots[selected]=id;slot(selected)}},drop:dropItem,turn:(x,y)=>{player.yaw-=x*.0029*settings.sense;player.pitch=Math.max(-1.48,Math.min(1.48,player.pitch-y*.0029*settings.sense))},remove:removeAimedTarget,mine:on=>{if(on)removeTarget=null;mineHeld=on;if(on){findHit();mining(0)}else if(removeTarget===null){mineKey='';mineTime=0}},build:use});
+ input=controls(renderer.domElement,{active,pack:()=>ui.pack(),pause:()=>ui.pause(),camera:()=>{player.third=!player.third},fly:()=>{if(meta.mode==='creative')player.fly=!player.fly},slot,cycle:step=>slot((selected+step+9)%9),pickBlock:()=>{findHit();if(!hit)return;const id=hit.kind==='prop'?hit.obj.userData.record.id:hit.id;if(!lookup[id]||(meta.mode==='survival'&&!meta.bag[id]))return;const i=meta.slots.indexOf(id);if(i>=0)slot(i);else{meta.slots[selected]=id;slot(selected)}},drop:dropItem,turn:(x,y)=>{player.yaw-=x*.0029*settings.sense;player.pitch=Math.max(-1.48,Math.min(1.48,player.pitch-y*.0029*settings.sense))},remove:removeAimedTarget,mine:on=>{if(on&&active()&&hasSword()){findHit();swingSword();return}if(on)removeTarget=null;mineHeld=on;if(on){findHit();mining(0)}else if(removeTarget===null){mineKey='';mineTime=0}},build:use});
  configure();requestAnimationFrame(frame)}
 function spawn(seedWorld){for(let r=0;r<=150;r+=6)for(const [x,z] of [[r,0],[-r,0],[0,r],[0,-r],[r,r]]){const h=seedWorld.info(x,z).height;if(h>21&&h<43)return [x+.5,h+1.02,z+.5]}return [.5,seedWorld.info(0,0).height+1.1,.5]}
-async function start(m,edits){if(homeBusy)return;homeBusy=true;try{await ready;setupRenderer();if(meta){await save();cleanup()}meta=m;meta.bag??={};if(!meta.mapGranted){meta.bag.map=Math.max(1,meta.bag.map||0);meta.mapGranted=true}if(!meta.flashlightGranted){meta.bag.flashlight=Math.max(1,meta.bag.flashlight||0);meta.flashlightGranted=true}flashlightOn=false;lampChecks.clear();for(const [x,y,z,id] of edits||[])if(lampBlock(id))lampChecks.set([x,y,z].join(','),[x,y,z]);meta.props??=[];meta.wear??={};removed=new Set(m.removed||[]);pending=new Map();selected=0;world=new World(scene,reg,atlas,m,edits);clip=blueprint(world,edit,([x,y,z])=>!(Math.abs(player.p.x-x-.5)<.79&&Math.abs(player.p.z-z-.5)<.79&&player.p.y<y+1&&player.p.y+1.75>y));const pos=m.position||spawn(world);player={p:new T.Vector3(...pos),yaw:m.yaw||0,pitch:m.pitch??-.18,fly:m.mode==='creative'&&m.fly===true,third:false,v:0};root=new T.Group();scene.add(root);
- m.drops??=[];for(const record of m.drops)showDrop(record);for(const record of m.props)attach(record);land=createLandscape({scene,kit,world,seed:world.seed,legacy:m.legacy,removed});fixtures=createFixtureInteractions({world,root,land});nature=createNature(T,scene,world);actors=createActors({scene,state:m.fauna??={removed:[],pets:{}},blockAt:(x,y,z)=>world.at(x,y,z),isSolid:id=>!!defs[id]?.collision,ground:(x,z)=>world.surface(x,z),seed:world.seed,waterLevel:21,biome:(x,z)=>world.info(x,z).biome});waiting=true;$('loading').hidden=false;suspended=false;weatherStep=-1;lastSave=elapsed;world.update(pos[0],pos[2],radius());$('home').hidden=true;$('hud').hidden=false;$('region').textContent='Förbereder landskapet…';bar();await save();audio.start()}finally{homeBusy=false}}
+async function start(m,edits){if(homeBusy)return;homeBusy=true;try{await ready;setupRenderer();if(meta){await save();cleanup()}meta=m;meta.bag??={};meta.bag[bananaSword.id]??=1;nextMonsterHit=elapsed+3;nextSwing=0;if(!meta.mapGranted){meta.bag.map=Math.max(1,meta.bag.map||0);meta.mapGranted=true}if(!meta.flashlightGranted){meta.bag.flashlight=Math.max(1,meta.bag.flashlight||0);meta.flashlightGranted=true}flashlightOn=false;lampChecks.clear();for(const [x,y,z,id] of edits||[])if(lampBlock(id))lampChecks.set([x,y,z].join(','),[x,y,z]);meta.props??=[];meta.wear??={};removed=new Set(m.removed||[]);pending=new Map();selected=0;world=new World(scene,reg,atlas,m,edits);clip=blueprint(world,edit,([x,y,z])=>!(Math.abs(player.p.x-x-.5)<.79&&Math.abs(player.p.z-z-.5)<.79&&player.p.y<y+1&&player.p.y+1.75>y));const pos=m.position||spawn(world);player={p:new T.Vector3(...pos),yaw:m.yaw||0,pitch:m.pitch??-.18,fly:m.mode==='creative'&&m.fly===true,third:false,v:0};root=new T.Group();scene.add(root);
+ m.drops??=[];for(const record of m.drops)showDrop(record);for(const record of m.props)attach(record);land=createLandscape({scene,kit,world,seed:world.seed,legacy:m.legacy,removed});fixtures=createFixtureInteractions({world,root,land});nature=createNature(T,scene,world);actors=createActors({scene,createHeldSword:()=>kit.create(bananaSword.id),
+ blocksStrike:(x,y,z)=>world.solid(x,y,z)||fixtures.collides({x,y,z},.025,.05),state:m.fauna??={removed:[],pets:{}},blockAt:(x,y,z)=>world.at(x,y,z),isSolid:id=>!!defs[id]?.collision,ground:(x,z)=>world.surface(x,z),seed:world.seed,waterLevel:21,biome:(x,z)=>world.info(x,z).biome});waiting=true;$('loading').hidden=false;suspended=false;weatherStep=-1;lastSave=elapsed;world.update(pos[0],pos[2],radius());$('home').hidden=true;$('hud').hidden=false;$('region').textContent='Förbereder landskapet…';bar();await save();audio.start()}finally{homeBusy=false}}
 function attach(record){const obj=kit.create(record.id);obj.position.fromArray(record.p);obj.rotation.y=(record.rot||0)+(record.open?Math.PI/2:0);obj.userData.record=record;root.add(obj);if(['lantern','torch','campfire'].includes(record.id))refreshLights();return obj}
 function refreshLights(){if(!player||!root)return;const sources=root.children.filter(o=>o.userData.record&&['lantern','torch','campfire'].includes(o.userData.record.id)).sort((a,b)=>a.position.distanceToSquared(player.p)-b.position.distanceToSquared(player.p)).slice(0,settings.quality?3:1);for(let i=0;i<sources.length;i++){if(!lamps[i]){lamps[i]=new T.PointLight(0xffb962,2.5,8);scene.add(lamps[i])}lamps[i].position.copy(sources[i].position);lamps[i].position.y+=.7}for(let i=sources.length;i<lamps.length;i++)scene.remove(lamps[i]);lamps.length=sources.length}
 function edit(cell,id){if(roomSession){roomSession.edit([...cell,id]);return true}if(world.set(...cell,id)){pending.set(cell.join(','),[...cell,id]);const [x,y,z]=cell;
@@ -116,7 +126,7 @@ function checkLampBlocks(){
  }
 }
 function findHit(){if(!world||!player)return;const o=player.p.clone();o.y+=fixtures.seatEye(player);const d=new T.Vector3();camera.getWorldDirection(d);ray.set(o,d);ray.far=7;const block=target(world,o,d);hit=block?{...block,kind:'block',key:block.cell.join(',')}:null;const h=land.harvest(ray,hit?.distance??7);if(h)hit={...h,kind:'plant',key:'v'+h.key,plantKey:h.key};const h2=ray.intersectObjects(root.children,true)[0];if(h2&&h2.distance<(hit?.distance??7)){let obj=h2.object;while(obj&&!obj.userData.record)obj=obj.parent;if(obj)hit={kind:'prop',obj,distance:h2.distance,key:obj.uuid}}hit=actors.hit(ray,hit?.distance??7)||hit;highlight.visible=hit?.kind==='block';if(highlight.visible)highlight.position.set(...hit.cell).addScalar(.5);
- const useLabel=meta.slots[selected]==='flashlight'?(flashlightOn?'Släck':'Tänd'):player.seat?'Res dig':hit?.kind==='animal'?'Mata':hit?.kind==='prop'?({chair:'Sitt',bed:'Vila',door:'Öppna / stäng',chest:'Öppna'})[hit.obj.userData.record.id]:null;
+ const useLabel=hasSword()?'Slå':meta.slots[selected]==='flashlight'?(flashlightOn?'Släck':'Tänd'):player.seat?'Res dig':hit?.kind==='animal'?'Mata':hit?.kind==='prop'?({chair:'Sitt',bed:'Vila',door:'Öppna / stäng',chest:'Öppna'})[hit.obj.userData.record.id]:null;
  const buildButton=$('build');if(buildButton.textContent!==(useLabel||'Bygg'))buildButton.textContent=useLabel||'Bygg';
 }
 function effects(pos,color){const arr=new Float32Array(18*3);for(let i=0;i<arr.length;i+=3){arr[i]=(Math.random()-.5)*.8;arr[i+1]=Math.random()*.7;arr[i+2]=(Math.random()-.5)*.8}glints.geometry.dispose();glints.geometry=new T.BufferGeometry();glints.geometry.setAttribute('position',new T.BufferAttribute(arr,3));glints.position.copy(pos);glints.material.color.set(color||'#baa882');glints.visible=true;glints.userData.until=elapsed+.3}
@@ -138,15 +148,33 @@ function removeAimedTarget() {
  mining(0);
 }
 
+let nextSwing=0, nextMonsterHit=0;
+function swingSword(){
+ if(elapsed<nextSwing)return;
+ nextSwing=elapsed+.48;
+ animateAct('use');
+ if(hit?.kind==='animal' && hit.distance<=3)hitAnimal(2);
+}
+function hitAnimal(amount){
+ const result=actors.attack(hit.key,amount);
+ if(!result)return;
+
+ animateAct('use');audio.effect('dig');toast(result.message);
+ if(result.drop){
+   for(const item of [result.drop,result.egg].filter(Boolean)){
+     const drop={...item,ready:Date.now()+600};
+     meta.drops.push(drop);showDrop(drop);
+   }
+   hit=null;mineHeld=false;checkpoint();
+ }
+}
+
 function mining(dt){
  if (removeTarget !== null && hit?.key !== removeTarget) removeTarget = null;
  if (!active() || !hit || (!mineHeld && removeTarget === null)) return;
  const id=meta.slots[selected],tool=durability[id]&&meta.bag[id]>0?id:null;if(roomSession&&!['block','plant'].includes(hit.kind))return;if(hit.key!==mineKey){mineTime=0;mineKey=hit.key;audio.effect('dig',defs[hit.id]?.sound)}
  if(hit.kind==='animal'){
-   const result=actors.attack(hit.key);if(!result)return;
-   animateAct('use');audio.effect('dig');toast(result.message);
-   if(result.drop){for(const item of [result.drop,result.egg].filter(Boolean)){const drop={...item,ready:Date.now()+600};meta.drops.push(drop);showDrop(drop)}hit=null;mineHeld=false;checkpoint()}
-   return;
+   hitAnimal(1);return;
  }
  const hard=hit.kind==='block'?defs[hit.id].hardness:1,softPlant=hit.kind==='plant'?['flowers','shrub','reeds','roots','mushroom'].includes(hit.id):hit.kind==='prop'?['flowers','shrub','reeds','roots','mushroom'].includes(hit.obj.userData.record.id):defs[hit.id]?.category==='Vegetation',
  delay=softPlant||(removeTarget!==null&&meta.mode==='creative')?0:meta.mode==='creative'?.38:Math.min(2.4,.63+hard*.24)/(tool?1.6:1);
@@ -179,6 +207,7 @@ function harvestRoomPlant(target,tool){
 function nearBench(){if(root.children.some(o=>o.userData.record?.id==='workbench'&&o.position.distanceTo(player.p)<5))return true;const p=player.p;for(let x=-3;x<=3;x++)for(let y=-2;y<=2;y++)for(let z=-3;z<=3;z++)if(world.at(p.x+x,p.y+y,p.z+z)===136)return true;return false}
 let lastBuild=-Infinity,lastBreak=-Infinity;
 function use(){if(!active()||performance.now()-lastBuild<360)return;findHit();const id=meta.slots[selected],s=meta.mode==='survival';
+ if(id===bananaSword.id){if(hasSword())swingSword();else toast('Du behöver ett banansvärd i ryggsäcken');return}
  if(id==='map'){if(s&&!meta.bag[id])return toast('Du behöver en karta');suspend();const d=showMap(world,player.p,roomSession?.players()||[]);d.addEventListener('close',resume,{once:true});return}
  if(String(id).startsWith('outfit_')){if(s&&!meta.bag[id])return toast('Tillverka kläderna först');settings.outfit=id==='outfit_sailor'?'sailor':'explorer';configure();player.third=true;toast('Du bytte till '+name(id).toLowerCase());return}
  if(player.boat){player.boat=null;player.p.y=21.5;player.v=4;toast('Du lämnade båten');return}
@@ -208,23 +237,55 @@ function use(){if(!active()||performance.now()-lastBuild<360)return;findHit();co
  if(id==='lantern'){const ground=fixtures.locateLantern(record,player);if(!ground)return toast('Lyktan behöver ett ledigt underlag');record.p=ground}
  if(meta.props.some(o=>o.p.every((v,i)=>v===record.p[i])))return;meta.props.push(record);attach(record)}lastBuild=performance.now();if(s)add(id,-1);audio.effect('place',defs[id]?.sound);animateAct('build');bar()}
 function switchMode(){if(roomSession)return toast('Skaparen har valt '+(meta.mode==='creative'?'kreativt läge':'överlevnad')+' för hela världen');meta.mode=meta.mode==='survival'?'creative':'survival';player.fly=false;bar();toast(meta.mode==='creative'?'Kreativt läge':'Överlevnadsläge')}
-function damage(n){if(meta.mode!=='survival'||meta.difficulty==='Lätt')return;meta.life-=n;audio.effect('hurt');animateAct('hurt');if(meta.life<=0){player.p.fromArray(spawn(world));player.v=0;meta.life=meta.food=10;waiting=true;toast('Du vaknar vid din startplats')}}
+function damage(n,monster){
+ if(!active()||meta.mode!=='survival'||(!monster&&meta.difficulty==='Lätt'))return;
+ if(monster){
+   if(elapsed<nextMonsterHit)return;
+   nextMonsterHit=elapsed+1.3;
+ }
+ meta.life=Math.max(0,meta.life-n);
+ audio.effect('hurt');animateAct('hurt');
+ if(meta.life>0){if(monster)toast(monster+' träffade dig!');return}
+ player.seat=null;player.seatEntry=null;player.boat=null;
+ player.p.fromArray(spawn(world));player.v=0;player.grounded=false;
+ meta.life=meta.food=10;nextMonsterHit=elapsed+4;
+ input.clear();removeTarget=null;hit=null;waiting=true;
+ toast('Du dog'+(monster?' av en '+monster.toLocaleLowerCase('sv'):'')+'. Du är tillbaka vid startplatsen.');
+ checkpoint();
+}
 function frame(now){requestAnimationFrame(frame);const ms=now-(frame.last||now),dt=Math.min(.1,ms/1000);frame.last=now;if(!world||suspended)return;if(!waiting)graphics.sample(ms,now);elapsed+=Math.min(.5,ms/1000);const p=player.p;world.update(p.x,p.z,radius());roomSession?.frame(dt,p,player.yaw);if(world.error){$('loading').hidden=true;suspend();toast(world.error);ui.pause();return}if(waiting){for(const dx of [-16,0,16])for(const dz of [-16,0,16])if(world.at(p.x+dx,0,p.z+dz)===null)return;$('loading').hidden=true;while(occupied(world,p)&&p.y<80)p.y+=.25;waiting=false}
  updateDrops(dt);const keys=input.read(dt);if(player.seat&&(keys.f||keys.r||keys.up))fixtures.dismount(player);if(!rowBoat(player,world,keys,dt)&&!player.seat)move(player,world,dt,keys,meta.mode,speed=>{if(speed>14)damage(Math.ceil((speed-14)/4))},p=>fixtures.collides(p),p=>stepHeight(root,p));
+ if(waiting)return;
  camera.rotation.set(player.pitch,player.yaw,0);camera.position.copy(p);camera.position.y+=fixtures.seatEye(player);const eyePos=camera.position.clone();
  if(player.third){const back=new T.Vector3(0,0,1).applyQuaternion(camera.quaternion);for(let r=.12;r<=3.8;r+=.12){const test=eyePos.clone().addScaledVector(back,r);if(world.solid(test.x,test.y,test.z)||fixtures.collides(test,.06,.1))break;camera.position.copy(test)}}
- if(handModel){handModel.visible=!player.third;const swing=mineHeld?Math.sin(elapsed*15):elapsed<actionTime?Math.sin((actionTime-elapsed)*7):0;handModel.rotation.set(-.22+swing*.5,.15,-.35+swing*.16);handModel.position.y=-.41+(player.moving?.015*Math.sin(elapsed*9):0)}
+ if(handModel){
+ const sword=hasSword();
+ const swing=mineHeld?Math.sin(elapsed*15):elapsed<actionTime?Math.sin((actionTime-elapsed)*7):0;
+ handModel.visible=!player.third;
+ if(sword){
+   const halfHeight=.63*Math.tan(camera.fov*Math.PI/360);
+   const scale=Math.min(halfHeight*.97,halfHeight*camera.aspect*1.3);
+   handModel.scale.setScalar(scale);
+   handModel.position.x=Math.min(.35,halfHeight*camera.aspect-scale*.47)-.12*swing;
+ }
+ handModel.rotation.set(-.22+swing*.5,.15,-.35+swing*(sword?.9:.16));
+ handModel.position.y=(sword?-.24:-.41)+(player.moving?.015*Math.sin(elapsed*9):0);
+ }
  camera.updateMatrixWorld();companions.update({players:roomSession?.players()??null,position:p,yaw:player.yaw,camera});const hasFlashlight=meta.slots[selected]==='flashlight'&&(meta.mode==='creative'||meta.bag.flashlight>0);flashlightLight.visible=flashlightOn&&hasFlashlight;if(flashlightLight.visible){flashlightLight.position.copy(eyePos);const direction=new T.Vector3();camera.getWorldDirection(direction);flashlightTarget.position.copy(eyePos).addScaledVector(direction,10);flashlightTarget.updateMatrixWorld()}meta.time=(meta.time+dt/720)%1;const info=world.info(p.x,p.z),night=meta.time<.23||meta.time>.78,under=p.y+3<info.height,sub=world.at(p.x,p.y+eye,p.z)===25;
  const wstep=Math.floor(meta.time*15);if(wstep!==weatherStep){weatherStep=wstep;const n=hash(wstep,info.biome,world.seed);weather=n<.51?'clear':n<.68?'cloud':n<.79?'fog':info.biome===4?'snow':n>.95?'storm':'rain'}
- world.clock.value=elapsed;sky.update({position:camera.position,time:meta.time,weather,quality:graphics.level,underground:under,underwater:sub});scene.fog.density=Math.max(scene.fog.density,1.44/(radius()*16));land.update(p.x,p.z);nature.update(dt,p,!!meta.quiet);for(const o of root.children){const flame=o.getObjectByName('flame');if(flame)flame.scale.y=1+Math.sin(elapsed*9)*.12}actors.update(dt,{x:p.x,y:p.y+eye,z:p.z,yaw:player.yaw,moving:player.moving,thirdPerson:player.third,outfit:settings.outfit,night,quiet:!!meta.quiet,action:player.seat?'rest':elapsed<actionTime?actionName:player.swim?'swim':!player.grounded&&!player.fly?'jump':player.moving?(keys.sprint?'run':'walk'):'idle'});fixtures.poseSeated(scene,player);
+ world.clock.value=elapsed;sky.update({position:camera.position,time:meta.time,weather,quality:graphics.level,underground:under,underwater:sub});scene.fog.density=Math.max(scene.fog.density,1.44/(radius()*16));land.update(p.x,p.z);nature.update(dt,p,!!meta.quiet);for(const o of root.children){const flame=o.getObjectByName('flame');if(flame)flame.scale.y=1+Math.sin(elapsed*9)*.12}
+ const attacker=actors.update(dt,{survival:meta.mode==='survival',sword:hasSword(),x:p.x,y:p.y+eye,z:p.z,yaw:player.yaw,moving:player.moving,thirdPerson:player.third,outfit:settings.outfit,night,quiet:!!meta.quiet,action:player.seat?'rest':elapsed<actionTime?actionName:player.swim?'swim':!player.grounded&&!player.fly?'jump':player.moving?(keys.sprint?'run':'walk'):'idle'});
+ if(attacker)damage(meta.difficulty==='Utmanande'?3:meta.difficulty==='Normal'?2:1,attacker);
+ if(waiting)return;
+ fixtures.poseSeated(scene,player);
  if(elapsed-lastHit>.09){findHit();lastHit=elapsed}if(mineHeld||removeTarget!==null)mining(dt);if(glints.visible){glints.position.y+=dt*.42;if(elapsed>glints.userData.until)glints.visible=false}
  if(player.moving&&elapsed-lastStep>.43&&!player.fly){audio.effect(player.swim?'splash':'step',defs[world.at(p.x,p.y-.08,p.z)]?.sound);lastStep=elapsed;if(meta.mode==='survival'&&meta.difficulty!=='Lätt')meta.food=Math.max(0,meta.food-(meta.difficulty==='Utmanande'?.02:.01))}
  if(elapsed-lastPanel>1){lastPanel=elapsed;checkLampBlocks();fixtures.settleLanterns(obj=>{
  const rec=obj.userData.record;meta.props.splice(meta.props.indexOf(rec),1);root.remove(obj);
  const drop={id:rec.id,count:1,p:[...rec.p],ready:Date.now()+500};meta.drops.push(drop);showDrop(drop);
- });refreshLights();$('region').textContent=biomes[info.biome]+' · '+(night?'Natt':'Dag');$('stats').textContent=meta.mode==='creative'?'Kreativt'+(player.fly?' · Flygläge':''):'♥ '+Math.ceil(meta.life)+'/10  ·  Mat '+Math.ceil(meta.food)+'/10';audio.setScene({biome:biomes[info.biome],weather,night,creative:meta.mode==='creative',underwater:sub,underground:under});if(meta.food<=0||world.at(p.x,p.y+.25,p.z)===26)damage(.5);if(meta.food>8)meta.life=Math.min(10,meta.life+.025)}
+ });refreshLights();$('region').textContent=biomes[info.biome]+' · '+(night?'Natt':'Dag');$('stats').textContent=meta.mode==='creative'?'Kreativt'+(player.fly?' · Flygläge':''):'♥ '+Math.max(1,Math.round(meta.life))+'/10  ·  Mat '+Math.ceil(meta.food)+'/10';audio.setScene({biome:biomes[info.biome],weather,night,creative:meta.mode==='creative',underwater:sub,underground:under});if(meta.food<=0||world.at(p.x,p.y+.25,p.z)===26)damage(.5);if(meta.food>8)meta.life=Math.min(10,meta.life+.025)}
  if(elapsed-lastSave>8){lastSave=elapsed;save().catch(()=>toast('Kunde inte spara. Kontrollera ledigt utrymme.'))}renderer.render(scene,camera)}
-const ready=Promise.all([fetch(base+'blocks/registry.json').then(r=>r.json()),loadProps(T).then(withFaunaFood).then(eggKit).then(withFlashlight).then(k=>withExtraFood(T,k)).then(k=>withEquipment(T,k)),new T.TextureLoader().loadAsync(base+'blocks/atlas.png'),fetch(base+'props/manifest.json').then(r=>r.json())]).then(([r,k,a,props])=>{reg=r;kit=k;atlas=a;atlas.colorSpace=T.SRGBColorSpace;atlas.magFilter=T.NearestFilter;atlas.minFilter=T.NearestFilter;atlas.generateMipmaps=false;catalog=[...equipment,...reg.blocks,faunaFood,flashlight,...extraFoods,...eggs,...props.assets.map(p=>p.id==='door'?{...p,name:'Trädörr'}:p)];lookup=Object.fromEntries(catalog.map(v=>[v.id,v]));defs=Object.fromEntries(reg.blocks.map(v=>[v.id,v]))});
+const ready=Promise.all([fetch(base+'blocks/registry.json').then(r=>r.json()),loadProps(T).then(withFaunaFood).then(eggKit).then(withFlashlight).then(k=>withExtraFood(T,k)).then(k=>withEquipment(T,k)).then(k=>withBananaSword(T,k)),new T.TextureLoader().loadAsync(base+'blocks/atlas.png'),fetch(base+'props/manifest.json').then(r=>r.json())]).then(([r,k,a,props])=>{reg=r;kit=k;atlas=a;atlas.colorSpace=T.SRGBColorSpace;atlas.magFilter=T.NearestFilter;atlas.minFilter=T.NearestFilter;atlas.generateMipmaps=false;catalog=[bananaSword,...equipment,...reg.blocks,faunaFood,flashlight,...extraFoods,...eggs,...props.assets.map(p=>p.id==='door'?{...p,name:'Trädörr'}:p)];lookup=Object.fromEntries(catalog.map(v=>[v.id,v]));defs=Object.fromEntries(reg.blocks.map(v=>[v.id,v]))});
 ui=panels({hatch:selection=>{if(roomSession)return {ok:false,message:'Varelselabbet finns i egna världar.'};const mix=mixEggs(selection,meta.bag,meta.mode==='creative');const result=actors.hatch(mix.seed,player.p);if(result.ok){if(meta.mode!=='creative')for(const [id,n] of mix.entries)add(id,-n);audio.effect('craft');bar();checkpoint()}return result},shared:()=>!!roomSession,host:()=>!!roomSession?.isHost(),deleteShared:()=>roomSession?.deleteRoom(),fullscreen:bindFullscreen($('fullscreen'),toast),start,save,home,refreshHome,suspend,resume,toast,defs:()=>defs,propIds:()=>kit.ids,settings,configure,meta:()=>meta,name,icon,checkpoint,slotIndex:()=>selected,setSlot:slot,bagChanged:bar,catalog:()=>roomSession?catalog.filter(item=>defs[item.id]||item.id==='flashlight'||item.category==='Mat'||item.category==='Verktyg'):catalog,sound:n=>audio.effect(n),pick:id=>{meta.slots[selected]=id;bar()},nearBench,switchMode,blueprint:op=>{if(roomSession)return 'Bygg ett block i taget i rummet.';findHit();if(hit?.kind!=='block')return 'Sikta på ett block först.';return op==='mark'?clip.mark(hit.cell):clip.paste(hit.prev)},craft:r=>{if(meta.mode==='survival'){if(r.station&&!nearBench()||Object.entries(r.needs).some(([k,n])=>(meta.bag[k]||0)<n))return;for(const [k,n] of Object.entries(r.needs))add(k,-n)}add(r.out,r.count);audio.effect('craft');bar()}});
 addEventListener('resize',resize);addEventListener('pagehide',()=>save().catch(()=>{}));document.addEventListener('visibilitychange',()=>{if(document.hidden&&meta){save().catch(()=>{});if(active())ui.pause()}});
 ready.then(async()=>{try{await db.migrate()}catch{toast('En äldre sparfil kunde inte importeras')}await refreshHome();if($('play-fullscreen'))$('play-fullscreen').disabled=false}).catch(e=>toast('Kunde inte läsa speldata: '+e.message));
