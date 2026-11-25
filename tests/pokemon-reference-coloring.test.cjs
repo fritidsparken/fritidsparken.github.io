@@ -21,6 +21,7 @@ vm.runInContext(loader,context);
 const code=context.patched.replace('function openPainter(IMAGE,TARGET,REFERENCE=""){','globalThis.openPainter=function openPainter(IMAGE,TARGET,REFERENCE=""){').replace(' if(autoButton)autoButton.addEventListener("click",safeRunAutoColor);','globalThis.controls={back,REFERENCE,runAutoColor,redraw,paint,lines,undo,redo,autoButton,status,autoProgress,save:()=>back.querySelector(`[data-action="save"]`).onclick(),acts:()=>acts,W:()=>W}; if(autoButton)autoButton.addEventListener("click",safeRunAutoColor);');vm.runInContext(code,context);
 vm.runInContext(fs.readFileSync('js/data/pokemon-coloring.js','utf8'),context);
 const batchSizes = {
+ 'pokemon-references-20261125-starmie': 10,
  'pokemon-references-20261109': 10,
  'pokemon-references-20261109-b': 10,
  'pokemon-references-20261109-c': 10,

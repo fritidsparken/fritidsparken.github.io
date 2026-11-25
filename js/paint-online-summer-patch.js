@@ -211,6 +211,13 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
       "10-mudkip":"mudkip", "78-seaking":"seaking",
       "egna-pokemonkort.webp":"egna-pokemonkort",
       "oppnad-pokeboll.webp":"oppnad-pokeboll"
+    },
+    "pokemon-references-20261125-starmie": {
+      "35-staryu":"staryu", "36-starmie":"starmie",
+      "37-squirtle":"squirtle", "38-drowzee":"drowzee",
+      "39-sudowoodo":"sudowoodo", "40-shuckle":"shuckle",
+      "41-sharpedo":"sharpedo", "42-lunatone":"lunatone",
+      "43-gligar":"gligar", "45-tangela":"tangela"
     }
   };
   const pokemonReferences = {};
