@@ -318,5 +318,105 @@ window.snowLeopardLevels = [
         94
       ]
     ]
+  },
+  {
+    "src": "assets/20261125-enbuskpasset.webp",
+    "targets": [
+      [
+        391,
+        720,
+        70
+      ]
+    ]
+  },
+  {
+    "src": "assets/20261125-snoravinen.webp",
+    "targets": [
+      [
+        361,
+        439,
+        39
+      ]
+    ]
+  },
+  {
+    "src": "assets/20261125-lavbranten.webp",
+    "targets": [
+      [
+        352,
+        253,
+        119
+      ]
+    ]
+  },
+  {
+    "src": "assets/20261125-grasbranten.webp",
+    "targets": [
+      [
+        1371,
+        662,
+        54
+      ]
+    ]
+  },
+  {
+    "src": "assets/20261125-frostterrasser.webp",
+    "targets": [
+      [
+        363,
+        451,
+        137
+      ]
+    ]
+  },
+  {
+    "src": "assets/20261125-mossklyftan.webp",
+    "targets": [
+      [
+        305,
+        290,
+        54
+      ]
+    ]
+  },
+  {
+    "src": "assets/20261125-ravinmynningen.webp",
+    "targets": [
+      [
+        790,
+        255,
+        150
+      ]
+    ]
+  },
+  {
+    "src": "assets/20261125-smaltvattenravinen.webp",
+    "targets": [
+      [
+        570,
+        185,
+        48
+      ]
+    ]
+  },
+  {
+    "src": "assets/20261125-grastuvorna.webp",
+    "targets": [
+      [
+        795,
+        643,
+        137
+      ]
+    ]
+  },
+  {
+    "src": "assets/20261125-granitsankor.webp",
+    "targets": [
+      [
+        1547,
+        623,
+        69
+      ]
+    ]
   }
 ];
