@@ -164,22 +164,45 @@ window.FP_patchSummerPainter = function patchSummerPainter(source) {
   // the reference image to its card, not to the wider browser viewport.
   // Exact user-supplied Pokémon references, registered to the unchanged originals.
   // Reuse Summer's mask painting, history, RGB samples, progress and timing.
-  const newPokemonReferences = new Set(["audino", "spiritomb", "chespin", "snorunt", "ledian", "salamence", "xatu", "wigglytuff", "weedle", "venonat"]);
-  const pokemonReferences = {
-    "01-spoink.jpeg":"spoink", "02-meowstic.jpeg":"meowstic",
-    "03-seadra.jpeg":"seadra", "04-masquerain.jpeg":"masquerain",
-    "05-metagross.jpeg":"metagross", "06-torterra-alt1.jpeg":"torterra",
-    "08-cacturne.jpeg":"cacturne", "11-pelipper.jpeg":"pelipper",
-    "12-seviper.jpeg":"seviper", "14-loudred.jpeg":"loudred",
-    "13-audino.jpeg":"audino", "15-spiritomb.jpeg":"spiritomb",
-    "16-chespin-alt1.jpeg":"chespin", "18-snorunt.jpeg":"snorunt",
-    "19-ledian.jpeg":"ledian", "20-salamence.jpeg":"salamence",
-    "21-xatu.jpeg":"xatu", "22-wigglytuff.jpeg":"wigglytuff",
-    "23-weedle.jpeg":"weedle", "26-venonat.jpeg":"venonat"
+  const pokemonReferenceBatches = {
+    "pokemon-references-20261109": {
+      "01-spoink":"spoink", "02-meowstic":"meowstic",
+      "03-seadra":"seadra", "04-masquerain":"masquerain",
+      "05-metagross":"metagross", "06-torterra-alt1":"torterra",
+      "08-cacturne":"cacturne", "11-pelipper":"pelipper",
+      "12-seviper":"seviper", "14-loudred":"loudred"
+    },
+    "pokemon-references-20261109-b": {
+      "13-audino":"audino", "15-spiritomb":"spiritomb",
+      "16-chespin-alt1":"chespin", "18-snorunt":"snorunt",
+      "19-ledian":"ledian", "20-salamence":"salamence",
+      "21-xatu":"xatu", "22-wigglytuff":"wigglytuff",
+      "23-weedle":"weedle", "26-venonat":"venonat"
+    },
+    "pokemon-references-20261109-c": {
+      "44-scyther":"scyther", "46-sableye":"sableye",
+      "47-sandshrew":"sandshrew", "48-pidgey":"pidgey",
+      "49-rhyperior":"rhyperior", "50-rhydon":"rhydon",
+      "51-regirock":"regirock", "52-regice":"regice",
+      "55-slowpoke":"slowpoke", "56-raichu":"raichu"
+    }
   };
+  const pokemonReferences = {};
+  for (const [directory, references] of Object.entries(pokemonReferenceBatches)) {
+    for (const [original, name] of Object.entries(references)) {
+      pokemonReferences[original + ".jpeg"] = "./assets/" + directory + "/" + name;
+    }
+  }
   replaceOnce('function openPainter(IMAGE,TARGET,REFERENCE=""){',
-    'function openPainter(IMAGE,TARGET,REFERENCE=""){\n const pokemonReferencePaths='+JSON.stringify(pokemonReferences)+';\n const newPokemonReferences='+JSON.stringify([...newPokemonReferences])+';\n const imagePath=new URL(IMAGE,location.href).pathname;\n const pokemonReferenceName=imagePath.includes("/pokemon-20261021/")?pokemonReferencePaths[imagePath.split("/").pop()]:null;\n const isPokemonReferenceTarget=!!pokemonReferenceName;\n const isCatalogReferenceTarget=!!REFERENCE&&/[/](?:fotbollsproffs|fotbollslag-20261022|squishy-20261021|smink|coloring-expansion-20261124)[/]/.test(imagePath);\n const pokemonReferenceDir="./assets/pokemon-references-20261109"+(newPokemonReferences.includes(pokemonReferenceName)?"-b":"")+"/";\n const pokemonTexture=isPokemonReferenceTarget?pokemonReferenceDir+pokemonReferenceName+"-texture.webp":"";\n if(isPokemonReferenceTarget)REFERENCE=pokemonReferenceDir+pokemonReferenceName+"-reference.webp";',
-    'ten exact Pokémon reference mappings');
+    `function openPainter(IMAGE,TARGET,REFERENCE=""){
+ const pokemonReferencePaths=${JSON.stringify(pokemonReferences)};
+ const imagePath=new URL(IMAGE,location.href).pathname;
+ const pokemonReference=imagePath.includes("/pokemon-20261021/")?pokemonReferencePaths[imagePath.split("/").pop()]:null;
+ const isPokemonReferenceTarget=!!pokemonReference;
+ const isCatalogReferenceTarget=!!REFERENCE&&/[/](?:fotbollsproffs|fotbollslag-20261022|squishy-20261021|smink|coloring-expansion-20261124)[/]/.test(imagePath);
+ const pokemonTexture=isPokemonReferenceTarget?pokemonReference+"-texture.webp":"";
+ if(isPokemonReferenceTarget)REFERENCE=pokemonReference+"-reference.webp";`,
+    'Pokémon reference mappings');
   source=source.replaceAll('isSummerTarget||isAutumnTarget||isWinterTarget||isBakeryTarget||isMachineTarget',
     'isCatalogReferenceTarget||isPokemonReferenceTarget||isSummerTarget||isAutumnTarget||isWinterTarget||isBakeryTarget||isMachineTarget');
   replaceOnce('if(isPokemonTarget){\n     const title=', 'if(isPokemonTarget&&!REFERENCE){\n     const title=', 'show supplied reference without generated suggestion');
