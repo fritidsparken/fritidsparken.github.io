@@ -401,17 +401,11 @@ body.std-design #stdNavigation,
 body.std-design .std-menu-toggle{display:none!important}
 
 
-/* Behåll högerställda verktyg på breda datorskärmar även utan navigationsrad. */
-@media(min-width:1440px){body.std-design .std-topbar > #fpVisitorTime{margin-left:auto}}
-
-
-/* Dela namnet på hela ord, och håll telefonens stående vy fri från sök och tema. */
+/* Dela namnet på hela ord. */
 body.std-design .std-categories > :is(button,a[data-origami-link]) > .std-tools-label{display:flex;flex-direction:column;justify-content:center;gap:0;hyphens:none;overflow-wrap:normal;word-break:normal}
 body.std-design .std-categories > :is(button,a[data-origami-link]) > .std-tools-label > span{white-space:nowrap}
 @media(max-width:700px) and (orientation:portrait){
- body.std-design .std-topbar .std-header-search,
  body.std-design .std-topbar .std-controls #theme{display:none!important}
- body.std-design .std-search-panel{display:none!important}
 }
 
 
