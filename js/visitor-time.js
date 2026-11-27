@@ -11,7 +11,7 @@ function mount() {
   el.className = 'fp-visitor-time';
   el.title = 'Ungefärlig sammanlagd tid i synliga flikar, från att mätningen aktiverades.';
   el.innerHTML = '<span aria-hidden="true">◷</span><div><small>Tid tillsammans</small><strong></strong></div>';
-  search.after(el);
+  search.before(el);
   render();
 }
 

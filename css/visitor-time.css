@@ -69,7 +69,46 @@ body.dark .fp-visitor-time, [data-theme=dark] .fp-visitor-time {
   body.std-design .fp-visitor-tools { order: 2; margin-left: auto; }
 }
 
+@media (max-width: 900px) and (orientation: landscape) {
+  body.std-design .std-header .std-topbar:has(> .fp-visitor-tools) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px 10px;
+  }
+
+  body.std-design .std-topbar:has(> .fp-visitor-tools)::before { display: none; }
+
+  body.std-design .std-topbar > :is(.std-brand, .std-plugg) {
+    flex: 0 0 auto;
+    gap: 5px;
+    font-size: clamp(12px, 2.2vw, 17px);
+  }
+
+  body.std-design .std-brand img, body.std-design .std-plugg img {
+    width: 28px;
+    height: 28px;
+  }
+
+  body.std-design .fp-visitor-tools { margin-left: auto; }
+  body.std-design.christmas .std-header .std-christmas-crafts { padding-inline: 10px; }
+}
+
+@media (max-width: 620px) and (orientation: landscape) {
+  body.std-design .std-header .std-topbar:has(> .fp-visitor-tools) { gap: 5px !important; }
+  body.std-design .std-topbar > :is(.std-brand, .std-plugg) { font-size: 11px; }
+  body.std-design .std-brand img, body.std-design .std-plugg img { width: 24px; height: 24px; }
+  body.std-design.christmas .std-header .std-christmas-crafts { font-size: 12px; padding-inline: 6px; }
+  .fp-visitor-time { padding-inline: 6px; }
+  .fp-visitor-time strong { font-size: 11px; }
+}
+
 @media (max-width: 700px) and (orientation: portrait) {
+  body.std-design .std-topbar > .fp-visitor-tools > .std-header-search,
+  body.std-design .std-header:has(.fp-visitor-tools) .std-search-panel {
+    display: none;
+  }
+
   body.std-design .std-topbar {
     padding: 8px 10px;
     gap: 6px;
