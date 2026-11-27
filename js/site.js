@@ -223,11 +223,11 @@ function funPage(){
 }
 function renderFun(){if(category==="Roliga verktyg"){$("#catalog").innerHTML=funPage();if(funTool==="wheel")window.FPWheel.mount($("#fpWheel"))}}
 
-const rastActivityNames=new Set(activities.filter(a=>a[1]==="Rast").map(a=>a[2]));
+const rastActivityCovers=new Map(activities.filter(a=>a[1]==="Rast").map(a=>[a[2],a[7]]));
 function createPreview(name){
-if(rastActivityNames.has(name)){
+if(rastActivityCovers.has(name)){
 const slug=name.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
-const src="./assets/rast/"+slug+".svg?v=rast-style-20261106";
+const src="./assets/rast/"+(rastActivityCovers.get(name)||slug+".svg?v=rast-style-20261106");
 return '<img class="recess-activity-photo" src="'+src+'" alt="Bild som visar aktiviteten: '+name+'" loading="lazy" decoding="async">';
 }
 const images={
