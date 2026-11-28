@@ -7,8 +7,8 @@
   const key='fpAdventProgress', maxClockAge=10*60*1000;
   let openingId=0,previewOpened=[];
   let openingMotion=true;
-  const isPreview=()=>window.FPChristmasPreview===true;
-  const availableDoors=timestamp=>isPreview()?24:timestamp===null?0:rules.available(timestamp);
+  const isPreview=timestamp=>timestamp!==null&&rules.available(timestamp)>0&&window.FPChristmasPreview===true;
+  const availableDoors=timestamp=>timestamp===null?0:isPreview(timestamp)?24:rules.available(timestamp);
   let clock=null, syncing=null, opened=[],year=null,lastDate='',returnFocus=null,revealTimer=null,storageWarning=false;
   const isChristmas=()=>document.body.classList.contains('christmas')&&!document.body.classList.contains('halloween');
   const section=document.createElement('section');
@@ -45,14 +45,13 @@
   async function syncClock(){
     if(syncing)return syncing;
     syncing=(async()=>{
-      const started=performance.now();
       try{
         // Same-origin HTTPS response: readable Date header, no third-party tracking.
         // Cache busting plus no-store avoids reusing an old CDN/browser response.
         const response=await fetch(`./index.html?advent-clock=${crypto.randomUUID()}`,{method:'HEAD',cache:'no-store',credentials:'omit',signal:AbortSignal.timeout(8000)});
         const time=Date.parse(response.headers.get('Date'));
         if(!response.ok||!Number.isFinite(time))throw new Error('No server clock');
-        clock={time:time+(performance.now()-started)/2,at:performance.now()};
+        clock={time,at:performance.now()};
       }catch{ /* Never fall back to the device date to unlock a door. */ }
       finally{syncing=null;render();}
     })();return syncing;
@@ -61,14 +60,17 @@
     section.hidden=!isChristmas();
     if(!isChristmas()){todayShortcut.hidden=true;if(noticeDialog.open)noticeDialog.close();close();return;}
     const timestamp=now(),verified=timestamp!==null;
-    section.querySelector('.advent-retry:not(.advent-preview):not(.advent-motion-toggle)').hidden=verified||isPreview();
-    section.querySelector('.advent-preview').textContent=isPreview()?'Avsluta förhandsvisning':'Lås upp alla luckor med kod';
-    section.querySelector('[data-clock]').textContent=isPreview()?'Förhandsvisning · alla 24 luckor är upplåsta':verified?'Datum kontrollerat · svensk tid':'Vi behöver kontrollera dagens datum innan luckorna kan öppnas. Anslut till internet och försök igen.';
+    const inDecember=verified&&rules.available(timestamp)>0, preview=isPreview(timestamp);
+    section.querySelector('.advent-preview').hidden=!inDecember;
+    section.querySelector('.advent-retry:not(.advent-preview):not(.advent-motion-toggle)').hidden=verified;
+    section.querySelector('.advent-preview').textContent=preview?'Avsluta förhandsvisning':'Lås upp alla luckor med kod';
+    section.querySelector('[data-clock]').textContent=preview?'Förhandsvisning · alla 24 luckor är upplåsta':verified?'Datum kontrollerat · svensk tid':'Vi behöver kontrollera dagens datum innan luckorna kan öppnas. Anslut till internet och försök igen.';
     if(verified)progress(timestamp);
-    const available=availableDoors(timestamp),activeOpened=isPreview()?previewOpened:opened,p=verified?rules.dateParts(timestamp):null;
+    const available=availableDoors(timestamp),activeOpened=preview?previewOpened:opened,p=verified?rules.dateParts(timestamp):null;
     todayShortcut.hidden=false;
     const bannerDay=p?.month===12?Math.min(24,Math.max(1,p.day)):1;
     const bannerAvailable=available>=bannerDay;
+    todayShortcut.disabled=!bannerAvailable;
     todayShortcut.dataset.day=String(bannerDay);
     todayShortcut.setAttribute('aria-label',`Julkalendern, lucka ${bannerDay} december, ${bannerAvailable?'öppna':'låst'}`);
     todayShortcut.setAttribute('aria-disabled',String(!bannerAvailable));
@@ -79,6 +81,7 @@
       const day=Number(button.dataset.day),unlocked=day<=available,today=p?.month===12&&day===p.day,seen=activeOpened.includes(day)&&unlocked;
       button.classList.toggle('is-opened',seen);button.classList.toggle('is-today',today);button.classList.toggle('is-locked',!unlocked);
       button.classList.toggle('is-past-opened',seen&&p?.month===12&&day<p.day);
+      button.disabled=!inDecember;
       button.setAttribute('aria-disabled',String(!unlocked));
       button.setAttribute('aria-label',`${day} december, ${seen?'öppnad':unlocked?'öppna luckan':'låst'}${today?', dagens lucka':''}`);
       button.querySelector('.advent-door-status').textContent=seen?'Öppnad ✓':today?'Idag':unlocked?'Öppna':'Låst';
@@ -95,10 +98,10 @@
     if(!isChristmas()||dialog.open)return;
     const day=typeof button==='number'?button:Number(button.dataset.day);
     if(!Number.isInteger(day)||day<1||day>days.length)return;
-    if(!isPreview()&&now()===null){todayShortcut.querySelector('.advent-banner-status').textContent='Kontrollerar datum…';await syncClock();}
+    if(now()===null){todayShortcut.querySelector('.advent-banner-status').textContent='Kontrollerar datum…';await syncClock();}
     if(!isChristmas())return;
     const timestamp=now();
-    if(!isPreview()&&timestamp===null){notice.textContent='Vi kunde inte kontrollera datumet. Försök igen när du är ansluten till internet.';showNotice(notice.textContent);return;}
+    if(timestamp===null){notice.textContent='Vi kunde inte kontrollera datumet. Försök igen när du är ansluten till internet.';showNotice(notice.textContent);return;}
     if(timestamp!==null)progress(timestamp);
     if(day>availableDoors(timestamp)){notice.textContent=`Ho ho ho! Den här luckan öppnas först den ${day} december! 🎅`;showNotice(notice.textContent);return;}
     const requestId=++openingId;
@@ -124,7 +127,7 @@
       if(!dialog.open||!isChristmas()||day>availableDoors(now())){close();return;}
       dialog.classList.add('is-revealed');
       dialog.querySelector('.advent-show-answer').disabled=false;
-      if(isPreview()){if(!previewOpened.includes(day))previewOpened.push(day);}
+      if(isPreview(now())){if(!previewOpened.includes(day))previewOpened.push(day);}
       else if(!opened.includes(day)){opened.push(day);save();}render();
       if(storageWarning)notice.textContent='Webbläsaren kunde inte spara luckorna. De finns kvar så länge sidan är öppen.';
     },openingMotion?3600:50);
@@ -147,9 +150,11 @@
   });
   updateMotion();
   grid.addEventListener('click',e=>{const button=e.target.closest('.advent-door');if(button)openDoor(button);});
-  section.querySelector('.advent-retry:not(.advent-preview)').addEventListener('click',syncClock);
+  section.querySelector('.advent-retry:not(.advent-preview):not(.advent-motion-toggle)').addEventListener('click',syncClock);
   section.querySelector('.advent-preview').addEventListener('click',()=>{
-    if(isPreview()){window.FPChristmasPreview=false;try{sessionStorage.removeItem('fpChristmasPreview');}catch{}close();render();if(now()===null)syncClock();}
+    const timestamp=now();
+    if(timestamp===null||rules.available(timestamp)===0)return;
+    if(isPreview(timestamp)){window.FPChristmasPreview=false;try{sessionStorage.removeItem('fpChristmasPreview');}catch{}close();render();if(now()===null)syncClock();}
     else window.dispatchEvent(new Event('fp:advent-preview-request'));
   });
   window.addEventListener('fp:christmas-preview',()=>{previewOpened=[];close();render();});
